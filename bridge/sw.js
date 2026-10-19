@@ -1,7 +1,10 @@
 // Allow Microsoft 365 Copilot to be shown inside the Jaliyat system tab only (frame headers removed for that tab's sub-frames).
-const HOSTS = ["cloud.microsoft", "microsoft.com", "microsoftonline.com", "office.com", "office.net", "sharepoint.com", "live.com"];
-async function allowTab(tabId) {
+// v2.0: extra Microsoft hosts can be supplied by the system (only Microsoft domains are accepted).
+const HOSTS = ["cloud.microsoft", "microsoft.com", "microsoftonline.com", "office.com", "office.net", "sharepoint.com", "live.com", "microsoft365.com", "office365.com", "msauth.net", "msftauth.net", "bing.com"];
+const OK = /^([a-z0-9-]+\.)*(cloud\.microsoft|microsoft\.com|microsoftonline\.com|office\.com|office\.net|sharepoint\.com|live\.com|microsoft365\.com|office365\.com|msauth\.net|msftauth\.net|bing\.com|msecnd\.net|azureedge\.net)$/;
+async function allowTab(tabId, extra) {
   const id = 1000 + (tabId % 2000000);
+  const domains = [...new Set([...HOSTS, ...(extra || []).map(h => String(h).toLowerCase().trim()).filter(h => OK.test(h))])];
   await chrome.declarativeNetRequest.updateSessionRules({
     removeRuleIds: [id],
     addRules: [{
@@ -11,11 +14,11 @@ async function allowTab(tabId) {
         { header: "content-security-policy", operation: "remove" },
         { header: "content-security-policy-report-only", operation: "remove" }
       ] },
-      condition: { tabIds: [tabId], resourceTypes: ["sub_frame"], requestDomains: HOSTS }
+      condition: { tabIds: [tabId], resourceTypes: ["sub_frame"], requestDomains: domains }
     }]
   });
 }
 chrome.runtime.onMessage.addListener((msg, sender, reply) => {
-  if (msg?.type === "jaliyat-register" && sender.tab?.id >= 0) { allowTab(sender.tab.id).then(() => reply({ ok: true }), e => reply({ ok: false, e: String(e) })); return true; }
+  if (msg?.type === "jaliyat-register" && sender.tab?.id >= 0) { allowTab(sender.tab.id, msg.hosts).then(() => reply({ ok: true }), e => reply({ ok: false, e: String(e) })); return true; }
 });
 chrome.tabs.onRemoved.addListener(tabId => chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1000 + (tabId % 2000000)] }).catch(() => {}));
