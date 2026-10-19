@@ -693,7 +693,7 @@ body.cp-full #cp-fab{display:none}
 .ai-fix{display:flex;flex-wrap:wrap;gap:6px}.ai-fix .btn{background:var(--oks);color:var(--ok);border-color:transparent;font-size:13px}
 .q-h{margin:16px 0 4px;font-size:16px}.q-meta{display:grid;gap:2px}.q-meta .s{color:var(--muted);font-size:12.5px}
 .q-body{background:var(--surface-2);border-radius:12px;padding:14px;font-size:15px;line-height:1.8}.q-ans{display:grid;gap:4px;background:var(--oks);border-radius:12px;padding:12px}
-.brand svg{color:#fff;width:38px;height:38px}.brand b{font-size:21px;letter-spacing:.3px}.login-card .mark{width:76px;height:76px}.login-card h1{font-size:34px}.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}</style>
+.brand svg{color:#fff;width:38px;height:38px}.brand b{font-size:21px;letter-spacing:.3px}.login-card .mark{width:76px;height:76px}.login-card h1{font-size:34px}.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}.nav .sep{font-weight:700;padding:16px 12px 4px}.nav .ext-i{width:14px!important;height:14px!important;opacity:.55;margin-inline-start:auto}.nav button{min-height:40px}</style>
 
 </head>
 <body>
@@ -724,6 +724,7 @@ body.cp-full #cp-fab{display:none}
   <symbol id="i-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></g></symbol>
   <symbol id="i-wa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.8z"/><path d="M9 8.5c0 3.5 2.5 6.5 6.5 6.5l1-1.6-2-1-1 .8c-1-.4-2.3-1.7-2.7-2.7l.8-1-1-2z"/></g></symbol>
   <symbol id="i-hall" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M9 20v-5h6v5M9 11h6"/></g></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
@@ -750,18 +751,21 @@ body.cp-full #cp-fab{display:none}
     <nav class="nav" id="nav">
       <button data-nav="home"><svg><use href="#i-home"/></svg><span>الرئيسية</span></button>
       <button data-nav="copilot" class="cp-nav"><svg><use href="#i-spark"/></svg><span>Copilot</span><span class="kbd">ذكاء</span></button>
-      <button data-nav="khatibs"><svg><use href="#i-mic"/></svg><span>خطباء الجاليات</span></button>
-      <button data-nav="rewards"><svg><use href="#i-badge"/></svg><span>مكافآت الخطباء</span></button>
+      <div class="sep">العمل اليومي</div>
       <button data-nav="tasks"><svg><use href="#i-list"/></svg><span>المهام والإنجاز</span></button>
       <button data-nav="questions"><svg><use href="#i-chat"/></svg><span>الأسئلة</span></button>
       <button data-nav="inbox"><svg><use href="#i-inbox"/></svg><span>الطلبات الواردة</span></button>
-      <button type="button" data-ext="https://watheqa.awqaf.gov.kw/Account/Login?ReturnUrl=%2F" title="يفتح نظام وثيقة في نافذة جديدة"><svg><use href="#i-doc"/></svg><span>وثيقة ↗</span></button>
+      <button type="button" data-ext="https://watheqa.awqaf.gov.kw/Account/Login?ReturnUrl=%2F" title="يفتح نظام وثيقة في نافذة جديدة"><svg><use href="#i-doc"/></svg><span>وثيقة</span><svg class="ext-i"><use href="#i-ext"/></svg></button>
+      <div class="sep">الأنشطة والجدولة</div>
       <button data-nav="acts"><svg><use href="#i-list"/></svg><span>الأنشطة</span></button>
-      <button data-nav="comms"><svg><use href="#i-people"/></svg><span>الجاليات</span></button>
       <button data-nav="cal"><svg><use href="#i-cal"/></svg><span>التقويم</span></button>
       <button data-nav="weekly"><svg><use href="#i-cal"/></svg><span>الجدول الأسبوعي</span></button>
       <button data-nav="halls"><svg><use href="#i-hall"/></svg><span>حجز القاعات</span></button>
+      <button data-nav="comms"><svg><use href="#i-people"/></svg><span>الجاليات</span></button>
       <button data-nav="stats"><svg><use href="#i-chart"/></svg><span>الإحصائيات</span></button>
+      <div class="sep">خطب الجمعة</div>
+      <button data-nav="khatibs"><svg><use href="#i-mic"/></svg><span>خطباء الجاليات</span></button>
+      <button data-nav="rewards"><svg><use href="#i-badge"/></svg><span>مكافآت الخطباء</span></button>
       <div class="sep">السجلات</div>
       <button data-nav="mosques"><svg><use href="#i-dome"/></svg><span>المساجد</span></button>
       <button data-nav="docs"><svg><use href="#i-doc"/></svg><span>الوثائق</span></button>
@@ -4184,7 +4188,7 @@ function taskForm(id, preset){
     ${fld("tk-title", "المهمة", `<input class="f" id="tk-title" value="${esc(t?.title || preset?.title || "")}" placeholder="مثال: مراجعة موافقات الجالية الفلبينية"${ro}>`)}
     ${fld("tk-det", "التفاصيل", `<textarea class="f" id="tk-det" rows="3"${ro}>${esc(t?.details || preset?.details || "")}</textarea>`)}
     <div class="g3">${fld("tk-who", "المكلّف", `<select class="f" id="tk-who"${ro}>${people.map(p => `<option value="${p.id}"${(t?.assignee || preset?.assignee) === p.id ? " selected" : ""}>${esc(p.name || p.username)}</option>`).join("")}</select>`)}${fld("tk-due", "الموعد النهائي", `<input class="f" type="date" id="tk-due" value="${esc(t?.due || preset?.due || "")}"${ro}>`)}${fld("tk-prio", "الأولوية", sel("tk-prio", PRIO, t?.prio || "متوسطة").replace('<option value="">—</option>', ""))}</div>
-    ${t?.link ? `<button type="button" class="btn" data-tklink="${esc(t.link)}">↗ فتح ${esc(linkName(t.link))}</button>` : preset?.link ? `<span class="hint">مرتبطة بـ ${esc(linkName(preset.link))}</span>` : ""}
+    ${t?.link ? `<button type="button" class="btn" data-tklink="${esc(t.link)}">فتح ${esc(linkName(t.link))}</button>` : preset?.link ? `<span class="hint">مرتبطة بـ ${esc(linkName(preset.link))}</span>` : ""}
     ${t ? `<div class="rq-sec"><b>متابعة التنفيذ</b>${tkTrack(t, false)}
       ${mgr ? fld("tk-st", "الحالة", `<select class="f" id="tk-st">${TK_ST.map(s => `<option${s === t.status ? " selected" : ""}>${s}</option>`).join("")}</select>`) : `<input type="hidden" id="tk-st" value="${esc(t.status)}">`}
       ${fld("tk-note", "ملاحظة الإنجاز", `<textarea class="f" id="tk-note" rows="2" placeholder="ماذا تم؟"${mine || mgr ? "" : " disabled"}>${esc(t.done_note || "")}</textarea>`)}
@@ -4523,7 +4527,7 @@ document.addEventListener("click", ev => {
   if (t.dataset.prioOpen) return openLink("#" + t.dataset.prioOpen);
 });
 const _letterOpen15 = letterOpen;
-letterOpen = function(src){ _letterOpen15(src); $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-primary" type="button" data-ext="${WATHEQA}">↗ فتح نظام وثيقة</button>`); };
+letterOpen = function(src){ _letterOpen15(src); $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-primary" type="button" data-ext="${WATHEQA}">فتح نظام وثيقة</button>`); };
 const _palAll15 = palAll;
 palAll = function(){ const A = _palAll15(); A.unshift({ g:"إجراءات", t:"فتح نظام وثيقة", s:"watheqa.awqaf.gov.kw", ic:"i-doc", run:() => window.open(WATHEQA, "_blank", "noopener"), txt:"وثيقه watheqa كتب" }); return A; };
 /* attendance was removed — stop loading it */
@@ -4561,7 +4565,7 @@ function qForm(id, preset){
   const toMe = q.to_id === S.me.id;
   openDrawer(`السؤال س-${q.no}`, `<div class="q-meta"><span>من <b>${esc(pname(q.from_id))}</b> إلى <b>${esc(pname(q.to_id))}</b></span><span class="s">${fmtTime(q.created_at)}${q.seen_at ? ` · قُرئ ${fmtTime(q.seen_at)}` : " · لم يُقرأ بعد"}</span></div>
     <div class="q-body">${esc(q.body).replace(/\n/g, "<br>")}</div>
-    ${q.link ? `<button type="button" class="btn" data-tklink="${esc(q.link)}">↗ فتح ${esc(linkName(q.link))}</button>` : ""}
+    ${q.link ? `<button type="button" class="btn" data-tklink="${esc(q.link)}">فتح ${esc(linkName(q.link))}</button>` : ""}
     ${toMe || S.admin ? fld("q-ans", q.answer ? `الإجابة${q.answered_at ? " — " + fmtTime(q.answered_at) : ""}` : "إجابتك", `<textarea class="f" id="q-ans" rows="5" placeholder="اكتب الإجابة…">${esc(q.answer || "")}</textarea>`) : q.answer ? `<div class="q-ans"><b>💬 الإجابة</b><span class="s">${fmtTime(q.answered_at)}</span><div>${esc(q.answer).replace(/\n/g, "<br>")}</div></div>` : `<div class="empty s">لم تصل إجابة بعد</div>`}`,
     `${toMe || S.admin ? `<button class="btn btn-primary" data-qans>${q.answer ? "تعديل الإجابة" : "إرسال الإجابة"}</button>` : ""}${q.from_id === S.me.id && !q.answer ? `<button class="btn btn-ghost" data-qnew="${q.to_id}">سؤال آخر لنفس الشخص</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
   if (toMe && !q.seen_at) { q.seen_at = new Date().toISOString(); sb.from("questions").update({ seen_at:q.seen_at }).eq("id", q.id).then(() => {}); }
