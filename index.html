@@ -1530,6 +1530,7 @@ async function start(session){
     derive(); live(); await loadProfiles(); joinPresence(); loadAudit();
     go(S.view);
     if (typeof boot9 === "function") boot9();
+    odAuto(); setInterval(odAuto, 36e5);
   } catch (e) { console.error(e); $("#view").innerHTML = `<div class="empty">تعذّر تحميل البيانات. تأكد من الاتصال بالإنترنت ثم أعد فتح النظام.</div>`; }
 }
 function showLogin(msg){
@@ -2583,7 +2584,7 @@ const _boot9c = boot9; boot9 = function(){ _boot9c(); const f = $("#cp-fab"); if
 const MS = {
   clientId:"217623bd-10f8-4c6d-8bcf-98d9c01f6842", tenant:"9cf4a75d-773e-479d-8dce-6ba02350810d",
   base:["User.Read", "Files.Read"],
-  scopes:["Sites.Read.All", "Mail.Read", "People.Read.All", "OnlineMeetingTranscript.Read.All", "Chat.Read", "ChannelMessage.Read.All", "ExternalItem.Read.All", "Files.Read"],
+  scopes:["Sites.Read.All", "Mail.Read", "People.Read.All", "OnlineMeetingTranscript.Read.All", "Chat.Read", "ChannelMessage.Read.All", "ExternalItem.Read.All", "Files.Read", "Files.ReadWrite"],
   app:null, account:null, conv:null, chat:[], busy:false, files:[], web:false, err:"", consentUrl:"",
 };
 const msReady = () => !/^__/.test(MS.clientId);
@@ -3632,16 +3633,82 @@ async function bkLoad(){ const { data, error } = await sb.from("backups").select
 function vBackups(){
   if (!S.admin) return `<div class="empty">هذه الصفحة لمدير النظام</div>`;
   if (!S.bk) { bkLoad(); return `<div class="empty">جارٍ التحميل…</div>`; }
-  return `<div class="toolbar"><span class="count">نسخة احتياطية تلقائية كل ليلة الساعة 3:00 ص، وتُحفظ آخر 45 يوماً</span><button class="btn btn-primary" type="button" data-bknow>نسخة احتياطية الآن</button></div>
+  return odCard() + `<div class="toolbar"><span class="count">نسخة احتياطية تلقائية كل ليلة الساعة 3:00 ص، وتُحفظ آخر 45 يوماً</span><button class="btn btn-primary" type="button" data-bknow>نسخة احتياطية الآن</button></div>
   <div class="panel"><div class="list">${S.bk.map(b => `<div class="li"><span><span class="t num">${new Date(b.at).toLocaleString("ar-KW", { dateStyle:"full", timeStyle:"short", hour12:true })}</span></span><button type="button" class="btn" data-bkxl="${b.id}">${icon("i-down")} تنزيل إكسل</button></div>`).join("") || `<div class="empty">لا توجد نسخ بعد</div>`}</div></div>`;
 }
-async function bkXlsx(id){
-  const { data, error } = await sb.from("backups").select("*").eq("id", id).single(); if (error) return writeFail(error);
-  const D = data.data, wb = XLSX.utils.book_new(); wb.Workbook = { Views:[{ RTL:true }] };
+function bkBook(D){
+  const wb = XLSX.utils.book_new(); wb.Workbook = { Views:[{ RTL:true }] };
   const flat = L => (L || []).map(r => { const o = { id:r.id }; const src = r.data && typeof r.data === "object" && !Array.isArray(r.data) ? r.data : r; for (const [k, v] of Object.entries(src)) o[k] = typeof v === "object" ? JSON.stringify(v) : v; return o; });
   for (const k of ["acts", "khatibs", "notes", "sermons", "requests", "attendance"]) if ((D[k] || []).length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(flat(D[k])), k);
   for (const r of D.refs || []) if (r.data?.list?.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(r.data.list.map(x => typeof x === "object" ? x : { v:x })), String(r.id).slice(0, 30));
-  XLSX.writeFile(wb, `نسخة-احتياطية-${data.at.slice(0, 10)}.xlsx`);
+  return wb;
+}
+async function bkXlsx(id){
+  const { data, error } = await sb.from("backups").select("*").eq("id", id).single(); if (error) return writeFail(error);
+  XLSX.writeFile(bkBook(data.data), `نسخة-احتياطية-${data.at.slice(0, 10)}.xlsx`);
+}
+
+/* =============== 10b) OneDrive: نسخة النظام كاملة تلقائياً (يوماً / يومين / أسبوع) =============== */
+// يرفع إلى OneDrive (حساب الوزارة للمدير الذي ربطه) مجلد «إنجاز»: آخر نسخة إكسل + JSON كامل + ملفات النظام نفسه.
+// يعمل تلقائياً عند فتح النظام وكل ساعة ما دام مفتوحاً إذا حان الموعد. الإعداد مشترك في جدول settings (المفتاح onedrive).
+const OD = { scope:["Files.ReadWrite"], dir:"إنجاز", busy:false, cfg:null, err:"" };
+const OD_FREQ = { off:{ t:"متوقف", d:0 }, d1:{ t:"كل يوم", d:1 }, d2:{ t:"كل يومين", d:2 }, w1:{ t:"كل أسبوع", d:7 } };
+async function odCfgLoad(){ const { data } = await sb.from("settings").select("*").eq("key", "onedrive").maybeSingle(); OD.cfg = data?.value || { freq:"off", last:null, by:"", files:0 }; return OD.cfg; }
+async function odCfgSave(v){ OD.cfg = { ...(OD.cfg || {}), ...v }; const { error } = await sb.from("settings").upsert({ key:"onedrive", value:OD.cfg }); if (error) throw error; }
+async function odPut(path, body, type){
+  const tk = await msToken(false, OD.scope);
+  const url = "https://graph.microsoft.com/v1.0/me/drive/root:/" + path.split("/").map(encodeURIComponent).join("/");
+  const size = body.byteLength ?? body.size ?? new Blob([body]).size;
+  if (size < 3.5e6) {
+    const r = await fetch(url + ":/content", { method:"PUT", headers:{ Authorization:"Bearer " + tk, "Content-Type":type }, body });
+    if (!r.ok) { const e = new Error((await r.text()).slice(0, 200)); e.status = r.status; throw e; } return;
+  }
+  const s = await fetch(url + ":/createUploadSession", { method:"POST", headers:{ Authorization:"Bearer " + tk, "Content-Type":"application/json" }, body:JSON.stringify({ item:{ "@microsoft.graph.conflictBehavior":"replace" } }) });
+  if (!s.ok) throw new Error((await s.text()).slice(0, 200));
+  const { uploadUrl } = await s.json(); const blob = new Blob([body]); const CH = 5 * 327680;
+  for (let i = 0; i < size; i += CH) { const part = blob.slice(i, Math.min(i + CH, size)); const r = await fetch(uploadUrl, { method:"PUT", headers:{ "Content-Range":`bytes ${i}-${i + part.size - 1}/${size}` }, body:part }); if (!r.ok && r.status !== 202) throw new Error("upload " + r.status); }
+}
+async function odRun(manual){
+  if (OD.busy) return; OD.busy = true; OD.err = ""; if (S.view === "backups") render();
+  try {
+    if (manual) await msToken(true, OD.scope);
+    if (!window.XLSX) throw new Error("مكتبة إكسل لم تُحمّل");
+    await sb.rpc("backup_now").then(() => {}, () => {});
+    const { data, error } = await sb.from("backups").select("*").order("at", { ascending:false }).limit(1).single(); if (error) throw error;
+    const day = TODAY, dir = OD.dir;
+    const xl = XLSX.write(bkBook(data.data), { type:"array", bookType:"xlsx" }), XT = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    const js = new TextEncoder().encode(JSON.stringify({ at:data.at, system:"إنجاز", data:data.data }));
+    await odPut(`${dir}/النسخ/إنجاز-${day}.xlsx`, xl, XT);
+    await odPut(`${dir}/النسخ/إنجاز-${day}.json`, js, "application/json");
+    await odPut(`${dir}/آخر نسخة.xlsx`, xl, XT);
+    let n = 3;
+    for (const f of ["index.html", "auth.html", "manifest.webmanifest", "sw.js", "icon-v2-512.png", "jaliyat-copilot.zip"]) {
+      try { const r = await fetch(f, { cache:"no-store" }); if (!r.ok) continue; await odPut(`${dir}/النظام/${f}`, await r.arrayBuffer(), r.headers.get("content-type") || "application/octet-stream"); n++; } catch (_) {}
+    }
+    await odPut(`${dir}/اقرأني.txt`, new TextEncoder().encode(`نظام «إنجاز» — نسخة تلقائية من ${location.href.split("#")[0]}\nآخر تحديث: ${new Date().toLocaleString("ar-KW", { hour12:true })}\nالنسخ: مجلد «النسخ» (إكسل وJSON لكل يوم)، وملفات النظام في «النظام».\n`), "text/plain; charset=utf-8");
+    await odCfgSave({ last:new Date().toISOString(), by:S.me?.name || S.me?.username || "", files:n + 1, acct:MS.account?.username || "" });
+    if (manual) toast("حُدّثت نسخة إنجاز في OneDrive");
+  } catch (e) { OD.err = msErr(e)?.t || String(e?.message || e); if (manual) toast(OD.err); console.warn("onedrive", e); }
+  finally { OD.busy = false; if (S.view === "backups") render(); }
+}
+async function odAuto(){
+  if (!S.admin || !msReady()) return;
+  try { const c = await odCfgLoad(); const f = OD_FREQ[c.freq]; if (!f || !f.d) return;
+    if (c.last && Date.now() - new Date(c.last).getTime() < f.d * 864e5 - 36e5) return;
+    await msInit(); if (!MS.account) return;
+    await odRun(false);
+  } catch (e) { console.warn("onedrive auto", e); }
+}
+function odCard(){
+  const c = OD.cfg; if (!c) { odCfgLoad().then(() => S.view === "backups" && render()); return `<div class="panel"><div class="empty">جارٍ تحميل إعداد OneDrive…</div></div>`; }
+  const last = c.last ? new Date(c.last).toLocaleString("ar-KW", { dateStyle:"full", timeStyle:"short", hour12:true }) : "لم تُرفع بعد";
+  const f = OD_FREQ[c.freq] || OD_FREQ.off, next = c.last && f.d ? new Date(new Date(c.last).getTime() + f.d * 864e5).toLocaleDateString("ar-KW", { dateStyle:"full" }) : "—";
+  return `<div class="panel" style="margin-bottom:14px"><h3 style="margin:0 0 6px">${icon("i-doc")} نسخة النظام في OneDrive</h3>
+  <p class="s" style="margin:0 0 10px">يرفع النظام كاملاً إلى مجلد «${OD.dir}» في OneDrive: آخر نسخة إكسل، ونسخة JSON كاملة لكل يوم، وملفات النظام نفسه. يتحدّث تلقائياً حسب المدة عند فتح النظام من هذا المتصفح.</p>
+  <div class="toolbar" style="flex-wrap:wrap;gap:8px">${Object.entries(OD_FREQ).map(([k, v]) => `<button type="button" class="btn ${c.freq === k ? "btn-primary" : ""}" data-odfreq="${k}">${v.t}</button>`).join("")}
+  <button type="button" class="btn" data-odnow ${OD.busy ? "disabled" : ""}>${OD.busy ? "جارٍ الرفع…" : "رفع الآن"}</button></div>
+  <div class="list" style="margin-top:8px"><div class="li"><span class="t">آخر رفع</span><span class="num">${esc(last)}${c.by ? " · " + esc(c.by) : ""}</span></div><div class="li"><span class="t">الرفع القادم</span><span class="num">${esc(next)}</span></div>${c.acct ? `<div class="li"><span class="t">الحساب</span><span class="num">${esc(c.acct)}</span></div>` : ""}</div>
+  ${OD.err ? `<div class="empty" style="color:var(--danger,#b42318)">${esc(OD.err)}</div>` : ""}</div>`;
 }
 
 /* =============== wiring =============== */
@@ -3718,6 +3785,8 @@ document.addEventListener("click", async ev => {
   if (D.reportcp !== undefined) return askAbout(`اكتب «التقرير الشهري لأنشطة الجاليات» لشهر ${TODAY.slice(5, 7)}/${TODAY.slice(0, 4)} بصياغة رسمية لرفعها لمدير الإدارة: مقدمة، أبرز الإنجازات بالأرقام من ملف النظام (الأنشطة الجارية والجديدة حسب الجالية والمحافظة، الموافقات، الطلبات الواردة، خطب الجمعة)، التحديات (التعارضات والموافقات المنتهية والنواقص)، والتوصيات. استخدم جداول.`);
   if (D.bknow !== undefined) { const { error } = await sb.rpc("backup_now"); if (error) return writeFail(error); toast("أُخذت نسخة احتياطية"); return bkLoad(); }
   if (D.bkxl) return bkXlsx(+D.bkxl);
+  if (D.odnow !== undefined) return odRun(true);
+  if (D.odfreq) { try { await odCfgSave({ freq:D.odfreq }); toast("المدة: " + OD_FREQ[D.odfreq].t); if (D.odfreq !== "off" && !OD.cfg.last) return odRun(true); render(); } catch (e) { writeFail(e); } return; }
   if (t.id === "br-mic") return voiceStart();
 });
 document.addEventListener("change", ev => {
