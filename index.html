@@ -491,6 +491,23 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
 .ph{color:var(--primary);text-decoration:none;font-size:14px;font-weight:600}
 @media (max-width:700px){.tbig{gap:8px}.tb{padding:12px 6px}.tb b{font-size:26px}.stabs button{padding:8px 10px;font-size:13.5px}}
 @media print{.stabs{display:none}.panel{break-inside:avoid}}
+/* ===== v9.4 Copilot ===== */
+.cp-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cp-badge{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;padding:5px 12px;border-radius:999px;background:linear-gradient(90deg,#e3f0ff,#efe6ff);color:#3b3bb3}
+:root[data-theme="dark"] .cp-badge{background:#1d2340;color:#b9c4ff}
+.cp-bar .s{font-size:13px;color:var(--muted);margin-inline-start:auto}
+.cp-opts{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+.cp-opts label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.cp-opts input{width:16px;height:16px;accent-color:var(--primary)}
+.cp-refs{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cp-refs a{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;background:var(--surface-2);border-radius:8px;padding:4px 10px;color:var(--primary);text-decoration:none;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp .ai-hero .btn-lg{margin-top:6px}
+.nav .cp-nav svg{color:#7b83ff;opacity:1}
+.cp-how{background:var(--surface-2);border-radius:10px;padding:10px 14px;font-size:13.5px;color:var(--muted)}
+.cp-how b{color:var(--ink)}
+.cp-tag{color:var(--primary);font-size:11.5px;font-weight:600}
+.cp-hero{background:linear-gradient(135deg,color-mix(in srgb,#7b83ff 8%,var(--surface)),var(--surface) 60%)}
+.cp #cp-q{width:100%;resize:vertical;font-size:16px;line-height:1.7}
 </style>
 
 </head>
@@ -542,6 +559,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
     <div class="brand"><svg><use href="#star"/></svg><div><b>أنشطة الجاليات</b><span>قسم الجاليات ورعاية المهتدين</span></div><button class="collapse" id="collapse" title="طي القائمة الجانبية" aria-label="طي القائمة"><svg><use href="#i-chev"/></svg></button></div>
     <nav class="nav" id="nav">
       <button data-nav="home"><svg><use href="#i-home"/></svg><span>الرئيسية</span></button>
+      <button data-nav="copilot" class="cp-nav"><svg><use href="#i-spark"/></svg><span>Copilot</span><span class="kbd">ذكاء</span></button>
       <button data-nav="khatibs"><svg><use href="#i-mic"/></svg><span>خطباء الجاليات</span></button>
       <button data-nav="acts"><svg><use href="#i-list"/></svg><span>الأنشطة</span></button>
       <button data-nav="comms"><svg><use href="#i-people"/></svg><span>الجاليات</span></button>
@@ -720,7 +738,7 @@ function render(){
   if (v === "users" && !S.admin) { S.view = "home"; return render(); }
   $("#title").innerHTML = esc(v === "comm" && S.comm ? S.comm : TITLES[v]) + (v === "home" ? `<span class="sub">${esc(new Date().toLocaleDateString("ar-EG-u-nu-latn",{weekday:"long"}))} ${fmt(TODAY)} م · ${esc(hijri(new Date()))}</span>` : "");
   if (!ready) { $("#view").innerHTML = `<div class="loading">جارٍ تحميل بيانات القسم…</div>`; return; }
-  const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit, ai:vAI, mine:vMine}[v] || vHome;
+  const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit, ai:vAI, mine:vMine, copilot:vCopilot}[v] || vHome;
   $("#view").innerHTML = fn();
   if (typeof afterRender === "function") afterRender(v);
   const fo = document.getElementById(S.focus); if (fo) { fo.focus(); try { fo.setSelectionRange(fo.value.length, fo.value.length); } catch(e) {} }
@@ -1275,7 +1293,7 @@ document.addEventListener("click", ev => {
 
 /* ---------------- data loading & live updates ---------------- */
 let dirty = false;
-function schedule(){ if (dirty) return; dirty = true; requestAnimationFrame(() => { dirty = false; derive(); if (!$("#app").hidden && S.view !== "ai" && !(S.form && !$("#drawer").hidden && document.activeElement && $("#drawer").contains(document.activeElement))) render(); }); }
+function schedule(){ if (dirty) return; dirty = true; requestAnimationFrame(() => { dirty = false; derive(); if (!$("#app").hidden && S.view !== "ai" && S.view !== "copilot" && !(S.form && !$("#drawer").hidden && document.activeElement && $("#drawer").contains(document.activeElement))) render(); }); }
 function putRow(tbl, row){
   if (tbl === "refs") { S[row.id] = row.data?.list || []; S.got.add(row.id); return; }
   S[tbl].set(row.id, row.data); S.meta.set(tbl + ":" + row.id, { by: row.updated_by, at: row.updated_at });
@@ -2299,6 +2317,78 @@ document.addEventListener("click", ev => {
   if (t.dataset.stab) { S.f.stab = t.dataset.stab; return render(); }
   if (t.dataset.small !== undefined) { S.f.small = t.dataset.small === "1"; return render(); }
 }, true);
+
+/* ================= v9.4: Microsoft 365 Copilot bridge (no admin consent needed) ================= */
+TITLES.copilot = "Copilot";
+const CP = { url:"https://m365.cloud.microsoft/chat/?auth=2", useData:true, max:11000, q:"" };
+const CP_PROMPTS = [
+  ["ابحث في ملفاتي", "كتب الموافقات وجداول الجاليات", "ابحث في ملفاتي على OneDrive وSharePoint وفي بريدي عن آخر كتب وموافقات أنشطة الجاليات، واعرضها مع روابطها وتواريخها.", false],
+  ["ملخص بريدي", "رسائل الجاليات التي تحتاج رداً", "لخّص لي آخر الرسائل في بريدي المتعلقة بالجاليات أو الدروس والمحاضرات الدينية، وحدد ما يحتاج رداً مني.", false],
+  ["قارن بالنظام", "موافقات ملفاتي مقابل الأنشطة المسجلة", "قارن بين كتب الموافقات الموجودة في ملفاتي وبريدي وبين قائمة الأنشطة المسجلة في النظام المرفقة أدناه، وأخبرني بأي نشاط غير مسجل أو موافقة ناقصة أو منتهية.", true],
+  ["تقرير الأسبوع", "جاهز للرفع لرئيس القسم", "اكتب تقريراً أسبوعياً موجزاً عن أنشطة القسم من البيانات المرفقة أدناه، بصيغة رسمية مناسبة للرفع لرئيس القسم، مع الأرقام والتوصيات.", true],
+  ["التعارضات", "حلول عملية للتعارضات", "حلّل التعارضات في البيانات المرفقة أدناه، واقترح لكل تعارض حلاً عملياً (يوم أو وقت أو مسجد بديل).", true],
+  ["كتاب رسمي", "طلب تجديد موافقة", "اكتب مسودة كتاب رسمي باسم إدارة العلاقات الخارجية — قسم الجاليات ورعاية المهتدين وطلبة البعوث، لطلب تجديد موافقة الأنشطة التي تنتهي قريباً في البيانات المرفقة أدناه، مع ترك فراغات للرقم والتاريخ والتوقيع.", true],
+  ["اجتماعاتي", "ما نوقش بخصوص الجاليات", "ما أبرز ما نوقش في اجتماعاتي ومحادثات Teams الأخيرة بخصوص الجاليات والأنشطة الدينية؟", false],
+  ["ملفات Excel", "جداول الأنشطة في ملفاتي", "ابحث في ملفاتي عن جداول Excel الخاصة بأنشطة الجاليات أو خطباء الجمعة، ولخّص محتواها.", false],
+];
+function cpData(q){
+  const cl = x => String(x ?? "").replace(/\s+/g, " ").trim();
+  const nq = nkey(q || "");
+  const hit = e => !nq || [e.comm, e.mosName, e.area, e.gov, e.lect, e.doc, e.type].some(v => { const k = nkey(v || ""); return k.length > 3 && nq.includes(k.replace(/^ال/, "").slice(0, 8)); });
+  let L = S.E.filter(hit); if (L.length < 3) L = S.E;
+  L = [...L].sort((a, b) => (RUN(b) - RUN(a)) || (b.cf.length - a.cf.length) || (a.n - b.n));
+  const head = [`[بيانات من نظام أنشطة الجاليات — قسم الجاليات ورعاية المهتدين وطلبة البعوث — بتاريخ ${fmt(TODAY)}]`,
+    `الإجمالي: ${S.E.length} نشاط (${S.E.filter(RUN).length} جارٍ، ${conflicts().length} فيها تعارض)، ${S.khatibs.size} مسجد خطبة جمعة، ${commNames.length} جالية.`,
+    `حسب الجالية: ${commRows().filter(r => r.L.length).map(r => `${r.c} ${r.L.length}`).join("، ")}.`,
+    `الأنشطة (الرقم | النوع | الجالية | المسجد — المنطقة | الأيام والوقت | المحاضر | من–إلى | الحالة | الوثيقة | تعارض):`];
+  const rows = []; let size = head.join("\n").length;
+  for (const e of L) { const r = [`#${e.n}`, e.type, e.comm, [e.mosName, e.area].filter(Boolean).join(" — "), daysText(e) + " " + (e.time || ""), e.lect, `${fmt(e.start)}–${fmt(e.end)}`, e.st, e.doc, e.cf.map(c => "#" + c.o.n).join("،")].map(cl).join(" | ");
+    if (size + r.length > CP.max) { rows.push(`… و${L.length - rows.length} نشاطاً آخر (الكل في النظام)`); break; } rows.push(r); size += r.length + 1; }
+  return head.concat(rows).join("\n");
+}
+function vCopilot(){
+  return `<div class="cp" style="display:grid;gap:20px">
+  <div class="panel cp-hero"><div class="panel-b" style="display:grid;gap:14px">
+    <div class="cp-bar"><span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot</span><span class="s">باشتراكك بحساب الوزارة — بدون أي صلاحيات إضافية</span></div>
+    <h3 style="font-size:20px">اسأل Copilot عن ملفاتك وبريدك واجتماعاتك، مع بيانات النظام</h3>
+    <textarea class="f" id="cp-q" rows="4" placeholder="اكتب سؤالك أو طلبك… مثال: ابحث في ملفاتي عن موافقة الجالية الباكستانية وقارنها بالأنشطة المسجلة">${esc(CP.q)}</textarea>
+    <div class="cp-opts"><label><input type="checkbox" id="cp-data"${CP.useData ? " checked" : ""}> أرفق بيانات النظام المتعلقة بالسؤال</label><span class="s" id="cp-size"></span></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary btn-lg" id="cp-go" type="button">${icon("i-spark", 18)} اسأل Copilot</button><button class="btn btn-ghost" id="cp-open" type="button">فتح Copilot فقط</button></div>
+    <div class="cp-how"><b>كيف يعمل؟</b> يجهّز النظام سؤالك مع البيانات وينسخه تلقائياً، ثم يفتح Copilot في تبويب جديد — <b>الصق (⌘V أو Ctrl+V) ثم اضغط Enter</b>.</div>
+  </div></div>
+  <div class="panel"><div class="panel-h"><h3>طلبات جاهزة</h3><span class="s">اضغط على أي طلب</span></div><div class="panel-b"><div class="ai-chips">${CP_PROMPTS.map((p, i) => `<button type="button" data-cpp="${i}"><b>${esc(p[0])}</b><span>${esc(p[1])}</span>${p[3] ? `<small class="cp-tag">+ بيانات النظام</small>` : ""}</button>`).join("")}</div></div></div>
+  <div class="panel"><div class="panel-h"><h3>ملف بيانات النظام كاملاً لـ Copilot</h3></div><div class="panel-b" style="display:grid;gap:10px;font-size:14px">
+    <span>لتحليل أعمق: نزّل ملف إكسل بكل بيانات النظام، ثم في Copilot اضغط <b>+</b> وأرفقه، أو احفظه في OneDrive ليجده Copilot في أي وقت.</span>
+    <div><button class="btn btn-ghost" id="cp-xlsx" type="button">${icon("i-down")}تنزيل ملف البيانات</button></div></div></div>
+  </div>`;
+}
+async function cpCopy(text){
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) { const t = document.createElement("textarea"); t.value = text; t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (_) {} t.remove(); return ok; }
+}
+async function cpAsk(q, withData){
+  q = String(q || "").trim(); if (!q) { toast("اكتب سؤالك أولاً"); $("#cp-q")?.focus(); return; }
+  const text = withData ? `${q}\n\n${cpData(q)}` : q;
+  const ok = await cpCopy(text);
+  const w = window.open(CP.url, "jaliyat-copilot");
+  toast(ok ? "نُسخ السؤال — الصقه في Copilot (⌘V / Ctrl+V) ثم Enter" : "افتح Copilot والصق السؤال يدوياً");
+  if (!w) toast("اسمح بفتح النوافذ المنبثقة لهذا الموقع");
+}
+function cpSize(){ const el = $("#cp-size"); if (!el) return; el.textContent = CP.useData ? `(${cpData(CP.q).length.toLocaleString("en")} حرف)` : ""; }
+document.addEventListener("click", ev => {
+  const t = ev.target.closest("button"); if (!t) return;
+  if (t.id === "cp-go") return cpAsk($("#cp-q").value, CP.useData);
+  if (t.id === "cp-open") { window.open(CP.url, "jaliyat-copilot"); return; }
+  if (t.id === "cp-xlsx") return exportXlsx();
+  if (t.dataset.cpp !== undefined) { const p = CP_PROMPTS[+t.dataset.cpp]; return cpAsk(p[2], p[3]); }
+});
+document.addEventListener("input", ev => { if (ev.target.id === "cp-q") { CP.q = ev.target.value; clearTimeout(cpSize.t); cpSize.t = setTimeout(cpSize, 300); } });
+document.addEventListener("change", ev => { if (ev.target.id === "cp-data") { CP.useData = ev.target.checked; cpSize(); } });
+document.addEventListener("keydown", ev => { if (ev.target.id === "cp-q" && ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); cpAsk(ev.target.value, CP.useData); } });
+const _afterRender5 = afterRender;
+afterRender = function(v){ _afterRender5(v); if (v === "copilot") { cpSize(); if (matchMedia("(min-width:901px)").matches) $("#cp-q")?.focus(); } };
+const _palAll5 = palAll;
+palAll = function(){ const A = _palAll5(); A.splice(1, 0, { g:"إجراءات", t:"اسأل Copilot", s:"ملفاتك وبريدك واجتماعاتك + بيانات النظام", ic:"i-spark", run:() => go("copilot"), txt:"copilot كوبايلت مايكروسوفت ذكاء ملفات بريد" }); return A; };
 
 (async function boot(){
   const { data } = await sb.auth.getSession();
