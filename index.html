@@ -4923,7 +4923,7 @@ document.addEventListener("click", async ev => {
   if (D.wqadd) return wqAdd(D.wqadd);
   if (D.wqdoc) { closeDrawer(); return listForm("doc", D.wqdoc); }
   if (D.wqtask) { const w = S.wq.find(x => x.id === D.wqtask); if (w) taskForm(null, { title:`متابعة كتاب وثيقة ${w.no}`, details:`${w.subj}\n${w.sender || ""}`, due:addDays(TODAY, 2), link:`#wq:${w.id}` }); return; }
-  if (D.wqhelp !== undefined) return toast("تتحدّث بيانات وثيقة تلقائياً كلما فتحت موقع وثيقة من جهاز عليه جسر Copilot 2.2");
+  if (D.wqhelp !== undefined) return toast("تُسحب كتب وثيقة (البريد الوارد ونصوص الكتب) إلى «إنجاز» وتظهر هنا مباشرة لكل الموظفين");
   if (D.pnew !== undefined) return permitForm();
   if (D.pfrom) { try { return permitForm(JSON.parse(D.pd)); } catch (_) { return permitForm(); } }
   if (D.pissue !== undefined) return permitIssue();
