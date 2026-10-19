@@ -794,6 +794,11 @@ button.kpi{transition:box-shadow .15s,transform .15s} button.kpi:hover{transform
 .wa-setup{display:grid;gap:12px}.wa-steps{margin:0;padding-inline-start:20px;display:grid;gap:8px;line-height:1.8}
 .wa-cp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}.wa-cp span{font-size:12px;color:var(--muted);min-width:90px}.wa-cp code{background:var(--surface-2);padding:4px 8px;border-radius:6px;font-size:12px;word-break:break-all}
 @media (max-width:820px){.wa-wrap{grid-template-columns:1fr}.wa-side{max-height:34vh;border-inline-end:0;border-bottom:1px solid var(--line)}.wa-b{max-width:90%}}
+#wa-embed{padding:0 max(24px,env(safe-area-inset-left,0px)) 16px}
+#wa-embed iframe{width:100%;height:calc(100dvh - 96px);border:1px solid var(--line);border-radius:var(--r);background:#fff;display:block;box-shadow:var(--shadow)}
+body.wa-on #view{padding-bottom:0;min-height:0}
+.wa-need .panel-b{display:grid;gap:10px;line-height:1.9}
+@media (max-width:900px){#wa-embed{padding:0 8px 8px}#wa-embed iframe{height:calc(100dvh - 80px)}}
 .brand svg{color:#fff;width:38px;height:38px}.brand b{font-size:21px;letter-spacing:.3px}.login-card .mark{width:76px;height:76px}.login-card h1{font-size:34px}.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}.nav .sep{font-weight:700;padding:16px 12px 4px}.nav .ext-i{width:14px!important;height:14px!important;opacity:.55;margin-inline-start:auto}.nav button{min-height:40px}</style>
 
 </head>
@@ -5120,7 +5125,32 @@ function openWaChats(){
   if (waWin && !waWin.closed) { try { waWin.focus(); return; } catch (_) {} }
   waWin = window.open("https://web.whatsapp.com/", "enjaz-whatsapp");
 }
-document.addEventListener("click", ev => { const b = ev.target.closest('#nav [data-nav="whatsapp"], #tabbar [data-nav="whatsapp"]'); if (!b || S.waCfg.on) return; ev.preventDefault(); ev.stopImmediatePropagation(); $("#side")?.classList.remove("open"); openWaChats(); }, true);
+document.addEventListener("click", ev => { const b = ev.target.closest('#nav [data-nav="whatsapp"], #tabbar [data-nav="whatsapp"]'); if (!b || S.waCfg.on || waEmbedOk() || !isTouchDev()) return; ev.preventDefault(); ev.stopImmediatePropagation(); $("#side")?.classList.remove("open"); openWaChats(); }, true);
+
+/* ---------- v19: WhatsApp Web shown INSIDE «إنجاز» (bridge 2.2 removes the frame block for the system only) ---------- */
+const waEmbedOk = () => hasBridge() && parseFloat(document.documentElement.dataset.copilotBridgeV || "0") >= 2.2;
+function waEmbed(show){
+  let box = $("#wa-embed");
+  if (show && !box) { box = document.createElement("div"); box.id = "wa-embed"; box.innerHTML = `<iframe src="https://web.whatsapp.com/" title="واتساب القسم" allow="clipboard-read; clipboard-write; microphone; camera; autoplay; notifications"></iframe>`; $("#view").after(box); }
+  if (box) box.hidden = !show;
+  document.body.classList.toggle("wa-on", !!show);
+}
+const _vWhatsApp20 = vWhatsApp;
+vWhatsApp = function(){
+  if (S.waCfg.on) return _vWhatsApp20();
+  if (waEmbedOk()) return "";
+  if (isTouchDev()) return `<div class="wa-need panel"><div class="panel-b"><b>واتساب على الجوال والآيباد يفتح في تطبيق واتساب</b><span class="s">آبل لا تسمح بعرض واتساب داخل صفحة أخرى على الآيفون والآيباد.</span><div class="br-acts"><button type="button" class="btn btn-primary" data-waopen>فتح واتساب</button></div></div></div>`;
+  return `<div class="wa-need panel"><div class="panel-b"><b>خطوة واحدة لعرض واتساب داخل «إنجاز»</b>
+    <span>حدّث الجسر لنسخة 2.2 (مرة واحدة فقط): <a href="jaliyat-copilot.zip" download>نزّل الجسر</a> ← استخرجه وانسخ الملفات فوق مجلد <b>jaliyat-copilot</b> القديم ← في صفحة الإضافات اضغط «إعادة تحميل» على الجسر ← حدّث «إنجاز».</span>
+    <span class="s">بعدها تضغط «واتساب القسم» فتظهر محادثاتك هنا مباشرة. أول مرة فقط تمسح الكود من جوال القسم (الأجهزة المرتبطة).</span>
+    <div class="br-acts"><button type="button" class="btn btn-ghost" data-waopen>افتح واتساب ويب مؤقتاً</button></div></div></div>`;
+};
+const _afterRender20 = afterRender;
+afterRender = function(){ _afterRender20(); waEmbed(S.view === "whatsapp" && !S.waCfg.on && waEmbedOk()); };
+// preload in the background once the system is ready, so opening it later is instant
+const _boot9w20 = boot9;
+boot9 = function(){ _boot9w20(); setTimeout(() => { if (waEmbedOk() && !isTouchDev() && !$("#wa-embed")) { waEmbed(true); waEmbed(S.view === "whatsapp"); } }, 4000); };
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-waopen]"); if (t) openWaChats(); });
 
 (async function boot(){
   const { data } = await sb.auth.getSession();

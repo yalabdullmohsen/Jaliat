@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "جسر Copilot لنظام الجاليات",
+  "name": "جسر إنجاز (Copilot وواتساب)",
   "short_name": "Jaliyat Copilot",
-  "version": "2.1.1",
-  "description": "يعرض Microsoft 365 Copilot داخل نظام أنشطة الجاليات ويرسل له الأسئلة مباشرة. يتحدّث إعداداته تلقائياً من النظام.",
+  "version": "2.2.0",
+  "description": "يعرض Microsoft 365 Copilot وواتساب ويب داخل نظام «إنجاز». يتحدّث إعداداته تلقائياً من النظام.",
   "permissions": [
     "declarativeNetRequest"
   ],
@@ -22,7 +22,9 @@
     "https://*.msftauth.net/*",
     "https://*.bing.com/*",
     "https://*.msecnd.net/*",
-    "https://*.azureedge.net/*"
+    "https://*.azureedge.net/*",
+    "https://*.whatsapp.com/*",
+    "https://*.whatsapp.net/*"
   ],
   "background": {
     "service_worker": "sw.js"

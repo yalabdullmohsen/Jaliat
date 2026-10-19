@@ -1,6 +1,7 @@
 // Allow Microsoft 365 Copilot to be shown inside the Jaliyat system tab only (frame headers removed for that tab's sub-frames).
 // v2.0: extra Microsoft hosts can be supplied by the system (only Microsoft domains are accepted).
-const HOSTS = ["cloud.microsoft", "microsoft.com", "microsoftonline.com", "office.com", "office.net", "sharepoint.com", "live.com", "microsoft365.com", "office365.com", "msauth.net", "msftauth.net", "bing.com"];
+const HOSTS = ["cloud.microsoft", "microsoft.com", "microsoftonline.com", "office.com", "office.net", "sharepoint.com", "live.com", "microsoft365.com", "office365.com", "msauth.net", "msftauth.net", "bing.com", "whatsapp.com"];
+// v2.2: WhatsApp Web is shown inside «إنجاز» too (only when framed by the system).
 const OK = /^([a-z0-9-]+\.)*(cloud\.microsoft|microsoft\.com|microsoftonline\.com|office\.com|office\.net|sharepoint\.com|live\.com|microsoft365\.com|office365\.com|msauth\.net|msftauth\.net|bing\.com|msecnd\.net|azureedge\.net)$/;
 async function allowTab(tabId, extra) {
   const id = 1000 + (tabId % 2000000);
