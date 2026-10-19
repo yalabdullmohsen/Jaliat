@@ -4935,6 +4935,18 @@ document.addEventListener("click", async ev => {
   if (D.prevoke) { if (D.sure !== "1") { D.sure = "1"; t.textContent = "اضغط مرة أخرى للتأكيد"; return; } const { error } = await sb.from("permits").update({ revoked:true }).eq("id", D.prevoke); if (error) return writeFail(error); const p = S.permits.find(x => x.id === D.prevoke); if (p) p.revoked = true; toast("أُلغي التصريح — يظهر للإمام «ملغى» عند المسح"); return permitView(D.prevoke); }
 });
 
+/* ---------- auto-update: an open or installed app picks up every new release by itself ---------- */
+if ("serviceWorker" in navigator) {
+  const hadCtrl = !!navigator.serviceWorker.controller; let reloading = false;
+  const apply = () => { if (reloading) return; reloading = true; location.reload(); };
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (!hadCtrl) return;
+    if ($("#drawer")?.hidden !== false) return apply();
+    toast("وصل تحديث جديد لإنجاز — سيُطبَّق عند إغلاق النافذة"); const t = setInterval(() => { if ($("#drawer").hidden) { clearInterval(t); apply(); } }, 1500); });
+  const up = () => navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {});
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) up(); });
+  window.addEventListener("focus", up); setInterval(up, 5 * 60 * 1000); setTimeout(up, 3000);
+}
+
 (async function boot(){
   const { data } = await sb.auth.getSession();
   if (data.session) start(data.session); else showLogin();
