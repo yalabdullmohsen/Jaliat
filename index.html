@@ -20,12 +20,12 @@
 <style>
 /* Layout: fixed right sidebar (RTL) + working area of panels; drawer slides from the left for forms. */
 :root{
-  --bg:#F3F5F2; --surface:#FFFFFF; --surface-2:#EEF2EE; --ink:#11241D; --muted:#5E6D66; --line:#DDE4DE;
-  --primary:#0E6B4E; --primary-ink:#FFFFFF; --primary-soft:#E2F0E8; --gold:#A87A12; --gold-soft:#F6EDD5;
-  --side:#0B3A2B; --side-ink:#E8F2EC; --side-muted:#9DBBAE; --side-hi:#145A43;
+  --bg:#F4F8F6; --surface:#FFFFFF; --surface-2:#EEF5F1; --ink:#13281F; --muted:#5C6E66; --line:#DFE8E3;
+  --primary:#168A63; --primary-ink:#FFFFFF; --primary-soft:#E1F3EA; --gold:#A87A12; --gold-soft:#F6EDD5;
+  --side:#1A7356; --side-2:#14614A; --side-ink:#F2FAF6; --side-muted:#BFE0D1; --side-hi:#23876A;
   --t1:#1F6FA6; --t1s:#E1EDF7; --t2:#6B4BB0; --t2s:#ECE6F7; --t3:#B8601F; --t3s:#F8E9DC;
   --ok:#23845A; --oks:#DFF1E7; --warn:#B07A00; --warns:#FBF0D4; --bad:#B8392B; --bads:#F9E1DD;
-  --shadow:0 1px 2px rgba(17,36,29,.06),0 6px 24px rgba(17,36,29,.06); --band:#EAF5EE;
+  --shadow:0 1px 2px rgba(20,70,50,.05),0 8px 24px rgba(20,70,50,.07); --shadow-s:0 1px 2px rgba(20,70,50,.05); --band:#E8F6EF;
   --f-display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
   --f-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
   --r:12px;
@@ -710,6 +710,70 @@ body.cp-full #cp-fab{display:none}
 .as-bar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:5}
 .as-bar .f{flex:1;border:0;background:transparent;font-size:16px}
 @media(max-width:900px){.as-bar{bottom:calc(76px + env(safe-area-inset-bottom))}}
+/* ===== v16 design: lighter, fresher green + consistent surfaces ===== */
+:root:not([data-theme="dark"]){--r:14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--side-2:#08120E}}
+:root[data-theme="dark"]{--side-2:#08120E}
+:root{--ring:0 0 0 3px color-mix(in srgb,var(--primary) 22%,transparent)}
+.side{background:linear-gradient(180deg,var(--side) 0%,var(--side-2,var(--side)) 100%);box-shadow:inset 1px 0 0 rgba(255,255,255,.06)}
+.nav button{border-radius:10px;transition:background .15s,color .15s}
+.nav button:hover{background:rgba(255,255,255,.10)}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.16);box-shadow:inset 3px 0 0 var(--gold)}
+.nav .sep{opacity:.85;font-weight:700;letter-spacing:.02em}
+.panel,.kpi{border-color:var(--line);box-shadow:var(--shadow-s,0 1px 2px rgba(20,60,40,.04))}
+.panel-h{background:linear-gradient(180deg,var(--surface) 0%,color-mix(in srgb,var(--surface-2) 40%,var(--surface)) 100%);border-radius:var(--r) var(--r) 0 0}
+button.kpi{transition:box-shadow .15s,transform .15s} button.kpi:hover{transform:translateY(-1px)}
+.btn{border-radius:11px;transition:background .15s,border-color .15s,box-shadow .15s}
+.btn-primary{box-shadow:0 1px 2px rgba(10,80,55,.18)} .btn-primary:hover{filter:brightness(1.06)}
+.f:focus,.btn:focus-visible{outline:0;box-shadow:var(--ring);border-color:var(--primary)}
+.top{border-bottom-color:color-mix(in srgb,var(--line) 70%,transparent)}
+.top h2{letter-spacing:-.01em}
+.view{gap:18px}
+/* ===== Watheqa ===== */
+.wq-head .panel-b{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.wq-head .panel-b>div:first-child{display:grid;gap:2px}
+.wq-list{display:grid;gap:8px}
+.wq-i{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;text-align:right;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;width:100%;transition:border-color .15s,box-shadow .15s}
+.wq-i:hover{border-color:color-mix(in srgb,var(--primary) 40%,var(--line));box-shadow:var(--shadow)}
+.wq-no{font-weight:700;color:var(--primary);background:var(--primary-soft);padding:4px 10px;border-radius:8px;font-size:13px;white-space:nowrap}
+.wq-t{display:grid;gap:2px;min-width:0}.wq-t b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wq-t .s{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wq-m{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end}
+.q-body{background:var(--surface-2);border-radius:12px;padding:14px 16px;line-height:1.9;max-height:50vh;overflow:auto;white-space:normal}
+.chip.ok{background:var(--oks);color:var(--ok)} .chip.bad{background:var(--bads);color:var(--bad)} .chip.gold{background:var(--gold-soft);color:var(--gold)}
+.bad-t{color:var(--bad)!important}
+@media (max-width:700px){.wq-i{grid-template-columns:minmax(0,1fr);gap:6px}.wq-m{justify-content:flex-start}.wq-no{justify-self:start}}
+/* ===== lesson permit (A4) ===== */
+.permit-wrap{overflow:auto;background:var(--surface-2);border-radius:12px;padding:12px}
+.permit{background:#fff;color:#14291F;width:100%;max-width:720px;margin:auto;padding:28px 30px;border:1px solid #d9e4dd;border-radius:6px;font-size:14px;line-height:1.8;position:relative}
+.permit::before{content:"";position:absolute;inset:8px;border:1.5px solid #1E7D5E;border-radius:4px;pointer-events:none;opacity:.5}
+.pm-h{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #1E7D5E;padding-bottom:12px}
+.pm-org{display:grid;font-size:12.5px}.pm-org b{font-size:15px;color:#145A43}
+.pm-meta{display:grid;font-size:12.5px;text-align:left;direction:rtl}
+.pm-title{text-align:center;font-family:var(--f-display);color:#145A43;font-size:24px;margin:18px 0 2px}
+.pm-sub{text-align:center;color:#5F7068;margin:0 0 14px;font-size:13px}
+.pm-lead{margin:0 0 12px}
+.pm-t{width:100%;border-collapse:collapse;margin:8px 0 14px}
+.pm-t th,.pm-t td{border:1px solid #cfdcd4;padding:7px 10px;text-align:right}
+.pm-t th{background:#EEF7F2;width:28%;font-weight:600;color:#145A43}
+.pm-valid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.pm-valid>div{border:1px dashed #1E7D5E;border-radius:8px;padding:8px 12px;display:grid}
+.pm-valid span{font-size:12px;color:#5F7068}.pm-valid b{color:#145A43}
+.pm-note{font-size:12px;color:#5F7068;background:#F4F8F5;border-radius:8px;padding:8px 12px}
+.pm-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:14px}
+.pm-appr{display:grid;gap:4px;font-size:12.5px}.pm-appr b{font-size:15px}
+.pm-sig{display:flex;gap:18px;margin-top:6px;font-size:12px;color:#5F7068;text-align:center}
+.pm-sig>div{display:grid;gap:4px;justify-items:center}
+.pm-sig i{display:block;width:120px;height:62px;border-bottom:1px solid #9fb5a8}
+.pm-sig i.r{width:78px;height:78px;border:1px dashed #9fb5a8;border-radius:50%}
+.pm-sig img{max-width:100%;max-height:100%;object-fit:contain}
+.pm-qr{display:grid;justify-items:center;gap:2px;font-size:11.5px;color:#5F7068}
+.pm-qr img{width:130px;height:130px;image-rendering:pixelated}
+.pm-qr b{font-family:monospace;color:#14291F;letter-spacing:.08em}
+@media (max-width:560px){.permit{padding:18px 16px;font-size:13px}.pm-h{flex-direction:column}.pm-meta{text-align:right}.pm-bottom{flex-direction:column;align-items:center}.pm-qr img{width:110px;height:110px}}
+#permit-print{display:none}
+@media print{body.print-any #permit-print.on{display:block}#permit-print .permit{border:0;max-width:none;padding:10mm 12mm}@page{size:A4;margin:8mm}}
+.search input.f{padding-inline-start:40px}
 .brand svg{color:#fff;width:38px;height:38px}.brand b{font-size:21px;letter-spacing:.3px}.login-card .mark{width:76px;height:76px}.login-card h1{font-size:34px}.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}.nav .sep{font-weight:700;padding:16px 12px 4px}.nav .ext-i{width:14px!important;height:14px!important;opacity:.55;margin-inline-start:auto}.nav button{min-height:40px}</style>
 
 </head>
@@ -718,6 +782,7 @@ body.cp-full #cp-fab{display:none}
   <symbol id="star" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-opacity=".22" stroke-width="6"/><path d="M32 8a24 24 0 1 1-22.6 16" fill="none" stroke="#d9b54a" stroke-width="6" stroke-linecap="round"/><path d="M22 33l7 7 14-15" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M17 20h4v-3M14 20h.01"/></g></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
   <symbol id="i-people" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.6c2.6-.2 4.6 1.4 5.4 4.4"/></g></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></g></symbol>
@@ -772,7 +837,8 @@ body.cp-full #cp-fab{display:none}
       <button data-nav="tasks"><svg><use href="#i-list"/></svg><span>المهام والإنجاز</span></button>
       <button data-nav="questions"><svg><use href="#i-chat"/></svg><span>الأسئلة</span></button>
       <button data-nav="inbox"><svg><use href="#i-inbox"/></svg><span>الطلبات الواردة</span></button>
-      <button type="button" data-ext="https://watheqa.awqaf.gov.kw/Account/Login?ReturnUrl=%2F" title="يفتح نظام وثيقة في نافذة جديدة"><svg><use href="#i-doc"/></svg><span>وثيقة</span><svg class="ext-i"><use href="#i-ext"/></svg></button>
+      <button data-nav="watheqa"><svg><use href="#i-doc"/></svg><span>وثيقة</span></button>
+      <button data-nav="permits"><svg><use href="#i-qr"/></svg><span>تصاريح الدروس</span></button>
       <div class="sep">الأنشطة والجدولة</div>
       <button data-nav="acts"><svg><use href="#i-list"/></svg><span>الأنشطة</span></button>
       <button data-nav="cal"><svg><use href="#i-cal"/></svg><span>التقويم</span></button>
@@ -957,7 +1023,7 @@ function render(){
   if (v === "users" && !S.admin) { S.view = "home"; return render(); }
   $("#title").innerHTML = esc(v === "comm" && S.comm ? S.comm : TITLES[v]) + (v === "home" ? `<span class="sub">${esc(new Date().toLocaleDateString("ar-EG-u-nu-latn",{weekday:"long"}))} ${fmt(TODAY)} م · ${esc(hijri(new Date()))}</span>` : "");
   if (!ready) { $("#view").innerHTML = `<div class="loading">جارٍ تحميل بيانات القسم…</div>`; return; }
-  const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit, ai:vAI, mine:vMine, copilot:vCopilot, rewards:vRewards, inbox:vInbox, weekly:vWeekly, attend:vAttend, backups:vBackups, halls:vHalls, tasks:vTasks, questions:vQuestions}[v] || vHome;
+  const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit, ai:vAI, mine:vMine, copilot:vCopilot, rewards:vRewards, inbox:vInbox, weekly:vWeekly, attend:vAttend, backups:vBackups, halls:vHalls, tasks:vTasks, questions:vQuestions, watheqa:vWatheqa, permits:vPermits}[v] || vHome;
   $("#view").innerHTML = fn();
   if (typeof afterRender === "function") afterRender(v);
   const fo = document.getElementById(S.focus); if (fo) { fo.focus(); try { fo.setSelectionRange(fo.value.length, fo.value.length); } catch(e) {} }
@@ -4705,6 +4771,169 @@ document.addEventListener("click", async ev => {
 /* voice → assistant input when no bridge */
 const _voiceStart16 = voiceStart;
 voiceStart = function(target){ if (!hasBridge() && $("#as-in")) { const i = $("#as-in"); if (!SR_API) return toast("الإدخال الصوتي غير مدعوم في هذا المتصفح"); const r = new SR_API(); r.lang = "ar-KW"; r.interimResults = true; r.onresult = ev => { i.value = [...ev.results].map(x => x[0].transcript).join(""); }; r.onend = () => { if (i.value.trim()) asAsk(i.value); }; r.start(); toast("تكلّم الآن…"); return; } return _voiceStart16(target); };
+
+/* ================= v16: Watheqa data inside «إنجاز» + lesson permits with verifiable barcode ================= */
+Object.assign(TITLES, { watheqa:"وثيقة", permits:"تصاريح الدروس" });
+const WQ_VIEW = id => `https://watheqa.awqaf.gov.kw/Documents/View?id=${encodeURIComponent(id)}`;
+S.wq = []; S.wqSync = null; S.permits = []; S.pAssets = {};
+async function loadWq(){ const { data, error } = await sb.from("watheqa_docs").select("*").order("id", { ascending:false }).limit(3000); if (!error) S.wq = data || []; const s = await sb.from("settings").select("value").eq("key", "watheqa_sync").maybeSingle(); S.wqSync = s.data?.value || null; }
+async function loadPermits(){ const { data, error } = await sb.from("permits").select("*").order("issued_at", { ascending:false }).limit(2000); if (!error) S.permits = data || []; const a = await sb.from("settings").select("value").eq("key", "permit_assets").maybeSingle(); S.pAssets = a.data?.value || {}; }
+let wqCh = null;
+function liveWq(){ if (wqCh) sb.removeChannel(wqCh); wqCh = sb.channel("wq").on("postgres_changes", { event:"*", schema:"public", table:"watheqa_docs" }, p => { if (p.new?.id) S.wq = [p.new, ...S.wq.filter(x => x.id !== p.new.id)]; if (S.view === "watheqa" && $("#drawer").hidden) render(); })
+  .on("postgres_changes", { event:"*", schema:"public", table:"permits" }, p => { S.permits = p.eventType === "DELETE" ? S.permits.filter(x => x.id !== p.old?.id) : [p.new, ...S.permits.filter(x => x.id !== p.new.id)]; if (S.view === "permits" && $("#drawer").hidden) render(); }).subscribe(); }
+const wqDate = w => { const m = (w.doc_date || "").match(/(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : (w.created || "").replace(/\//g, "-").slice(0, 10); };
+const wqComm = w => { const t = norm(w.subj + " " + w.body); return commNames.find(c => norm(c).split(/[\s–-]+/).filter(x => x.length > 4).some(x => t.includes(x.replace(/^ال/, "")))) || ""; };
+
+/* ---------- Watheqa page ---------- */
+function vWatheqa(){
+  const q = nkey(S.f.wqq || ""), tab = S.f.wqt || "all";
+  let L = S.wq.filter(w => !q || nkey([w.no, w.subj, w.sender, w.to_whom, w.body].join(" ")).includes(q));
+  if (tab === "ok") L = L.filter(w => w.approval); if (tab === "open") L = L.filter(w => /لم يُتخذ|قيد|جديد/.test(w.action_state + w.status)); if (tab === "new") L = L.filter(w => w.approval && !docBy[w.no] && !(w.refs || []).some(r => docBy[r]));
+  L.sort((a, b) => wqDate(b).localeCompare(wqDate(a)));
+  const newOk = S.wq.filter(w => w.approval && !docBy[w.no] && !(w.refs || []).some(r => docBy[r])).length;
+  const last = S.wqSync?.last ? fmtTime(S.wqSync.last) : "لم تتم بعد";
+  return `<div class="wq-head panel"><div class="panel-b"><div><b>بيانات نظام وثيقة داخل «إنجاز»</b><span class="s">آخر مزامنة: ${esc(last)} · ${S.wq.length} كتاب</span></div>
+      <div class="br-acts"><button type="button" class="btn" data-ext="${WATHEQA}">فتح موقع وثيقة</button><button type="button" class="btn btn-ghost" data-wqhelp>كيف تتحدّث؟</button></div></div></div>
+    <div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input class="f" id="wqq" data-fk="wqq" placeholder="ابحث برقم الكتاب أو الموضوع أو الجهة…" value="${esc(S.f.wqq || "")}"></div>
+      <div class="seg">${[["all", "الكل", S.wq.length], ["ok", "موافقات / لا مانع", S.wq.filter(w => w.approval).length], ["new", "موافقات غير مسجلة", newOk], ["open", "بانتظار إجراء", S.wq.filter(w => /لم يُتخذ|قيد|جديد/.test(w.action_state + w.status)).length]].map(([k, l, n]) => `<button type="button" data-wqt="${k}" class="${tab === k ? "on" : ""}">${l} <span class="num">${n}</span></button>`).join("")}</div></div>
+    <div class="wq-list">${L.slice(0, 300).map(w => { const inSys = docBy[w.no] || (w.refs || []).map(r => docBy[r]).find(Boolean);
+      return `<button type="button" class="wq-i" data-wq="${esc(w.id)}"><span class="num wq-no">${esc(w.no || "—")}</span><span class="wq-t"><b>${esc(w.subj || "—")}</b><span class="s">${esc([w.sender, w.to_whom].filter(Boolean).join(" ← ").slice(0, 120))}</span></span>
+        <span class="wq-m"><span class="s num">${fmt(wqDate(w))}</span>${w.approval ? `<span class="chip ok">لا مانع / موافقة</span>` : ""}${inSys ? `<span class="chip t1">مسجّلة في النظام</span>` : w.approval ? `<span class="chip gold">غير مسجّلة</span>` : ""}${w.status ? `<span class="chip">${esc(w.status)}</span>` : ""}</span></button>`; }).join("") || `<div class="empty">لا توجد كتب — افتح موقع وثيقة لتتم المزامنة</div>`}</div>`;
+}
+function wqForm(id){
+  const w = S.wq.find(x => x.id === id); if (!w) return; S.form = { kind:"wq", id };
+  const inSys = docBy[w.no] ? w.no : (w.refs || []).find(r => docBy[r]);
+  const acts = S.E.filter(e => e.doc && (e.doc === w.no || (w.refs || []).includes(e.doc)));
+  openDrawer(`كتاب وثيقة \u2066${w.no || ""}\u2069`, `
+    <div class="q-meta"><b>${esc(w.subj)}</b><span class="s">${esc(fmt(wqDate(w)))} · ${esc(w.sender || "")}${w.status ? " · " + esc(w.status) : ""}</span><span class="s">${esc(w.to_whom || "")}</span></div>
+    ${w.approval ? `<div class="check ok"><b>هذا الكتاب يتضمّن موافقة («لا مانع»)</b><span>${inSys ? `مسجّلة في النظام برقم ${esc(inSys)}` : "غير مسجّلة في النظام بعد"}</span></div>` : ""}
+    <div class="q-body">${esc(w.body || "لا يوجد نص").replace(/\n/g, "<br>")}</div>
+    ${w.signer ? `<span class="s">التوقيع: ${esc(w.signer)}</span>` : ""}
+    ${(w.refs || []).length ? `<span class="s">كتب مشار إليها: ${w.refs.map(r => docBy[r] ? `<button type="button" class="chip t1" data-wqdoc="${esc(r)}">${esc(r)} ✓</button>` : `<span class="chip">${esc(r)}</span>`).join(" ")}</span>` : ""}
+    ${acts.length ? `<div class="rq-sec"><b>أنشطة مرتبطة (${acts.length})</b>${acts.map(e => `<button type="button" class="as-i" data-prio-open="act:${e.id}"><span>#${e.n} · ${esc(e.comm || "")} · ${esc(e.mosName || "")}</span></button>`).join("")}</div>` : ""}`,
+    `<button class="btn btn-primary" type="button" data-ext="${WQ_VIEW(w.id)}">فتح في وثيقة</button>${w.approval && !inSys && S.canWrite ? `<button class="btn btn-ok" type="button" data-wqadd="${esc(w.id)}">تسجيل الموافقة في النظام</button>` : ""}${S.admin ? `<button class="btn btn-ghost" type="button" data-wqtask="${esc(w.id)}">إسناد متابعة</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
+}
+async function wqAdd(id){
+  const w = S.wq.find(x => x.id === id); if (!w) return; const no = w.no; if (!no) return toast("لا يوجد رقم للكتاب");
+  if (docBy[no]) return toast("الوثيقة مسجلة مسبقاً");
+  const start = wqDate(w) || TODAY, end = addMonths(start, 6);
+  try { await T.ref("docs", [...S.docs, { no, date:start, subj:w.subj || "موافقة", comm:wqComm(w), start, end, notes:"من نظام وثيقة — " + (w.signer || "") }]); toast(`سُجّلت الموافقة ${no} — من ${fmt(start)} إلى ${fmt(end)}`); closeDrawer(); setTimeout(() => listForm("doc", no), 700); } catch (e) { writeFail(e); }
+}
+
+/* ---------- lesson permits with a verifiable barcode (issued by admins only) ---------- */
+const VERIFY = id => `${location.origin}${location.pathname.replace(/[^/]*$/, "")}verify.html#${id}`;
+function loadQR(){ return window.qrcode ? Promise.resolve() : loadScript("https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"); }
+const pStatus = p => p.revoked ? ["ملغى", "bad"] : p.until < TODAY ? ["منتهي", ""] : ["ساري", "ok"];
+function vPermits(){
+  const q = nkey(S.f.pq || ""); const L = S.permits.filter(p => !q || nkey([p.no, p.data?.sheikh, p.data?.mosque, p.data?.topic].join(" ")).includes(q));
+  return `<div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input class="f" id="pq" data-fk="pq" placeholder="ابحث برقم التصريح أو اسم الشيخ أو المسجد…" value="${esc(S.f.pq || "")}"></div>
+    ${S.admin ? `<button class="btn btn-primary" type="button" data-pnew>${icon("i-plus")} إصدار تصريح</button><button class="btn" type="button" data-passets>التوقيع والختم</button>` : ""}<span class="count">${S.permits.filter(p => pStatus(p)[0] === "ساري").length} ساري · ${S.permits.length} إجمالي</span></div>
+    ${!S.admin ? `<div class="check"><b>إصدار التصاريح لمدير النظام ورئيس القسم فقط</b><span>يمكنك عرض التصاريح وطباعتها.</span></div>` : ""}
+    <div class="wq-list">${L.map(p => { const [st, c] = pStatus(p); return `<button type="button" class="wq-i" data-permit="${p.id}"><span class="num wq-no">${esc(p.no)}</span><span class="wq-t"><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.date ? fmt(p.data.date) : "")} · ${esc(p.data?.time || "")}</span></span><span class="wq-m"><span class="chip ${c}">${st}</span><span class="s">حتى ${fmt(p.until)}</span></span></button>`; }).join("") || `<div class="empty">لا توجد تصاريح بعد</div>`}</div>`;
+}
+const DUR = [["day", "يوم الدرس فقط", 1], ["3", "3 أيام", 3], ["7", "أسبوع", 7], ["30", "شهر", 30], ["90", "3 أشهر", 90], ["180", "6 أشهر", 180]];
+function permitForm(preset){
+  if (!S.admin) return toast("إصدار التصاريح لمدير النظام ورئيس القسم فقط");
+  const d = { sheikh:"", mosque:"", topic:"", lang:"", date:addDays(TODAY, 1), t_from:"19:30", t_to:"20:30", dur:"day", head:S.pAssets.head || "فايز رزقان الرشيدي", ...preset };
+  S.form = { kind:"permit", act:preset?.act_id || "" };
+  openDrawer("إصدار تصريح إلقاء درس", `
+    ${fld("p-sheikh", "اسم الشيخ", `<input class="f" id="p-sheikh" value="${esc(d.sheikh)}" list="p-lects"><datalist id="p-lects">${[...new Set(S.E.flatMap(e => (e.lect || "").split(" / ")).filter(Boolean))].slice(0, 400).map(l => `<option value="${esc(l)}">`).join("")}</datalist>`)}
+    ${fld("p-mosque", "المسجد والمنطقة", `<input class="f" id="p-mosque" value="${esc(d.mosque)}" list="p-mos"><datalist id="p-mos">${S.mosques.map(m => `<option value="${esc("مسجد " + m.name + (m.area ? " — " + m.area : ""))}">`).join("")}</datalist>`)}
+    <div class="g2">${fld("p-topic", "عنوان الدرس (اختياري)", `<input class="f" id="p-topic" value="${esc(d.topic)}">`)}${fld("p-lang", "اللغة (اختياري)", `<input class="f" id="p-lang" value="${esc(d.lang)}">`)}</div>
+    <div class="g3">${fld("p-date", "تاريخ الدرس", `<input class="f" type="date" id="p-date" value="${esc(d.date)}">`)}${fld("p-from", "من", `<input class="f" type="time" id="p-from" value="${esc(d.t_from)}">`)}${fld("p-to", "إلى", `<input class="f" type="time" id="p-to" value="${esc(d.t_to)}">`)}</div>
+    <div class="g2">${fld("p-dur", "مدة التصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("p-head", "المعتمِد", `<input class="f" id="p-head" value="${esc(d.head)}">`)}</div>
+    <span class="hint">يُولَّد رقم التصريح ورمز التحقق تلقائياً. الباركود يفتح صفحة تحقق رسمية تبيّن للإمام صلاحية التصريح الآن.</span>`,
+    `<button class="btn btn-primary" data-pissue>إصدار التصريح</button><button class="btn btn-ghost" data-close>إلغاء</button>`);
+}
+async function permitIssue(){
+  const v = id => $("#" + id)?.value.trim() || "";
+  if (!v("p-sheikh") || !v("p-mosque") || !v("p-date")) return toast("أكمل اسم الشيخ والمسجد والتاريخ");
+  const dur = DUR.find(x => x[0] === v("p-dur")) || DUR[0]; const until = addDays(v("p-date"), dur[2] - 1);
+  const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), time:`من ${t12(v("p-from"))} إلى ${t12(v("p-to"))}`, dur:dur[1], head:v("p-head") };
+  const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "" }).select().single(); if (error) return writeFail(error);
+  S.permits = [row, ...S.permits]; closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id);
+}
+async function permitView(id){
+  const p = S.permits.find(x => x.id === id); if (!p) return; await loadQR().catch(() => {});
+  const d = p.data || {}, [st, c] = pStatus(p), url = VERIFY(`${p.id}.${p.code}`);
+  let qr = ""; try { const q = qrcode(0, "M"); q.addData(url); q.make(); qr = q.createDataURL(6, 2); } catch (_) {}
+  const H = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn", { day:"numeric", month:"long", year:"numeric" });
+  S.form = { kind:"permitv", id };
+  openDrawer(`التصريح ${p.no}`, `<div class="check ${c === "ok" ? "ok" : "warn"}"><b>${st}</b><span>حتى ${fmt(p.until)} · رمز التحقق ${p.code.slice(0, 4)}-${p.code.slice(4)}</span></div>
+    <div class="permit-wrap"><div class="permit print-area" id="permit-paper">
+      <div class="pm-h"><div class="pm-org"><span>دولة الكويت</span><b>وزارة الأوقاف والشؤون الإسلامية</b><span>إدارة العلاقات الخارجية</span><span>قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
+        <div class="pm-meta"><span><b>رقم التصريح:</b> ${esc(p.no)}</span><span><b>تاريخ الإصدار:</b> ${fmt(p.issued_at.slice(0, 10))}</span><span><b>الموافق:</b> ${esc(H.format(new Date(p.issued_at)))}</span></div></div>
+      <h2 class="pm-title">تصريح إلقاء درس</h2><p class="pm-sub">يُبرَز لإمام المسجد عند إقامة الدرس</p>
+      <p class="pm-lead">تُصرِّح إدارة العلاقات الخارجية (قسم الجاليات ورعاية المهتدين وطلبة البعوث) لفضيلة الشيخ / <strong>${esc(d.sheikh)}</strong> بإلقاء درس في <strong>${esc(d.mosque)}</strong>، وفق البيانات الموضحة أدناه.</p>
+      <table class="pm-t"><tr><th>اسم الشيخ</th><td>${esc(d.sheikh)}</td></tr><tr><th>المسجد</th><td>${esc(d.mosque)}</td></tr>${d.topic ? `<tr><th>عنوان الدرس</th><td>${esc(d.topic)}</td></tr>` : ""}${d.lang ? `<tr><th>لغة الدرس</th><td>${esc(d.lang)}</td></tr>` : ""}<tr><th>التاريخ</th><td>${DAYS[dOf(d.date).getDay()]} ${fmt(d.date)} — ${esc(H.format(dOf(d.date)))}</td></tr><tr><th>الوقت</th><td>${esc(d.time || "")}</td></tr></table>
+      <div class="pm-valid"><div><span>مدة التصريح</span><b>${esc(d.dur || "")}</b></div><div><span>ينتهي العمل به</span><b>${fmt(p.until)} — 11:59 م</b></div></div>
+      <p class="pm-note">يُعدّ هذا التصريح رسمياً ونافذاً خلال مدته فقط ويُلغى تلقائياً بانتهائها. على إمام المسجد مسح الباركود للتحقق الفوري من صحته وصلاحيته عبر نظام «إنجاز».</p>
+      <div class="pm-bottom"><div class="pm-appr"><span>اعتماد رئيس قسم الجاليات ورعاية المهتدين وطلبة البعوث</span><b>${esc(d.head || "")}</b>
+        <div class="pm-sig"><div><i>${S.pAssets.sig ? `<img src="${S.pAssets.sig}" alt="">` : ""}</i>التوقيع</div><div><i class="r">${S.pAssets.stamp ? `<img src="${S.pAssets.stamp}" alt="">` : ""}</i>الختم</div></div></div>
+        <div class="pm-qr">${qr ? `<img src="${qr}" alt="باركود التحقق">` : ""}<span>امسح للتحقق</span><b dir="ltr">${p.code.slice(0, 4)}-${p.code.slice(4)}</b></div></div>
+    </div></div>`,
+    `<button class="btn btn-primary" data-pprint>طباعة / PDF</button><button class="btn" data-pwa="${p.id}">${icon("i-wa")} إرسال</button>${S.admin && !p.revoked ? `<button class="btn btn-ghost bad-t" data-prevoke="${p.id}">إلغاء التصريح</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
+}
+function assetsForm(){
+  if (!S.admin) return; S.form = { kind:"passets" };
+  openDrawer("التوقيع والختم على التصاريح", `${fld("pa-head", "اسم المعتمِد الافتراضي", `<input class="f" id="pa-head" value="${esc(S.pAssets.head || "فايز رزقان الرشيدي")}">`)}
+    <div class="g2">${fld("pa-sig", "صورة التوقيع", `<input class="f" type="file" id="pa-sig" accept="image/*">`)}${fld("pa-stamp", "صورة الختم", `<input class="f" type="file" id="pa-stamp" accept="image/*">`)}</div>
+    <div class="pm-sig">${S.pAssets.sig ? `<div><i><img src="${S.pAssets.sig}" alt=""></i>التوقيع الحالي</div>` : ""}${S.pAssets.stamp ? `<div><i class="r"><img src="${S.pAssets.stamp}" alt=""></i>الختم الحالي</div>` : ""}</div>
+    <span class="hint">يُفضّل صورة PNG بخلفية شفافة. تظهر على كل التصاريح الجديدة والقديمة عند الطباعة.</span>`,
+    `<button class="btn btn-primary" data-pasave>حفظ</button><button class="btn btn-ghost" data-close>إغلاق</button>`);
+}
+const readImg = f => new Promise(res => { if (!f) return res(null); compressImg(f, 600, .92).then(({ canvas }) => res(canvas.toDataURL("image/png"))).catch(() => res(null)); });
+async function assetsSave(){
+  const sig = await readImg($("#pa-sig").files[0]), stamp = await readImg($("#pa-stamp").files[0]);
+  const v = { ...S.pAssets, head:$("#pa-head").value.trim() }; if (sig) v.sig = sig; if (stamp) v.stamp = stamp;
+  const { error } = await sb.from("settings").upsert({ key:"permit_assets", value:v }); if (error) return writeFail(error);
+  S.pAssets = v; closeDrawer(); toast("حُفظ التوقيع والختم");
+}
+
+/* ---------- wiring ---------- */
+const _actForm17 = actForm;
+actForm = function(id, preset){ _actForm17(id, preset); const e = id && S.byId.get(id); if (!e || !S.admin || S.form?.kind !== "act") return;
+  const nextD = (() => { for (let i = 0; i < 14; i++) { const iso = addDays(TODAY, i); if (e.days.includes(dOf(iso).getDay())) return iso; } return addDays(TODAY, 1); })();
+  const sl = e.sl || [1140, 1200], hhmm = m => `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`;
+  $(".drawer-f [data-close]")?.insertAdjacentHTML("afterend", `<button class="btn btn-ghost" type="button" data-pfrom="${esc(id)}" data-pd="${esc(JSON.stringify({ sheikh:(e.lect || "").split(" / ")[0], mosque:`${e.mosName}${e.area ? " — " + e.area : ""}`, topic:e.title || "", date:nextD, t_from:hhmm(sl[0]), t_to:hhmm(sl[1]), act_id:id }))}">تصريح</button>`); };
+const _openLink17 = openLink;
+openLink = function(h){ const s = String(h || "").replace(/^#/, ""); if (s.startsWith("permit:")) { if (S.view !== "permits") go("permits"); return permitView(s.slice(7)); } if (s.startsWith("wq:")) { if (S.view !== "watheqa") go("watheqa"); return wqForm(s.slice(3)); } return _openLink17(h); };
+const _answer17 = answer;
+answer = function(q){ const m = String(q).match(/\d{4}\s*-\s*\d{4}/); if (m) { const no = m[0].replace(/\s/g, ""); const L = S.wq.filter(w => w.no === no || (w.refs || []).includes(no)); const d = docBy[no];
+    if (L.length || d) return { title:`الكتاب ${no}`, items:[...(d ? [{ t:`مسجّل في النظام: ${d.subj || ""}`, s:`${d.comm || ""} · من ${fmt(d.start)} إلى ${fmt(d.end)} · ${S.E.filter(e => e.doc === no).length} نشاط`, open:`doc:${no}` }] : []), ...L.map(w => ({ t:`وثيقة: ${w.subj}`, s:`${fmt(wqDate(w))} · ${w.sender || ""}${w.approval ? " · لا مانع ✓" : ""}`, open:`wq:${w.id}` }))], extra:"" }; }
+  if (/وثيقه|وثيقة|كتب|كتاب/.test(norm(q)) && /موافق|مانع|جديد/.test(norm(q))) { const L = S.wq.filter(w => w.approval && !docBy[w.no] && !(w.refs || []).some(r => docBy[r])); return { title:`موافقات في وثيقة غير مسجلة بالنظام (${L.length})`, items:L.map(w => ({ t:`${w.no} — ${w.subj}`, s:fmt(wqDate(w)), open:`wq:${w.id}` })), extra:"افتح أي كتاب واضغط «تسجيل الموافقة في النظام»." }; }
+  return _answer17(q); };
+SUGG.splice(4, 0, ["موافقات وثيقة الجديدة", "i-doc", "موافقات وثيقة جديدة"]);
+const _sysMd17 = sysMarkdown;
+sysMarkdown = function(){ const L = S.wq.slice().sort((a, b) => wqDate(b).localeCompare(wqDate(a))).slice(0, 150);
+  return _sysMd17() + (L.length ? `\n\n## كتب نظام وثيقة (آخر ${L.length})\n| رقم الكتاب | التاريخ | الموضوع | المرسل | الحالة | لا مانع | مسجّل في النظام |\n|---|---|---|---|---|---|---|\n` + L.map(w => `| ${w.no} | ${fmt(wqDate(w))} | ${(w.subj || "").replace(/\|/g, "/")} | ${w.sender || ""} | ${w.status || ""} | ${w.approval ? "نعم" : ""} | ${docBy[w.no] ? "نعم" : ""} |`).join("\n") : ""); };
+const _prio17 = priorities;
+priorities = function(){ const P = _prio17(); const n = S.wq.filter(w => w.approval && !docBy[w.no] && !(w.refs || []).some(r => docBy[r])).length; if (n) P.push({ w:78, k:"gold", t:`${n} موافقة في وثيقة غير مسجّلة في النظام`, s:"سجّلها بضغطة لتظهر الأنشطة ومواعيد انتهائها", act:{ go:"watheqa", l:"وثيقة" } }); return P.sort((a, b) => b.w - a.w); };
+const _palAll17 = palAll;
+palAll = function(){ const A = _palAll17(); if (S.admin) A.unshift({ g:"إجراءات", t:"إصدار تصريح درس (باركود)", s:"", ic:"i-badge", run:() => permitForm(), txt:"تصريح باركود درس شيخ" });
+  for (const w of S.wq.slice(0, 400)) A.push({ g:"وثيقة", t:`${w.no} ${w.subj}`, s:[fmt(wqDate(w)), w.sender].filter(Boolean).join(" · "), ic:"i-doc", run:() => { go("watheqa"); wqForm(w.id); }, txt:[w.no, w.subj, w.sender].join(" ") });
+  for (const p of S.permits.slice(0, 200)) A.push({ g:"التصاريح", t:`${p.no} ${p.data?.sheikh || ""}`, s:p.data?.mosque || "", ic:"i-badge", run:() => { go("permits"); permitView(p.id); }, txt:[p.no, p.data?.sheikh, p.data?.mosque].join(" ") });
+  return A; };
+const _boot9w = boot9;
+boot9 = function(){ _boot9w(); Promise.all([loadWq(), loadPermits()]).then(() => { liveWq(); if ($("#drawer").hidden && ["watheqa", "permits", "home"].includes(S.view)) render(); }); };
+document.addEventListener("click", async ev => {
+  const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
+  if (D.wqt) { S.f.wqt = D.wqt; return render(); }
+  if (D.wq) return wqForm(D.wq);
+  if (D.wqadd) return wqAdd(D.wqadd);
+  if (D.wqdoc) { closeDrawer(); return listForm("doc", D.wqdoc); }
+  if (D.wqtask) { const w = S.wq.find(x => x.id === D.wqtask); if (w) taskForm(null, { title:`متابعة كتاب وثيقة ${w.no}`, details:`${w.subj}\n${w.sender || ""}`, due:addDays(TODAY, 2), link:`#wq:${w.id}` }); return; }
+  if (D.wqhelp !== undefined) return toast("تتحدّث بيانات وثيقة تلقائياً كلما فتحت موقع وثيقة من جهاز عليه جسر Copilot 2.2");
+  if (D.pnew !== undefined) return permitForm();
+  if (D.pfrom) { try { return permitForm(JSON.parse(D.pd)); } catch (_) { return permitForm(); } }
+  if (D.pissue !== undefined) return permitIssue();
+  if (D.permit) return permitView(D.permit);
+  if (D.passets !== undefined) return assetsForm();
+  if (D.pasave !== undefined) return assetsSave();
+  if (D.pprint !== undefined) { let pp = $("#permit-print"); if (!pp) { pp = document.createElement("div"); pp.id = "permit-print"; pp.className = "print-area"; document.body.appendChild(pp); } pp.innerHTML = $("#permit-paper").outerHTML.replace('id="permit-paper"', ""); return printArea("#permit-print"); }
+  if (D.pwa) { const p = S.permits.find(x => x.id === D.pwa); if (!p) return; const txt = `تصريح إلقاء درس رقم ${p.no}\nالشيخ: ${p.data?.sheikh}\nالمسجد: ${p.data?.mosque}\nالتاريخ: ${fmt(p.data?.date)} ${p.data?.time || ""}\nللتحقق: ${VERIFY(`${p.id}.${p.code}`)}${SIGN}`; if (navigator.share) { try { await navigator.share({ text:txt }); return; } catch (_) { return; } } const ok = await cpCopy(txt); return toast(ok ? "نُسخ نص التصريح ورابط التحقق" : "تعذّر النسخ"); }
+  if (D.prevoke) { if (D.sure !== "1") { D.sure = "1"; t.textContent = "اضغط مرة أخرى للتأكيد"; return; } const { error } = await sb.from("permits").update({ revoked:true }).eq("id", D.prevoke); if (error) return writeFail(error); const p = S.permits.find(x => x.id === D.prevoke); if (p) p.revoked = true; toast("أُلغي التصريح — يظهر للإمام «ملغى» عند المسح"); return permitView(D.prevoke); }
+});
 
 (async function boot(){
   const { data } = await sb.auth.getSession();

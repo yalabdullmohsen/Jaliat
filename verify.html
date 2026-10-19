@@ -1,0 +1,25 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>التحقق من تصريح درس — إنجاز</title><meta name="robots" content="noindex">
+<link rel="icon" href="favicon.ico">
+<style>
+:root{--g:#168A63;--gs:#E1F3EA;--bad:#B8392B;--bads:#F9E1DD;--w:#B07A00;--ws:#FBF0D4;--ink:#13281F;--mu:#5C6E66;--bg:#F4F8F6}
+@media (prefers-color-scheme:dark){:root{--bg:#0C1411;--ink:#E5EEE9;--mu:#97AA9F;--gs:#163528;--bads:#3A1A16;--ws:#33290F}body .card{background:#131E19;border-color:#24352C}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,sans-serif;min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{background:#fff;border:1px solid #DFE8E3;border-radius:18px;max-width:440px;width:100%;padding:24px;box-shadow:0 8px 30px rgba(20,70,50,.08)}
+.org{text-align:center;font-size:13px;color:var(--mu);line-height:1.6}.org b{display:block;color:var(--g);font-size:15px}
+.st{margin:18px 0;border-radius:14px;padding:18px;text-align:center}.st b{display:block;font-size:24px}.st span{font-size:14px}
+.ok{background:var(--gs);color:var(--g)}.no{background:var(--bads);color:var(--bad)}.ex{background:var(--ws);color:var(--w)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:15px}dt{color:var(--mu)}dd{margin:0;font-weight:600}
+.ft{text-align:center;color:var(--mu);font-size:12px;margin-top:18px}
+</style></head><body><main class="card"><div class="org">دولة الكويت — وزارة الأوقاف والشؤون الإسلامية<b>قسم الجاليات ورعاية المهتدين وطلبة البعوث</b>التحقق من تصريح إلقاء درس</div>
+<div id="r"><div class="st"><span>جارٍ التحقق…</span></div></div><div class="ft">نظام «إنجاز»</div></main>
+<script>
+(async()=>{const r=document.getElementById("r");const h=decodeURIComponent(location.hash.slice(1)).split(".");const e=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f=d=>d?d.split("-").reverse().join("/"):"";
+if(h.length<2){r.innerHTML='<div class="st no"><b>رابط غير صالح</b><span>امسح الباركود من التصريح الأصلي</span></div>';return}
+try{const res=await fetch("https://nybuospfwbbtejvjivhd.supabase.co/rest/v1/rpc/verify_permit",{method:"POST",headers:{"Content-Type":"application/json",apikey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55YnVvc3Bmd2JidGVqdmppdmhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNTM2NzUsImV4cCI6MjEwNzkyOTY3NX0.raSv5v4repFqwam7C7l0d5mWABVH44REq_oRfDYzgF4",Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55YnVvc3Bmd2JidGVqdmppdmhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNTM2NzUsImV4cCI6MjEwNzkyOTY3NX0.raSv5v4repFqwam7C7l0d5mWABVH44REq_oRfDYzgF4"},body:JSON.stringify({p_id:h[0],p_code:h[1]})});
+const d=await res.json();if(!res.ok||!d||!d.found){r.innerHTML='<div class="st no"><b>✕ التصريح غير موجود</b><span>هذا التصريح غير صادر من القسم — لا يُسمح بإقامة الدرس</span></div>';return}
+const st=d.revoked?['no','✕ التصريح ملغى','أُلغي هذا التصريح من القسم']:d.valid?['ok','✓ تصريح ساري','يُسمح بإقامة الدرس وفق البيانات أدناه']:['ex','التصريح منتهي','انتهت مدة هذا التصريح في '+f(d.until)];
+r.innerHTML='<div class="st '+st[0]+'"><b>'+st[1]+'</b><span>'+st[2]+'</span></div><dl><dt>رقم التصريح</dt><dd>'+e(d.no)+'</dd><dt>الشيخ</dt><dd>'+e(d.sheikh)+'</dd><dt>المسجد</dt><dd>'+e(d.mosque)+'</dd>'+(d.topic?'<dt>الدرس</dt><dd>'+e(d.topic)+'</dd>':'')+'<dt>التاريخ</dt><dd>'+e(f(d.date))+'</dd><dt>الوقت</dt><dd>'+e(d.time)+'</dd><dt>ساري حتى</dt><dd>'+e(f(d.until))+'</dd><dt>المعتمِد</dt><dd>'+e(d.head)+'</dd></dl>'}
+catch(_){r.innerHTML='<div class="st ex"><b>تعذّر الاتصال</b><span>تحقق من الإنترنت ثم أعد المسح</span></div>'}})();
+</script></body></html>
