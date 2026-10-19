@@ -775,6 +775,25 @@ button.kpi{transition:box-shadow .15s,transform .15s} button.kpi:hover{transform
 @media print{body.print-any #permit-print.on{display:block}#permit-print .permit{border:0;max-width:none;padding:10mm 12mm}@page{size:A4;margin:8mm}}
 .search input.f{padding-inline-start:40px}
 .f[readonly]{background:var(--surface-2);color:var(--muted);cursor:not-allowed}
+/* ===== WhatsApp ===== */
+.wa-wrap{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:68vh;overflow:hidden}
+.wa-side{border-inline-end:1px solid var(--line);overflow:auto;max-height:76vh;display:flex;flex-direction:column}
+.wa-sh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:1}
+.wa-t{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 14px;background:none;border:0;border-bottom:1px solid var(--line);text-align:right;width:100%}
+.wa-t:hover{background:var(--surface-2)}.wa-t.on{background:var(--primary-soft)}
+.wa-av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:700}
+.wa-tt{display:grid;min-width:0}.wa-tt b,.wa-tt .s{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.wa-tm{display:grid;justify-items:end;gap:4px}.wa-dot{width:10px;height:10px;border-radius:50%;background:#25D366}
+.wa-main{display:flex;flex-direction:column;min-width:0;max-height:76vh}
+.wa-mh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}.wa-mh>div:first-child{display:grid}
+.wa-thread{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--surface-2) 60%,var(--surface))}
+.wa-b{max-width:75%;padding:8px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);align-self:flex-start;display:grid;gap:4px}
+.wa-b.out{align-self:flex-end;background:#DCF8C6;border-color:#c5e9ae;color:#13281F}
+.wa-b p{margin:0;line-height:1.7;white-space:normal;word-break:break-word}.wa-meta{font-size:11px;color:var(--muted)}
+.wa-comp{border-top:1px solid var(--line);padding:10px 12px;display:grid;gap:8px}
+.wa-setup{display:grid;gap:12px}.wa-steps{margin:0;padding-inline-start:20px;display:grid;gap:8px;line-height:1.8}
+.wa-cp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}.wa-cp span{font-size:12px;color:var(--muted);min-width:90px}.wa-cp code{background:var(--surface-2);padding:4px 8px;border-radius:6px;font-size:12px;word-break:break-all}
+@media (max-width:820px){.wa-wrap{grid-template-columns:1fr}.wa-side{max-height:34vh;border-inline-end:0;border-bottom:1px solid var(--line)}.wa-b{max-width:90%}}
 .brand svg{color:#fff;width:38px;height:38px}.brand b{font-size:21px;letter-spacing:.3px}.login-card .mark{width:76px;height:76px}.login-card h1{font-size:34px}.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}.nav .sep{font-weight:700;padding:16px 12px 4px}.nav .ext-i{width:14px!important;height:14px!important;opacity:.55;margin-inline-start:auto}.nav button{min-height:40px}</style>
 
 </head>
@@ -838,6 +857,7 @@ button.kpi{transition:box-shadow .15s,transform .15s} button.kpi:hover{transform
       <button data-nav="tasks"><svg><use href="#i-list"/></svg><span>المهام والإنجاز</span></button>
       <button data-nav="questions"><svg><use href="#i-chat"/></svg><span>الأسئلة</span></button>
       <button data-nav="inbox"><svg><use href="#i-inbox"/></svg><span>الطلبات الواردة</span></button>
+      <button data-nav="whatsapp"><svg><use href="#i-wa"/></svg><span>واتساب القسم</span></button>
       <button data-nav="watheqa"><svg><use href="#i-doc"/></svg><span>وثيقة</span></button>
       <button data-nav="permits"><svg><use href="#i-qr"/></svg><span>تصاريح الدروس</span></button>
       <div class="sep">الأنشطة والجدولة</div>
@@ -1024,7 +1044,7 @@ function render(){
   if (v === "users" && !S.admin) { S.view = "home"; return render(); }
   $("#title").innerHTML = esc(v === "comm" && S.comm ? S.comm : TITLES[v]) + (v === "home" ? `<span class="sub">${esc(new Date().toLocaleDateString("ar-EG-u-nu-latn",{weekday:"long"}))} ${fmt(TODAY)} م · ${esc(hijri(new Date()))}</span>` : "");
   if (!ready) { $("#view").innerHTML = `<div class="loading">جارٍ تحميل بيانات القسم…</div>`; return; }
-  const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit, ai:vAI, mine:vMine, copilot:vCopilot, rewards:vRewards, inbox:vInbox, weekly:vWeekly, attend:vAttend, backups:vBackups, halls:vHalls, tasks:vTasks, questions:vQuestions, watheqa:vWatheqa, permits:vPermits}[v] || vHome;
+  const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit, ai:vAI, mine:vMine, copilot:vCopilot, rewards:vRewards, inbox:vInbox, weekly:vWeekly, attend:vAttend, backups:vBackups, halls:vHalls, tasks:vTasks, questions:vQuestions, watheqa:vWatheqa, permits:vPermits, whatsapp:vWhatsApp}[v] || vHome;
   $("#view").innerHTML = fn();
   if (typeof afterRender === "function") afterRender(v);
   const fo = document.getElementById(S.focus); if (fo) { fo.focus(); try { fo.setSelectionRange(fo.value.length, fo.value.length); } catch(e) {} }
@@ -5014,6 +5034,82 @@ document.addEventListener("click", async ev => {
   if (D.pgsave !== undefined) return grantSave();
   if (D.pguse) return grantUse(D.pguse);
   if (D.pgrevoke) { if (D.sure !== "1") { D.sure = "1"; t.textContent = "اضغط للتأكيد"; return; } const g = S.grants.find(x => x.id === D.pgrevoke); const { error } = await sb.from("permit_grants").update({ revoked:true }).eq("id", D.pgrevoke); if (error) return writeFail(error); if (g) { g.revoked = true; if (g.task_id) await sb.from("tasks").update({ status:"ملغاة" }).eq("id", g.task_id); } toast("سُحب التفويض"); return render(); }
+});
+
+/* ================= v18: the section's WhatsApp (official Cloud API) inside «إنجاز» ================= */
+Object.assign(TITLES, { whatsapp:"واتساب القسم" });
+S.waMsgs = []; S.waCfg = { on:false }; S.waAdmin = null;
+const waKey = p => String(p || "").replace(/[^\d]/g, "").replace(/^00/, "").replace(/^(\d{8})$/, "965$1");
+async function loadWa(){ const s = await sb.from("settings").select("value").eq("key", "whatsapp").maybeSingle(); S.waCfg = s.data?.value || { on:false };
+  const { data, error } = await sb.from("wa_messages").select("*").order("created_at", { ascending:false }).limit(3000); if (!error) S.waMsgs = data || []; }
+let waCh = null;
+function liveWa(){ if (waCh) sb.removeChannel(waCh); waCh = sb.channel("wa").on("postgres_changes", { event:"*", schema:"public", table:"wa_messages" }, p => { if (!p.new?.id) return; const had = S.waMsgs.some(m => m.id === p.new.id); S.waMsgs = [p.new, ...S.waMsgs.filter(m => m.id !== p.new.id)];
+    if (!had && p.new.dir === "in") { toast(`واتساب: ${p.new.name || p.new.phone} — ${String(p.new.body || "مرفق").slice(0, 60)}`); devNotify?.("رسالة واتساب جديدة", `${p.new.name || p.new.phone}: ${String(p.new.body || "مرفق").slice(0, 80)}`); }
+    if (S.view === "whatsapp") { const keep = $("#wa-in")?.value || ""; render(); if ($("#wa-in")) { $("#wa-in").value = keep; } waScroll(); } }).subscribe(); }
+const waThreads = () => { const m = new Map(); for (const x of S.waMsgs) { const k = waKey(x.phone); if (!m.has(k)) m.set(k, { phone:k, name:"", last:x, n:0, unread:0 }); const t = m.get(k); if (!t.name && x.name) t.name = x.name; t.n++; } return [...m.values()]; };
+const waWho = k => { const c = S.coords.find(c => waKey(c.phone) === k); return c ? `${c.name}${c.comm ? " — " + c.comm : ""}` : ""; };
+const waSeen = () => { try { return JSON.parse(localStorage.getItem("wa-seen") || "{}"); } catch (_) { return {}; } };
+function waMarkSeen(k){ try { const s = waSeen(); s[k] = new Date().toISOString(); localStorage.setItem("wa-seen", JSON.stringify(s)); } catch (_) {} }
+function waUnread(){ const s = waSeen(); return waThreads().filter(t => t.last.dir === "in" && (!s[t.phone] || s[t.phone] < t.last.created_at)).length; }
+const waTime = iso => { const d = new Date(iso); return d.toLocaleString("ar-KW-u-nu-latn", { hour:"numeric", minute:"2-digit", day:"numeric", month:"numeric", hour12:true }); };
+function waScroll(){ const b = $("#wa-thread"); if (b) b.scrollTop = b.scrollHeight; }
+
+function vWhatsApp(){
+  const T = waThreads(), sel = S.f.wa || T[0]?.phone || "", seen = waSeen();
+  const setup = S.admin && !S.waCfg.on ? waSetupCard() : !S.waCfg.on ? `<div class="check"><b>واتساب القسم غير مربوط بعد</b><span>يربطه مدير النظام مرة واحدة من هذه الصفحة.</span></div>` : "";
+  if (sel) waMarkSeen(sel);
+  const msgs = S.waMsgs.filter(m => waKey(m.phone) === sel).slice().reverse();
+  const reqIds = [...new Set(msgs.map(m => m.req_id).filter(Boolean))];
+  const lastIn = msgs.filter(m => m.dir === "in").pop(); const open24 = lastIn && (Date.now() - new Date(lastIn.created_at)) < 24 * 3600e3;
+  return `${setup}<div class="wa-wrap panel">
+    <div class="wa-side"><div class="wa-sh"><b>المحادثات</b><button type="button" class="btn btn-ghost" data-wanew>${icon("i-plus")} رسالة جديدة</button></div>
+      ${T.map(t => { const un = t.last.dir === "in" && (!seen[t.phone] || seen[t.phone] < t.last.created_at) && t.phone !== sel; return `<button type="button" class="wa-t${t.phone === sel ? " on" : ""}" data-wat="${t.phone}"><span class="wa-av">${esc((t.name || waWho(t.phone) || "؟").trim().charAt(0))}</span><span class="wa-tt"><b>${esc(t.name || waWho(t.phone) || "+" + t.phone)}</b><span class="s">${t.last.dir === "out" ? "أنت: " : ""}${esc(String(t.last.body || (t.last.media?.length ? "📎 مرفق" : "")).slice(0, 60))}</span></span><span class="wa-tm"><span class="s">${waTime(t.last.created_at)}</span>${un ? `<i class="wa-dot"></i>` : ""}</span></button>`; }).join("") || `<div class="empty">لا توجد محادثات بعد${S.waCfg.on ? "" : " — تظهر هنا بعد ربط الرقم"}</div>`}</div>
+    <div class="wa-main">${sel ? `<div class="wa-mh"><div><b>${esc(T.find(t => t.phone === sel)?.name || waWho(sel) || "+" + sel)}</b><span class="s" dir="ltr">+${sel}</span></div><div class="br-acts">${reqIds.map(id => { const r = S.reqs.find(x => x.id === id); return r ? `<button type="button" class="btn btn-ghost" data-prio-open="req:${id}">الطلب ط-${r.no}</button>` : ""; }).join("")}</div></div>
+      <div class="wa-thread" id="wa-thread">${msgs.map(m => `<div class="wa-b ${m.dir}">${m.body ? `<p>${esc(m.body).replace(/\n/g, "<br>")}</p>` : ""}${(m.media || []).map(f => f.path ? `<button type="button" class="chip" data-wamedia="${esc(f.path)}">📎 ${esc(f.name || "مرفق")}</button>` : f.url ? `<a class="chip" href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.filename || "ملف")}</a>` : "").join("")}<span class="wa-meta">${m.dir === "out" && m.sent_by ? esc(pname(m.sent_by)) + " · " : ""}${waTime(m.created_at)}${m.dir === "out" ? ` · ${({ sent:"أُرسلت", delivered:"وصلت", read:"قُرئت", failed:"فشل" })[m.status] || ""}` : ""}</span></div>`).join("")}</div>
+      ${S.canWrite ? `<div class="wa-comp">${open24 || !S.waCfg.on ? "" : `<span class="hint">مرّ أكثر من 24 ساعة على آخر رسالة منه — واتساب يسمح فقط بقالب معتمد، أو افتح المحادثة في تطبيق واتساب.</span>`}<textarea class="f" id="wa-in" rows="2" placeholder="اكتب ردك…"></textarea><div class="br-acts"><button type="button" class="btn btn-primary" data-wasend="${sel}">إرسال من رقم القسم</button><button type="button" class="btn btn-ghost" data-waapp="${sel}">${icon("i-wa")} فتح في واتساب</button></div></div>` : ""}`
+      : `<div class="empty">اختر محادثة</div>`}</div></div>`;
+}
+function waSetupCard(){
+  const hook = `${SB_URL}/functions/v1/wa-webhook`, c = S.waAdmin || {};
+  return `<div class="panel"><div class="panel-h"><h3>ربط واتساب القسم (مرة واحدة)</h3><span class="s">واتساب الرسمي من Meta — Cloud API</span></div><div class="panel-b wa-setup">
+    <ol class="wa-steps"><li>من <b>Meta for Developers</b> أنشئ تطبيق (Business) وأضف منتج <b>WhatsApp</b> وأضف رقم القسم.</li>
+      <li>في <b>WhatsApp ← Configuration ← Webhook</b> الصق:<div class="wa-cp"><span>Callback URL</span><code dir="ltr">${esc(hook)}</code><button type="button" class="btn btn-ghost" data-wacopy="${esc(hook)}">نسخ</button></div><div class="wa-cp"><span>Verify token</span><code dir="ltr">${esc(c.verify || "…")}</code><button type="button" class="btn btn-ghost" data-wacopy="${esc(c.verify || "")}">نسخ</button></div>ثم فعّل الاشتراك في <b>messages</b>.</li>
+      <li>الصق القيم الأربع هنا واضغط «ربط» — تُحفظ في الخادم ولا يطّلع عليها أحد من مستخدمي النظام.</li></ol>
+    <div class="g2">${fld("wa-pid", "Phone number ID", `<input class="f" id="wa-pid" dir="ltr" value="${esc(c.phone_id || "")}">`)}${fld("wa-waba", "WhatsApp Business Account ID", `<input class="f" id="wa-waba" dir="ltr" value="${esc(c.waba_id || "")}">`)}</div>
+    <div class="g2">${fld("wa-tok", `Access token دائم ${c.has_token ? "✓ محفوظ" : ""}`, `<input class="f" id="wa-tok" dir="ltr" type="password" placeholder="${c.has_token ? "اتركه فارغاً للإبقاء" : "EAA…"}">`)}${fld("wa-sec", `App secret ${c.has_secret ? "✓ محفوظ" : ""}`, `<input class="f" id="wa-sec" dir="ltr" type="password" placeholder="${c.has_secret ? "اتركه فارغاً للإبقاء" : ""}">`)}</div>
+    ${fld("wa-disp", "رقم القسم (للعرض)", `<input class="f" id="wa-disp" dir="ltr" placeholder="+965…" value="${esc(S.waCfg.display || "")}">`)}
+    <div class="br-acts"><button type="button" class="btn btn-primary" data-wasave>ربط</button></div></div></div>`;
+}
+async function waSend(phone, text, extra){
+  const { data, error } = await sb.functions.invoke("wa-send", { body:{ phone, text, ...(extra || {}) } });
+  if (error) { let msg = "تعذّر الإرسال"; try { const j = await error.context.json(); msg = j.error || msg; } catch (_) {} throw new Error(msg); }
+  return data;
+}
+// every «واتساب للمنسق» in the system now sends from the section's number when it is linked
+const _waOpen19 = waOpen;
+waOpen = function(phone, text){ if (!S.waCfg.on || !S.canWrite) return _waOpen19(phone, text); const k = waKey(phone); if (k.length < 10) return toast("لا يوجد رقم هاتف صحيح");
+  S.form = { kind:"wa", phone:k };
+  openDrawer("إرسال واتساب من رقم القسم", `<div class="q-meta"><b>${esc(waWho(k) || "+" + k)}</b><span class="s" dir="ltr">+${k}</span></div>${fld("wa-txt", "الرسالة", `<textarea class="f" id="wa-txt" rows="9">${esc(text || "")}</textarea>`)}`,
+    `<button class="btn btn-primary" data-wasend2="${k}">إرسال</button><button class="btn btn-ghost" data-waapp="${k}">${icon("i-wa")} فتح في واتساب بدلاً من ذلك</button><button class="btn btn-ghost" data-close>إلغاء</button>`); };
+const _boot9wa = boot9;
+boot9 = function(){ _boot9wa(); loadWa().then(() => { liveWa(); waBadge(); if (S.view === "whatsapp" && $("#drawer").hidden) { render(); waScroll(); } }); if (S.admin) sb.rpc("wa_config_get").then(r => { if (!r.error) { S.waAdmin = r.data; if (S.view === "whatsapp" && $("#drawer").hidden) render(); } }); };
+function waBadge(){ const b = $('#nav [data-nav="whatsapp"]'); if (!b) return; let i = b.querySelector(".nb"); const n = waUnread(); if (!n) { i?.remove(); return; } if (!i) { i = document.createElement("i"); i.className = "nb"; b.appendChild(i); } i.textContent = n; }
+const _afterRender19 = afterRender;
+afterRender = function(){ _afterRender19(); waBadge(); if (S.view === "whatsapp") waScroll(); };
+const _prio19 = priorities;
+priorities = function(){ const P = _prio19(); const n = waUnread(); if (n) P.push({ w:88, k:"t1", t:`${n} محادثة واتساب بانتظار الرد`, s:"رسائل المنسقين على رقم القسم", act:{ go:"whatsapp", l:"واتساب" } }); return P.sort((a, b) => b.w - a.w); };
+document.addEventListener("click", async ev => {
+  const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
+  if (D.wat) { S.f.wa = D.wat; render(); return waScroll(); }
+  if (D.wacopy !== undefined) { const ok = await cpCopy(D.wacopy); return toast(ok ? "نُسخ" : "تعذّر النسخ"); }
+  if (D.waapp) return _waOpen19(D.waapp, $("#wa-in")?.value || $("#wa-txt")?.value || "");
+  if (D.wanew !== undefined) { const p = prompt("رقم الهاتف (مثال 9xxxxxxx):"); if (p) { S.f.wa = waKey(p); render(); } return; }
+  if (D.wamedia) { const { data } = await sb.storage.from("requests").createSignedUrl(D.wamedia, 3600); if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener"); return; }
+  if (D.wasend || D.wasend2) { const k = D.wasend || D.wasend2, box = $(D.wasend ? "#wa-in" : "#wa-txt"), txt = box?.value.trim(); if (!txt) return toast("اكتب الرسالة"); t.disabled = true;
+    try { await waSend(k, txt); if (box) box.value = ""; toast("أُرسلت من رقم القسم"); if (D.wasend2) closeDrawer(); } catch (e) { toast(e.message); } finally { t.disabled = false; } return; }
+  if (D.wasave !== undefined) { const v = id => $("#" + id)?.value.trim() || ""; if (!v("wa-pid") && !S.waAdmin?.phone_id) return toast("الصق Phone number ID");
+    const { data, error } = await sb.rpc("wa_config_set", { p_token:v("wa-tok"), p_phone_id:v("wa-pid"), p_waba_id:v("wa-waba"), p_app_secret:v("wa-sec"), p_display:v("wa-disp") }); if (error) return writeFail(error);
+    S.waAdmin = data; await loadWa(); render(); return toast(S.waCfg.on ? "رُبط واتساب القسم ✓" : "حُفظ — أكمل القيم الناقصة"); }
 });
 
 (async function boot(){
