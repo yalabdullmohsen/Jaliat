@@ -744,7 +744,6 @@ body.cp-full #cp-fab{display:none}
       <button data-nav="weekly"><svg><use href="#i-cal"/></svg><span>الجدول الأسبوعي</span></button>
       <button data-nav="halls"><svg><use href="#i-hall"/></svg><span>حجز القاعات</span></button>
       <button data-nav="stats"><svg><use href="#i-chart"/></svg><span>الإحصائيات</span></button>
-      <button data-nav="attend"><svg><use href="#i-people"/></svg><span>الحضور والمهتدين</span></button>
       <div class="sep">السجلات</div>
       <button data-nav="mosques"><svg><use href="#i-dome"/></svg><span>المساجد</span></button>
       <button data-nav="docs"><svg><use href="#i-doc"/></svg><span>الوثائق</span></button>
@@ -3131,7 +3130,7 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 document.addEventListener("change", ev => { if (ev.target.id === "cpx-auto") { CPX.auto = ev.target.checked; LS.set("cpauto", CPX.auto); } });
 
 /* ================= v10: intake inbox, Copilot vision, letters, WhatsApp, weekly sheet, attendance, alerts, voice, reports, backups ================= */
-Object.assign(TITLES, { inbox:"الطلبات الواردة", weekly:"الجدول الأسبوعي", attend:"الحضور والمهتدين", backups:"النسخ الاحتياطية" });
+Object.assign(TITLES, { inbox:"الطلبات الواردة", weekly:"الجدول الأسبوعي", backups:"النسخ الاحتياطية" });
 S.reqs = []; S.att = [];
 const RQ_ST = ["جديد", "قيد المراجعة", "بانتظار الموافقة", "معتمد", "مرفوض"];
 const RQ_C = { "جديد":"gold", "قيد المراجعة":"t1", "بانتظار الموافقة":"warn", "معتمد":"ok", "مرفوض":"bad" };
@@ -3214,11 +3213,10 @@ sysMarkdown = function(){
   let out = _sysMd11();
   const T2 = (head, rows) => `| ${head.join(" | ")} |\n|${head.map(() => "---").join("|")}|\n` + rows.map(r => `| ${r.map(x => String(x ?? "").replace(/\|/g, "/").replace(/\s+/g, " ").trim() || "—").join(" | ")} |`).join("\n");
   if (S.reqs.length) out += `\n\n## الطلبات الواردة (${S.reqs.length})\n` + T2(["التاريخ", "الجهة", "الجالية", "المنسق", "الحالة", "عدد الأنشطة", "الأنشطة", "ملاحظات"], S.reqs.slice(0, 200).map(r => [fmt(r.data?.date || r.created_at?.slice(0, 10)), r.data?.org, r.data?.comm, r.data?.coord, r.status, (r.data?.acts || []).length, (r.data?.acts || []).map(actLine).join(" / "), r.data?.notes]));
-  if (S.att.length) { const from = addMonths(TODAY, -3); out += `\n\n## سجل الحضور والمهتدين (آخر 3 أشهر)\n` + T2(["التاريخ", "النشاط", "الجالية", "المسجد", "الحضور", "المهتدون الجدد", "ملاحظة"], S.att.filter(x => x.day >= from).map(x => { const e = S.byId.get(x.act_id); return [fmt(x.day), e ? "#" + e.n : "—", e?.comm, e?.mosName, x.cnt, x.converts, x.note]; })); }
+  if (false) { const from = addMonths(TODAY, -3); out += `\n\n## سجل الحضور والمهتدين (آخر 3 أشهر)\n` + T2(["التاريخ", "النشاط", "الجالية", "المسجد", "الحضور", "المهتدون الجدد", "ملاحظة"], S.att.filter(x => x.day >= from).map(x => { const e = S.byId.get(x.act_id); return [fmt(x.day), e ? "#" + e.n : "—", e?.comm, e?.mosName, x.cnt, x.converts, x.note]; })); }
   return out;
 };
 PRIME_MSG = PRIME_MSG.replace("مثال:", `- {"op":"add_request","data":{"org":"الجهة الطالبة","comm":"الجالية","coord":"اسم المنسق أو الموقّع","phone":"","date":"تاريخ الطلب","subj":"موضوع الطلب","acts":[ نفس حقول add_act لكل نشاط مطلوب ],"notes":"","issues":"النواقص أو الملاحظات على الطلب"}}  ← للطلبات الواردة التي لم تصدر لها موافقة بعد
-- {"op":"log_attendance","n":رقم_النشاط,"day":"YYYY-MM-DD","cnt":عدد_الحضور,"converts":عدد_المهتدين_الجدد,"note":""}
 مثال:`);
 
 const _describe11 = describe;
@@ -3562,7 +3560,6 @@ function alerts(){
   const exp = S.docs.filter(d => d.end && d.end >= TODAY && d.end <= addDays(TODAY, 14) && S.E.some(e => e.doc === d.no && e.live)); if (exp.length) A.push({ k:"warn", t:`${exp.length} موافقة تنتهي خلال 14 يوماً`, s:exp.slice(0, 4).map(d => d.no + " (" + fmt(d.end) + ")").join("، "), go:"docs" });
   const cf = S.E.filter(e => e.cf.length && RUN(e)).length; if (cf) A.push({ k:"bad", t:`${Math.round(cf / 2) || 1} تعارض في الأنشطة الجارية`, go:"acts", f:{ cf:1 } });
   if (typeof SR !== "undefined" && SR.loaded !== false) { const d = dOf(TODAY); d.setDate(d.getDate() - ((d.getDay() + 2) % 7)); const fri = isoOf(d); const miss = [...S.khatibs.keys()].filter(k => !SR.rows.has(fri + "|" + k)).length; if (fri < TODAY && miss && S.khatibs.size) A.push({ k:"t1", t:`${miss} خطبة غير مسجلة لجمعة ${fmt(fri)}`, go:"rewards" }); }
-  const due = S.E.filter(e => RUN(e) && e.days.includes(new Date(Date.now() - 864e5).getDay()) && !S.att.some(a => a.act_id === e.id && a.day === addDays(TODAY, -1))).length; if (due && S.att.length) A.push({ k:"", t:`${due} نشاط أمس بلا تسجيل حضور`, go:"attend" });
   const today = S.E.filter(e => e.live && e.start <= TODAY && e.end >= TODAY && e.days.includes(dOf(TODAY).getDay())).length; A.push({ k:"ok", t:`${today} نشاط اليوم`, go:"weekly" });
   return A;
 }
@@ -3616,8 +3613,8 @@ function reportHTML(ym){
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>تقرير ${MN} ${y}</title><style>body{font-family:'Simplified Arabic',Arial;direction:rtl}h1,h2{color:#1d4d3a}h2{font-size:15pt;border-bottom:2px solid #c9a227;padding-bottom:3px;margin-top:18px}</style></head><body dir="rtl">
 <p style="text-align:center;margin:0">وزارة الأوقاف والشؤون الإسلامية<br>${DEPT}</p>
 <h1 style="text-align:center;font-size:20pt">التقرير الشهري لأنشطة الجاليات — ${MN} ${y} م</h1>
-<h2>ملخص الشهر</h2>${tbl(["الأنشطة الجارية", "أنشطة جديدة", "موافقات جديدة", "طلبات واردة", "جلسات حضور", "إجمالي الحضور", "مهتدون جدد", "خطب الجمعة المسجلة"], [[act.length, nw.length, docs.length, reqs.length, att.length, att.reduce((s, x) => s + x.cnt, 0), att.reduce((s, x) => s + x.converts, 0), serm.filter(r => r.who !== "none").length]])}
-<h2>الأنشطة حسب الجالية</h2>${tbl(["الجالية", "الأنشطة الجارية", "الجديدة هذا الشهر", "الحضور", "المهتدون"], Object.entries(byC).sort((a, b) => b[1].a - a[1].a).map(([c, o]) => [c, o.a, o.n, o.c, o.v]))}
+<h2>ملخص الشهر</h2>${tbl(["الأنشطة الجارية", "أنشطة جديدة", "موافقات جديدة", "طلبات واردة", "خطب الجمعة المسجلة"], [[act.length, nw.length, docs.length, reqs.length, serm.filter(r => r.who !== "none").length]])}
+<h2>الأنشطة حسب الجالية</h2>${tbl(["الجالية", "الأنشطة الجارية", "الجديدة هذا الشهر"], Object.entries(byC).sort((a, b) => b[1].a - a[1].a).map(([c, o]) => [c, o.a, o.n]))}
 <h2>الأنشطة حسب المحافظة</h2>${tbl(["المحافظة", "عدد الأنشطة"], GOVS.map(g => [g, act.filter(e => e.gov === g).length]))}
 ${nw.length ? `<h2>الأنشطة الجديدة</h2>${tbl(["#", "النوع", "الجالية", "المسجد", "الأيام", "الوقت", "المحاضر"], nw.map(e => [e.n, e.type, e.comm, e.mosName, daysText(e), e.time, e.lect]))}` : ""}
 ${docs.length ? `<h2>الموافقات الصادرة</h2>${tbl(["رقم الوثيقة", "الموضوع", "الجالية", "من", "إلى"], docs.map(d => [d.no, d.subj, d.comm, fmt(d.start), fmt(d.end)]))}` : ""}
@@ -3654,10 +3651,9 @@ actForm = function(id, preset){
   const e = id && S.byId.get(id); if (!e) return;
   const f = $(".drawer-f [data-close]");
   f?.insertAdjacentHTML("afterend", `<button class="btn btn-ghost" type="button" data-wa="act:${esc(id)}" title="واتساب للمنسق">${icon("i-wa")}</button><button class="btn btn-ghost" type="button" data-letter="${esc(id)}" title="مسودة كتاب وثيقة">${icon("i-doc")}</button>`);
-  $(".drawer-b")?.insertAdjacentHTML("beforeend", attBlock(e));
 };
 const _vStats11 = vStats;
-vStats = function(){ return `<div class="toolbar" style="margin-bottom:10px"><button class="btn" type="button" data-report>${icon("i-doc")} التقرير الشهري (Word)</button>${hasBridge() ? `<button class="btn cp-ask" type="button" data-reportcp>${icon("i-spark")} اطلب من Copilot كتابة التقرير</button>` : ""}<button class="btn" type="button" data-go="attend">الحضور والمهتدين</button></div>` + _vStats11(); };
+vStats = function(){ return `<div class="toolbar" style="margin-bottom:10px"><button class="btn" type="button" data-report>${icon("i-doc")} التقرير الشهري (Word)</button>${hasBridge() ? `<button class="btn cp-ask" type="button" data-reportcp>${icon("i-spark")} اطلب من Copilot كتابة التقرير</button>` : ""}</div>` + _vStats11(); };
 const _vCopilot11 = vCopilot;
 vCopilot = function(){
   let h = _vCopilot11(); if (!hasBridge()) return h;
@@ -3717,7 +3713,7 @@ document.addEventListener("click", async ev => {
   if (D.atm) { S.f.atm = D.atm; return render(); }
   if (D.attxl !== undefined) return attXlsx();
   if (D.report !== undefined) return reportDownload();
-  if (D.reportcp !== undefined) return askAbout(`اكتب «التقرير الشهري لأنشطة الجاليات» لشهر ${TODAY.slice(5, 7)}/${TODAY.slice(0, 4)} بصياغة رسمية لرفعها لمدير الإدارة: مقدمة، أبرز الإنجازات بالأرقام من ملف النظام (الأنشطة الجارية والجديدة حسب الجالية والمحافظة، الموافقات، الحضور والمهتدين، خطب الجمعة)، التحديات (التعارضات والموافقات المنتهية والنواقص)، والتوصيات. استخدم جداول.`);
+  if (D.reportcp !== undefined) return askAbout(`اكتب «التقرير الشهري لأنشطة الجاليات» لشهر ${TODAY.slice(5, 7)}/${TODAY.slice(0, 4)} بصياغة رسمية لرفعها لمدير الإدارة: مقدمة، أبرز الإنجازات بالأرقام من ملف النظام (الأنشطة الجارية والجديدة حسب الجالية والمحافظة، الموافقات، الطلبات الواردة، خطب الجمعة)، التحديات (التعارضات والموافقات المنتهية والنواقص)، والتوصيات. استخدم جداول.`);
   if (D.bknow !== undefined) { const { error } = await sb.rpc("backup_now"); if (error) return writeFail(error); toast("أُخذت نسخة احتياطية"); return bkLoad(); }
   if (D.bkxl) return bkXlsx(+D.bkxl);
   if (t.id === "br-mic") return voiceStart();
