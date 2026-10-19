@@ -774,6 +774,7 @@ button.kpi{transition:box-shadow .15s,transform .15s} button.kpi:hover{transform
 #permit-print{display:none}
 @media print{body.print-any #permit-print.on{display:block}#permit-print .permit{border:0;max-width:none;padding:10mm 12mm}@page{size:A4;margin:8mm}}
 .search input.f{padding-inline-start:40px}
+.f[readonly]{background:var(--surface-2);color:var(--muted);cursor:not-allowed}
 .brand svg{color:#fff;width:38px;height:38px}.brand b{font-size:21px;letter-spacing:.3px}.login-card .mark{width:76px;height:76px}.login-card h1{font-size:34px}.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}.nav .sep{font-weight:700;padding:16px 12px 4px}.nav .ext-i{width:14px!important;height:14px!important;opacity:.55;margin-inline-start:auto}.nav button{min-height:40px}</style>
 
 </head>
@@ -4775,12 +4776,13 @@ voiceStart = function(target){ if (!hasBridge() && $("#as-in")) { const i = $("#
 /* ================= v16: Watheqa data inside «إنجاز» + lesson permits with verifiable barcode ================= */
 Object.assign(TITLES, { watheqa:"وثيقة", permits:"تصاريح الدروس" });
 const WQ_VIEW = id => `https://watheqa.awqaf.gov.kw/Documents/View?id=${encodeURIComponent(id)}`;
-S.wq = []; S.wqSync = null; S.permits = []; S.pAssets = {};
+S.wq = []; S.wqSync = null; S.permits = []; S.pAssets = {}; S.grants = [];
 async function loadWq(){ const { data, error } = await sb.from("watheqa_docs").select("*").order("id", { ascending:false }).limit(3000); if (!error) S.wq = data || []; const s = await sb.from("settings").select("value").eq("key", "watheqa_sync").maybeSingle(); S.wqSync = s.data?.value || null; }
-async function loadPermits(){ const { data, error } = await sb.from("permits").select("*").order("issued_at", { ascending:false }).limit(2000); if (!error) S.permits = data || []; const a = await sb.from("settings").select("value").eq("key", "permit_assets").maybeSingle(); S.pAssets = a.data?.value || {}; }
+async function loadPermits(){ const { data, error } = await sb.from("permits").select("*").order("issued_at", { ascending:false }).limit(2000); if (!error) S.permits = data || []; const a = await sb.from("settings").select("value").eq("key", "permit_assets").maybeSingle(); S.pAssets = a.data?.value || {}; const g = await sb.from("permit_grants").select("*").order("created_at", { ascending:false }).limit(500); if (!g.error) S.grants = g.data || []; }
 let wqCh = null;
 function liveWq(){ if (wqCh) sb.removeChannel(wqCh); wqCh = sb.channel("wq").on("postgres_changes", { event:"*", schema:"public", table:"watheqa_docs" }, p => { if (p.new?.id) S.wq = [p.new, ...S.wq.filter(x => x.id !== p.new.id)]; if (S.view === "watheqa" && $("#drawer").hidden) render(); })
-  .on("postgres_changes", { event:"*", schema:"public", table:"permits" }, p => { S.permits = p.eventType === "DELETE" ? S.permits.filter(x => x.id !== p.old?.id) : [p.new, ...S.permits.filter(x => x.id !== p.new.id)]; if (S.view === "permits" && $("#drawer").hidden) render(); }).subscribe(); }
+  .on("postgres_changes", { event:"*", schema:"public", table:"permits" }, p => { S.permits = p.eventType === "DELETE" ? S.permits.filter(x => x.id !== p.old?.id) : [p.new, ...S.permits.filter(x => x.id !== p.new.id)]; if (S.view === "permits" && $("#drawer").hidden) render(); })
+  .on("postgres_changes", { event:"*", schema:"public", table:"permit_grants" }, p => { if (p.new?.id) S.grants = [p.new, ...S.grants.filter(x => x.id !== p.new.id)]; if (["permits", "tasks", "home"].includes(S.view) && $("#drawer").hidden) render(); }).subscribe(); }
 const wqDate = w => { const m = (w.doc_date || "").match(/(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : (w.created || "").replace(/\//g, "-").slice(0, 10); };
 const wqComm = w => { const t = norm(w.subj + " " + w.body); return commNames.find(c => norm(c).split(/[\s–-]+/).filter(x => x.length > 4).some(x => t.includes(x.replace(/^ال/, "")))) || ""; };
 
@@ -4827,21 +4829,22 @@ const pStatus = p => p.revoked ? ["ملغى", "bad"] : p.until < TODAY ? ["من�
 function vPermits(){
   const q = nkey(S.f.pq || ""); const L = S.permits.filter(p => !q || nkey([p.no, p.data?.sheikh, p.data?.mosque, p.data?.topic].join(" ")).includes(q));
   return `<div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input class="f" id="pq" data-fk="pq" placeholder="ابحث برقم التصريح أو اسم الشيخ أو المسجد…" value="${esc(S.f.pq || "")}"></div>
-    ${S.admin ? `<button class="btn btn-primary" type="button" data-pnew>${icon("i-plus")} إصدار تصريح</button><button class="btn" type="button" data-passets>التوقيع والختم</button>` : ""}<span class="count">${S.permits.filter(p => pStatus(p)[0] === "ساري").length} ساري · ${S.permits.length} إجمالي</span></div>
-    ${!S.admin ? `<div class="check"><b>إصدار التصاريح لمدير النظام ورئيس القسم فقط</b><span>يمكنك عرض التصاريح وطباعتها.</span></div>` : ""}
+    ${S.admin ? `<button class="btn btn-primary" type="button" data-pnew>${icon("i-plus")} إصدار تصريح</button><button class="btn" type="button" data-pgnew>تفويض موظف بتصريح</button><button class="btn btn-ghost" type="button" data-passets>التوقيع والختم</button>` : ""}<span class="count">${S.permits.filter(p => pStatus(p)[0] === "ساري").length} ساري · ${S.permits.length} إجمالي</span></div>
+    ${grantsPanel()}${!S.admin && !myGrants().length ? `<div class="check"><b>إصدار التصاريح لرئيس القسم ومدير النظام</b><span>أو لمن يفوّضه رئيس القسم بتصريح محدد — ويظهر لك هنا عند التفويض.</span></div>` : ""}
     <div class="wq-list">${L.map(p => { const [st, c] = pStatus(p); return `<button type="button" class="wq-i" data-permit="${p.id}"><span class="num wq-no">${esc(p.no)}</span><span class="wq-t"><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.date ? fmt(p.data.date) : "")} · ${esc(p.data?.time || "")}</span></span><span class="wq-m"><span class="chip ${c}">${st}</span><span class="s">حتى ${fmt(p.until)}</span></span></button>`; }).join("") || `<div class="empty">لا توجد تصاريح بعد</div>`}</div>`;
 }
 const DUR = [["day", "يوم الدرس فقط", 1], ["3", "3 أيام", 3], ["7", "أسبوع", 7], ["30", "شهر", 30], ["90", "3 أشهر", 90], ["180", "6 أشهر", 180]];
-function permitForm(preset){
-  if (!S.admin) return toast("إصدار التصاريح لمدير النظام ورئيس القسم فقط");
+function permitForm(preset, grant){
+  if (!S.admin && !grant) return toast("إصدار التصاريح لرئيس القسم أو بتفويض منه");
+  if (grant) preset = { ...grant.preset, ...preset };
   const d = { sheikh:"", mosque:"", topic:"", lang:"", date:addDays(TODAY, 1), t_from:"19:30", t_to:"20:30", dur:"day", head:S.pAssets.head || "فايز رزقان الرشيدي", ...preset };
-  S.form = { kind:"permit", act:preset?.act_id || "" };
-  openDrawer("إصدار تصريح إلقاء درس", `
-    ${fld("p-sheikh", "اسم الشيخ", `<input class="f" id="p-sheikh" value="${esc(d.sheikh)}" list="p-lects"><datalist id="p-lects">${[...new Set(S.E.flatMap(e => (e.lect || "").split(" / ")).filter(Boolean))].slice(0, 400).map(l => `<option value="${esc(l)}">`).join("")}</datalist>`)}
-    ${fld("p-mosque", "المسجد والمنطقة", `<input class="f" id="p-mosque" value="${esc(d.mosque)}" list="p-mos"><datalist id="p-mos">${S.mosques.map(m => `<option value="${esc("مسجد " + m.name + (m.area ? " — " + m.area : ""))}">`).join("")}</datalist>`)}
+  S.form = { kind:"permit", act:preset?.act_id || "", grant:grant?.id || "" }; const lock = grant ? " readonly" : "";
+  openDrawer("إصدار تصريح إلقاء درس", `${grant ? `<div class="check ok"><b>تفويض من ${esc(pname(grant.granted_by))}</b><span>صلاحيتك على هذا التصريح فقط: الشيخ والمسجد محددان من رئيس القسم${grant.note ? " — " + esc(grant.note) : ""}</span></div>` : ""}
+    ${fld("p-sheikh", "اسم الشيخ", `<input class="f" id="p-sheikh" value="${esc(d.sheikh)}" list="p-lects"${lock}><datalist id="p-lects">${[...new Set(S.E.flatMap(e => (e.lect || "").split(" / ")).filter(Boolean))].slice(0, 400).map(l => `<option value="${esc(l)}">`).join("")}</datalist>`)}
+    ${fld("p-mosque", "المسجد والمنطقة", `<input class="f" id="p-mosque" value="${esc(d.mosque)}" list="p-mos"${lock}><datalist id="p-mos">${S.mosques.map(m => `<option value="${esc("مسجد " + m.name + (m.area ? " — " + m.area : ""))}">`).join("")}</datalist>`)}
     <div class="g2">${fld("p-topic", "عنوان الدرس (اختياري)", `<input class="f" id="p-topic" value="${esc(d.topic)}">`)}${fld("p-lang", "اللغة (اختياري)", `<input class="f" id="p-lang" value="${esc(d.lang)}">`)}</div>
     <div class="g3">${fld("p-date", "تاريخ الدرس", `<input class="f" type="date" id="p-date" value="${esc(d.date)}">`)}${fld("p-from", "من", `<input class="f" type="time" id="p-from" value="${esc(d.t_from)}">`)}${fld("p-to", "إلى", `<input class="f" type="time" id="p-to" value="${esc(d.t_to)}">`)}</div>
-    <div class="g2">${fld("p-dur", "مدة التصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("p-head", "المعتمِد", `<input class="f" id="p-head" value="${esc(d.head)}">`)}</div>
+    <div class="g2">${fld("p-dur", "مدة التصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("p-head", "المعتمِد", `<input class="f" id="p-head" value="${esc(d.head)}"${lock}>`)}</div>
     <span class="hint">يُولَّد رقم التصريح ورمز التحقق تلقائياً. الباركود يفتح صفحة تحقق رسمية تبيّن للإمام صلاحية التصريح الآن.</span>`,
     `<button class="btn btn-primary" data-pissue>إصدار التصريح</button><button class="btn btn-ghost" data-close>إلغاء</button>`);
 }
@@ -4850,8 +4853,8 @@ async function permitIssue(){
   if (!v("p-sheikh") || !v("p-mosque") || !v("p-date")) return toast("أكمل اسم الشيخ والمسجد والتاريخ");
   const dur = DUR.find(x => x[0] === v("p-dur")) || DUR[0]; const until = addDays(v("p-date"), dur[2] - 1);
   const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), time:`من ${t12(v("p-from"))} إلى ${t12(v("p-to"))}`, dur:dur[1], head:v("p-head") };
-  const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "" }).select().single(); if (error) return writeFail(error);
-  S.permits = [row, ...S.permits]; closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id);
+  const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
+  S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id);
 }
 async function permitView(id){
   const p = S.permits.find(x => x.id === id); if (!p) return; await loadQR().catch(() => {});
@@ -4946,6 +4949,72 @@ if ("serviceWorker" in navigator) {
   document.addEventListener("visibilitychange", () => { if (!document.hidden) up(); });
   window.addEventListener("focus", up); setInterval(up, 5 * 60 * 1000); setTimeout(up, 3000);
 }
+
+/* ================= v17: head of section delegates ONE specific permit to an employee ================= */
+const gOpen = g => !g.permit_id && !g.revoked && g.expires >= TODAY;
+const myGrants = () => S.grants.filter(g => g.grantee === S.me?.id && gOpen(g));
+function grantsPanel(){
+  const mine = myGrants(), open = S.admin ? S.grants.filter(gOpen) : [];
+  const row = (g, act) => `<div class="wq-i"><span class="num wq-no">تفويض</span><span class="wq-t"><b>${esc(g.preset?.sheikh || "—")}</b><span class="s">${esc(g.preset?.mosque || "")}${g.preset?.date ? " · " + fmt(g.preset.date) : ""}${g.note ? " · " + esc(g.note) : ""}</span></span><span class="wq-m">${act}</span></div>`;
+  let h = "";
+  if (mine.length) h += `<div class="panel"><div class="panel-h"><h3>تفويضات بانتظارك (${mine.length})</h3><span class="s">صلاحية إصدار هذه التصاريح فقط</span></div><div class="panel-b wq-list">${mine.map(g => row(g, `<span class="s">من ${esc(pname(g.granted_by))} · حتى ${fmt(g.expires)}</span><button type="button" class="btn btn-primary" data-pguse="${g.id}">إصدار التصريح</button>`)).join("")}</div></div>`;
+  const others = open.filter(g => g.grantee !== S.me?.id);
+  if (others.length) h += `<div class="panel"><div class="panel-h"><h3>تفويضات لم تُنفَّذ بعد (${others.length})</h3></div><div class="panel-b wq-list">${others.map(g => row(g, `<span class="chip t2">${esc(pname(g.grantee))}</span><span class="s">حتى ${fmt(g.expires)}</span><button type="button" class="btn btn-ghost bad-t" data-pgrevoke="${g.id}">سحب التفويض</button>`)).join("")}</div></div>`;
+  return h;
+}
+function grantForm(preset){
+  if (!S.admin) return toast("التفويض لرئيس القسم فقط");
+  const d = { sheikh:"", mosque:"", topic:"", lang:"", date:addDays(TODAY, 1), t_from:"19:30", t_to:"20:30", dur:"day", head:S.pAssets.head || "فايز رزقان الرشيدي", ...preset };
+  const people = S.profiles.filter(p => p.active && p.id !== S.me?.id);
+  S.form = { kind:"pgrant", src:preset?.source || "", act:preset?.act_id || "" };
+  openDrawer("تفويض موظف بإصدار تصريح", `
+    <div class="check"><b>الموظف يأخذ صلاحية إصدار هذا التصريح فقط</b><span>لا يستطيع تغيير اسم الشيخ أو المسجد، ولا إصدار أي تصريح آخر. تصله مهمة وإشعار، وتُغلق المهمة تلقائياً عند الإصدار.</span></div>
+    ${fld("g-to", "الموظف المفوَّض", `<select class="f" id="g-to">${people.map(p => `<option value="${p.id}">${esc(p.name || p.username)}</option>`).join("")}</select>`)}
+    ${fld("p-sheikh", "اسم الشيخ", `<input class="f" id="p-sheikh" value="${esc(d.sheikh)}">`)}
+    ${fld("p-mosque", "المسجد والمنطقة", `<input class="f" id="p-mosque" value="${esc(d.mosque)}" list="p-mos"><datalist id="p-mos">${S.mosques.map(m => `<option value="${esc("مسجد " + m.name + (m.area ? " — " + m.area : ""))}">`).join("")}</datalist>`)}
+    <div class="g2">${fld("p-topic", "عنوان الدرس (اختياري)", `<input class="f" id="p-topic" value="${esc(d.topic)}">`)}${fld("p-lang", "اللغة (اختياري)", `<input class="f" id="p-lang" value="${esc(d.lang)}">`)}</div>
+    <div class="g3">${fld("p-date", "تاريخ الدرس", `<input class="f" type="date" id="p-date" value="${esc(d.date)}">`)}${fld("p-from", "من", `<input class="f" type="time" id="p-from" value="${esc(d.t_from)}">`)}${fld("p-to", "إلى", `<input class="f" type="time" id="p-to" value="${esc(d.t_to)}">`)}</div>
+    <div class="g2">${fld("p-dur", "أقصى مدة للتصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("g-note", "توجيه للموظف (اختياري)", `<input class="f" id="g-note" placeholder="مثال: بناءً على كتاب وثيقة 2608-2957">`)}</div>`,
+    `<button class="btn btn-primary" data-pgsave>تفويض وإرسال المهمة</button><button class="btn btn-ghost" data-close>إلغاء</button>`);
+}
+async function grantSave(){
+  const v = id => $("#" + id)?.value.trim() || "";
+  if (!v("g-to") || !v("p-sheikh") || !v("p-mosque") || !v("p-date")) return toast("اختر الموظف وأكمل اسم الشيخ والمسجد والتاريخ");
+  const dur = DUR.find(x => x[0] === v("p-dur")) || DUR[0];
+  const preset = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), dur:dur[0], until:addDays(v("p-date"), dur[2] - 1), head:S.pAssets.head || "فايز رزقان الرشيدي", act_id:S.form?.act || "" };
+  const { data:g, error } = await sb.from("permit_grants").insert({ grantee:v("g-to"), preset, source:S.form?.src || "", note:v("g-note"), expires:addDays(v("p-date"), 3) }).select().single(); if (error) return writeFail(error);
+  const { data:t, error:e2 } = await sb.from("tasks").insert({ title:`إصدار تصريح درس — ${preset.sheikh}`, details:`${preset.mosque}\nتاريخ الدرس: ${fmt(preset.date)}${g.note ? "\n" + g.note : ""}\nصلاحيتك على هذا التصريح فقط.`, assignee:g.grantee, due:preset.date, prio:"عالية", link:`#pgrant:${g.id}` }).select().single();
+  if (!e2 && t) { await sb.from("permit_grants").update({ task_id:t.id }).eq("id", g.id); g.task_id = t.id; S.tasks = [t, ...S.tasks]; }
+  S.grants = [g, ...S.grants.filter(x => x.id !== g.id)]; closeDrawer(); render(); toast(`فُوِّض ${pname(g.grantee)} بإصدار التصريح ووصله إشعار`);
+}
+function grantUse(id){ const g = S.grants.find(x => x.id === id); if (!g) return toast("التفويض غير موجود"); if (g.permit_id) { toast("صدر هذا التصريح مسبقاً"); return permitView(g.permit_id); } if (!gOpen(g)) return toast("انتهى هذا التفويض أو سُحب"); if (g.grantee !== S.me?.id && !S.admin) return toast("هذا التفويض لموظف آخر"); permitForm({}, g.grantee === S.me?.id ? g : null); }
+
+const _openLink18 = openLink;
+openLink = function(h){ const s = String(h || "").replace(/^#/, ""); if (s.startsWith("pgrant:")) { if (S.view !== "permits") go("permits"); return grantUse(s.slice(7)); } return _openLink18(h); };
+const _prio18 = priorities;
+priorities = function(){ const P = _prio18(); const n = myGrants().length; if (n) P.push({ w:92, k:"gold", t:`${n} تصريح فوّضك رئيس القسم بإصداره`, s:"صلاحيتك على هذه التصاريح فقط", act:{ go:"permits", l:"إصدار" } }); return P.sort((a, b) => b.w - a.w); };
+const _palAll18 = palAll;
+palAll = function(){ const A = _palAll18(); if (S.admin) A.unshift({ g:"إجراءات", t:"تفويض موظف بإصدار تصريح", s:"", ic:"i-badge", run:() => grantForm(), txt:"تفويض صلاحية تصريح موظف" }); for (const g of myGrants()) A.unshift({ g:"إجراءات", t:`إصدار تصريح مفوَّض: ${g.preset?.sheikh || ""}`, s:g.preset?.mosque || "", ic:"i-badge", run:() => { go("permits"); grantUse(g.id); }, txt:"تصريح تفويض " + (g.preset?.sheikh || "") }); return A; };
+// add «تفويض» next to «تصريح» in the activity drawer, and in the Watheqa letter drawer
+const _actForm18 = actForm;
+actForm = function(id, preset){ _actForm18(id, preset); const b = $(".drawer-f [data-pfrom]"); if (b && S.admin) b.insertAdjacentHTML("afterend", `<button class="btn btn-ghost" type="button" data-pgfrom="1" data-pd='${esc(b.dataset.pd)}'>تفويض تصريح</button>`); };
+const _wqForm18 = wqForm;
+wqForm = function(id){ _wqForm18(id); const w = S.wq.find(x => x.id === id); if (!w || !S.admin) return;
+  const lect = (w.body.match(/(?:الشيخ|فضيلة الشيخ|الداعية)\s*\/?\s*([^\n،,.(]{4,40})/) || [])[1] || "";
+  const mos = (w.body.match(/(مسجد\s*\/?\s*[^\n،,.(]{3,40})/) || [])[1] || "";
+  $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-ghost" type="button" data-pgfrom="1" data-pd='${esc(JSON.stringify({ sheikh:lect.trim(), mosque:mos.trim(), topic:w.subj || "", source:`#wq:${w.id}` }))}'>تفويض تصريح</button>`); };
+// show «صدر بتفويض» on a delegated permit
+const _permitView18 = permitView;
+permitView = async function(id){ await _permitView18(id); const p = S.permits.find(x => x.id === id); if (!p?.grant_id) return; const g = S.grants.find(x => x.id === p.grant_id);
+  $("#drawer .check")?.insertAdjacentHTML("afterend", `<div class="check"><b>صدر بتفويض</b><span>من ${esc(pname(g?.granted_by))} إلى ${esc(pname(p.issued_by))}</span></div>`); };
+document.addEventListener("click", async ev => {
+  const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
+  if (D.pgnew !== undefined) return grantForm();
+  if (D.pgfrom) { try { return grantForm(JSON.parse(D.pd)); } catch (_) { return grantForm(); } }
+  if (D.pgsave !== undefined) return grantSave();
+  if (D.pguse) return grantUse(D.pguse);
+  if (D.pgrevoke) { if (D.sure !== "1") { D.sure = "1"; t.textContent = "اضغط للتأكيد"; return; } const g = S.grants.find(x => x.id === D.pgrevoke); const { error } = await sb.from("permit_grants").update({ revoked:true }).eq("id", D.pgrevoke); if (error) return writeFail(error); if (g) { g.revoked = true; if (g.task_id) await sb.from("tasks").update({ status:"ملغاة" }).eq("id", g.task_id); } toast("سُحب التفويض"); return render(); }
+});
 
 (async function boot(){
   const { data } = await sb.auth.getSession();
