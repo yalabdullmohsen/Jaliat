@@ -3871,7 +3871,7 @@ document.addEventListener("change", ev => { if (/^bk-(hall|day|from|to|st)$/.tes
 /* Edit these when Microsoft changes Copilot's page; every bridge 2.0 picks them up automatically. */
 const BRIDGE_CFG = {
   editor: ["#m365-chat-editor-target-element", '[role="textbox"][contenteditable="true"]', "textarea[placeholder]"],
-  send: ['button[aria-label="Send"]', 'button[aria-label="إرسال"]', 'button[data-testid="sendButton"]'],
+  send: ['button[aria-label="Send"]', 'button[aria-label="إرسال"]', 'button[data-testid="sendButton"]', 'button[aria-label*="Send"]', 'button[aria-label*="إرسال"]', 'button[aria-label="Submit"]', 'button[title*="Send"]', ".fai-SendButton", 'button[type="submit"]'],
   reply: ['[data-testid="markdown-reply"]', '[data-content="ai-message"]'],
   busy: ['[data-testid="loading-message"]', 'button[aria-label="Stop generating"]', 'button[aria-label="إيقاف"]'],
   upload: ["#upload-file-button", 'input[type="file"]'],
