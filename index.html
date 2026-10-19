@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>نظام أنشطة الجاليات</title>
+<title>إنجاز — قسم الجاليات</title>
 <meta name="theme-color" content="#0B3A2B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="أنشطة الجاليات">
+<meta name="apple-mobile-web-app-title" content="إنجاز">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -677,7 +677,7 @@ body.cp-full #cp-fab{display:none}
 .tk-track li::after{content:"";position:absolute;top:13px;inset-inline-start:50%;width:100%;height:2px;background:var(--line)}.tk-track li:last-child::after{display:none}
 .tk-track li.on{color:var(--ink)}.tk-track li.on::before{background:var(--ok);border-color:var(--ok)}.tk-track li.on::after{background:var(--ok)}
 .tk-track .s{font-size:11px;color:var(--muted)}
-</style>
+.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}</style>
 
 </head>
 <body>
@@ -716,7 +716,7 @@ body.cp-full #cp-fab{display:none}
   <div class="login-card">
     <svg class="mark"><use href="#star"/></svg>
     <p class="org">وزارة الأوقاف والشؤون الإسلامية · إدارة العلاقات الخارجية</p>
-    <h1>نظام أنشطة الجاليات</h1>
+    <h1>إنجاز</h1><p class="sys-tag">منصة أنشطة الجاليات والمهام والإنجاز</p>
     <p class="dept">قسم الجاليات ورعاية المهتدين وطلبة البعوث</p>
     <form id="lg-form" class="lg-form" autocomplete="on" novalidate>
       <div class="fld"><label for="lg-user">اسم المستخدم</label><input class="f" id="lg-user" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" dir="ltr" required></div>
@@ -730,7 +730,7 @@ body.cp-full #cp-fab{display:none}
 
 <div id="app" class="shell" hidden>
   <aside class="side" id="side">
-    <div class="brand"><svg><use href="#star"/></svg><div><b>أنشطة الجاليات</b><span>قسم الجاليات ورعاية المهتدين</span></div><button class="collapse" id="collapse" title="طي القائمة الجانبية" aria-label="طي القائمة"><svg><use href="#i-chev"/></svg></button></div>
+    <div class="brand"><svg><use href="#star"/></svg><div><b>إنجاز</b><span>قسم الجاليات ورعاية المهتدين</span></div><button class="collapse" id="collapse" title="طي القائمة الجانبية" aria-label="طي القائمة"><svg><use href="#i-chev"/></svg></button></div>
     <nav class="nav" id="nav">
       <button data-nav="home"><svg><use href="#i-home"/></svg><span>الرئيسية</span></button>
       <button data-nav="copilot" class="cp-nav"><svg><use href="#i-spark"/></svg><span>Copilot</span><span class="kbd">ذكاء</span></button>
@@ -2519,7 +2519,7 @@ function cpData(q, max){
   const hit = e => !nq || [e.comm, e.mosName, e.area, e.gov, e.lect, e.doc, e.type].some(v => { const k = nkey(v || ""); return k.length > 3 && nq.includes(k.replace(/^ال/, "").slice(0, 8)); });
   let L = S.E.filter(hit); if (L.length < 3) L = S.E;
   L = [...L].sort((a, b) => (RUN(b) - RUN(a)) || (b.cf.length - a.cf.length) || (a.n - b.n));
-  const head = [`[بيانات من نظام أنشطة الجاليات — قسم الجاليات ورعاية المهتدين وطلبة البعوث — بتاريخ ${fmt(TODAY)}]`,
+  const head = [`[بيانات من نظام «إنجاز» لأنشطة الجاليات — قسم الجاليات ورعاية المهتدين وطلبة البعوث — بتاريخ ${fmt(TODAY)}]`,
     `الإجمالي: ${S.E.length} نشاط (${S.E.filter(RUN).length} جارٍ، ${conflicts().length} فيها تعارض)، ${S.khatibs.size} مسجد خطبة جمعة، ${commNames.length} جالية.`,
     `حسب الجالية: ${commRows().filter(r => r.L.length).map(r => `${r.c} ${r.L.length}`).join("، ")}.`,
     `الأنشطة (الرقم | النوع | الجالية | المسجد — المنطقة | الأيام والوقت | المحاضر | من–إلى | الحالة | الوثيقة | تعارض):`];
@@ -2635,7 +2635,7 @@ function msMsg(m, i){
 function vCopilotMS(){
   const signed = !!MS.account;
   if (!msReady() || !signed) return `<div class="cp cp-simple"><div class="cp-box"><span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot</span>
-      <h3>Copilot داخل نظام الجاليات</h3>
+      <h3>Copilot داخل إنجاز</h3>
       <p class="s" style="max-width:620px;margin:0;color:var(--muted)">سجّل دخولك بحساب الوزارة مرة واحدة، وبعدها Copilot يجاوبك هنا داخل النظام: يبحث في ملفاتك وبريدك واجتماعاتك، ويعرف بيانات النظام.</p>
       <button class="btn btn-primary btn-lg ms-btn" id="ms-in" type="button"${msReady() ? "" : " disabled"}><svg width="20" height="20" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg> تسجيل الدخول بحساب Microsoft 365</button>
       ${MS.err ? `<div class="check warn" style="text-align:right;width:100%">${esc(MS.err)}${MS.errConsent ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" class="btn" id="ms-consent-copy">نسخ رابط موافقة المدير</button></div>` : ""}</div>` : ""}
@@ -2710,7 +2710,7 @@ document.addEventListener("click", ev => {
   const t = ev.target.closest("button"); if (!t) return;
   if (t.id === "ms-in") return msSignIn();
   if (t.id === "cp-legacy") { const q = prompt("اكتب سؤالك:"); if (q) cpAsk(q, cpNeedsData(q)); return; }
-  if (t.id === "ms-consent-copy") { cpCopy(`السلام عليكم، أرجو الموافقة على ربط نظام أنشطة الجاليات مع Microsoft 365 Copilot عبر الرابط التالي (موافقة مدير مرة واحدة):\n${MS.consentUrl}`).then(ok => toast(ok ? "نُسخ رابط الموافقة — أرسله لتقنية المعلومات" : MS.consentUrl)); return; }
+  if (t.id === "ms-consent-copy") { cpCopy(`السلام عليكم، أرجو الموافقة على ربط نظام «إنجاز» لأنشطة الجاليات مع Microsoft 365 Copilot عبر الرابط التالي (موافقة مدير مرة واحدة):\n${MS.consentUrl}`).then(ok => toast(ok ? "نُسخ رابط الموافقة — أرسله لتقنية المعلومات" : MS.consentUrl)); return; }
   if (t.id === "ms-out") { (async () => { try { await msInit(); if (MS.account) await MS.app.clearCache({ account:MS.account }); } catch (_) {} MS.account = null; MS.conv = null; MS.chat = []; render(); })(); return; }
   if (t.id === "ms-new") { MS.chat = []; MS.conv = null; return render(); }
   if (t.id === "ms-file") return msPick();
@@ -2774,7 +2774,7 @@ function vCopilot(){
 /* give Copilot the system's data once per conversation, automatically */
 function brPrime(){
   if (BR.primed) return; BR.primed = true;
-  const intro = "أنا موظف في قسم الجاليات ورعاية المهتدين وطلبة البعوث بوزارة الأوقاف. هذه بيانات «نظام أنشطة الجاليات» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والحالات والتعارضات). اعتمد عليها في كل إجاباتك القادمة في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو محاضر فأقصد هذه البيانات. لا تلخصها الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».";
+  const intro = "أنا موظف في قسم الجاليات ورعاية المهتدين وطلبة البعوث بوزارة الأوقاف. هذه بيانات «نظام «إنجاز» لأنشطة الجاليات» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والحالات والتعارضات). اعتمد عليها في كل إجاباتك القادمة في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو محاضر فأقصد هذه البيانات. لا تلخصها الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».";
   const f = $("#br-frame"); if (f) f.contentWindow.postMessage({ type:"jaliyat-ask", text:`${intro}\n\n${cpData("", 14000)}` }, "https://m365.cloud.microsoft");
 }
 function brSend(q, withData){
@@ -2805,7 +2805,7 @@ function sysMarkdown(){
   const c = x => String(x ?? "").replace(/\|/g, "/").replace(/\s+/g, " ").trim() || "—";
   const T = (head, rows) => `| ${head.join(" | ")} |\n|${head.map(() => "---").join("|")}|\n` + rows.map(r => `| ${r.map(c).join(" | ")} |`).join("\n");
   const td = dOf(TODAY);
-  const out = [`# بيانات نظام أنشطة الجاليات`, `وزارة الأوقاف والشؤون الإسلامية — إدارة العلاقات الخارجية — قسم الجاليات ورعاية المهتدين وطلبة البعوث.`,
+  const out = [`# بيانات نظام «إنجاز» لأنشطة الجاليات`, `وزارة الأوقاف والشؤون الإسلامية — إدارة العلاقات الخارجية — قسم الجاليات ورعاية المهتدين وطلبة البعوث.`,
     `تاريخ الملف: ${DAYS[td.getDay()]} ${fmt(TODAY)} م — ${hijri(td)}. أسبوع العمل يبدأ السبت. الحالات محسوبة تلقائياً من التواريخ.`,
     `\n## ملخص\n- عدد الأنشطة: ${S.E.length} (جارية ${S.E.filter(RUN).length}، فيها تعارض ${conflicts().length})\n- مساجد خطبة الجمعة: ${S.khatibs.size}\n- الجاليات: ${commNames.length}\n- المساجد المسجلة: ${S.mosques.length}\n- الوثائق: ${S.docs.length}`,
     `\n## الأنشطة (${S.E.length})`, T(["الرقم", "النوع", "الجالية", "المسجد", "المنطقة", "المحافظة", "الأيام", "الوقت", "المحاضر", "العنوان", "من", "إلى", "الحالة", "رقم الوثيقة", "يتعارض مع", "ملاحظات"],
@@ -2820,12 +2820,12 @@ function sysMarkdown(){
   if (typeof SR !== "undefined" && SR.rows?.size) out.push(`\n## سجل خطب الجمعة المسجل (آخر 3 أشهر)`, T(["الجمعة", "المسجد", "من ألقى الخطبة", "النوع", "المكافأة"], [...SR.rows.values()].filter(r => r.fri >= isoOf(new Date(td.getFullYear(), td.getMonth() - 3, 1))).map(r => [fmt(r.fri), S.khatibs.get(r.kh_id)?.mosque, r.name, ({ pri:"أساسي", bak:"احتياط", other:"بديل", none:"لم تُلقَ" })[r.who], r.amount])));
   return out.join("\n");
 }
-let PRIME_MSG = "مرفق ملف «بيانات نظام أنشطة الجاليات» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والخطباء والمنسقون والوثائق والملاحظات). اعتمد عليه كمصدر رئيسي في كل إجاباتك في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو خطيب أو منسق أو وثيقة فأقصد هذا الملف، ويمكنك أيضاً البحث في ملفاتي وبريدي عند الحاجة. أجب بالعربية بدقة واذكر أرقام الأنشطة والوثائق. لا تلخص الملف الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».";
+let PRIME_MSG = "مرفق ملف «بيانات نظام إنجاز» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والخطباء والمنسقون والوثائق والملاحظات). اعتمد عليه كمصدر رئيسي في كل إجاباتك في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو خطيب أو منسق أو وثيقة فأقصد هذا الملف، ويمكنك أيضاً البحث في ملفاتي وبريدي عند الحاجة. أجب بالعربية بدقة واذكر أرقام الأنشطة والوثائق. لا تلخص الملف الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».";
 brPrime = function(){
   if (BR.primed) return; BR.primed = true;
   const f = $("#br-frame"); if (!f) return;
   if (brV() >= 1.1) f.contentWindow.postMessage({ type:"jaliyat-ask", text:PRIME_MSG, file:{ name:`بيانات-نظام-الجاليات-${TODAY}.md`, content:sysMarkdown(), type:"text/markdown" } }, "https://m365.cloud.microsoft");
-  else { const intro = PRIME_MSG.replace("مرفق ملف «بيانات نظام أنشطة الجاليات»", "هذه بيانات «نظام أنشطة الجاليات»"); f.contentWindow.postMessage({ type:"jaliyat-ask", text:`${intro}\n\n${cpData("", 14000)}` }, "https://m365.cloud.microsoft"); }
+  else { const intro = PRIME_MSG.replace("مرفق ملف «بيانات نظام إنجاز»", "هذه بيانات «نظام «إنجاز» لأنشطة الجاليات»"); f.contentWindow.postMessage({ type:"jaliyat-ask", text:`${intro}\n\n${cpData("", 14000)}` }, "https://m365.cloud.microsoft"); }
   const st = $("#br-st"); if (st) st.textContent = brV() >= 1.1 ? "جارٍ إرفاق ملف بيانات النظام لـ Copilot…" : "جارٍ إرسال بيانات النظام…";
 };
 BR.last = "";
@@ -3188,7 +3188,7 @@ function brPump(){
 brPrime = function(){
   if (BR.primed) return; BR.primed = true;
   if (brV() >= 1.1) brPost({ type:"jaliyat-ask", text:PRIME_MSG, file:{ name:`بيانات-نظام-الجاليات-${TODAY}.md`, content:sysMarkdown(), type:"text/markdown" } });
-  else brPost({ type:"jaliyat-ask", text:`${PRIME_MSG.replace("مرفق ملف «بيانات نظام أنشطة الجاليات»", "هذه بيانات «نظام أنشطة الجاليات»")}\n\n${cpData("", 14000)}` });
+  else brPost({ type:"jaliyat-ask", text:`${PRIME_MSG.replace("مرفق ملف «بيانات نظام «إنجاز» لأنشطة الجاليات»", "هذه بيانات «نظام «إنجاز» لأنشطة الجاليات»")}\n\n${cpData("", 14000)}` });
   if (BR.pending) { const t = BR.pending; BR.pending = ""; brPost({ type:"jaliyat-ask", text:t }); }
   if (INTAKE.msg) { brPost(INTAKE.msg); INTAKE.msg = null; }
 };
@@ -3581,7 +3581,7 @@ async function devNotify(title, body){
 }
 function dailyDigest(){
   if (LS.get("digest-day", "") === TODAY) return; const A = alerts(); LS.set("digest-day", TODAY);
-  devNotify("ملخص اليوم — نظام الجاليات", A.map(a => a.t).join(" · "));
+  devNotify("ملخص اليوم — إنجاز", A.map(a => a.t).join(" · "));
 }
 
 /* =============== 8) Voice commands (Arabic speech → Copilot) =============== */
@@ -3688,7 +3688,7 @@ document.addEventListener("click", async ev => {
   const t = ev.target.closest("button,[data-rq],#iz-drop"); if (!t) return;
   const D = t.dataset;
   if (t.id === "bell") return bellOpen();
-  if (D.notif !== undefined) { const p = await Notification.requestPermission(); toast(p === "granted" ? "فُعّلت الإشعارات على هذا الجهاز" : "لم تُفعّل الإشعارات"); if (p === "granted") devNotify("تم التفعيل", "ستصلك تنبيهات نظام الجاليات على هذا الجهاز"); return; }
+  if (D.notif !== undefined) { const p = await Notification.requestPermission(); toast(p === "granted" ? "فُعّلت الإشعارات على هذا الجهاز" : "لم تُفعّل الإشعارات"); if (p === "granted") devNotify("تم التفعيل", "ستصلك تنبيهات إنجاز على هذا الجهاز"); return; }
   if (t.id === "iz-drop" || D.intake !== undefined) return intakeOpen();
   if (t.id === "iz-go") return intakeGo();
   if (D.izrm !== undefined) { INTAKE.files.splice(+D.izrm, 1); return intakeAdd([]); }
