@@ -679,6 +679,9 @@ body.cp-full #cp-fab{display:none}
 .tk-track li::after{content:"";position:absolute;top:13px;inset-inline-start:50%;width:100%;height:2px;background:var(--line)}.tk-track li:last-child::after{display:none}
 .tk-track li.on{color:var(--ink)}.tk-track li.on::before{background:var(--ok);border-color:var(--ok)}.tk-track li.on::after{background:var(--ok)}
 .tk-track .s{font-size:11px;color:var(--muted)}
+#cp-fab{display:none!important}
+.cp-mob .btn-lg{padding:14px;font-size:16px}
+.cp-mstep{display:flex;gap:10px;align-items:center;font-weight:700}.cp-mstep b{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:13px;flex:none}
 .brand svg{color:#fff;width:38px;height:38px}.brand b{font-size:21px;letter-spacing:.3px}.login-card .mark{width:76px;height:76px}.login-card h1{font-size:34px}.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}</style>
 
 </head>
@@ -4373,6 +4376,50 @@ vCopilot = function(){
   </div>`;
 };
 document.addEventListener("click", ev => { if (ev.target.closest("[data-cpfile]")) { const b = new Blob([sysMarkdown()], { type:"text/markdown" }); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `بيانات-نظام-إنجاز-${TODAY}.md`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast("نُزّل ملف البيانات — أرفقه في Copilot"); } });
+
+/* ================= Copilot on phones / tablets / any device without the bridge ================= */
+const isMobileDev = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+const _vCopilot14m = vCopilot;
+vCopilot = function(){
+  if (hasBridge() || !isMobileDev()) { const h = _vCopilot14m(); return hasBridge() ? h : h.replace('<details class="cp-alt">', `${mobCopilot()}<details class="cp-alt">`); }
+  return `<div class="cp">${mobCopilot()}<details class="cp-alt"><summary>تسجيل الدخول بمايكروسوفت والبحث في ملفاتك</summary>${vCopilotMS()}</details></div>`;
+};
+function mobCopilot(){
+  return `<div class="panel cp-mob"><div class="panel-b" style="display:grid;gap:12px">
+    <span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot — ${isMobileDev() ? "على الجوال" : "بدون جسر"}</span>
+    <div class="cp-mstep"><b>1</b><span>اكتب سؤالك أو أمرك</span></div>
+    <textarea class="f" id="mob-q" rows="3" placeholder="مثال: كم نشاط للجالية البنغالية؟ أو: احجز القاعة الكبرى الخميس 7 م"></textarea>
+    <div class="cp-chips">${CP_PROMPTS.slice(0, 6).map((p, i) => `<button type="button" data-mobp="${i}">${esc(p[0])}</button>`).join("")}</div>
+    <div class="cp-mstep"><b>2</b><span>أرسله لـ Copilot مع بيانات النظام</span></div>
+    <button type="button" class="btn btn-primary btn-lg" data-mobgo>${icon("i-spark")} إرسال إلى Copilot</button>
+    <span class="hint">${navigator.canShare ? "تظهر قائمة المشاركة: اختر تطبيق «Microsoft 365 Copilot» أو «Copilot». الملف والسؤال يُرسلان معاً." : "يُنسخ السؤال مع بيانات النظام ويفتح Copilot — الصق (لصق) واضغط إرسال."}</span>
+    <div class="cp-mstep"><b>3</b><span>إذا طلبت تعديلاً: انسخ رد Copilot والصقه هنا لينفّذه النظام</span></div>
+    <textarea class="f" id="mob-r" rows="3" placeholder="الصق رد Copilot هنا…"></textarea>
+    <button type="button" class="btn" data-mobrun>تنفيذ الأوامر من الرد</button>
+    <div id="cpx"></div>
+  </div></div>`;
+}
+function mobPrompt(q){ return `${PRIME_MSG.replace("لا تلخص الملف الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».", "")}\n\nسؤالي/أمري: ${q}\n\nملاحظة: إذا كان طلبي تعديلاً على النظام فضع كتلة jaliyat-actions في نهاية ردك لأنسخها إلى النظام.`; }
+async function mobSend(){
+  const q = ($("#mob-q")?.value || "").trim(); if (!q) return toast("اكتب سؤالك أولاً");
+  const text = mobPrompt(q), md = sysMarkdown();
+  const file = new File([md], `بيانات-نظام-إنجاز-${TODAY}.txt`, { type:"text/plain" });
+  if (navigator.canShare && navigator.canShare({ files:[file] })) {
+    try { await cpCopy(text); await navigator.share({ files:[file], text, title:"إنجاز → Copilot" }); return toast("اختر Copilot — والسؤال منسوخ أيضاً إن احتجته"); } catch (e) { if (e?.name === "AbortError") return; }
+  }
+  const ok = await cpCopy(`${text}\n\n${cpData(q, 12000)}`);
+  toast(ok ? "نُسخ السؤال مع البيانات — الصقه في Copilot" : "تعذّر النسخ");
+  window.open("https://m365.cloud.microsoft/chat/", "_blank", "noopener");
+}
+function mobRun(){
+  const acts = findActions(String($("#mob-r")?.value || "")); if (!acts.length) return toast("لم أجد أوامر في الرد — تأكد أنك نسخت الرد كاملاً");
+  CPX.list = acts.map(a => ({ a })); cpxRender(); $("#cpx")?.scrollIntoView({ behavior:"smooth", block:"center" });
+}
+document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;
+  if (t.dataset.mobgo !== undefined) return mobSend();
+  if (t.dataset.mobrun !== undefined) return mobRun();
+  if (t.dataset.mobp !== undefined) { const p = CP_PROMPTS[+t.dataset.mobp]; const q = $("#mob-q"); if (q) q.value = p[2]; }
+});
 
 (async function boot(){
   const { data } = await sb.auth.getSession();
