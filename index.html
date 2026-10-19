@@ -5112,6 +5112,16 @@ document.addEventListener("click", async ev => {
     S.waAdmin = data; await loadWa(); render(); return toast(S.waCfg.on ? "رُبط واتساب القسم ✓" : "حُفظ — أكمل القيم الناقصة"); }
 });
 
+/* ---------- sidebar «واتساب القسم»: one tap opens the chats directly ---------- */
+const isTouchDev = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+let waWin = null;
+function openWaChats(){
+  if (isTouchDev()) { location.href = "whatsapp://"; return; }
+  if (waWin && !waWin.closed) { try { waWin.focus(); return; } catch (_) {} }
+  waWin = window.open("https://web.whatsapp.com/", "enjaz-whatsapp");
+}
+document.addEventListener("click", ev => { const b = ev.target.closest('#nav [data-nav="whatsapp"], #tabbar [data-nav="whatsapp"]'); if (!b || S.waCfg.on) return; ev.preventDefault(); ev.stopImmediatePropagation(); $("#side")?.classList.remove("open"); openWaChats(); }, true);
+
 (async function boot(){
   const { data } = await sb.auth.getSession();
   if (data.session) start(data.session); else showLogin();
