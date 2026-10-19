@@ -2361,7 +2361,8 @@ const CP_PROMPTS = [
   ["اجتماعاتي", "ما نوقش بخصوص الجاليات", "ما أبرز ما نوقش في اجتماعاتي ومحادثات Teams الأخيرة بخصوص الجاليات والأنشطة الدينية؟", false],
   ["ملفات Excel", "جداول الأنشطة في ملفاتي", "ابحث في ملفاتي عن جداول Excel الخاصة بأنشطة الجاليات أو خطباء الجمعة، ولخّص محتواها.", false],
 ];
-function cpData(q){
+function cpData(q, max){
+  max = max || CP.max;
   const cl = x => String(x ?? "").replace(/\s+/g, " ").trim();
   const nq = nkey(q || "");
   const hit = e => !nq || [e.comm, e.mosName, e.area, e.gov, e.lect, e.doc, e.type].some(v => { const k = nkey(v || ""); return k.length > 3 && nq.includes(k.replace(/^ال/, "").slice(0, 8)); });
@@ -2373,7 +2374,7 @@ function cpData(q){
     `الأنشطة (الرقم | النوع | الجالية | المسجد — المنطقة | الأيام والوقت | المحاضر | من–إلى | الحالة | الوثيقة | تعارض):`];
   const rows = []; let size = head.join("\n").length;
   for (const e of L) { const r = [`#${e.n}`, e.type, e.comm, [e.mosName, e.area].filter(Boolean).join(" — "), daysText(e) + " " + (e.time || ""), e.lect, `${fmt(e.start)}–${fmt(e.end)}`, e.st, e.doc, e.cf.map(c => "#" + c.o.n).join("،")].map(cl).join(" | ");
-    if (size + r.length > CP.max) { rows.push(`… و${L.length - rows.length} نشاطاً آخر (الكل في النظام)`); break; } rows.push(r); size += r.length + 1; }
+    if (size + r.length > max) { rows.push(`… و${L.length - rows.length} نشاطاً آخر (الكل في النظام)`); break; } rows.push(r); size += r.length + 1; }
   return head.concat(rows).join("\n");
 }
 function vCopilot(){
@@ -2592,7 +2593,7 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 async function msCheckCopilot(){ try { await msToken(false, MS.scopes); MS.copilotOk = true; } catch (e) { MS.copilotOk = false; } }
 
 /* ================= v9.6: Copilot embedded inside the system (via the free bridge extension) ================= */
-const BR = { ready:false, frame:null, queue:[] };
+const BR = { ready:false, frame:null, queue:[], primed:false };
 const hasBridge = () => !!document.documentElement.dataset.copilotBridge;
 function vCopilot(){
   if (!hasBridge()) return `<div class="cp" style="display:grid;gap:20px">
@@ -2619,9 +2620,15 @@ function vCopilot(){
     <iframe id="br-frame" class="cp-frame" src="https://m365.cloud.microsoft/chat/?auth=2" allow="clipboard-read; clipboard-write; microphone" title="Microsoft 365 Copilot"></iframe>
   </div>`;
 }
+/* give Copilot the system's data once per conversation, automatically */
+function brPrime(){
+  if (BR.primed) return; BR.primed = true;
+  const intro = "أنا موظف في قسم الجاليات ورعاية المهتدين وطلبة البعوث بوزارة الأوقاف. هذه بيانات «نظام أنشطة الجاليات» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والحالات والتعارضات). اعتمد عليها في كل إجاباتك القادمة في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو محاضر فأقصد هذه البيانات. لا تلخصها الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».";
+  const f = $("#br-frame"); if (f) f.contentWindow.postMessage({ type:"jaliyat-ask", text:`${intro}\n\n${cpData("", 14000)}` }, "https://m365.cloud.microsoft");
+}
 function brSend(q, withData){
   q = String(q || "").trim(); if (!q) return toast("اكتب سؤالك أولاً");
-  const text = withData ? `${q}\n\n${cpData(q)}` : q;
+  const text = withData && !BR.primed ? `${q}\n\n${cpData(q)}` : q;
   const f = $("#br-frame"); if (!f) return;
   if (!BR.ready) { BR.queue.push(text); $("#br-st").textContent = "سيُرسل فور جاهزية Copilot…"; return; }
   f.contentWindow.postMessage({ type:"jaliyat-ask", text }, "https://m365.cloud.microsoft");
@@ -2630,7 +2637,7 @@ function brSend(q, withData){
 }
 window.addEventListener("message", e => {
   if (!/^https:\/\/m365\.cloud\.microsoft$/.test(e.origin)) return;
-  if (e.data?.type === "jaliyat-copilot-ready") { BR.ready = true; const st = $("#br-st"); if (st) st.textContent = "Copilot جاهز"; const f = $("#br-frame"); while (BR.queue.length && f) f.contentWindow.postMessage({ type:"jaliyat-ask", text:BR.queue.shift() }, "https://m365.cloud.microsoft"); }
+  if (e.data?.type === "jaliyat-copilot-ready") { BR.ready = true; const st = $("#br-st"); if (st) st.textContent = "Copilot جاهز ويعرف بيانات النظام"; brPrime(); const f = $("#br-frame"); while (BR.queue.length && f) f.contentWindow.postMessage({ type:"jaliyat-ask", text:BR.queue.shift() }, "https://m365.cloud.microsoft"); }
   if (e.data?.type === "jaliyat-copilot-error") { const st = $("#br-st"); if (st) st.textContent = "سجّل دخولك في Copilot داخل الإطار إن طُلب منك"; }
 });
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;
@@ -2639,7 +2646,7 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 });
 document.addEventListener("keydown", ev => { if (ev.target.id === "br-q" && ev.key === "Enter" && !ev.shiftKey && !ev.isComposing) { ev.preventDefault(); const q = ev.target.value; brSend(q, cpNeedsData(q)); } });
 const _afterRender7 = afterRender;
-afterRender = function(v){ _afterRender7(v); if (v === "copilot" && hasBridge()) { BR.ready = false; } };
+afterRender = function(v){ _afterRender7(v); if (v === "copilot" && hasBridge()) { BR.ready = false; BR.primed = false; } };
 
 (async function boot(){
   const { data } = await sb.auth.getSession();
