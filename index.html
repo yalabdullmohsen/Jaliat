@@ -4150,6 +4150,7 @@ vCopilot = function(){
     <div class="br-acts">${app ? `<a class="btn btn-primary" href="${location.origin + location.pathname}#copilot" target="_blank" rel="noopener">فتح في المتصفح</a>` : ""}<button type="button" class="btn" data-copyext>نسخ رابط صفحة الملحقات</button><button type="button" class="btn btn-ghost" onclick="location.reload()">تحديث الصفحة</button></div></div></div></div>`;
   return `<div class="cp"><div class="panel cp-install"><div class="panel-b" style="display:grid;gap:14px">
     <span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot داخل النظام</span>
+    ${app ? `<div class="check warn"><b>إذا ثبّت الجسر الآن: اضغط Ctrl + F5 لتحديث هذه النافذة</b><span>وإن بقيت هذه الرسالة، افتح النظام في متصفح Edge مباشرة <a class="btn btn-primary" href="${location.origin + location.pathname}#copilot" target="_blank" rel="noopener">فتح في المتصفح</a></span></div>` : `<div class="check"><b>ثبّت الجسر الآن؟</b><span>اضغط <button type="button" class="btn btn-ghost" onclick="location.reload()">تحديث الصفحة</button> ليظهر Copilot.</span></div>`}
     <h3 style="font-size:20px">ثبّت «جسر Copilot» مرة واحدة على هذا الجهاز (دقيقة واحدة)</h3>
     <ol class="cp-steps big">
       <li><a class="btn btn-primary" href="jaliyat-copilot.zip" download>${icon("i-down")} تنزيل الجسر</a> ثم اضغط عليه بالزر الأيمن ← <b>استخراج الكل</b> ← <b>استخراج</b>.</li>
