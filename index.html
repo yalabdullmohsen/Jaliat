@@ -11,8 +11,10 @@
 <meta name="apple-mobile-web-app-title" content="إنجاز">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-v2-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png?v=2">
+<link rel="shortcut icon" href="favicon.ico?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@400;500;600;700&display=swap">
 <style>
@@ -3574,7 +3576,7 @@ function bellOpen(){
 }
 async function devNotify(title, body){
   if (!("Notification" in window) || Notification.permission !== "granted") return;
-  try { const reg = await navigator.serviceWorker?.getRegistration(); if (reg) reg.showNotification(title, { body, icon:"icon-192.png", badge:"icon-192.png", lang:"ar", dir:"rtl", tag:title }); else new Notification(title, { body, icon:"icon-192.png" }); } catch (_) {}
+  try { const reg = await navigator.serviceWorker?.getRegistration(); if (reg) reg.showNotification(title, { body, icon:"icon-v2-192.png", badge:"icon-v2-192.png", lang:"ar", dir:"rtl", tag:title }); else new Notification(title, { body, icon:"icon-v2-192.png" }); } catch (_) {}
 }
 function dailyDigest(){
   if (LS.get("digest-day", "") === TODAY) return; const A = alerts(); LS.set("digest-day", TODAY);
@@ -3978,7 +3980,7 @@ function liveNtf(){
     const pop = $("#bell-pop"); if (pop) { pop.remove(); bellOpen(); }
   }).on("postgres_changes", { event:"UPDATE", schema:"public", table:"notifications", filter:`user_id=eq.${S.me.id}` }, p => { S.ntf = S.ntf.map(x => x.id === p.new.id ? p.new : x); bellRefresh(); }).subscribe();
 }
-async function localNote(n){ if (!("Notification" in window) || Notification.permission !== "granted") return; try { const reg = await navigator.serviceWorker?.getRegistration(); reg?.showNotification(n.title, { body:n.body, icon:"icon-192.png", badge:"icon-192.png", dir:"rtl", lang:"ar", tag:"n" + n.id, data:{ link:n.link } }); } catch (_) {} }
+async function localNote(n){ if (!("Notification" in window) || Notification.permission !== "granted") return; try { const reg = await navigator.serviceWorker?.getRegistration(); reg?.showNotification(n.title, { body:n.body, icon:"icon-v2-192.png", badge:"icon-v2-192.png", dir:"rtl", lang:"ar", tag:"n" + n.id, data:{ link:n.link } }); } catch (_) {} }
 async function ntfRead(ids){ ids = ids.filter(Boolean); if (!ids.length) return; const now = new Date().toISOString(); S.ntf.forEach(x => { if (ids.includes(x.id)) x.read_at = now; }); bellRefresh(); await sb.from("notifications").update({ read_at:now }).in("id", ids); }
 const unread = () => S.ntf.filter(x => !x.read_at).length;
 
