@@ -4261,6 +4261,22 @@ vInbox = function(){ let h = _vInbox14b(); for (const r of S.reqs) { const c = a
 const _reqForm14c = reqForm;
 reqForm = async function(id){ await _reqForm14c(id); const t = linkedTask(`#req:${id}`); if (t && S.form?.id === id) { const b = document.querySelector(`[data-tkfrom="req|${id}"]`); if (b) b.outerHTML = `<button type="button" class="btn" data-task="${t.id}">مسندة إلى ${esc(pname(t.assignee))}</button>`; } };
 
+/* ---------- load Copilot only after the bridge confirms it has allowed framing for this window ---------- */
+const _vCopilot14b = vCopilot;
+vCopilot = function(){ let h = _vCopilot14b(); if (!hasBridge()) return h;
+  return h.replace('<iframe id="br-frame" class="cp-frame" src="', '<iframe id="br-frame" class="cp-frame" data-src="').replace('<button type="button" class="btn btn-ghost" id="br-reprime"', '<button type="button" class="btn btn-ghost" id="br-retry">↻ إعادة تحميل Copilot</button><button type="button" class="btn btn-ghost" id="br-reprime"'); };
+async function brArm(){
+  const f = $("#br-frame"); if (!f || !f.dataset.src) return;
+  const st = $("#br-st"); if (st) st.textContent = "جارٍ تجهيز الجسر…";
+  const de = document.documentElement; de.dataset.copilotBridge = "1";
+  for (let i = 0; i < 20 && de.dataset.copilotBridge !== "ready"; i++) { window.postMessage({ type:"jaliyat-bridge-hosts", hosts:BRIDGE_HOSTS }, location.origin); await new Promise(r => setTimeout(r, 300)); }
+  if (de.dataset.copilotBridge !== "ready") { de.dataset.copilotBridge = "1"; if (st) st.innerHTML = `الجسر لم يستجب — افتح <code dir="ltr">edge://extensions</code> واضغط «Reload» على الجسر ثم <button type="button" class="btn btn-ghost" id="br-retry">أعد المحاولة</button>`; return; }
+  if ($("#br-frame") === f) { f.src = f.dataset.src; if (st) st.textContent = "جارٍ تحميل Copilot…"; }
+}
+const _afterRender14 = afterRender;
+afterRender = function(v){ _afterRender14(v); if (v === "copilot" && hasBridge()) brArm(); };
+document.addEventListener("click", ev => { if (ev.target.closest("#br-retry")) { BR.ready = false; BR.primed = false; BR.busy = false; const f = $("#br-frame"); if (f) { f.removeAttribute("src"); f.dataset.src = f.dataset.src || "https://m365.cloud.microsoft/chat/?auth=2"; } brArm(); } });
+
 (async function boot(){
   const { data } = await sb.auth.getSession();
   if (data.session) start(data.session); else showLogin();

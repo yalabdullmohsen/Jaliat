@@ -18,7 +18,15 @@ async function allowTab(tabId, extra) {
     }]
   });
 }
+// v2.1: also allow framing for any window (tab or installed app) whose page is the Jaliyat system itself.
+async function allowSystem() {
+  await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1], addRules: [{ id: 1, priority: 1,
+    action: { type: "modifyHeaders", responseHeaders: [{ header: "x-frame-options", operation: "remove" }, { header: "content-security-policy", operation: "remove" }, { header: "content-security-policy-report-only", operation: "remove" }] },
+    condition: { initiatorDomains: ["yalabdullmohsen.github.io"], resourceTypes: ["sub_frame"], requestDomains: HOSTS } }] });
+}
+chrome.runtime.onInstalled.addListener(() => allowSystem().catch(() => {}));
+chrome.runtime.onStartup.addListener(() => allowSystem().catch(() => {}));
 chrome.runtime.onMessage.addListener((msg, sender, reply) => {
-  if (msg?.type === "jaliyat-register" && sender.tab?.id >= 0) { allowTab(sender.tab.id, msg.hosts).then(() => reply({ ok: true }), e => reply({ ok: false, e: String(e) })); return true; }
+  if (msg?.type === "jaliyat-register") { allowSystem().catch(() => {}); if (!(sender.tab?.id >= 0)) { reply({ ok: true }); return; } allowTab(sender.tab.id, msg.hosts).then(() => reply({ ok: true }), e => reply({ ok: false, e: String(e) })); return true; }
 });
 chrome.tabs.onRemoved.addListener(tabId => chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1000 + (tabId % 2000000)] }).catch(() => {}));
