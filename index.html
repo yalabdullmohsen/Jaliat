@@ -4354,6 +4354,26 @@ function brWatch(){
 const _afterRender14c = afterRender;
 afterRender = function(v){ _afterRender14c(v); if (v === "copilot") brWatch(); };
 
+/* installed-app window where Edge did not inject the bridge script: bridge 2.1+ still allows framing for the whole
+   browser profile, so show Copilot directly (typing happens inside Copilot itself). */
+const _vCopilot14d = vCopilot;
+vCopilot = function(){
+  if (hasBridge() || !(LS.get("bridge-ok", 0) || matchMedia("(display-mode: standalone)").matches)) return _vCopilot14d();
+  return `<div class="cp cp-embed cp-lite">
+    <div class="cp-side">
+      <span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot</span>
+      <div class="check warn" style="font-size:13px"><b>وضع التطبيق المثبّت</b><span>Copilot ظاهر هنا، اكتب له مباشرة في الإطار. الإرسال التلقائي وملف بيانات النظام يعملان في المتصفح.</span></div>
+      <button type="button" class="btn btn-primary" data-cpfile>${icon("i-down")} تنزيل ملف بيانات النظام لإرفاقه</button>
+      <span class="hint">نزّل الملف ثم أرفقه في Copilot بزر «+» ليعرف كل بيانات النظام.</span>
+      <a class="btn" href="${location.origin + location.pathname}#copilot" target="_blank" rel="noopener">فتح في المتصفح (كل المزايا)</a>
+      <button type="button" class="btn btn-ghost" onclick="location.reload()">↻ تحديث</button>
+      <span class="hint">إذا ظهر «refused to connect»: ثبّت جسر Copilot 2.1 أو أحدث في Edge نفسه.</span>
+    </div>
+    <iframe class="cp-frame" src="https://m365.cloud.microsoft/chat/?auth=2" allow="clipboard-read; clipboard-write; microphone" title="Microsoft 365 Copilot"></iframe>
+  </div>`;
+};
+document.addEventListener("click", ev => { if (ev.target.closest("[data-cpfile]")) { const b = new Blob([sysMarkdown()], { type:"text/markdown" }); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `بيانات-نظام-إنجاز-${TODAY}.md`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast("نُزّل ملف البيانات — أرفقه في Copilot"); } });
+
 (async function boot(){
   const { data } = await sb.auth.getSession();
   if (data.session) start(data.session); else showLogin();
