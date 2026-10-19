@@ -4276,6 +4276,16 @@ async function brArm(){
 const _afterRender14 = afterRender;
 afterRender = function(v){ _afterRender14(v); if (v === "copilot" && hasBridge()) brArm(); };
 document.addEventListener("click", ev => { if (ev.target.closest("#br-retry")) { BR.ready = false; BR.primed = false; BR.busy = false; const f = $("#br-frame"); if (f) { f.removeAttribute("src"); f.dataset.src = f.dataset.src || "https://m365.cloud.microsoft/chat/?auth=2"; } brArm(); } });
+/* the installed app can open before Edge has loaded its extensions: re-check, then reload once automatically */
+function brWatch(){
+  if (hasBridge() || !LS.get("bridge-ok", 0)) return;
+  let n = 0; const t = setInterval(() => {
+    if (hasBridge()) { clearInterval(t); if (S.view === "copilot" && $("#drawer").hidden) render(); return; }
+    if (++n >= 8) { clearInterval(t); let done = false; try { done = sessionStorage.getItem("br-reload") === "1"; sessionStorage.setItem("br-reload", "1"); } catch (_) {} if (!done && S.view === "copilot") location.reload(); }
+  }, 500);
+}
+const _afterRender14c = afterRender;
+afterRender = function(v){ _afterRender14c(v); if (v === "copilot") brWatch(); };
 
 (async function boot(){
   const { data } = await sb.auth.getSession();
