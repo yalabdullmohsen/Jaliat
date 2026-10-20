@@ -158,3 +158,6 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .sr-adh{border-radius:12px;padding:10px 12px;display:grid;gap:4px;background:var(--surface-2)}.sr-adh>div{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.sr-adh b{font-size:14.5px}.sr-adh span{font-size:12.5px;color:var(--muted)}.sr-adh p{margin:0;line-height:1.9;font-size:13.5px}
 .sr-adh.ok{background:var(--oks)}.sr-adh.ok b{color:var(--ok)}.sr-adh.warn{background:var(--warns)}.sr-adh.warn b{color:var(--warn)}.sr-adh.bad{background:var(--bads)}.sr-adh.bad b{color:var(--bad)}
 .ft .seg button{white-space:nowrap}
+.lmap{height:calc(100vh - 220px);min-height:420px;border-radius:16px;border:1px solid var(--line);overflow:hidden;margin-top:10px;z-index:0}
+.lm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 8px 0 3px;vertical-align:middle}
+.ft-tr{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
