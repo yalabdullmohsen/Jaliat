@@ -2,7 +2,7 @@
 const RH = { rows:[], kb:new Map(), loaded:false, m:"", q:"" };
 const BANK_ORD = ["بيت التمويل الكويتي", "بنك الكويت الدولي", "بنك الكويت الوطني", "البنك التجاري", "بنك الخليج", "بنك برقان", "بنك وربة", "بنك بوبيان", "البنك الأهلي"];
 const ibanOk = i => /^KW\d{2}[A-Z]{4}[A-Z0-9]{22}$/.test(i || "");
-async function rhLoad(){ if (!S.admin) return; const [a, b] = await Promise.all([sb.from("reward_history").select("*").order("month", { ascending:false }).limit(5000), sb.from("khatib_bank").select("*").limit(3000)]);
+async function rhLoad(){ const [a, b] = await Promise.all([sb.from("reward_history").select("*").order("month", { ascending:false }).limit(5000), sb.from("khatib_bank").select("*").limit(3000)]);
   RH.rows = a.data || []; RH.kb = new Map((b.data || []).map(r => [r.cid, r])); RH.loaded = true; }
 const rhMonths = () => [...new Set(RH.rows.map(r => r.month))].sort().reverse();
 const ymOf = (y, m) => `${y}-${String(m + 1).padStart(2, "0")}`;
@@ -13,7 +13,6 @@ function rhGroups(ym){ const q = nkey(RH.q); const L = RH.rows.filter(r => r.mon
   return [...G.entries()].sort((a, b) => (BANK_ORD.indexOf(a[0]) + 1 || 99) - (BANK_ORD.indexOf(b[0]) + 1 || 99)); }
 function rhPeriod(ym){ const [y, m] = ym.split("-").map(Number); const F = fridays(y, m - 1); return F.length ? `من تاريخ ${fmt(F[0])} إلى ${fmt(F[F.length - 1])}م` : ""; }
 function vRewardHist(){
-  if (!S.admin) return `<div class="empty">الكشوفات المعتمدة (الآيبان والرقم المدني) لمدير النظام فقط</div>`;
   if (!RH.loaded) { rhLoad().then(() => S.view === "rewards" && render()); return `<div class="loading">جارٍ التحميل…</div>`; }
   const M = rhMonths(); if (!RH.m || !M.includes(RH.m)) RH.m = M[0] || ""; if (!RH.m) return `<div class="empty">لا توجد كشوفات معتمدة بعد</div>`;
   const G = rhGroups(RH.m), all = G.flatMap(g => g[1]), sum = all.reduce((s, r) => s + +r.amount, 0), cnt = all.reduce((s, r) => s + r.count, 0), bad = all.filter(r => !ibanOk(r.iban)).length;
@@ -49,10 +48,10 @@ async function rhApprove(){ const [y, m] = srMonth(), ym = ymOf(y, m); if (!RH.l
   await rhLoad(); RH.m = ym; SR.tab = "hist"; render(); toast(`اعتُمد كشف ${monLabel(ym)}: ${rows.length} خطيب في كشوف البنوك ✓`); }
 
 const _vRewards38 = vRewards;
-vRewards = function(){ let h = _vRewards38(); if (!S.admin) return h;
+vRewards = function(){ let h = _vRewards38();
   h = h.replace('data-srtab="sheet" aria-pressed="' + (SR.tab === "sheet") + '">كشف المكافآت</button>', `data-srtab="sheet" aria-pressed="${SR.tab === "sheet"}">كشف المكافآت</button><button type="button" data-srtab="hist" aria-pressed="${SR.tab === "hist"}">كشوف البنوك المعتمدة</button>`);
   if (SR.tab === "hist") { const seg = (h.match(/<div class="seg" style="flex:none">[\s\S]*?<\/div>/) || [""])[0]; return `<div class="toolbar sr-bar">${seg}</div>` + vRewardHist(); }
-  if (SR.tab === "sheet") h = h.replace('<span class="count">', `<button class="btn btn-ok" type="button" data-rhapprove>✓ اعتماد الكشف وتوزيعه على البنوك</button><span class="count">`);
+  if (SR.tab === "sheet" && S.canWrite) h = h.replace('<span class="count">', `<button class="btn btn-ok" type="button" data-rhapprove>✓ اعتماد الكشف وتوزيعه على البنوك</button><span class="count">`);
   return h; };
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
   if (D.rhm) { RH.m = D.rhm; return render(); }
@@ -62,4 +61,4 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
   if (D.rhprint !== undefined) { document.body.classList.add("print-sheet"); setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove("print-sheet"), 500); }, 50); }
 });
 document.addEventListener("input", ev => { if (ev.target.id === "rhq") { RH.q = ev.target.value; const p = ev.target.selectionStart; render(); const i = $("#rhq"); if (i) { i.focus(); i.setSelectionRange(p, p); } } });
-NEWF.splice(1, 0, ["v38-rh", "nav:rewards", "كشوف البنوك في مكافآت الخطباء", "كشوف أبريل–يوليو 2026 أُدخلت (107 خطيب بالآيبان)، مقسّمة حسب البنك بنفس نموذج الإدارة: طباعة وإكسل لكل بنك، وسجل كل خطيب، واعتماد كشف الشهر الحالي بضغطة.", false, "2026-10-20"]);
+NEWF.splice(1, 0, ["v38-rh", "nav:rewards", "كشوف البنوك في مكافآت الخطباء", "كشوف أبريل–يوليو 2026 أُدخلت (107 خطيب بالآيبان) — تظهر لجميع الموظفين، مقسّمة حسب البنك بنفس نموذج الإدارة: طباعة وإكسل لكل بنك، وسجل كل خطيب، واعتماد كشف الشهر الحالي بضغطة.", false, "2026-10-20"]);
