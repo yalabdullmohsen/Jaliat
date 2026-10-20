@@ -68,3 +68,13 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 document.addEventListener("change", ev => { if (ev.target.id === "wn-c") wnRefresh(); });
 document.addEventListener("input", ev => { if (ev.target.id === "wn-why") wnRefresh(); });
 NEWF.splice(1, 0, ["v37-wn", "nav:watheqa", "إبلاغ المنسق برد وثيقة", "كل رد يصل من وثيقة (موافقة أو اعتذار) يظهر مساره خطوة بخطوة، وزر «إبلاغ المنسق» يرسل له الرسالة الرسمية بالواتساب ويُسجَّل.", false, "2026-10-20"]);
+
+/* v44: one-tap «أبلغ المنسق» from the list, and opening a reply from its notification jumps straight to the ready message */
+async function wnQuick(id){ const w = S.wq.find(x => x.id === id); if (!w) return; const c = wqCoords(w)[0]; if (!c) return wqForm(id);
+  const oc = wqOutcome(w) || "ملاحظات";
+  waGo(c.phone, wqMsg(w, oc, c), null, c.name);
+  const { data, error } = await sb.from("wq_notify").insert({ wq_id:w.id, outcome:oc, coord:c.name, phone:waNum(c.phone), comm:c.comm || null }).select().single(); if (error) return writeFail(error);
+  S.wqn.set(w.id, data); toast(`الرسالة جاهزة لـ ${c.name} — اضغط إرسال في واتساب`); }
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-wnq]"); if (!t) return; ev.preventDefault(); ev.stopPropagation(); wnQuick(t.dataset.wnq); }, true);
+const _wqForm44 = wqForm;
+wqForm = function(id){ _wqForm44(id); const w = S.wq.find(x => x.id === id); if (w && S.canWrite && typeof wqNeeds === "function" && wqNeeds(w)) setTimeout(() => { const b = $("#wn"); if (b) { b.scrollIntoView({ behavior:"smooth", block:"start" }); b.classList.add("wn-hot"); } }, 150); };

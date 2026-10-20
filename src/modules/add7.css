@@ -449,3 +449,5 @@ body.wa-q #wa-embed iframe{height:calc(100dvh - 170px)}
 .back-btn{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px 0 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer;flex:none}
 .back-btn:hover{background:var(--primary-soft,rgba(31,166,117,.1))}.back-btn[hidden]{display:none}
 @media (max-width:700px){.back-btn span{display:none}.back-btn{padding:0 8px}}
+.wnq{cursor:pointer}.wnq:hover{filter:brightness(.95);box-shadow:0 0 0 2px rgba(226,190,85,.4)}
+.wn-hot{box-shadow:0 0 0 2px rgba(226,190,85,.7);border-radius:var(--r)}
