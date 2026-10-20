@@ -446,3 +446,6 @@ body.wa-q #wa-embed iframe{height:calc(100dvh - 170px)}
 .mw-e{color:var(--muted);font-size:13px;padding:10px 4px}
 .br-all{margin-bottom:12px}
 @media (max-width:900px){.mw-g{grid-template-columns:1fr}}
+.back-btn{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px 0 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer;flex:none}
+.back-btn:hover{background:var(--primary-soft,rgba(31,166,117,.1))}.back-btn[hidden]{display:none}
+@media (max-width:700px){.back-btn span{display:none}.back-btn{padding:0 8px}}

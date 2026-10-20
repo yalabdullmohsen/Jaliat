@@ -35,3 +35,16 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
   if (t.dataset.brlater !== undefined) { try { localStorage.setItem("br-later", Date.now() + 3 * 864e5); } catch (_) {} return render(); }
 });
 NEWF.splice(1, 0, ["v42-mw", "nav:home", "لوحتي", "في أول الرئيسية: المطلوب منك الآن، والمتبقي، وما أنجزته هذا الشهر مع نسبة إنجازك — كل بند يفتح بضغطة.", false, "2026-10-20"]);
+
+/* ================= v43: «رجوع» — back to the previous page (works in the installed app window too) ================= */
+S.backStack = [];
+const _go43 = go;
+go = function(v, ...a){ const from = S.view; if (!S._goingBack && from && from !== v) { S.backStack.push(from); if (S.backStack.length > 30) S.backStack.shift(); } S._goingBack = false; const r = _go43(v, ...a); backBtn(); return r; };
+function goBack(){ if (!$("#drawer").hidden) return closeDrawer(); const v = S.backStack.pop(); if (!v) return; S._goingBack = true; go(v); }
+function backBtn(){ let b = $("#back-btn"); if (!b) { const t = $("#title"); if (!t) return; t.insertAdjacentHTML("beforebegin", `<button class="back-btn" id="back-btn" type="button" aria-label="رجوع" title="رجوع (Alt+←)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>رجوع</span></button>`); b = $("#back-btn"); }
+  b.hidden = !S.backStack.length || S.view === "home"; }
+document.addEventListener("click", ev => { if (ev.target.closest("#back-btn")) goBack(); });
+document.addEventListener("keydown", ev => { if (ev.altKey && ev.key === "ArrowLeft") { ev.preventDefault(); goBack(); } });
+document.addEventListener("mouseup", ev => { if (ev.button === 3) { ev.preventDefault(); goBack(); } });
+const _afterRender43 = afterRender;
+afterRender = function(v){ _afterRender43(v); backBtn(); };
