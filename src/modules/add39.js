@@ -5,7 +5,7 @@ async function wqtSet(id, state){ const note = $("#wqt-n")?.value.trim() || null
 const _wqForm39 = wqForm;
 wqForm = function(id){ _wqForm39(id); const w = S.wq.find(x => x.id === id); if (!w) return; const reply = wqIndex(), st = wqStage(w, reply), tr = S.wqt.get(id), r = reply.get(id);
   const b = $(".drawer-b"); if (!b) return;
-  b.insertAdjacentHTML("afterbegin", `<div class="wqs ${st || ""}"><b>${st === "done" ? "✓ منجز" : st === "follow" ? "⏳ قيد المتابعة" : "كتاب وارد"}</b><span>${wqDir(w) === "out" ? (r ? `وصل الرد ${esc(r.no || "")} بتاريخ ${fmt(wqDate(r))}` : `أُرسل ${fmt(wqDate(w))} — بانتظار رد ${esc(wqClean(w.to_whom).replace(/^مدير\s+/, "") || "الجهة")}`) : esc(wqFrom(w) || "")}${tr?.note ? ` · ملاحظة: ${esc(tr.note)}` : ""}</span>
+  b.insertAdjacentHTML("afterbegin", `<div class="wqs ${st || ""}"><b>${st === "done" ? "✓ منجز" : st === "follow" ? "⏳ قيد المتابعة" : "كتاب وارد"}</b><span>${wqDir(w) === "out" ? (r ? `وصل الرد ${esc(r.no || "")} بتاريخ ${fmt(wqDate(r))}` : `أُرسل ${fmt(wqDate(w))}، بانتظار رد ${esc(wqClean(w.to_whom).replace(/^مدير\s+/, "") || "الجهة")}`) : esc(wqFrom(w) || "")}${tr?.note ? ` · ملاحظة: ${esc(tr.note)}` : ""}</span>
     ${r ? `<button type="button" class="lnk" data-wq="${esc(r.id)}">فتح الرد</button>` : ""}</div>`);
   if (!S.canWrite) return;
   $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", st === "done" ? `<button class="btn btn-ghost" type="button" data-wqts="follow:${esc(id)}">↺ إرجاع لقيد المتابعة</button>` : `<button class="btn btn-ok" type="button" data-wqts="done:${esc(id)}">✓ تم الإنجاز</button>`);
@@ -25,7 +25,7 @@ priorities = function(){ const P = _prio39(); if (!S.wq?.length) return P; const
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wqts]"); if (!t) return; const [st, id] = t.dataset.wqts.split(":"); wqtSet(id, st); });
 NEWF.splice(1, 0, ["v39-wqt", "nav:watheqa", "متابعة الكتب: مرسلة · قيد المتابعة · منجزة", "كل كتاب نرسله يُتابَع حتى يصل رده ويُبلَّغ المنسق فيصير «منجزاً»، ويمكنك تسجيله منجزاً يدوياً بملاحظة. وكتب حجز القاعات تظهر في صفحة القاعات بحالتها.", false, "2026-10-20"]);
 
-/* ================= v40: sidebar search — type to find any page ================= */
+/* ================= v40: sidebar search، type to find any page ================= */
 const NAV_KW = { docs:"موافقات وثائق تصاريح", fix:"ناقص بيانات توزيع", rewards:"مكافآت رواتب بنوك ايبان", khatibs:"خطباء جمعة", watheqa:"كتب مراسلات", halls:"قاعات حجز مسرح", renew:"تجديد انتهاء", avail:"تعارض وقت متاح", portal:"بوابة منسقين رابط", whatsapp:"واتساب", decisions:"قرارات تعميم", recs:"توصيات اقتراح", report:"تقرير شهري", stats:"إحصائيات", backups:"نسخ احتياطي", users:"مستخدمين صلاحيات حسابات" };
 function navSearchMount(){ const nav = $("#nav"); if (!nav || $("#nav-q")) return;
   nav.insertAdjacentHTML("afterbegin", `<div class="nav-q"><svg><use href="#i-search"/></svg><input id="nav-q" type="search" placeholder="ابحث في القائمة…" autocomplete="off" aria-label="ابحث في القائمة"></div>`); }
@@ -45,7 +45,7 @@ S.waPop = null;
 function decWaNextFor(id){ S.form = { kind:"decwa", id }; const sent = S.waSent[id] || new Map(), c = waTargets().find(x => !sent.has(waNum(x.phone))); if (!c) { toast("أُرسل القرار لجميع المنسقين ✓"); return waBack(); } decWaSend(waNum(c.phone)); }
 function waBack(){ const b = S.waPop?.back; S.waPop = null; document.body.classList.remove("wa-q"); go(b && b !== "whatsapp" ? b : "home"); }
 function waInside(phone, text, next, name){ const n = waNum(phone); if (n.length < 10) return toast("لا يوجد رقم هاتف صحيح");
-  if (!waEmbedOk() || isTouchDev()) { if (isTouchDev()) return window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`, "_blank", "noopener"); toast("ركّب «جسر إنجاز» 2.3 ليُرسل من واتساب داخل النظام — من صفحة «واتساب القسم»"); return window.open(`https://web.whatsapp.com/send?phone=${n}&text=${encodeURIComponent(text)}`, "enjaz-whatsapp"); }
+  if (!waEmbedOk() || isTouchDev()) { if (isTouchDev()) return window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`, "_blank", "noopener"); toast("ركّب «جسر إنجاز» 2.3 ليُرسل من واتساب داخل النظام، من صفحة «واتساب القسم»"); return window.open(`https://web.whatsapp.com/send?phone=${n}&text=${encodeURIComponent(text)}`, "enjaz-whatsapp"); }
   const back = S.waPop?.back || (S.view !== "whatsapp" ? S.view : "home");
   S.waPop = { next, name, back, n }; if (!$("#drawer").hidden) closeDrawer(); document.body.classList.add("wa-q");
   if (S.view !== "whatsapp") go("whatsapp"); else render();
@@ -54,7 +54,7 @@ waOpen = (phone, text) => waInside(phone, text);
 waGo = (phone, text, next, name) => waInside(phone, text, next, name);
 const _vWhatsApp41 = vWhatsApp;
 vWhatsApp = function(){ if (!S.waPop || !waEmbedOk() || S.waCfg.on) return _vWhatsApp41();
-  return `<div class="wa-qbar"><span class="wa-qi">📲</span><div><b>الرسالة جاهزة${S.waPop.name ? ` إلى ${esc(S.waPop.name)}` : ""}</b><span>تُفتح المحادثة خلال ثوانٍ — اضغط زر الإرسال ➤ داخل واتساب</span></div>${S.waPop.next ? `<button type="button" class="btn btn-primary" data-wapnext>التالي ›</button>` : ""}<button type="button" class="btn btn-ghost" data-wapback>↩ رجوع</button></div>`; };
+  return `<div class="wa-qbar"><span class="wa-qi">📲</span><div><b>الرسالة جاهزة${S.waPop.name ? ` إلى ${esc(S.waPop.name)}` : ""}</b><span>تُفتح المحادثة خلال ثوانٍ، اضغط زر الإرسال ➤ داخل واتساب</span></div>${S.waPop.next ? `<button type="button" class="btn btn-primary" data-wapnext>التالي ›</button>` : ""}<button type="button" class="btn btn-ghost" data-wapback>↩ رجوع</button></div>`; };
 const _go41 = go;
 go = function(v, ...a){ if (v !== "whatsapp" && S.waPop && !S.waPop._leaving) { S.waPop = null; document.body.classList.remove("wa-q"); } return _go41(v, ...a); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wapback],[data-wapnext]"); if (!t) return; if (t.dataset.wapnext !== undefined) { const nx = S.waPop?.next; if (nx) nx(); return; } waBack(); });

@@ -36,14 +36,14 @@ function cmBlock(tbl, row){
   const L = cmFor(tbl, row);
   return `<div class="cmts" id="cmts" data-tbl="${esc(tbl)}" data-row="${esc(row)}">
     <div class="cmts-h">${icon("i-chat")}<b>التعليقات والملاحظات</b><span class="chip" id="cm-n">${L.length}</span></div>
-    <div class="cmts-l" id="cmts-l">${L.map(cmItem).join("") || `<div class="s" style="padding:4px 2px">لا تعليقات بعد — اكتب أول تعليق.</div>`}</div>
+    <div class="cmts-l" id="cmts-l">${L.map(cmItem).join("") || `<div class="s" style="padding:4px 2px">لا تعليقات بعد، اكتب أول تعليق.</div>`}</div>
     <div class="cmt-new"><textarea class="f" id="cm-in" rows="2" placeholder="اكتب تعليقاً للفريق أو ملاحظة لنفسك…  (Ctrl+Enter للإرسال)"></textarea>
-      <div class="cmt-row"><label class="pv-t"><input type="checkbox" id="cm-priv"> ${icon("i-lock", 14)} ملاحظة خاصة — تظهر لي فقط</label><button type="button" class="btn btn-primary" id="cm-add">إضافة</button></div></div></div>`;
+      <div class="cmt-row"><label class="pv-t"><input type="checkbox" id="cm-priv"> ${icon("i-lock", 14)} ملاحظة خاصة، تظهر لي فقط</label><button type="button" class="btn btn-primary" id="cm-add">إضافة</button></div></div></div>`;
 }
 function refreshCmts(){
   const box = $("#cmts"); if (!box) return;
   const L = cmFor(box.dataset.tbl, box.dataset.row);
-  $("#cmts-l").innerHTML = L.map(cmItem).join("") || `<div class="s" style="padding:4px 2px">لا تعليقات بعد — اكتب أول تعليق.</div>`;
+  $("#cmts-l").innerHTML = L.map(cmItem).join("") || `<div class="s" style="padding:4px 2px">لا تعليقات بعد، اكتب أول تعليق.</div>`;
   $("#cm-n").textContent = L.length;
 }
 function attachCmts(tbl, row){ if (!row || !$(".drawer-b") || $("#cmts")) return; $(".drawer-b").insertAdjacentHTML("beforeend", cmBlock(tbl, row)); }
@@ -127,7 +127,7 @@ vHome = function(){
   let h = _vHome2();
   const L = S.cm.slice(0, 6);
   const panel = `<div class="panel"><div class="panel-h"><h3>آخر التعليقات</h3><span class="chip">${S.cm.filter(c => !c.private).length}</span></div><div class="list">
-    ${L.map(c => { const tg = cmTarget(c.tbl, c.row_id); return `<button class="li"${tg.open ? ` data-open="${esc(tg.open)}"` : ""}><span class="av-s">${esc(whoName(c.user_id).trim().charAt(0))}</span><span style="min-width:0"><span class="t">${esc(whoName(c.user_id))}</span> <span class="s">على ${esc(tg.l)}${c.private ? " · خاصة" : ""}</span><br><span class="s cm-1">${esc(c.body)}</span></span><span class="s num">${fmtTime(c.created_at).split(" ")[0]}</span></button>`; }).join("") || `<div class="empty">لا تعليقات بعد — افتح أي نشاط واكتب تعليقاً في أسفله</div>`}</div></div>`;
+    ${L.map(c => { const tg = cmTarget(c.tbl, c.row_id); return `<button class="li"${tg.open ? ` data-open="${esc(tg.open)}"` : ""}><span class="av-s">${esc(whoName(c.user_id).trim().charAt(0))}</span><span style="min-width:0"><span class="t">${esc(whoName(c.user_id))}</span> <span class="s">على ${esc(tg.l)}${c.private ? " · خاصة" : ""}</span><br><span class="s cm-1">${esc(c.body)}</span></span><span class="s num">${fmtTime(c.created_at).split(" ")[0]}</span></button>`; }).join("") || `<div class="empty">لا تعليقات بعد، افتح أي نشاط واكتب تعليقاً في أسفله</div>`}</div></div>`;
   const k = '<div class="panel"><div class="panel-h"><h3>المتصلون الآن</h3>';
   return h.includes(k) ? h.replace(k, panel + k) : h + panel;
 };
@@ -141,7 +141,7 @@ actsTable = function(list, showComm){
 const _aiContext2 = aiContext;
 aiContext = function(){
   const pub = S.cm.filter(c => !c.private).slice(0, 300);
-  return _aiContext2() + (pub.length ? `\n\n## تعليقات الفريق — على | الكاتب | التاريخ | التعليق\n` + pub.map(c => [cmTarget(c.tbl, c.row_id).l, whoName(c.user_id), fmtTime(c.created_at), c.body.replace(/\s+/g, " ").slice(0, 300)].join(" | ")).join("\n") : "");
+  return _aiContext2() + (pub.length ? `\n\n## تعليقات الفريق، على | الكاتب | التاريخ | التعليق\n` + pub.map(c => [cmTarget(c.tbl, c.row_id).l, whoName(c.user_id), fmtTime(c.created_at), c.body.replace(/\s+/g, " ").slice(0, 300)].join(" | ")).join("\n") : "");
 };
 /* palette entries */
 const _palAll2 = palAll;

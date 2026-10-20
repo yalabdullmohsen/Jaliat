@@ -44,7 +44,7 @@ const _boot9s50b = boot9; boot9 = function(){ _boot9s50b(); paLoad().then(() => 
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-pareset],[data-paoff]"); if (!t) return;
   if (t.dataset.sure !== "1") { t.dataset.sure = "1"; t.textContent = "اضغط للتأكيد"; return; }
   const { error } = await sb.rpc("staff_portal_reset", { p_id:t.dataset.pareset || t.dataset.paoff, p_off:!!t.dataset.paoff }); if (error) return writeFail(error);
-  await paLoad(); render(); toast(t.dataset.paoff ? "أُوقف الحساب" : "أُعيد التعيين — يفعّله صاحبه برقمه المدني وهاتفه"); });
+  await paLoad(); render(); toast(t.dataset.paoff ? "أُوقف الحساب" : "أُعيد التعيين، يفعّله صاحبه برقمه المدني وهاتفه"); });
 
 /* request drawer: who sent it (coordinator or deputy) */
 const _reqForm50b = reqForm;
@@ -112,7 +112,8 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
   t.disabled = true; const { data, error } = await sb.rpc("staff_portal_decide", { p_id:id, p_ok:ok, p_comm:$("#sg-c-" + id)?.value || null, p_reason:$("#sg-r-" + id)?.value.trim() || null });
   if (error) { t.disabled = false; return writeFail(error); }
   await Promise.all([paLoad(), loadPortal(), sb.from("refs").select("*").eq("id", "coords").maybeSingle().then(({ data }) => { if (data) { putRow("refs", data); derive(); } })]); render();
-  if (ok && g) { g.comm = data?.comm || g.comm; toast("اعتُمد الحساب — أبلغ المنسق"); waOpen(g.phone, sgMsg(g)); } else toast("رُفض الطلب"); });
+  if (ok && g) { g.comm = data?.comm || g.comm; toast("اعتُمد الحساب، أبلغ المنسق"); waOpen(g.phone, sgMsg(g)); } else toast("رُفض الطلب"); });
 const _prio50s = priorities;
 priorities = function(){ const P = _prio50s(); const n = (S.psign || []).filter(g => g.status === "pending").length;
   if (n && S.canWrite) P.push({ w:88, k:"gold", t:`${n} طلب حساب جديد في بوابة المنسقين`, s:"منسق ونائبه بانتظار موافقتك", act:{ go:"portal", l:"مراجعة" } }); return P.sort((a, b) => b.w - a.w); };
+NEWF.splice(1, 0, ["v52-id", "nav:home", "هوية «إنجاز» الجديدة", "ألوان أعمق وأهدأ، وأرقام أوضح، وبطاقات نظيفة بلا خطوط ملوّنة، وشريط علوي ثابت، وعبارات مرتبة بلا شَخطات.", false, "2026-10-20"]);

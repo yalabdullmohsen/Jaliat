@@ -130,7 +130,7 @@ document.addEventListener("click", ev => {
   const t = ev.target.closest("button"); if (!t) return;
   if (t.id === "ms-in") return msSignIn();
   if (t.id === "cp-legacy") { const q = prompt("اكتب سؤالك:"); if (q) cpAsk(q, cpNeedsData(q)); return; }
-  if (t.id === "ms-consent-copy") { cpCopy(`السلام عليكم، أرجو الموافقة على ربط نظام أنشطة الجاليات مع Microsoft 365 Copilot عبر الرابط التالي (موافقة مدير مرة واحدة):\n${MS.consentUrl}`).then(ok => toast(ok ? "نُسخ رابط الموافقة — أرسله لتقنية المعلومات" : MS.consentUrl)); return; }
+  if (t.id === "ms-consent-copy") { cpCopy(`السلام عليكم، أرجو الموافقة على ربط نظام أنشطة الجاليات مع Microsoft 365 Copilot عبر الرابط التالي (موافقة مدير مرة واحدة):\n${MS.consentUrl}`).then(ok => toast(ok ? "نُسخ رابط الموافقة، أرسله لتقنية المعلومات" : MS.consentUrl)); return; }
   if (t.id === "ms-out") { (async () => { try { await msInit(); if (MS.account) await MS.app.clearCache({ account:MS.account }); } catch (_) {} MS.account = null; MS.conv = null; MS.chat = []; render(); })(); return; }
   if (t.id === "ms-new") { MS.chat = []; MS.conv = null; return render(); }
   if (t.id === "ms-file") return msPick();

@@ -56,16 +56,16 @@ function vRewards(){
     <span class="legend">${Object.entries(WHO).map(([k, [l, c]]) => `<span><i class="dot" style="background:var(--${c === "t1" ? "t1" : c})"></i>${l}</span>`).join("")}</span></div>
   <div class="panel"><div class="table-wrap"><table class="sr-grid"><thead><tr><th>م</th><th>المسجد</th><th>الخطيب الأساسي</th><th>الاحتياط</th>${FR.map(f => `<th class="c">الجمعة<br><span class="num">${fmt(f).slice(0, 5)}</span></th>`).join("")}<th class="c">المستحق</th></tr></thead><tbody>
   ${L.map(([id, k], i) => { let n = 0; const cells = FR.map(f => { const r = SR.rows.get(f + "|" + id); if (r && r.who !== "none") n++;
-      const w = r ? WHO[r.who] : null; return `<td class="c"><button type="button" class="sr-cell ${w ? w[1] : ""}" data-src="${f}|${esc(id)}" title="${r ? esc(w[0] + (r.name ? " — " + r.name : "")) : "غير مسجل"}"${S.canWrite ? "" : " disabled"}>${w ? w[2] + " " + w[0] : "—"}</button></td>`; }).join("");
+      const w = r ? WHO[r.who] : null; return `<td class="c"><button type="button" class="sr-cell ${w ? w[1] : ""}" data-src="${f}|${esc(id)}" title="${r ? esc(w[0] + (r.name ? "، " + r.name : "")) : "غير مسجل"}"${S.canWrite ? "" : " disabled"}>${w ? w[2] + " " + w[0] : "—"}</button></td>`; }).join("");
     return `<tr><td class="n">${i + 1}</td><td class="nm">${esc(k.mosque)}<span class="s">${esc([k.area, k.gov].filter(Boolean).join(" · "))}</span></td><td>${esc(k.pri || "—")}</td><td>${esc(k.bak || "—")}</td>${cells}<td class="c num"><b>${n}</b>${SR.rate && n ? `<span class="s">${kd(n * SR.rate)}</span>` : ""}</td></tr>`; }).join("")}
   </tbody></table></div></div>`;
 }
 function srSheetHTML(sheet, y, m, sum, cnt){
   return `<div class="toolbar"><button class="btn btn-primary" data-srprint>${icon("i-doc")} طباعة الكشف</button><button class="btn btn-ghost" data-srxls>${icon("i-down")} تصدير إكسل</button><span class="count">${sheet.length} خطيب · ${cnt} خطبة</span></div>
-  <div class="panel sr-sheet" id="sr-sheet"><div class="sr-h"><div><b>وزارة الأوقاف والشؤون الإسلامية</b><span>إدارة العلاقات الخارجية — قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
+  <div class="panel sr-sheet" id="sr-sheet"><div class="sr-h"><div><b>وزارة الأوقاف والشؤون الإسلامية</b><span>إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
     <h2>كشف مكافآت خطباء الجاليات عن شهر ${MONTHS[m]} ${y}</h2><span class="s">قيمة الخطبة الواحدة: ${SR.rate ? kd(SR.rate) + " د.ك" : "غير محددة"}</span></div>
     <div class="table-wrap"><table class="stbl sr-tbl"><thead><tr><th>م</th><th>اسم الخطيب</th><th>الرقم المدني</th><th>الهاتف</th><th>المسجد</th><th class="c">عدد الخطب</th><th>تواريخ الخطب</th><th class="c">المبلغ (د.ك)</th></tr></thead><tbody>
-    ${sheet.map((p, i) => `<tr><td class="n">${i + 1}</td><td class="nm">${esc(p.name || "—")}</td><td class="num">${esc(p.pid || "")}</td><td class="num">${esc(p.ph || "")}</td><td class="s2">${esc([...p.mos].filter(Boolean).join("، "))}</td><td class="c num"><b>${p.n}</b></td><td class="s2 num">${p.fr.sort().map(f => fmt(f).slice(0, 5)).join("، ")}</td><td class="c num"><b>${SR.rate ? kd(p.sum) : "—"}</b></td></tr>`).join("") || `<tr><td colspan="8" class="empty">لا توجد خطب مسجلة لهذا الشهر — سجّلها من تبويب «تسجيل الخطب»</td></tr>`}
+    ${sheet.map((p, i) => `<tr><td class="n">${i + 1}</td><td class="nm">${esc(p.name || "—")}</td><td class="num">${esc(p.pid || "")}</td><td class="num">${esc(p.ph || "")}</td><td class="s2">${esc([...p.mos].filter(Boolean).join("، "))}</td><td class="c num"><b>${p.n}</b></td><td class="s2 num">${p.fr.sort().map(f => fmt(f).slice(0, 5)).join("، ")}</td><td class="c num"><b>${SR.rate ? kd(p.sum) : "—"}</b></td></tr>`).join("") || `<tr><td colspan="8" class="empty">لا توجد خطب مسجلة لهذا الشهر، سجّلها من تبويب «تسجيل الخطب»</td></tr>`}
     </tbody><tfoot><tr><td></td><td class="nm">الإجمالي</td><td></td><td></td><td></td><td class="c num">${cnt}</td><td></td><td class="c num">${SR.rate ? kd(sum) : "—"}</td></tr></tfoot></table></div>
     <div class="sr-sign"><div><span>إعداد</span><i></i></div><div><span>رئيس القسم</span><i></i></div><div><span>مدير الإدارة</span><i></i></div></div></div>`;
 }
@@ -82,7 +82,7 @@ function srPop(btn){
   srPopClose();
   const key = btn.dataset.src; const r = SR.rows.get(key); const k = S.khatibs.get(key.split("|")[1]) || {};
   const p = document.createElement("div"); p.className = "sr-pop"; SR.pop = p;
-  p.innerHTML = `<b>${esc(k.mosque || "")} — ${fmt(key.split("|")[0])}</b>
+  p.innerHTML = `<b>${esc(k.mosque || "")}، ${fmt(key.split("|")[0])}</b>
     <button type="button" data-srw="pri" class="ok">✓ ألقاها الأساسي: ${esc(k.pri || "—")}</button>
     <button type="button" data-srw="bak" class="gold">✓ ألقاها الاحتياط: ${esc(k.bak || "—")}</button>
     <div class="sr-other"><input class="f" id="sr-oname" placeholder="خطيب بديل: الاسم" value="${esc(r?.who === "other" ? r.name : "")}"><input class="f" id="sr-opid" placeholder="الرقم المدني" inputmode="numeric" value="${esc(r?.who === "other" ? r.pid : "")}"><button type="button" data-srw="other" class="t1">حفظ البديل</button></div>
@@ -100,7 +100,7 @@ async function srAuto(){
   const rows = []; for (const [id, k] of srFilter(khList())) for (const f of FR) if (!SR.rows.has(f + "|" + id) && k.pri) rows.push({ fri:f, kh_id:id, who:"pri", name:k.pri || "", pid:k.pid || "", amount:SR.rate, note:"" });
   if (!rows.length) return toast("لا توجد جُمع فارغة حتى اليوم في هذا الشهر");
   for (let i = 0; i < rows.length; i += 200) { const { data, error } = await sb.from("sermons").upsert(rows.slice(i, i + 200), { onConflict:"fri,kh_id" }).select(); if (error) return writeFail(error); (data || []).forEach(r => SR.rows.set(r.fri + "|" + r.kh_id, r)); }
-  toast(`سُجّلت ${rows.length} خطبة للخطيب الأساسي — عدّل الاستثناءات`); render();
+  toast(`سُجّلت ${rows.length} خطبة للخطيب الأساسي، عدّل الاستثناءات`); render();
 }
 function srRate(){
   S.form = { kind:"srrate" };
@@ -123,7 +123,7 @@ function srXls(){
   const rows = sheet.map((p, i) => ({ "م":i + 1, "اسم الخطيب":p.name, "الرقم المدني":p.pid, "الهاتف":p.ph, "المسجد":[...p.mos].join("، "), "عدد الخطب":p.n, "تواريخ الخطب":p.fr.sort().map(fmt).join("، "), "المبلغ (د.ك)":SR.rate ? +p.sum.toFixed(3) : "" }));
   rows.push({ "م":"", "اسم الخطيب":"الإجمالي", "عدد الخطب":sheet.reduce((s, p) => s + p.n, 0), "المبلغ (د.ك)":SR.rate ? +sheet.reduce((s, p) => s + p.sum, 0).toFixed(3) : "" });
   const wb = XLSX.utils.book_new(); wb.Workbook = { Views:[{ RTL:true }] };
-  const ws = XLSX.utils.aoa_to_sheet([["وزارة الأوقاف والشؤون الإسلامية — إدارة العلاقات الخارجية — قسم الجاليات ورعاية المهتدين وطلبة البعوث"], [`كشف مكافآت خطباء الجاليات عن شهر ${MONTHS[m]} ${y}`], [`قيمة الخطبة: ${SR.rate ? kd(SR.rate) + " د.ك" : "غير محددة"}`], []]);
+  const ws = XLSX.utils.aoa_to_sheet([["وزارة الأوقاف والشؤون الإسلامية، إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث"], [`كشف مكافآت خطباء الجاليات عن شهر ${MONTHS[m]} ${y}`], [`قيمة الخطبة: ${SR.rate ? kd(SR.rate) + " د.ك" : "غير محددة"}`], []]);
   XLSX.utils.sheet_add_json(ws, rows, { origin:"A5" }); ws["!cols"] = [6, 28, 16, 12, 30, 10, 36, 14].map(w => ({ wch:w }));
   XLSX.utils.book_append_sheet(wb, ws, "الكشف");
   const data = XLSX.write(wb, { type:"array", bookType:"xlsx" }); const url = URL.createObjectURL(new Blob([data], { type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));

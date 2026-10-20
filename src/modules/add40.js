@@ -1,4 +1,4 @@
-/* ================= v42: «لوحتي» — every employee sees what is required of him, what remains and what he finished ================= */
+/* ================= v42: «لوحتي»، every employee sees what is required of him, what remains and what he finished ================= */
 const monthNow = () => TODAY.slice(0, 7);
 function myWork(){ const me = S.me?.id; if (!me) return null;
   const T = S.tasks.filter(t => t.assignee === me), open = T.filter(t => TK_OPEN.includes(t.status));
@@ -22,21 +22,21 @@ function myWorkCard(){ const W = myWork(); if (!W) return "";
   const col = (cls, title, sub, L, empty) => `<div class="mw-c ${cls}"><div class="mw-h"><b>${title}</b><span class="num">${L.length}</span></div><small>${sub}</small>
     <div class="mw-l">${L.slice(0, 6).map(x => `<button type="button" class="mw-i ${x.k || ""}" ${x.a}><b>${esc(x.t)}</b><span>${esc(x.s)}</span></button>`).join("") || `<div class="mw-e">${empty}</div>`}${L.length > 6 ? `<button type="button" class="lnk" data-go="tasks">+ ${L.length - 6} أخرى</button>` : ""}</div></div>`;
   const pct = W.doneN + W.openN ? Math.round(W.doneN / (W.doneN + W.openN) * 100) : 100;
-  return `<section class="mw panel"><div class="mw-top"><div><h2>لوحتي — ${esc((S.me.name || S.me.username || "").split(" ")[0])}</h2><span class="s">ما المطلوب منك الآن، وما المتبقي، وما أنجزته هذا الشهر</span></div>
+  return `<section class="mw panel"><div class="mw-top"><div><h2>لوحتي، ${esc((S.me.name || S.me.username || "").split(" ")[0])}</h2><span class="s">ما المطلوب منك الآن، وما المتبقي، وما أنجزته هذا الشهر</span></div>
     <div class="mw-p"><div class="mw-ring" style="--p:${pct}"><b class="num">${pct}%</b></div><span>إنجاز الشهر</span></div></div>
     <div class="mw-g">${col("now", "المطلوب منك الآن", "متأخر، أو اليوم، أو جديد", W.now, "لا يوجد شيء عاجل ✓")}${col("rest", "المتبقي", "مهام مفتوحة مواعيدها لاحقاً", W.rest, "لا توجد مهام متبقية")}${col("done", "أنجزته هذا الشهر", "تُحسب في سجل إنجازك", W.done, "لم تُنجز مهام هذا الشهر بعد")}</div></section>`; }
 
 /* bridge for every employee on a computer: one card until it is installed */
 function bridgeCard(){ if (isTouchDev() || waEmbedOk()) return ""; try { if (+localStorage.getItem("br-later") > Date.now()) return ""; } catch (_) {}
-  return `<div class="check warn br-all"><b>🔌 ركّب «جسر إنجاز 2.3» على هذا الجهاز — مرة واحدة</b><span>يشغّل Copilot وواتساب القسم داخل «إنجاز»، وتُرسل كل الرسائل من داخل النظام.</span><div class="br-acts"><button type="button" class="btn btn-primary" data-go="whatsapp">خطوات التركيب (دقيقتان)</button><button type="button" class="btn btn-ghost" data-brlater>لاحقاً</button></div></div>`; }
+  return `<div class="check warn br-all"><b>🔌 ركّب «جسر إنجاز 2.3» على هذا الجهاز، مرة واحدة</b><span>يشغّل Copilot وواتساب القسم داخل «إنجاز»، وتُرسل كل الرسائل من داخل النظام.</span><div class="br-acts"><button type="button" class="btn btn-primary" data-go="whatsapp">خطوات التركيب (دقيقتان)</button><button type="button" class="btn btn-ghost" data-brlater>لاحقاً</button></div></div>`; }
 const _vHome42 = vHome;
 vHome = function(){ return bridgeCard() + myWorkCard() + _vHome42(); };
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;
   if (t.dataset.brlater !== undefined) { try { localStorage.setItem("br-later", Date.now() + 3 * 864e5); } catch (_) {} return render(); }
 });
-NEWF.splice(1, 0, ["v42-mw", "nav:home", "لوحتي", "في أول الرئيسية: المطلوب منك الآن، والمتبقي، وما أنجزته هذا الشهر مع نسبة إنجازك — كل بند يفتح بضغطة.", false, "2026-10-20"]);
+NEWF.splice(1, 0, ["v42-mw", "nav:home", "لوحتي", "في أول الرئيسية: المطلوب منك الآن، والمتبقي، وما أنجزته هذا الشهر مع نسبة إنجازك، كل بند يفتح بضغطة.", false, "2026-10-20"]);
 
-/* ================= v43: «رجوع» — back to the previous page (works in the installed app window too) ================= */
+/* ================= v43: «رجوع»، back to the previous page (works in the installed app window too) ================= */
 S.backStack = [];
 const _go43 = go;
 go = function(v, ...a){ const from = S.view; if (!S._goingBack && from && from !== v) { S.backStack.push(from); if (S.backStack.length > 30) S.backStack.shift(); } S._goingBack = false; const r = _go43(v, ...a); backBtn(); return r; };
@@ -56,7 +56,7 @@ afterRender = function(v){ _afterRender43(v); backBtn(); };
     const idle = $("#drawer")?.hidden !== false && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName) && !S.waPop;
     try { const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); } catch (_) {}
     if (idle) return location.reload();
-    if (!$("#upd-bar")) document.body.insertAdjacentHTML("beforeend", `<button type="button" id="upd-bar" class="upd-bar" onclick="location.reload()">⟳ يوجد تحديث جديد لـ«إنجاز» — اضغط للتحديث</button>`); }
+    if (!$("#upd-bar")) document.body.insertAdjacentHTML("beforeend", `<button type="button" id="upd-bar" class="upd-bar" onclick="location.reload()">⟳ يوجد تحديث جديد لـ«إنجاز»، اضغط للتحديث</button>`); }
   const badge = v => { if (!v) return; let e = $("#app-ver"); if (!e) { const a = $("#sugg-btn") || $("#side .side-foot"); if (!a) return; a.insertAdjacentHTML("afterend", `<div id="app-ver" class="app-ver"></div>`); e = $("#app-ver"); } e.textContent = `الإصدار ${v.replace("jaliyat-v", "")} · محدَّث ✓`; };
   ver().then(v => { mine = v; badge(v); });
   const _ar46 = afterRender; afterRender = function(x){ _ar46(x); badge(mine); };
@@ -64,12 +64,12 @@ afterRender = function(v){ _afterRender43(v); backBtn(); };
   addEventListener("focus", check); setInterval(check, 5 * 60e3);
 })();
 
-/* ================= v47: notifications on EVERY device — a clear card until this device receives them ================= */
+/* ================= v47: notifications on EVERY device، a clear card until this device receives them ================= */
 const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 function pushCard(){ try { if (+localStorage.getItem("push-later") > Date.now()) return ""; } catch (_) {}
   if (S.push.on) return "";
-  if (isIOS() && !isStandalone()) return `<div class="check pc"><b>لتصلك إشعارات «إنجاز» على الآيفون</b><span>اضغط زر المشاركة <b>⬆</b> في Safari ثم <b>«إضافة إلى الشاشة الرئيسية»</b>، وافتح «إنجاز» من أيقونته وفعّل الإشعارات — مرة واحدة.</span><div class="br-acts"><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`;
+  if (isIOS() && !isStandalone()) return `<div class="check pc"><b>لتصلك إشعارات «إنجاز» على الآيفون</b><span>اضغط زر المشاركة <b>⬆</b> في Safari ثم <b>«إضافة إلى الشاشة الرئيسية»</b>، وافتح «إنجاز» من أيقونته وفعّل الإشعارات، مرة واحدة.</span><div class="br-acts"><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`;
   if (!S.push.sup) return "";
   if ("Notification" in window && Notification.permission === "denied") return `<div class="check pc"><b>الإشعارات موقوفة على هذا الجهاز</b><span>فعّلها من إعدادات المتصفح أو الجهاز لموقع «إنجاز»، ثم حدّث الصفحة.</span></div>`;
   return `<div class="check pc"><b>فعّل الإشعارات على هذا الجهاز</b><span>تصلك المهام والقرارات وموافقات وثيقة فوراً، حتى و«إنجاز» مغلق.</span><div class="br-acts"><button type="button" class="btn btn-primary" data-pushon>تفعيل الإشعارات</button><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`; }
@@ -78,7 +78,7 @@ vHome = function(){ return pushCard() + _vHome47(); };
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-pushlater]"); if (t) { try { localStorage.setItem("push-later", Date.now() + 7 * 864e5); } catch (_) {} return render(); }
   if (ev.target.closest(".pc [data-pushon]")) { setTimeout(() => S.view === "home" && render(), 1500); } });
 
-/* ================= v48: sidebar «الأكثر استخداماً» — the pages each employee opens most, one tap away ================= */
+/* ================= v48: sidebar «الأكثر استخداماً»، the pages each employee opens most, one tap away ================= */
 const NAVF_SKIP = new Set(["home", "copilot"]);
 const _go48 = go;
 go = function(v, ...a){ if (v && !NAVF_SKIP.has(v)) { try { const f = JSON.parse(localStorage.getItem("navf") || "{}"); f[v] = (f[v] || 0) + 1; localStorage.setItem("navf", JSON.stringify(f)); } catch (_) {} } return _go48(v, ...a); };

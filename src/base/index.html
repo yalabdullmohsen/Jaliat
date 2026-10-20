@@ -149,7 +149,7 @@ tbody tr:hover td{background:var(--surface-2)}
 td .s{display:block;font-size:12.5px;color:var(--muted)}
 .n{font-family:var(--f-display);color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
 .flag{color:var(--bad);font-weight:700}
-/* khatib table — same look as the department's sheet */
+/* khatib table، same look as the department's sheet */
 .kt th{background:#006C35;color:#fff;text-align:center;font-size:13px;border:1px solid #0b5a30}
 .kt td{text-align:center;border:1px solid var(--line);padding:7px 10px;font-size:13.5px}
 .kt tbody tr:nth-child(even) td{background:var(--band)}
@@ -730,7 +730,7 @@ function actForm(id){
 }
 function mosOpts(gov, sel){
   const L = S.mosques.filter(m => !gov || m.gov === gov).sort((a,b) => (a.area + a.name).localeCompare(b.area + b.name, "ar"));
-  return `<option value="">اختر المسجد</option>` + L.map(m => `<option value="${esc(m.id)}"${m.id === sel ? " selected" : ""}>مسجد ${esc(m.name)} — ${esc(m.area)}</option>`).join("") + (S.canWrite ? `<option value="__new">+ مسجد غير موجود في القائمة</option>` : "");
+  return `<option value="">اختر المسجد</option>` + L.map(m => `<option value="${esc(m.id)}"${m.id === sel ? " selected" : ""}>مسجد ${esc(m.name)}، ${esc(m.area)}</option>`).join("") + (S.canWrite ? `<option value="__new">+ مسجد غير موجود في القائمة</option>` : "");
 }
 function docHint(){
   const h = $("#f-doc-h"); if (!h) return; const no = $("#f-doc").value.trim(); const d = docBy[no];
@@ -765,7 +765,7 @@ async function saveAct(){
       const list = [...S.mosques, {id:nid, name, area, gov:v.gov}]; v.mosque = nid; ops.push(() => T.ref("mosques", list));
     }
   }
-  if (v.doc && !docBy[v.doc] && v.start && v.end) { const list = [...S.docs, {no:v.doc, date:v.start, subj:`موافقة ${v.type} — ${v.comm}`, comm:v.comm, start:v.start, end:v.end, notes:""}]; ops.push(() => T.ref("docs", list)); }
+  if (v.doc && !docBy[v.doc] && v.start && v.end) { const list = [...S.docs, {no:v.doc, date:v.start, subj:`موافقة ${v.type}، ${v.comm}`, comm:v.comm, start:v.start, end:v.end, notes:""}]; ops.push(() => T.ref("docs", list)); }
   const d = docBy[v.doc]; if (d) { if (v.start === d.start) v.start = ""; if (v.end === d.end) v.end = ""; }
   const n = F.id ? S.acts.get(F.id).n : Math.max(0, ...[...S.acts.values()].map(a => a.n || 0)) + 1;
   const body = { ...v, n };
@@ -777,7 +777,7 @@ async function saveAct(){
 }
 function writeFail(err){
   console.error(err);
-  if (err?.code === "42501") toast("لا تملك صلاحية هذه العملية — اطلبها من مدير النظام");
+  if (err?.code === "42501") toast("لا تملك صلاحية هذه العملية، اطلبها من مدير النظام");
   else if (/fetch|network/i.test(err?.message || "")) toast("لا يوجد اتصال بالإنترنت، حاول مرة أخرى");
   else toast("تعذّر الحفظ، حاول مرة أخرى");
 }

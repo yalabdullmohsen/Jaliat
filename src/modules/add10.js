@@ -46,14 +46,14 @@ function normActFields(src, base){
 }
 function describe(a){
   try {
-    if (a.op === "add_act") { const d = a.data || {}; return ["إضافة نشاط", `${d.type || ""} — ${d.comm || ""} — مسجد ${d.mosque || ""} — ${(d.days || []).join("، ")} ${d.time || ""} — ${d.lect || ""}`, "ok"]; }
+    if (a.op === "add_act") { const d = a.data || {}; return ["إضافة نشاط", `${d.type || ""}، ${d.comm || ""}، مسجد ${d.mosque || ""}، ${(d.days || []).join("، ")} ${d.time || ""}، ${d.lect || ""}`, "ok"]; }
     if (a.op === "update_act") return [`تعديل النشاط #${a.n}`, Object.entries(a.set || {}).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join("، ") : v}`).join(" · "), "gold"];
-    if (a.op === "delete_act") { const e = S.E.find(x => x.n === +a.n); return [`حذف النشاط #${a.n}`, e ? `${e.comm} — ${e.mosName} — ${daysText(e)} ${e.time}` : "غير موجود", "bad"]; }
-    if (a.op === "add_doc") return ["إضافة وثيقة", `${a.data?.no} — ${a.data?.subj || ""}`, "ok"];
+    if (a.op === "delete_act") { const e = S.E.find(x => x.n === +a.n); return [`حذف النشاط #${a.n}`, e ? `${e.comm}، ${e.mosName}، ${daysText(e)} ${e.time}` : "غير موجود", "bad"]; }
+    if (a.op === "add_doc") return ["إضافة وثيقة", `${a.data?.no}، ${a.data?.subj || ""}`, "ok"];
     if (a.op === "update_doc") return [`تعديل الوثيقة ${a.no}`, Object.entries(a.set || {}).map(([k, v]) => `${k}: ${v}`).join(" · "), "gold"];
     if (a.op === "update_khatib") return [`تعديل خطباء مسجد ${a.mosque}`, Object.entries(a.set || {}).map(([k, v]) => `${k}: ${v}`).join(" · "), "gold"];
     if (a.op === "add_note") return ["إضافة ملاحظة", a.data?.title || "", "ok"];
-    if (a.op === "set_sermon") return [`تسجيل خطبة ${a.fri}`, `${a.mosque} — ${({ pri:"الأساسي", bak:"الاحتياط", none:"لم تُلقَ" })[a.who] || a.who}`, "t1"];
+    if (a.op === "set_sermon") return [`تسجيل خطبة ${a.fri}`, `${a.mosque}، ${({ pri:"الأساسي", bak:"الاحتياط", none:"لم تُلقَ" })[a.who] || a.who}`, "t1"];
   } catch (_) {}
   return [a.op, "", ""];
 }

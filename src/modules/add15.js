@@ -15,9 +15,9 @@ function cfWhy(e, c){
     ? `المحاضر «${(e.lect || "").split(" / ").find(l => (o.lect || "").includes(l.trim())) || e.lect}» مسجّل في نشاطين بنفس الوقت: #${e.n} في ${e.mosName || "—"} و#${o.n} في ${o.mosName || "—"}، يوم ${days} (${e.time || "—"} / ${o.time || "—"}). لا يمكنه حضور الاثنين.`
     : `${e.mosName} يستضيف نشاطين بنفس الوقت: #${e.n} للجالية ${e.comm || "—"} و#${o.n} للجالية ${o.comm || "—"}، يوم ${days} (${e.time || "—"} / ${o.time || "—"}).`;
   const root = [];
-  if (e.doc && e.doc === o.doc) root.push("النشاطان على نفس الموافقة — غالباً أُدخل الوقت نفسه لهما عند التسجيل");
+  if (e.doc && e.doc === o.doc) root.push("النشاطان على نفس الموافقة، غالباً أُدخل الوقت نفسه لهما عند التسجيل");
   else if (e.doc && o.doc) root.push(`الموافقتان مختلفتان (${e.doc} و${o.doc}) وصدرتا دون فحص تعارض بينهما`);
-  if (!e.doc || !o.doc) root.push("أحد النشاطين بلا رقم موافقة — راجع صحة بياناته");
+  if (!e.doc || !o.doc) root.push("أحد النشاطين بلا رقم موافقة، راجع صحة بياناته");
   root.push(`فترة التداخل: من ${fmt(from)} إلى ${fmt(to)}`);
   return { why, root };
 }
@@ -26,7 +26,7 @@ function cfPanel(e){
   const fixes = [...altFixes(e), ...e.cf.flatMap(c => altFixes(c.o, 2))].slice(0, 7);
   return `<div class="ai-an"><b>🧠 تحليل التعارض والحلول المقترحة</b>
     ${e.cf.map(c => { const w = cfWhy(e, c); return `<div class="ai-why"><span>${esc(w.why)}</span><ul>${w.root.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>`; }).join("")}
-    ${fixes.length ? `<span class="s">حلول خالية من أي تعارض (تم فحصها مع كل الأنشطة):</span><div class="ai-fix">${fixes.map(f => `<button type="button" class="btn" data-cffix="${esc(JSON.stringify(f))}">✓ ${esc(f.label)}</button>`).join("")}</div>` : `<span class="s">لا يوجد وقت أو يوم بديل خالٍ — الحل: تغيير المحاضر أو المسجد.</span>`}
+    ${fixes.length ? `<span class="s">حلول خالية من أي تعارض (تم فحصها مع كل الأنشطة):</span><div class="ai-fix">${fixes.map(f => `<button type="button" class="btn" data-cffix="${esc(JSON.stringify(f))}">✓ ${esc(f.label)}</button>`).join("")}</div>` : `<span class="s">لا يوجد وقت أو يوم بديل خالٍ، الحل: تغيير المحاضر أو المسجد.</span>`}
     ${S.admin ? `<button type="button" class="btn btn-ghost" data-tkfrom="cf|${esc(e.id)}">أو أسند حل التعارض لموظف</button>` : ""}</div>`;
 }
 async function applyFix(f){
@@ -42,7 +42,7 @@ function priorities(){
   const P = [], me = S.me?.id, td = dOf(TODAY).getDay();
   const pairs = typeof cfPairs === "function" ? cfPairs() : [];
   if (pairs.length) { const solvable = pairs.filter(p => altFixes(p.a, 1).length || altFixes(p.b, 1).length).length;
-    P.push({ w:100, k:"bad", t:`${pairs.length} تعارض في الأنشطة الجارية`, s:`${solvable} منها لها حل جاهز بضغطة — افتح النشاط وستجد التحليل والحلول`, act:{ open:`act:${pairs[0].a.id}`, l:"عرض الحل" } }); }
+    P.push({ w:100, k:"bad", t:`${pairs.length} تعارض في الأنشطة الجارية`, s:`${solvable} منها لها حل جاهز بضغطة، افتح النشاط وستجد التحليل والحلول`, act:{ open:`act:${pairs[0].a.id}`, l:"عرض الحل" } }); }
   const myLate = (S.tasks || []).filter(t => t.assignee === me && TK_OPEN.includes(t.status) && t.due && t.due <= TODAY);
   if (myLate.length) P.push({ w:95, k:"bad", t:`${myLate.length} مهمة عليك موعدها اليوم أو متأخرة`, s:myLate.slice(0, 2).map(t => t.title).join(" · "), act:{ go:"tasks", l:"مهامي" } });
   const unseen = (S.tasks || []).filter(t => t.assignee === me && !t.seen_at && TK_OPEN.includes(t.status));
@@ -63,7 +63,7 @@ function priorities(){
 }
 function prioPanel(){
   const P = priorities();
-  return `<div class="panel prio"><div class="panel-h"><h3>أولويات اليوم</h3><span class="chip">${P.length - 1}</span><span class="s">مرتبة حسب الأهمية — كل بند بإجرائه</span></div>
+  return `<div class="panel prio"><div class="panel-h"><h3>أولويات اليوم</h3><span class="chip">${P.length - 1}</span><span class="s">مرتبة حسب الأهمية، كل بند بإجرائه</span></div>
     <div class="prio-l">${P.map((p, i) => `<div class="prio-i ${p.k}"><span class="num pr-n">${i + 1}</span><span class="pr-t"><b>${esc(p.t)}</b>${p.s ? `<br><span class="s">${esc(p.s)}</span>` : ""}</span>
       <button type="button" class="btn" ${p.act.go ? `data-go="${p.act.go}"${p.act.f ? ` data-f="${esc(JSON.stringify(p.act.f))}"` : ""}` : p.act.open ? `data-prio-open="${esc(p.act.open)}"` : `data-tkfrom="${esc(p.act.tkfrom)}"`}>${esc(p.act.l)}</button></div>`).join("")}</div></div>`;
 }
@@ -76,7 +76,7 @@ bkAvail = function(){
   _bkAvail15(); const box = $("#bk-av"); if (!box) return; const f = bkRead(); if (!f.day || !/^gm-/.test(f.hall)) return;
   const d = dOf(f.day).getDay(), a = hm(f.t_from), z = hm(f.t_to);
   const L = S.E.filter(e => e.live && /الكبير/.test(e.mosName || "") && e.start <= f.day && e.end >= f.day && e.days.includes(d) && e.sl && e.sl[0] < z && a < e.sl[1]);
-  if (L.length) box.insertAdjacentHTML("beforeend", `<div class="check warn"><b>تنبيه: أنشطة في المسجد الكبير بنفس الوقت</b><span>${L.map(e => `#${e.n} ${esc(e.comm || "")} (${esc(e.time || "")})`).join("، ")} — تأكد من عدم التأثير على القاعة.</span></div>`);
+  if (L.length) box.insertAdjacentHTML("beforeend", `<div class="check warn"><b>تنبيه: أنشطة في المسجد الكبير بنفس الوقت</b><span>${L.map(e => `#${e.n} ${esc(e.comm || "")} (${esc(e.time || "")})`).join("، ")}، تأكد من عدم التأثير على القاعة.</span></div>`);
 };
 
 /* ---------- Watheqa ---------- */
@@ -90,7 +90,7 @@ const _letterOpen15 = letterOpen;
 letterOpen = function(src){ _letterOpen15(src); $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-primary" type="button" data-ext="${WATHEQA}">فتح نظام وثيقة</button>`); };
 const _palAll15 = palAll;
 palAll = function(){ const A = _palAll15(); A.unshift({ g:"إجراءات", t:"فتح نظام وثيقة", s:"watheqa.awqaf.gov.kw", ic:"i-doc", run:() => window.open(WATHEQA, "_blank", "noopener"), txt:"وثيقه watheqa كتب" }); return A; };
-/* attendance was removed — stop loading it */
+/* attendance was removed، stop loading it */
 loadAtt = async function(){ S.att = []; };
 
 /* ================= questions between colleagues ================= */
@@ -126,7 +126,7 @@ function qForm(id, preset){
   openDrawer(`السؤال س-${q.no}`, `<div class="q-meta"><span>من <b>${esc(pname(q.from_id))}</b> إلى <b>${esc(pname(q.to_id))}</b></span><span class="s">${fmtTime(q.created_at)}${q.seen_at ? ` · قُرئ ${fmtTime(q.seen_at)}` : " · لم يُقرأ بعد"}</span></div>
     <div class="q-body">${esc(q.body).replace(/\n/g, "<br>")}</div>
     ${q.link ? `<button type="button" class="btn" data-tklink="${esc(q.link)}">فتح ${esc(linkName(q.link))}</button>` : ""}
-    ${toMe || S.admin ? fld("q-ans", q.answer ? `الإجابة${q.answered_at ? " — " + fmtTime(q.answered_at) : ""}` : "إجابتك", `<textarea class="f" id="q-ans" rows="5" placeholder="اكتب الإجابة…">${esc(q.answer || "")}</textarea>`) : q.answer ? `<div class="q-ans"><b>💬 الإجابة</b><span class="s">${fmtTime(q.answered_at)}</span><div>${esc(q.answer).replace(/\n/g, "<br>")}</div></div>` : `<div class="empty s">لم تصل إجابة بعد</div>`}`,
+    ${toMe || S.admin ? fld("q-ans", q.answer ? `الإجابة${q.answered_at ? "، " + fmtTime(q.answered_at) : ""}` : "إجابتك", `<textarea class="f" id="q-ans" rows="5" placeholder="اكتب الإجابة…">${esc(q.answer || "")}</textarea>`) : q.answer ? `<div class="q-ans"><b>💬 الإجابة</b><span class="s">${fmtTime(q.answered_at)}</span><div>${esc(q.answer).replace(/\n/g, "<br>")}</div></div>` : `<div class="empty s">لم تصل إجابة بعد</div>`}`,
     `${toMe || S.admin ? `<button class="btn btn-primary" data-qans>${q.answer ? "تعديل الإجابة" : "إرسال الإجابة"}</button>` : ""}${q.from_id === S.me.id && !q.answer ? `<button class="btn btn-ghost" data-qnew="${q.to_id}">سؤال آخر لنفس الشخص</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
   if (toMe && !q.seen_at) { q.seen_at = new Date().toISOString(); sb.from("questions").update({ seen_at:q.seen_at }).eq("id", q.id).then(() => {}); }
 }

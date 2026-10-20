@@ -2,16 +2,16 @@
 <title>بوابة المنسقين · قسم الجاليات</title><meta name="robots" content="noindex"><meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#121715" media="(prefers-color-scheme: dark)"><link rel="icon" href="favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--g:#2F6B57;--g2:#245544;--gs:#EAF2EE;--ink:#1C2521;--mu:#6B7671;--line:#E7E4DD;--bg:#F6F5F1;--card:#FFFFFF;--bad:#A9483C;--bads:#F8EAE7;--w:#8A6514;--ws:#F7EFDC;--sh:0 1px 2px rgba(28,37,33,.04),0 4px 14px rgba(28,37,33,.04)}
+:root{--g:#0F5440;--g2:#0B4433;--gs:#E6EFEA;--ink:#14201B;--mu:#5F6B65;--line:#E5E1D6;--bg:#F6F5F0;--card:#FFFFFF;--bad:#A63F33;--bads:#F8E8E5;--w:#8C6416;--ws:#F7EEDB;--gold:#A47E35;--sh:0 1px 2px rgba(20,32,27,.04),0 12px 32px -14px rgba(20,32,27,.10)}
 @media (prefers-color-scheme:dark){:root{--bg:#0F1412;--card:#171D1A;--ink:#E4EAE7;--mu:#98A39E;--line:#26302B;--gs:#1C2A24;--g:#6FB295;--g2:#8CC6AC;--bads:#2D1C19;--ws:#2A2416;--sh:none}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
-/* top bar — solid, respects the notch, nothing scrolls behind it */
+/* top bar ، solid, respects the notch, nothing scrolls behind it */
 .bar{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
 .bar-in{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
-.mark{width:38px;height:38px;border-radius:11px;background:var(--g);display:grid;place-items:center;flex:none}
+.mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(160deg,#16684F,#0B4433);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);display:grid;place-items:center;flex:none}
 .mark svg{width:20px;height:20px;stroke:#fff}
 .bar-t{min-width:0;flex:1}.bar-t b{display:block;font-size:16px;font-weight:700;line-height:1.3}
 .bar-t small{display:block;font-size:12.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -38,7 +38,7 @@ button{font:inherit;color:inherit}
 .rep b{font-size:12px;color:var(--g);display:block}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:0;box-shadow:var(--sh)}
-.stat b{font-size:24px;font-weight:700;line-height:1.2}.stat span{font-size:12px;color:var(--mu)}
+.stat b{font-size:26px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:var(--mu)}
 .pill{font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 10px;background:var(--gs);color:var(--g);white-space:nowrap;flex:none}
 .pill.w{background:var(--ws);color:var(--w)}.pill.no{background:var(--bads);color:var(--bad)}.pill.mu{background:var(--bg);color:var(--mu)}
 .empty{padding:22px 16px;text-align:center;color:var(--mu);font-size:13.5px}

@@ -1,4 +1,4 @@
-/* ================= v12: bridge 2.0 — settings pushed from the system (no reinstall for future fixes) ================= */
+/* ================= v12: bridge 2.0، settings pushed from the system (no reinstall for future fixes) ================= */
 /* Edit these when Microsoft changes Copilot's page; every bridge 2.0 picks them up automatically. */
 const BRIDGE_CFG = {
   editor: ["#m365-chat-editor-target-element", '[role="textbox"][contenteditable="true"]', "textarea[placeholder]"],
@@ -18,7 +18,7 @@ window.addEventListener("message", e => {
 });
 function bridgeHosts(){ if (hasBridge()) window.postMessage({ type:"jaliyat-bridge-hosts", hosts:BRIDGE_HOSTS }, location.origin); }
 const bridgeOld = () => hasBridge() && brV() < BRIDGE_LATEST;
-const BR_UPD = () => `<div class="check warn br-upd"><b>تحديث أخير للجسر (2.0) — بعده كل التحديثات تلقائية</b>
+const BR_UPD = () => `<div class="check warn br-upd"><b>تحديث أخير للجسر (2.0)، بعده كل التحديثات تلقائية</b>
   <span>1) <a href="jaliyat-copilot.zip" download>نزّل الجسر الجديد</a>  2) استخرجه وانسخ الملفات فوق مجلد jaliyat-copilot القديم (استبدال)  3) افتح <code dir="ltr">edge://extensions</code> واضغط «إعادة تحميل» على الجسر، ثم حدّث هذه الصفحة.</span></div>`;
 const _vCopilot13 = vCopilot;
 vCopilot = function(){

@@ -1,10 +1,10 @@
-/* ================= v27: «هل الوقت متاح؟» — instant availability check for any date / time / mosque / lecturer ================= */
+/* ================= v27: «هل الوقت متاح؟»، instant availability check for any date / time / mosque / lecturer ================= */
 Object.assign(TITLES, { avail:"هل الوقت متاح؟" });
-S.av = { date:TODAY, time:"بعد صلاة المغرب", from:"", to:"", mos:"", lect:"", comm:"", weeks:"1" }; // a single date — no repetition
+S.av = { date:TODAY, time:"بعد صلاة المغرب", from:"", to:"", mos:"", lect:"", comm:"", weeks:"1" }; // a single date، no repetition
 const AV_SLOTS = [...SLOTS.filter(s => s !== "بين المغرب والعشاء"), "وقت محدد…"];
 const mmToT = m => `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`;
 const avSlot = () => S.av.time === "وقت محدد…" ? (S.av.from && S.av.to ? (() => { const [a, b] = [S.av.from, S.av.to].map(t => +t.slice(0, 2) * 60 + +t.slice(3, 5)); return b > a ? [a, b] : null; })() : null) : slot(S.av.time);
-const mosLabel = m => `مسجد ${m.name}${m.area ? " — " + m.area : ""}`;
+const mosLabel = m => `مسجد ${m.name}${m.area ? "، " + m.area : ""}`;
 const avMosAll = () => { const q = nkey(S.av.mos); if (!q) return []; const ex = S.mosques.filter(m => nkey(mosLabel(m)) === q); if (ex.length) return ex;
   const nm = q.replace(/^مسجد\s*/, ""); const same = S.mosques.filter(m => nkey(m.name) === nm || nkey("مسجد " + m.name) === q); return same.length ? same : S.mosques.filter(m => nkey(m.name).includes(nm)).slice(0, 12); };
 const avMos = () => (S.av.mosId && S.mosques.find(m => m.id === S.av.mosId)) || avMosAll()[0] || null;
@@ -25,7 +25,7 @@ function avCheck(){
   if (wd === 5 && sl[0] < 840 && sl[1] > 690) out.warn.push("يتزامن مع وقت صلاة وخطبة الجمعة.");
   if (m && wd === 5) { const kh = [...S.khatibs.values()].find(k => nkey(k.mosque || "") && nkey(m.name).includes(nkey(k.mosque))); if (kh && sl[0] < 840 && sl[1] > 690) out.warn.push(`المسجد فيه خطبة جمعة بلغة ${kh.label || kh.comm || "أخرى"}.`); }
   if (d < TODAY) out.warn.push("التاريخ المختار في الماضي.");
-  const all = avMosAll(); if (all.length > 1) out.warn.push(`يوجد ${all.length} مساجد بهذا الاسم (${all.map(x => x.area || x.gov).filter(Boolean).slice(0, 4).join("، ")}) — اختر المسجد مع المنطقة من القائمة.`);
+  const all = avMosAll(); if (all.length > 1) out.warn.push(`يوجد ${all.length} مساجد بهذا الاسم (${all.map(x => x.area || x.gov).filter(Boolean).slice(0, 4).join("، ")})، اختر المسجد مع المنطقة من القائمة.`);
   if (S.av.comm) { const docs = S.docs.filter(x => x.comm === S.av.comm && x.start <= d && x.end >= end); if (!docs.length) out.warn.push(`لا توجد موافقة سارية للجالية ${S.av.comm} تغطي هذه الفترة.`); }
   // alternatives: other prayer slots that day at this mosque, and the next free weeks for this slot
   out.altSlots = m ? SLOTS.filter(t => t !== S.av.time && !/العشاء/.test(t)).filter(t => { const s = slot(t); return s && !S.E.some(e => e.live && e.sl && e.days.includes(wd) && e.start <= end && e.end >= d && e.sl[0] < s[1] && s[0] < e.sl[1] && (e.mosque === m.id || (names.length && e.names.length && sameLect(names, e.names)))); }) : [];
@@ -40,7 +40,7 @@ S.av.mosId = S.av.mosId || "";
 const avM = () => S.mosques.find(m => m.id === S.av.mosId) || null;
 function avAnswer(){
   const m = avM(), sl = avSlot(), d = S.av.date || TODAY, wd = dOf(d).getDay();
-  const when = `${d === TODAY ? "اليوم" : d === addDays(TODAY, 1) ? "غداً" : DAYS[wd]} ${fmt(d)} · ${S.av.time === "وقت محدد…" ? (S.av.from && S.av.to ? `${t12(S.av.from)} – ${t12(S.av.to)}` : "حدّد الساعة") : S.av.time}`;
+  const when = `${d === TODAY ? "اليوم" : d === addDays(TODAY, 1) ? "غداً" : DAYS[wd]} ${fmt(d)} · ${S.av.time === "وقت محدد…" ? (S.av.from && S.av.to ? `${t12(S.av.from)}، ${t12(S.av.to)}` : "حدّد الساعة") : S.av.time}`;
   if (!m) return `<div class="avx-ans idle"><span class="avx-ic">؟</span><div><b>اختر المسجد</b><span>${esc(when)}</span></div></div>`;
   if (!sl) return `<div class="avx-ans idle"><span class="avx-ic">؟</span><div><b>حدّد الساعة</b><span>${esc(mosLabel(m))}</span></div></div>`;
   S.av.mos = mosLabel(m); S.av.lect = "";
@@ -48,7 +48,7 @@ function avAnswer(){
   const alts = busy.length ? [...r.altSlots.slice(0, 2).map(t => `<button type="button" class="avx-alt" data-avtime="${esc(t)}">${esc(t.replace("بعد صلاة ", "بعد "))}<small>نفس اليوم</small></button>`),
     ...r.altDays.slice(0, 2).map(dd => `<button type="button" class="avx-alt" data-avdate="${dd}">${DAYS[dOf(dd).getDay()]}<small>${fmt(dd)}</small></button>`)].join("") : "";
   return `<div class="avx-ans ${busy.length ? "bad" : "ok"}"><span class="avx-ic">${busy.length ? "✕" : "✓"}</span><div><b>${busy.length ? "غير متاح" : "متاح"}</b><span>${esc(mosLabel(m))}<br>${esc(when)}</span></div></div>
-    ${busy.length ? `<div class="avx-why">${busy.slice(0, 3).map(e => `<button type="button" class="avx-act" data-prio-open="act:${e.id}"><b>يوجد ${esc(e.type || "نشاط")} — ${esc(e.comm || "")}</b><span>${esc(e.time || "")}${e.lect ? " · " + esc(e.lect) : ""}</span></button>`).join("")}</div>` : ""}
+    ${busy.length ? `<div class="avx-why">${busy.slice(0, 3).map(e => `<button type="button" class="avx-act" data-prio-open="act:${e.id}"><b>يوجد ${esc(e.type || "نشاط")}، ${esc(e.comm || "")}</b><span>${esc(e.time || "")}${e.lect ? " · " + esc(e.lect) : ""}</span></button>`).join("")}</div>` : ""}
     ${alts ? `<div class="avx-alts"><span>أوقات متاحة قريبة</span><div>${alts}</div></div>` : ""}
     ${r.warn.filter(w => !/أكثر من مسجد|مساجد بهذا الاسم/.test(w)).map(w => `<div class="avx-warn">⚠ ${esc(w)}</div>`).join("")}`;
 }
@@ -98,4 +98,4 @@ answer = function(q){ const t = norm(q);
 SUGG.splice(1, 0, ["هل الوقت متاح؟", "i-cal", "هل مسجد متاح اليوم بعد المغرب"]);
 const _palAll27 = palAll;
 palAll = function(){ const A = _palAll27(); A.unshift({ g:"إجراءات", t:"هل الوقت متاح؟ (فحص مسجد/محاضر/موعد)", s:"", ic:"i-cal", run:() => go("avail"), txt:"متاح تعارض فاضي مشغول موعد وقت مسجد" }); return A; };
-NEWF.splice(1, 0, ["v27-avail", "nav:avail", "هل الوقت متاح؟", "اختر التاريخ والوقت (مثلاً اليوم بعد المغرب) والمسجد أو المحاضر — يطلع لك فوراً متاح أو مشغول مع السبب والبدائل.", false, "2026-10-20"]);
+NEWF.splice(1, 0, ["v27-avail", "nav:avail", "هل الوقت متاح؟", "اختر التاريخ والوقت (مثلاً اليوم بعد المغرب) والمسجد أو المحاضر، يطلع لك فوراً متاح أو مشغول مع السبب والبدائل.", false, "2026-10-20"]);

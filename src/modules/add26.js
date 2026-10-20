@@ -28,6 +28,6 @@ palAll = function(){ const A = _palAll26(); A.push({ g:"إجراءات", t:"سج
 const _answer26 = answer;
 answer = function(q){ const t = norm(q); const R = (title, items, extra) => ({ title, items:items || [], extra:extra || "" });
   if (/رسائل|محادث|دردش/.test(t)) { const convs = [...new Set(S.chat.map(m => m.conv))].map(c => ({ c, n:chatUnread(c), last:S.chat.find(m => m.conv === c) })).filter(x => x.last);
-    return R(`المحادثات (${chatUnreadAll()} غير مقروءة)`, convs.sort((a, b) => b.n - a.n).slice(0, 12).map(x => ({ t:`${chatName(peerOfConv(x.c))}${x.n ? ` — ${x.n} جديدة` : ""}`, s:x.last.deleted ? "رسالة محذوفة" : x.last.body.slice(0, 80), open:`chat:${peerOfConv(x.c)}` }))); }
+    return R(`المحادثات (${chatUnreadAll()} غير مقروءة)`, convs.sort((a, b) => b.n - a.n).slice(0, 12).map(x => ({ t:`${chatName(peerOfConv(x.c))}${x.n ? `، ${x.n} جديدة` : ""}`, s:x.last.deleted ? "رسالة محذوفة" : x.last.body.slice(0, 80), open:`chat:${peerOfConv(x.c)}` }))); }
   if (/تحديث|جديد في|ما الجديد/.test(t)) return R("آخر تحديثات النظام", (typeof CHANGELOG !== "undefined" ? CHANGELOG : []).slice(0, 10).map(c => ({ t:c[2], s:fmt(String(c[1]).slice(0, 10)), go:"changes" })));
   return _answer26(q); };

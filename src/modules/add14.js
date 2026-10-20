@@ -92,7 +92,7 @@ function receiptText(r){ const f = rqRead();
   return `السلام عليكم ورحمة الله وبركاته\n${f.coord ? `الأخ الفاضل/ ${f.coord} حفظه الله\n` : ""}\nنفيدكم باستلام طلبكم${f.subj ? ` بخصوص «${f.subj}»` : ""}${f.org ? ` المقدم من ${f.org}` : ""}، وقد سُجّل برقم *${rqNo(r)}* بتاريخ ${fmt(TODAY)}.\n${S.rqActs.length ? `عدد الأنشطة المطلوبة: ${S.rqActs.length}\n` : ""}سيتم دراسة الطلب والرد عليكم في أقرب وقت، ونرجو ذكر رقم الطلب عند المراجعة.${SIGN}`; }
 async function rqAck(via){
   const r = await rqSave(true); if (!r) return;
-  if (via === "wa") { const f = rqRead(); const list = f.phone ? [{ name:f.coord, phone:f.phone }] : S.coords.filter(c => c.comm === f.comm && c.phone); if (!list.length) { const ok = await cpCopy(receiptText(r)); toast(ok ? "لا يوجد رقم — نُسخ نص التأكيد" : "لا يوجد رقم هاتف"); } else waPick(list, () => receiptText(r)); }
+  if (via === "wa") { const f = rqRead(); const list = f.phone ? [{ name:f.coord, phone:f.phone }] : S.coords.filter(c => c.comm === f.comm && c.phone); if (!list.length) { const ok = await cpCopy(receiptText(r)); toast(ok ? "لا يوجد رقم، نُسخ نص التأكيد" : "لا يوجد رقم هاتف"); } else waPick(list, () => receiptText(r)); }
   const ack = { at:new Date().toISOString(), by:S.me.id, via };
   const data = { ...r.data, ack }; const st = r.status === "جديد" ? "قيد المراجعة" : r.status;
   const { error } = await sb.from("requests").update({ data, status:st }).eq("id", r.id); if (error) return writeFail(error);
@@ -102,7 +102,7 @@ const _reqForm14 = reqForm;
 reqForm = async function(id){
   await _reqForm14(id); const r = S.reqs.find(x => x.id === id); if (!r || S.form?.id !== id) return;
   const ack = r.data?.ack; const h = $(".drawer-h h3"); if (h) h.textContent = `طلب وارد ${rqNo(r)}`;
-  $(".drawer-b")?.insertAdjacentHTML("afterbegin", ack ? `<div class="check ok"><b>✓ تم تأكيد استلام الطلب للمنسق</b><span>${fmtTime(ack.at)} — بواسطة ${esc(whoName(ack.by))}${ack.via === "wa" ? " عبر واتساب" : ""}</span></div>`
+  $(".drawer-b")?.insertAdjacentHTML("afterbegin", ack ? `<div class="check ok"><b>✓ تم تأكيد استلام الطلب للمنسق</b><span>${fmtTime(ack.at)}، بواسطة ${esc(whoName(ack.by))}${ack.via === "wa" ? " عبر واتساب" : ""}</span></div>`
     : `<div class="check warn rq-ack"><b>لم يُؤكد استلام الطلب للمنسق بعد</b><span>أرسل له رسالة تأكيد برقم الطلب ${rqNo(r)}</span><span class="br-acts"><button type="button" class="btn btn-primary" data-rqack="wa">${icon("i-wa")} تأكيد الاستلام عبر واتساب</button><button type="button" class="btn" data-rqack="other">أُكّد بطريقة أخرى</button></span></div>`);
 };
 const _vInbox14 = vInbox;
@@ -160,7 +160,7 @@ function taskForm(id, preset){
     ${t ? `<div class="rq-sec"><b>متابعة التنفيذ</b>${tkTrack(t, false)}
       ${mgr ? fld("tk-st", "الحالة", `<select class="f" id="tk-st">${TK_ST.map(s => `<option${s === t.status ? " selected" : ""}>${s}</option>`).join("")}</select>`) : `<input type="hidden" id="tk-st" value="${esc(t.status)}">`}
       ${fld("tk-note", "ملاحظة الإنجاز", `<textarea class="f" id="tk-note" rows="2" placeholder="ماذا تم؟"${mine || mgr ? "" : " disabled"}>${esc(t.done_note || "")}</textarea>`)}
-      <span class="hint">أسندها ${esc(pname(t.assigner))} — ${fmtTime(t.created_at)}</span></div>` : ""}`,
+      <span class="hint">أسندها ${esc(pname(t.assigner))}، ${fmtTime(t.created_at)}</span></div>` : ""}`,
     `${t && mine && t.status === "جديدة" ? `<button class="btn btn-primary" data-tkstep="تم الاستلام">📥 استلمت المهمة</button>` : ""}${t && mine && ["جديدة", "تم الاستلام"].includes(t.status) ? `<button class="btn" data-tkstep="قيد التنفيذ">⏳ بدأت التنفيذ</button>` : ""}${t && mine && t.status !== "منجزة" && t.status !== "ملغاة" ? `<button class="btn btn-ok" data-tkdone>✅ تم الإنجاز</button>` : ""}${mgr || (mine && t?.status === "منجزة") ? `<button class="btn ${t ? "" : "btn-primary"}" data-tksave>${t ? "حفظ" : "إسناد المهمة"}</button>` : ""}${t && mgr ? `<button class="btn btn-ghost bad-t" data-tkdel>حذف</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
   if (t && mine && !t.seen_at) { t.seen_at = new Date().toISOString(); sb.from("tasks").update({ seen_at:t.seen_at }).eq("id", t.id).then(() => {}); }
 }
@@ -172,7 +172,7 @@ async function taskSave(done){
   const t = S.tasks.find(x => x.id === id); const up = { status:typeof done === "string" ? done : done ? "منجزة" : v("tk-st") || t.status, done_note:$("#tk-note")?.value.trim() || "" };
   if (S.admin) Object.assign(up, { title:v("tk-title"), details:v("tk-det"), assignee:v("tk-who"), due:v("tk-due") || null, prio:v("tk-prio") || t.prio });
   const { data, error } = await sb.from("tasks").update(up).eq("id", id).select(); if (error) return writeFail(error);
-  if (data?.[0]) Object.assign(t, data[0]); closeDrawer(); render(); navBadge(); toast(up.status === "منجزة" && t.assignee === S.me.id ? "أحسنت! أُضيفت لسجل إنجازك ✓" : up.status === "تم الاستلام" ? "تم — وصل لرئيس القسم أنك استلمت المهمة" : up.status === "قيد التنفيذ" ? "تم — وصل لرئيس القسم أنك بدأت التنفيذ" : "حُفظت المهمة");
+  if (data?.[0]) Object.assign(t, data[0]); closeDrawer(); render(); navBadge(); toast(up.status === "منجزة" && t.assignee === S.me.id ? "أحسنت! أُضيفت لسجل إنجازك ✓" : up.status === "تم الاستلام" ? "تم، وصل لرئيس القسم أنك استلمت المهمة" : up.status === "قيد التنفيذ" ? "تم، وصل لرئيس القسم أنك بدأت التنفيذ" : "حُفظت المهمة");
 }
 function tkXlsx(){ if (!window.XLSX) return toast("مكتبة إكسل لم تُحمّل");
   const rows = S.tasks.map(t => ({ "الرقم":"م-" + t.no, "المهمة":t.title, "المكلّف":pname(t.assignee), "أسندها":pname(t.assigner), "الأولوية":t.prio, "الحالة":t.status, "الموعد":t.due || "", "تاريخ الإسناد":(t.created_at || "").slice(0, 10), "تاريخ الإنجاز":(t.done_at || "").slice(0, 10), "في الموعد":t.status === "منجزة" ? (onTime(t) ? "نعم" : "لا") : "", "ملاحظة الإنجاز":t.done_note || "" }));
@@ -181,7 +181,7 @@ function tkXlsx(){ if (!window.XLSX) return toast("مكتبة إكسل لم تُ
 /* Copilot can assign tasks (head of section) */
 PRIME_MSG = PRIME_MSG.replace("مثال:", `- {"op":"add_task","to":"اسم الموظف","title":"","details":"","due":"YYYY-MM-DD","prio":"عالية|متوسطة|منخفضة"}  ← إسناد مهمة لموظف (لرئيس القسم/المدير فقط)
 مثال:`);
-const _describe14 = describe; describe = function(a){ if (a.op === "add_task") return ["إسناد مهمة", `${a.to || ""} — ${a.title || ""}${a.due ? " — " + fmt(a.due) : ""}`, "gold"]; return _describe14(a); };
+const _describe14 = describe; describe = function(a){ if (a.op === "add_task") return ["إسناد مهمة", `${a.to || ""}، ${a.title || ""}${a.due ? "، " + fmt(a.due) : ""}`, "gold"]; return _describe14(a); };
 const _runAction14 = runAction;
 runAction = async function(a){ if (a.op !== "add_task") return _runAction14(a);
   if (!S.admin) throw new Error("إسناد المهام لرئيس القسم فقط"); const k = nkey(a.to || ""); const p = S.profiles.find(x => nkey(x.name || "") === k || nkey(x.username || "") === k) || S.profiles.find(x => k && (nkey(x.name || "").includes(k) || k.includes(nkey(x.name || "x"))));
@@ -201,7 +201,7 @@ vCopilot = function(){
   if (had) return `<div class="cp"><div class="panel cp-install"><div class="panel-b" style="display:grid;gap:12px">
     <span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot</span>
     <h3 style="font-size:19px">الجسر مثبّت على هذا الجهاز لكنه لا يعمل في هذه النافذة</h3>
-    <ul class="cp-steps"><li>${app ? "أنت تستخدم نافذة النظام المثبّت — افتح النظام في متصفح Edge مباشرة:" : "تأكد أن «جسر Copilot» مفعّل (المفتاح أخضر) في صفحة الملحقات:"}</li></ul>
+    <ul class="cp-steps"><li>${app ? "أنت تستخدم نافذة النظام المثبّت، افتح النظام في متصفح Edge مباشرة:" : "تأكد أن «جسر Copilot» مفعّل (المفتاح أخضر) في صفحة الملحقات:"}</li></ul>
     <div class="br-acts">${app ? `<a class="btn btn-primary" href="${location.origin + location.pathname}#copilot" target="_blank" rel="noopener">فتح في المتصفح</a>` : ""}<button type="button" class="btn" data-copyext>نسخ رابط صفحة الملحقات</button><button type="button" class="btn btn-ghost" onclick="location.reload()">تحديث الصفحة</button></div></div></div></div>`;
   return `<div class="cp"><div class="panel cp-install"><div class="panel-b" style="display:grid;gap:14px">
     <span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot داخل النظام</span>
@@ -212,7 +212,7 @@ vCopilot = function(){
       <li><button type="button" class="btn" data-copyext>نسخ رابط صفحة الملحقات</button> ثم الصقه في شريط العنوان واضغط Enter.</li>
       <li>فعّل <b>وضع المطوّر</b> (أسفل يمين الصفحة).</li>
       <li>اضغط <b>«تحميل ملحق لم يتم فك حزمته»</b> واختر مجلد <b dir="ltr">jaliyat-copilot</b> المستخرج.</li>
-      <li>ارجع هنا واضغط <button type="button" class="btn btn-ghost" onclick="location.reload()">تحديث الصفحة</button> — يظهر Copilot داخل النظام بحساب الوزارة.</li></ol>
+      <li>ارجع هنا واضغط <button type="button" class="btn btn-ghost" onclick="location.reload()">تحديث الصفحة</button>، يظهر Copilot داخل النظام بحساب الوزارة.</li></ol>
     <span class="hint">بعد التثبيت تختفي هذه الخطوات، وكل التحديثات القادمة تصل تلقائياً. يعمل على Microsoft Edge أو Google Chrome على الكمبيوتر.</span>
   </div></div><details class="cp-alt"><summary>بدون تثبيت: تسجيل الدخول بمايكروسوفت والبحث في ملفاتك</summary>${vCopilotMS()}</details></div>`;
 };
@@ -229,8 +229,8 @@ document.addEventListener("click", async ev => {
   if (D.nall !== undefined) { ntfRead(S.ntf.filter(x => !x.read_at).map(x => x.id)); $("#bell-pop")?.remove(); return bellOpen(); }
   if (D.nset !== undefined) return nSettings();
   if (D.nsave !== undefined) return nSave();
-  if (D.pushon !== undefined) { const ok = await pushSync(true); toast(ok ? "فُعّلت الإشعارات على هذا الجهاز ✓" : Notification.permission === "denied" ? "المتصفح يمنع الإشعارات — اسمح بها من القفل بجانب الرابط" : "تعذّر التفعيل"); bellRefresh(); if (S.form?.kind === "nset") nSettings(); else { $("#bell-pop")?.remove(); } return; }
-  if (D.ntest !== undefined) { const { error } = await sb.rpc("notify_me_test"); return toast(error ? "تعذّر الإرسال" : "أُرسل إشعار التجربة — يصلك خلال ثوانٍ"); }
+  if (D.pushon !== undefined) { const ok = await pushSync(true); toast(ok ? "فُعّلت الإشعارات على هذا الجهاز ✓" : Notification.permission === "denied" ? "المتصفح يمنع الإشعارات، اسمح بها من القفل بجانب الرابط" : "تعذّر التفعيل"); bellRefresh(); if (S.form?.kind === "nset") nSettings(); else { $("#bell-pop")?.remove(); } return; }
+  if (D.ntest !== undefined) { const { error } = await sb.rpc("notify_me_test"); return toast(error ? "تعذّر الإرسال" : "أُرسل إشعار التجربة، يصلك خلال ثوانٍ"); }
   if (D.rqack) return rqAck(D.rqack);
   if (D.tkt) { S.f.tkt = D.tkt; return render(); }
   if (D.tkp) { S.f.tkp = S.f.tkp === D.tkp ? "" : D.tkp; return render(); }
@@ -245,7 +245,7 @@ document.addEventListener("click", async ev => {
   if (D.tkfrom) { const [kind, id] = D.tkfrom.split("|"); return taskFrom(kind, id); }
   if (D.tkdel !== undefined) { if (D.sure !== "1") { D.sure = "1"; t.textContent = "اضغط مرة أخرى للتأكيد"; return; } const { error } = await sb.from("tasks").delete().eq("id", S.form.id); if (error) return writeFail(error); S.tasks = S.tasks.filter(x => x.id !== S.form.id); closeDrawer(); render(); return toast("حُذفت المهمة"); }
   if (D.tkxl !== undefined) return tkXlsx();
-  if (D.copyext !== undefined) { const ok = await cpCopy(extUrl); return toast(ok ? `نُسخ ${extUrl} — الصقه في شريط العنوان` : extUrl); }
+  if (D.copyext !== undefined) { const ok = await cpCopy(extUrl); return toast(ok ? `نُسخ ${extUrl}، الصقه في شريط العنوان` : extUrl); }
 });
 document.addEventListener("change", ev => { if (ev.target.id === "tk-m") { S.f.tkm = ev.target.value; render(); } });
 
@@ -260,10 +260,10 @@ function linkName(l){ const [k, id] = String(l).replace(/^#/, "").split(":"); if
 /* ---------- create tasks from problems (conflicts, approvals, requests) ---------- */
 function taskFrom(kind, id){
   if (!S.admin) return toast("إسناد المهام لرئيس القسم");
-  if (kind === "cf") { const e = S.byId.get(id); if (!e) return; const others = e.cf.map(c => `#${c.o.n} (${c.k === "lect" ? "نفس المحاضر" : "نفس المسجد"} — ${c.o.mosName}، ${daysText(c.o)} ${c.o.time || ""})`).join("، ");
-    return taskForm(null, { title:`حل تعارض النشاط #${e.n} مع ${e.cf.map(c => "#" + c.o.n).join("، ")}`, details:`النشاط #${e.n}: ${e.comm} — ${e.mosName} — ${daysText(e)} ${e.time || ""} — ${e.lect || ""}\nيتعارض مع: ${others}\nالمطلوب: التنسيق مع المنسق وتعديل الوقت أو المكان أو المحاضر.`, due:addDays(TODAY, 3), link:`#act:${id}` }); }
-  if (kind === "doc") { const d = docBy[id]; if (!d) return; return taskForm(null, { title:`تجديد الموافقة ${d.no} — ${d.comm || ""}`, details:`الموافقة تنتهي ${fmt(d.end)} وعليها ${S.E.filter(e => e.doc === d.no && e.live).length} نشاط.\nالمطلوب: إعداد كتاب التجديد في وثيقة ومتابعته.`, due:d.end && d.end > TODAY ? addDays(d.end, -3) : addDays(TODAY, 2), link:`#doc:${d.no}` }); }
-  if (kind === "req") { const r = S.reqs.find(x => x.id === id); if (!r) return; return taskForm(null, { title:`متابعة الطلب ${rqNo(r)} — ${r.data?.org || r.data?.comm || ""}`, details:`المطلوب: مراجعة الطلب، إعداد كتاب وثيقة، وإبلاغ المنسق ${r.data?.coord || ""}.`, due:addDays(TODAY, 2), link:`#req:${id}` }); }
+  if (kind === "cf") { const e = S.byId.get(id); if (!e) return; const others = e.cf.map(c => `#${c.o.n} (${c.k === "lect" ? "نفس المحاضر" : "نفس المسجد"}، ${c.o.mosName}، ${daysText(c.o)} ${c.o.time || ""})`).join("، ");
+    return taskForm(null, { title:`حل تعارض النشاط #${e.n} مع ${e.cf.map(c => "#" + c.o.n).join("، ")}`, details:`النشاط #${e.n}: ${e.comm}، ${e.mosName}، ${daysText(e)} ${e.time || ""}، ${e.lect || ""}\nيتعارض مع: ${others}\nالمطلوب: التنسيق مع المنسق وتعديل الوقت أو المكان أو المحاضر.`, due:addDays(TODAY, 3), link:`#act:${id}` }); }
+  if (kind === "doc") { const d = docBy[id]; if (!d) return; return taskForm(null, { title:`تجديد الموافقة ${d.no}، ${d.comm || ""}`, details:`الموافقة تنتهي ${fmt(d.end)} وعليها ${S.E.filter(e => e.doc === d.no && e.live).length} نشاط.\nالمطلوب: إعداد كتاب التجديد في وثيقة ومتابعته.`, due:d.end && d.end > TODAY ? addDays(d.end, -3) : addDays(TODAY, 2), link:`#doc:${d.no}` }); }
+  if (kind === "req") { const r = S.reqs.find(x => x.id === id); if (!r) return; return taskForm(null, { title:`متابعة الطلب ${rqNo(r)}، ${r.data?.org || r.data?.comm || ""}`, details:`المطلوب: مراجعة الطلب، إعداد كتاب وثيقة، وإبلاغ المنسق ${r.data?.coord || ""}.`, due:addDays(TODAY, 2), link:`#req:${id}` }); }
 }
 function cfPairs(){ const seen = new Set(), out = []; for (const e of S.E) for (const c of e.cf) { const k = [e.n, c.o.n].sort((a, b) => a - b).join("-"); if (seen.has(k) || !RUN(e)) continue; seen.add(k); out.push({ a:e, b:c.o, k:c.k, key:k }); } return out; }
 const cfTasked = key => S.tasks.some(t => TK_OPEN.includes(t.status) && new RegExp(`#${key.split("-")[0]}\\b`).test(t.title) && new RegExp(`#${key.split("-")[1]}\\b`).test(t.title));
@@ -272,14 +272,14 @@ function cfBulk(){
   const people = S.profiles.filter(p => p.active);
   openDrawer(`إسناد مهام حل التعارضات (${P.length})`, `
     <div class="g2">${fld("cf-who", "إسناد إلى", `<select class="f" id="cf-who">${people.map(p => `<option value="${p.id}">${esc(p.name || p.username)}</option>`).join("")}</select>`)}${fld("cf-due", "الموعد", `<input class="f" type="date" id="cf-due" value="${addDays(TODAY, 3)}">`)}</div>
-    <div class="list ocr-list">${P.map((x, i) => { const done = cfTasked(x.key); return `<label class="li"><input type="checkbox" data-cfi="${i}"${done ? "" : " checked"}><span><b>#${x.a.n} ↔ #${x.b.n}</b> — ${x.k === "lect" ? "نفس المحاضر" : "نفس المسجد"}<br><span class="s">${esc([x.a.mosName, daysText(x.a), x.a.time].join(" · "))} / ${esc([x.b.mosName, daysText(x.b), x.b.time].join(" · "))}</span></span>${done ? `<span class="chip ok">عليه مهمة</span>` : ""}</label>`; }).join("") || `<div class="empty">لا توجد تعارضات جارية ✓</div>`}</div>`,
+    <div class="list ocr-list">${P.map((x, i) => { const done = cfTasked(x.key); return `<label class="li"><input type="checkbox" data-cfi="${i}"${done ? "" : " checked"}><span><b>#${x.a.n} ↔ #${x.b.n}</b>، ${x.k === "lect" ? "نفس المحاضر" : "نفس المسجد"}<br><span class="s">${esc([x.a.mosName, daysText(x.a), x.a.time].join(" · "))} / ${esc([x.b.mosName, daysText(x.b), x.b.time].join(" · "))}</span></span>${done ? `<span class="chip ok">عليه مهمة</span>` : ""}</label>`; }).join("") || `<div class="empty">لا توجد تعارضات جارية ✓</div>`}</div>`,
     `<button class="btn btn-primary" data-cfgo>إسناد المحدد</button><button class="btn btn-ghost" data-close>إلغاء</button>`);
   S.cfP = P;
 }
 async function cfCreate(){
   const sel2 = [...document.querySelectorAll("[data-cfi]")].filter(x => x.checked).map(x => S.cfP[+x.dataset.cfi]); if (!sel2.length) return toast("حدّد تعارضاً واحداً على الأقل");
   const who = $("#cf-who").value, due = $("#cf-due").value || null;
-  const rows = sel2.map(x => ({ title:`حل تعارض النشاط #${x.a.n} مع #${x.b.n}`, details:`${x.k === "lect" ? "نفس المحاضر" : "نفس المسجد"} في نفس الوقت.\n#${x.a.n}: ${x.a.comm} — ${x.a.mosName} — ${daysText(x.a)} ${x.a.time || ""} — ${x.a.lect || ""}\n#${x.b.n}: ${x.b.comm} — ${x.b.mosName} — ${daysText(x.b)} ${x.b.time || ""} — ${x.b.lect || ""}\nالمطلوب: التنسيق وتعديل أحدهما.`, assignee:who, due, prio:"عالية", link:`#act:${x.a.id}` }));
+  const rows = sel2.map(x => ({ title:`حل تعارض النشاط #${x.a.n} مع #${x.b.n}`, details:`${x.k === "lect" ? "نفس المحاضر" : "نفس المسجد"} في نفس الوقت.\n#${x.a.n}: ${x.a.comm}، ${x.a.mosName}، ${daysText(x.a)} ${x.a.time || ""}، ${x.a.lect || ""}\n#${x.b.n}: ${x.b.comm}، ${x.b.mosName}، ${daysText(x.b)} ${x.b.time || ""}، ${x.b.lect || ""}\nالمطلوب: التنسيق وتعديل أحدهما.`, assignee:who, due, prio:"عالية", link:`#act:${x.a.id}` }));
   const { data, error } = await sb.from("tasks").insert(rows).select(); if (error) return writeFail(error);
   S.tasks = [...(data || []), ...S.tasks]; closeDrawer(); render(); toast(`أُسندت ${rows.length} مهمة إلى ${pname(who)} ووصله إشعار`);
 }
@@ -298,8 +298,8 @@ const linkedTask = l => S.tasks.find(t => t.link === l && TK_OPEN.includes(t.sta
 const _taskFrom2 = taskFrom;
 taskFrom = function(kind, id){
   if (!S.admin) return toast("إسناد المهام لرئيس القسم");
-  if (kind === "act") { const e = S.byId.get(id); if (!e) return; return taskForm(null, { title:`متابعة النشاط #${e.n} — ${e.comm || ""}`, details:`${e.type} — ${e.mosName} — ${daysText(e)} ${e.time || ""} — ${e.lect || ""}\nالمطلوب: `, due:addDays(TODAY, 3), link:`#act:${id}` }); }
-  if (kind === "bk") { const b = S.bks.find(x => x.id === id); if (!b) return; return taskForm(null, { title:`تجهيز ${hallName(b.hall)} — ${fmt(b.day)}`, details:`${b.data?.title || ""} — من ${t12(b.t_from)} إلى ${t12(b.t_to)}${(b.data?.equip || []).length ? "\nالتجهيزات: " + b.data.equip.join("، ") : ""}`, due:addDays(b.day, -1) < TODAY ? TODAY : addDays(b.day, -1), link:`#bk:${id}` }); }
+  if (kind === "act") { const e = S.byId.get(id); if (!e) return; return taskForm(null, { title:`متابعة النشاط #${e.n}، ${e.comm || ""}`, details:`${e.type}، ${e.mosName}، ${daysText(e)} ${e.time || ""}، ${e.lect || ""}\nالمطلوب: `, due:addDays(TODAY, 3), link:`#act:${id}` }); }
+  if (kind === "bk") { const b = S.bks.find(x => x.id === id); if (!b) return; return taskForm(null, { title:`تجهيز ${hallName(b.hall)}، ${fmt(b.day)}`, details:`${b.data?.title || ""}، من ${t12(b.t_from)} إلى ${t12(b.t_to)}${(b.data?.equip || []).length ? "\nالتجهيزات: " + b.data.equip.join("، ") : ""}`, due:addDays(b.day, -1) < TODAY ? TODAY : addDays(b.day, -1), link:`#bk:${id}` }); }
   if (kind === "note") { const n = S.notes.get(id); if (!n) return; return taskForm(null, { title:n.title || "متابعة ملاحظة", details:n.body || "", due:addDays(TODAY, 3), link:`#note:${id}` }); }
   return _taskFrom2(kind, id);
 };
@@ -325,7 +325,7 @@ async function brArm(){
   const st = $("#br-st"); if (st) st.textContent = "جارٍ تجهيز الجسر…";
   const de = document.documentElement; de.dataset.copilotBridge = "1";
   for (let i = 0; i < 20 && de.dataset.copilotBridge !== "ready"; i++) { window.postMessage({ type:"jaliyat-bridge-hosts", hosts:BRIDGE_HOSTS }, location.origin); await new Promise(r => setTimeout(r, 300)); }
-  if (de.dataset.copilotBridge !== "ready") { de.dataset.copilotBridge = "1"; if (st) st.innerHTML = `الجسر لم يستجب — افتح <code dir="ltr">edge://extensions</code> واضغط «Reload» على الجسر ثم <button type="button" class="btn btn-ghost" id="br-retry">أعد المحاولة</button>`; return; }
+  if (de.dataset.copilotBridge !== "ready") { de.dataset.copilotBridge = "1"; if (st) st.innerHTML = `الجسر لم يستجب، افتح <code dir="ltr">edge://extensions</code> واضغط «Reload» على الجسر ثم <button type="button" class="btn btn-ghost" id="br-retry">أعد المحاولة</button>`; return; }
   if ($("#br-frame") === f) { f.src = f.dataset.src; if (st) st.textContent = "جارٍ تحميل Copilot…"; }
 }
 const _afterRender14 = afterRender;
@@ -360,7 +360,7 @@ vCopilot = function(){
     <iframe class="cp-frame" src="https://m365.cloud.microsoft/chat/?auth=2" allow="clipboard-read; clipboard-write; microphone" title="Microsoft 365 Copilot"></iframe>
   </div>`;
 };
-document.addEventListener("click", ev => { if (ev.target.closest("[data-cpfile]")) { const b = new Blob([sysMarkdown()], { type:"text/markdown" }); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `بيانات-نظام-إنجاز-${TODAY}.md`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast("نُزّل ملف البيانات — أرفقه في Copilot"); } });
+document.addEventListener("click", ev => { if (ev.target.closest("[data-cpfile]")) { const b = new Blob([sysMarkdown()], { type:"text/markdown" }); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `بيانات-نظام-إنجاز-${TODAY}.md`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast("نُزّل ملف البيانات، أرفقه في Copilot"); } });
 
 /* ================= Copilot on phones / tablets / any device without the bridge ================= */
 const isMobileDev = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
@@ -371,33 +371,33 @@ vCopilot = function(){
 };
 function mobCopilot(){
   return `<div class="panel cp-mob"><div class="panel-b" style="display:grid;gap:12px">
-    <span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot — ${isMobileDev() ? "على الجوال" : "بدون جسر"}</span>
+    <span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot، ${isMobileDev() ? "على الجوال" : "بدون جسر"}</span>
     <div class="cp-mstep"><b>1</b><span>اكتب سؤالك أو أمرك</span></div>
     <textarea class="f" id="mob-q" rows="3" placeholder="مثال: كم نشاط للجالية البنغالية؟ أو: احجز القاعة الكبرى الخميس 7 م"></textarea>
     <div class="cp-chips">${CP_PROMPTS.slice(0, 6).map((p, i) => `<button type="button" data-mobp="${i}">${esc(p[0])}</button>`).join("")}</div>
     <div class="cp-mstep"><b>2</b><span>أرسله لـ Copilot مع بيانات النظام</span></div>
     <button type="button" class="btn btn-primary btn-lg" data-mobgo>${icon("i-spark")} إرسال إلى Copilot</button>
-    <span class="hint">${navigator.canShare ? "تظهر قائمة المشاركة: اختر تطبيق «Microsoft 365 Copilot» أو «Copilot». الملف والسؤال يُرسلان معاً." : "يُنسخ السؤال مع بيانات النظام ويفتح Copilot — الصق (لصق) واضغط إرسال."}</span>
+    <span class="hint">${navigator.canShare ? "تظهر قائمة المشاركة: اختر تطبيق «Microsoft 365 Copilot» أو «Copilot». الملف والسؤال يُرسلان معاً." : "يُنسخ السؤال مع بيانات النظام ويفتح Copilot، الصق (لصق) واضغط إرسال."}</span>
     <div class="cp-mstep"><b>3</b><span>إذا طلبت تعديلاً: انسخ رد Copilot والصقه هنا لينفّذه النظام</span></div>
     <textarea class="f" id="mob-r" rows="3" placeholder="الصق رد Copilot هنا…"></textarea>
     <button type="button" class="btn" data-mobrun>تنفيذ الأوامر من الرد</button>
     <div id="cpx"></div>
   </div></div>`;
 }
-function mobPrompt(q){ return `${PRIME_MSG.replace("لا تلخص الملف الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».", "")}\n\nسؤالي/أمري: ${q}\n\nملاحظة: إذا كان طلبي تعديلاً على النظام فضع كتلة jaliyat-actions في نهاية ردك لأنسخها إلى النظام.`; }
+function mobPrompt(q){ return `${PRIME_MSG.replace("لا تلخص الملف الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓، اسألني ما تشاء».", "")}\n\nسؤالي/أمري: ${q}\n\nملاحظة: إذا كان طلبي تعديلاً على النظام فضع كتلة jaliyat-actions في نهاية ردك لأنسخها إلى النظام.`; }
 async function mobSend(){
   const q = ($("#mob-q")?.value || "").trim(); if (!q) return toast("اكتب سؤالك أولاً");
   const text = mobPrompt(q), md = sysMarkdown();
   const file = new File([md], `بيانات-نظام-إنجاز-${TODAY}.txt`, { type:"text/plain" });
   if (navigator.canShare && navigator.canShare({ files:[file] })) {
-    try { await cpCopy(text); await navigator.share({ files:[file], text, title:"إنجاز → Copilot" }); return toast("اختر Copilot — والسؤال منسوخ أيضاً إن احتجته"); } catch (e) { if (e?.name === "AbortError") return; }
+    try { await cpCopy(text); await navigator.share({ files:[file], text, title:"إنجاز → Copilot" }); return toast("اختر Copilot، والسؤال منسوخ أيضاً إن احتجته"); } catch (e) { if (e?.name === "AbortError") return; }
   }
   const ok = await cpCopy(`${text}\n\n${cpData(q, 12000)}`);
-  toast(ok ? "نُسخ السؤال مع البيانات — الصقه في Copilot" : "تعذّر النسخ");
+  toast(ok ? "نُسخ السؤال مع البيانات، الصقه في Copilot" : "تعذّر النسخ");
   window.open("https://m365.cloud.microsoft/chat/", "_blank", "noopener");
 }
 function mobRun(){
-  const acts = findActions(String($("#mob-r")?.value || "")); if (!acts.length) return toast("لم أجد أوامر في الرد — تأكد أنك نسخت الرد كاملاً");
+  const acts = findActions(String($("#mob-r")?.value || "")); if (!acts.length) return toast("لم أجد أوامر في الرد، تأكد أنك نسخت الرد كاملاً");
   CPX.list = acts.map(a => ({ a })); cpxRender(); $("#cpx")?.scrollIntoView({ behavior:"smooth", block:"center" });
 }
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;

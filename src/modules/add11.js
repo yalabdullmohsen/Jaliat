@@ -6,7 +6,7 @@ const RQ_C = { "جديد":"gold", "قيد المراجعة":"t1", "بانتظا�
 const cm1 = (y, m) => `${y}-${pad(m + 1)}`;
 const addDays = (iso, n) => { const d = dOf(iso); d.setDate(d.getDate() + n); return isoOf(d); };
 const addMonths = (iso, n) => { const d = dOf(iso); d.setMonth(d.getMonth() + n); return isoOf(d); };
-const DEPT = "إدارة العلاقات الخارجية — قسم الجاليات ورعاية المهتدين وطلبة البعوث";
+const DEPT = "إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث";
 
 /* ---------- data ---------- */
 async function loadReqs(){ const { data, error } = await sb.from("requests").select("*").order("created_at", { ascending:false }).limit(1000); if (!error) S.reqs = data || []; }
@@ -50,7 +50,7 @@ function brPump(){
   if (m.intake) { INTAKE.waiting = true; INTAKE.sent = true; }
   f.contentWindow.postMessage(m, "https://m365.cloud.microsoft");
   clearTimeout(BR.bt); BR.bt = setTimeout(() => { BR.busy = false; brPump(); }, 240000);
-  const st = $("#br-st"); if (st) st.textContent = m.file ? "جارٍ إرفاق الملف لـ Copilot…" : "أُرسل — Copilot يكتب الرد…";
+  const st = $("#br-st"); if (st) st.textContent = m.file ? "جارٍ إرفاق الملف لـ Copilot…" : "أُرسل، Copilot يكتب الرد…";
 }
 brPrime = function(){
   if (BR.primed) return; BR.primed = true;
@@ -89,8 +89,8 @@ PRIME_MSG = PRIME_MSG.replace("مثال:", `- {"op":"add_request","data":{"org":
 
 const _describe11 = describe;
 describe = function(a){
-  if (a.op === "add_request") { const d = a.data || {}; return ["تسجيل طلب وارد", `${d.org || ""} — ${d.comm || ""} — ${(d.acts || []).length} نشاط${d.issues ? " — نواقص: " + d.issues : ""}`, "gold"]; }
-  if (a.op === "log_attendance") return [`حضور النشاط #${a.n}`, `${fmt(a.day)} — الحضور ${a.cnt || 0} — مهتدون ${a.converts || 0}`, "ok"];
+  if (a.op === "add_request") { const d = a.data || {}; return ["تسجيل طلب وارد", `${d.org || ""}، ${d.comm || ""}، ${(d.acts || []).length} نشاط${d.issues ? "، نواقص: " + d.issues : ""}`, "gold"]; }
+  if (a.op === "log_attendance") return [`حضور النشاط #${a.n}`, `${fmt(a.day)}، الحضور ${a.cnt || 0}، مهتدون ${a.converts || 0}`, "ok"];
   const r = _describe11(a);
   if (a.op === "add_act") { try { const m = actMatch(tolAct(a.data)); if (m) r[1] += ` ⚠ مشابه للنشاط #${m.n}`; } catch (_) {} }
   return r;
@@ -98,10 +98,10 @@ describe = function(a){
 const _runAction11 = runAction;
 runAction = async function(a){
   if (a.op === "add_request") { const d = a.data || {}; const body = { org:d.org || "", comm:commByName(d.comm) || d.comm || "", coord:d.coord || "", phone:d.phone || "", date:d.date || TODAY, subj:d.subj || "", notes:d.notes || "", issues:d.issues || "", acts:(d.acts || []).map(x => tolAct(x, { comm:commByName(d.comm) || "" })), src:"copilot" };
-    if (INTAKE.reqId) { const cur = S.reqs.find(r => r.id === INTAKE.reqId); const { error } = await sb.from("requests").update({ data:{ ...(cur?.data || {}), ...body }, updated_at:new Date().toISOString() }).eq("id", INTAKE.reqId); if (error) throw error; const id = INTAKE.reqId; INTAKE.reqId = null; await loadReqs(); setTimeout(() => toast("سُجّل الطلب — افتحه من «الطلبات الواردة»"), 50); return `سُجّل الطلب (${body.acts.length} نشاط) في الطلبات الواردة`; }
+    if (INTAKE.reqId) { const cur = S.reqs.find(r => r.id === INTAKE.reqId); const { error } = await sb.from("requests").update({ data:{ ...(cur?.data || {}), ...body }, updated_at:new Date().toISOString() }).eq("id", INTAKE.reqId); if (error) throw error; const id = INTAKE.reqId; INTAKE.reqId = null; await loadReqs(); setTimeout(() => toast("سُجّل الطلب، افتحه من «الطلبات الواردة»"), 50); return `سُجّل الطلب (${body.acts.length} نشاط) في الطلبات الواردة`; }
     const { error } = await sb.from("requests").insert({ data:body, status:"جديد" }); if (error) throw error; await loadReqs(); return "سُجّل الطلب في الطلبات الواردة"; }
   if (a.op === "log_attendance") { const e = S.E.find(x => x.n === +a.n); if (!e) throw new Error(`النشاط #${a.n} غير موجود`); await attSave(e.id, a.day || TODAY, a.cnt, a.converts, a.note); return `سُجّل حضور النشاط #${a.n}`; }
-  if (a.op === "add_act" && !a.force) { const m = actMatch(tolAct(a.data)); if (m) throw new Error(`يوجد نشاط مشابه مسجل (#${m.n}) — لم يُكرر`); }
+  if (a.op === "add_act" && !a.force) { const m = actMatch(tolAct(a.data)); if (m) throw new Error(`يوجد نشاط مشابه مسجل (#${m.n})، لم يُكرر`); }
   return _runAction11(a);
 };
 
@@ -113,7 +113,7 @@ function intakeOpen(files){
   INTAKE.files = []; S.form = { kind:"intake" };
   const cp = hasBridge() && brV() >= 1.1;
   openDrawer("استقبال طلب من صور أو ملف", `
-    <label class="iz" id="iz"><input type="file" id="iz-in" accept="image/*,application/pdf" multiple hidden>${icon("i-cam", 30)}<b>اسحب صور الطلب أو الكتاب هنا، أو اضغط للاختيار</b><span class="s">صور (حتى 6) أو ملف PDF — يمكنك أيضاً اللصق Ctrl+V</span></label>
+    <label class="iz" id="iz"><input type="file" id="iz-in" accept="image/*,application/pdf" multiple hidden>${icon("i-cam", 30)}<b>اسحب صور الطلب أو الكتاب هنا، أو اضغط للاختيار</b><span class="s">صور (حتى 6) أو ملف PDF، يمكنك أيضاً اللصق Ctrl+V</span></label>
     <div class="iz-files" id="iz-files"></div>
     <div class="iz-mode ${cp ? "ok" : ""}">${cp ? `${icon("i-spark", 18)}<span><b>التحليل بـ Microsoft 365 Copilot</b><br><span class="s">يقرأ الصورة بدقة عالية، يفرز البيانات، يقارنها بالنظام، ثم يعرض لك الأوامر للتنفيذ.</span></span>` : `${icon("i-cam", 18)}<span><b>القراءة على الجهاز</b><br><span class="s">لتحليل أدق بـ Copilot ثبّت/حدّث «جسر Copilot» إلى 1.1 من صفحة Copilot.</span></span>`}</div>
     <div class="fld"><label for="iz-note">ملاحظة مع الطلب (اختياري)</label><input class="f" id="iz-note" placeholder="مثال: وصل عبر الواتساب من منسق الجالية"></div>`,
@@ -173,7 +173,7 @@ async function intakeGo(){
     closeDrawer();
     if (S.view === "copilot" && BR.primed) brPost(msg); else { INTAKE.msg = msg; go("copilot"); }
     clearTimeout(INTAKE.timer);
-    INTAKE.timer = setTimeout(() => { if (INTAKE.reqId === rid && !INTAKE.sent) { INTAKE.waiting = false; INTAKE.reqId = null; INTAKE.msg = null; toast("Copilot لم يجهز — أكمل القراءة على الجهاز"); intakeLocal(rid, files); } }, 60000);
+    INTAKE.timer = setTimeout(() => { if (INTAKE.reqId === rid && !INTAKE.sent) { INTAKE.waiting = false; INTAKE.reqId = null; INTAKE.msg = null; toast("Copilot لم يجهز، أكمل القراءة على الجهاز"); intakeLocal(rid, files); } }, 60000);
     toast("أُرسل الطلب لـ Copilot للتحليل…");
   } else { closeDrawer(); intakeLocal(rid, files); }
 }
@@ -183,7 +183,7 @@ function intakeReply(text){
   const r = S.reqs.find(x => x.id === rid);
   sb.from("requests").update({ data:{ ...(r?.data || {}), ai:text.slice(0, 20000) } }).eq("id", rid).then(() => loadReqs());
   const acts = findActions(text);
-  if (!acts.some(a => a.op === "add_request")) setTimeout(() => { if (INTAKE.reqId === rid && !acts.length) { INTAKE.reqId = null; toast("لم يُرجع Copilot أوامر — راجع الطلب يدوياً"); } }, 100);
+  if (!acts.some(a => a.op === "add_request")) setTimeout(() => { if (INTAKE.reqId === rid && !acts.length) { INTAKE.reqId = null; toast("لم يُرجع Copilot أوامر، راجع الطلب يدوياً"); } }, 100);
   if (acts.length && !acts.some(a => a.op === "add_request")) { /* approval letter → mark the request done once applied */ const t = S.reqs.find(x => x.id === rid); if (t) sb.from("requests").update({ status:"معتمد" }).eq("id", rid); INTAKE.reqId = null; }
 }
 /* on-device reading (fallback), stronger preprocessing + PDF text */
@@ -233,7 +233,7 @@ async function intakeLocal(rid, files){
   const r = S.reqs.find(x => x.id === rid);
   const data = { ...(r?.data || {}), acts, comm:acts[0]?.comm || "", coord:coordM?.[1] || "", phone:phoneM?.[1] || "", text:text.slice(0, 20000), src:"ocr" };
   await sb.from("requests").update({ data }).eq("id", rid); await loadReqs();
-  closeDrawer(); reqForm(rid); toast(acts.length ? `تعرّفتُ على ${acts.length} نشاط — راجعها` : "لم أتعرّف على أنشطة واضحة — أكمل يدوياً");
+  closeDrawer(); reqForm(rid); toast(acts.length ? `تعرّفتُ على ${acts.length} نشاط، راجعها` : "لم أتعرّف على أنشطة واضحة، أكمل يدوياً");
 }
 ocrPick = function(){ intakeOpen(); };
 ocrRun = function(file){ intakeOpen([file]); };
@@ -243,7 +243,7 @@ function vInbox(){
   const tab = S.f.rqt || "open";
   const L = S.reqs.filter(r => tab === "all" ? true : tab === "open" ? !["معتمد", "مرفوض"].includes(r.status) : r.status === tab);
   const cnt = s => S.reqs.filter(r => r.status === s).length;
-  return `<div class="iz iz-top" id="iz-drop" role="button" tabindex="0">${icon("i-cam", 26)}<span><b>استقبال طلب جديد</b><br><span class="s">اسحب صور الطلب أو ملف PDF هنا، أو اضغط — يُحلَّل ويُفرز ويُدخل تلقائياً</span></span></div>
+  return `<div class="iz iz-top" id="iz-drop" role="button" tabindex="0">${icon("i-cam", 26)}<span><b>استقبال طلب جديد</b><br><span class="s">اسحب صور الطلب أو ملف PDF هنا، أو اضغط، يُحلَّل ويُفرز ويُدخل تلقائياً</span></span></div>
   <div class="toolbar"><div class="seg">${[["open", "المفتوحة", S.reqs.filter(r => !["معتمد", "مرفوض"].includes(r.status)).length], ...RQ_ST.map(s => [s, s, cnt(s)]), ["all", "الكل", S.reqs.length]].map(([k, l, n]) => `<button type="button" class="${tab === k ? "on" : ""}" data-rqt="${esc(k)}">${esc(l)} <span class="num">${n}</span></button>`).join("")}</div></div>
   <div class="rq-grid">${L.map(r => { const d = r.data || {}; const acts = d.acts || []; const done = acts.filter(a => actMatch(a)).length;
     return `<button type="button" class="rq-card" data-rq="${r.id}"><div class="rq-h"><span class="chip ${RQ_C[r.status] || ""}">${esc(r.status)}</span><span class="s">${fmt(d.date || r.created_at?.slice(0, 10))}</span>${(r.files || []).length ? `<span class="s">${icon("i-cam", 14)} ${r.files.length}</span>` : ""}</div>
@@ -276,7 +276,7 @@ function rqActsRender(){
   const box = $("#rq-acts"); if (!box) return;
   box.innerHTML = S.rqActs.map((a, i) => { const m = actMatch(a); return `<div class="rq-act"><span>${esc(actLine(a) || "—")}${a.title ? `<br><span class="s">${esc(a.title)}</span>` : ""}</span>
     ${m ? `<span class="chip ok" title="مسجل في النظام">#${m.n} ✓</span>` : !a.mosque ? `<span class="chip warn">المسجد غير مسجل</span>` : ""}
-    <button type="button" class="btn btn-ghost" data-rqedit="${i}">مراجعة وإضافة</button><button type="button" class="x" data-rqrm="${i}" aria-label="حذف">×</button></div>`; }).join("") || `<div class="empty">لا توجد أنشطة — أضف نشاطاً أو حلّل الطلب بـ Copilot</div>`;
+    <button type="button" class="btn btn-ghost" data-rqedit="${i}">مراجعة وإضافة</button><button type="button" class="x" data-rqrm="${i}" aria-label="حذف">×</button></div>`; }).join("") || `<div class="empty">لا توجد أنشطة، أضف نشاطاً أو حلّل الطلب بـ Copilot</div>`;
 }
 function rqRead(){
   const v = id => $("#" + id)?.value.trim() || "";
@@ -292,11 +292,11 @@ async function rqSave(quiet){
 async function rqApprove(){
   const f = rqRead(); if (!f.comm) return toast("اختر الجالية أولاً");
   if (!f.doc) return toast("اكتب رقم الوثيقة (الموافقة) أولاً");
-  if (!docBy[f.doc] && !(f.start && f.end)) return toast("الوثيقة غير مسجلة — حدّد تاريخ البداية والنهاية");
+  if (!docBy[f.doc] && !(f.start && f.end)) return toast("الوثيقة غير مسجلة، حدّد تاريخ البداية والنهاية");
   const todo = S.rqActs.filter(a => !actMatch({ ...a, comm:f.comm })); const bad = todo.filter(a => !a.mosque || !(a.days || []).length);
   if (bad.length) return toast(`أكمل المسجد واليوم لـ ${bad.length} نشاط (مراجعة وإضافة)`);
   try {
-    if (!docBy[f.doc]) await T.ref("docs", [...S.docs, { no:f.doc, date:f.date || f.start, subj:f.subj || `موافقة ${todo[0]?.type || "نشاط"} — ${f.comm}`, comm:f.comm, start:f.start, end:f.end, notes:f.coord ? "المنسق: " + f.coord : "" }]);
+    if (!docBy[f.doc]) await T.ref("docs", [...S.docs, { no:f.doc, date:f.date || f.start, subj:f.subj || `موافقة ${todo[0]?.type || "نشاط"}، ${f.comm}`, comm:f.comm, start:f.start, end:f.end, notes:f.coord ? "المنسق: " + f.coord : "" }]);
     let n = Math.max(0, ...[...S.acts.values()].map(a => a.n || 0));
     for (const a of todo) { n++; const { mosRaw, ...x } = a; await T.put("acts", null, { ...x, comm:f.comm, doc:f.doc, start:"", end:"", status:"مجدول", n }); }
     $("#rq-st").value = "معتمد"; await rqSave(true); closeDrawer(); toast(`اعتُمد الطلب وأُضيف ${todo.length} نشاط`); render();
@@ -324,10 +324,10 @@ function letterOpen(src){
   if (!L.acts.length) return toast("لا توجد أنشطة في الطلب");
   const byGov = {}; for (const a of L.acts) { const g = a.gov || mosBy[a.mosque]?.gov || "غير محددة"; (byGov[g] = byGov[g] || []).push(a); }
   const govs = Object.keys(byGov); const miss = [];
-  if (!L.coord) miss.push("اسم المنسق (للملاحظات)"); if (!L.start) miss.push("تاريخ البداية — كُتبت «لمدة 6 أشهر»"); if (L.acts.some(a => !a.mosque)) miss.push("مسجد غير مسجل في النظام"); if (L.acts.some(a => !a.time)) miss.push("وقت غير محدد");
-  S.letters = govs.map(g => ({ g, html:letterHTML(L, g, byGov[g]), subj:`طلب الموافقة على إقامة ${[...new Set(byGov[g].map(a => a.type))].join(" و")} — ${L.comm} — محافظة ${g}`, to:`مدير إدارة مساجد محافظة ${g}`, note:L.coord ? `المنسق: ${L.coord}` : "" }));
+  if (!L.coord) miss.push("اسم المنسق (للملاحظات)"); if (!L.start) miss.push("تاريخ البداية، كُتبت «لمدة 6 أشهر»"); if (L.acts.some(a => !a.mosque)) miss.push("مسجد غير مسجل في النظام"); if (L.acts.some(a => !a.time)) miss.push("وقت غير محدد");
+  S.letters = govs.map(g => ({ g, html:letterHTML(L, g, byGov[g]), subj:`طلب الموافقة على إقامة ${[...new Set(byGov[g].map(a => a.type))].join(" و")}، ${L.comm}، محافظة ${g}`, to:`مدير إدارة مساجد محافظة ${g}`, note:L.coord ? `المنسق: ${L.coord}` : "" }));
   const back = S.form;
-  openDrawer(`مسودة كتاب وثيقة${govs.length > 1 ? ` (${govs.length} كتب — كتاب لكل محافظة)` : ""}`, `
+  openDrawer(`مسودة كتاب وثيقة${govs.length > 1 ? ` (${govs.length} كتب، كتاب لكل محافظة)` : ""}`, `
     ${miss.length ? `<div class="check warn"><b>انتبه قبل الحفظ في وثيقة</b><span>${miss.map(esc).join(" · ")}</span></div>` : ""}
     ${S.letters.map((x, i) => `<div class="lt"><div class="lt-h"><b>${esc(x.to)}</b><span class="s">التأشيرة: لعمل اللازم</span></div>
       <div class="lt-m"><span><b>الموضوع:</b> ${esc(x.subj)}</span>${x.note ? `<span><b>الملاحظات:</b> ${esc(x.note)}</span>` : ""}</div>
@@ -346,7 +346,7 @@ const waNum = p => { let d = digits(p).replace(/\D/g, ""); if (d.length === 8) d
 function waOpen(phone, text){ const n = waNum(phone); if (n.length < 10) return toast("لا يوجد رقم هاتف صحيح"); window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`, "_blank", "noopener"); }
 const SIGN = "\n\nقسم الجاليات ورعاية المهتدين وطلبة البعوث\nوزارة الأوقاف والشؤون الإسلامية";
 function waAct(e, c){
-  return `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل/ ${c?.name || ""} حفظه الله\n\nنود إفادتكم بتفاصيل ${e.type} للجالية ${e.comm}:\n• المسجد: ${e.mosName || "—"}${e.area ? " — " + e.area : ""}\n• اليوم: ${daysText(e)}\n• الوقت: ${e.time || "—"}\n• المحاضر: ${e.lect || "—"}\n• المدة: من ${fmt(e.start)} إلى ${fmt(e.end)}${e.doc ? `\n• رقم الموافقة: ${e.doc}` : ""}\n\nنرجو التأكيد والالتزام بالموعد، وجزاكم الله خيراً.${SIGN}`;
+  return `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل/ ${c?.name || ""} حفظه الله\n\nنود إفادتكم بتفاصيل ${e.type} للجالية ${e.comm}:\n• المسجد: ${e.mosName || "—"}${e.area ? "، " + e.area : ""}\n• اليوم: ${daysText(e)}\n• الوقت: ${e.time || "—"}\n• المحاضر: ${e.lect || "—"}\n• المدة: من ${fmt(e.start)} إلى ${fmt(e.end)}${e.doc ? `\n• رقم الموافقة: ${e.doc}` : ""}\n\nنرجو التأكيد والالتزام بالموعد، وجزاكم الله خيراً.${SIGN}`;
 }
 function waReq(){
   const f = rqRead(); const ok = f.status === "معتمد";
@@ -376,14 +376,14 @@ function vWeekly(){
     ${sel("wk-c", commNames, S.f.wkc, "كل الجاليات")}${sel("wk-g", GOVS, S.f.wkg, "كل المحافظات")}
     <span class="count">${tot} موعد</span><button class="btn" type="button" data-wktxt>${icon("i-wa")} نسخ للواتساب</button><button class="btn btn-primary" type="button" data-wkprint>${icon("i-down")} طباعة / PDF</button></div>
   <div class="panel print-area" id="wk-sheet"><div class="panel-b">
-    <div class="sr-h"><div><b>وزارة الأوقاف والشؤون الإسلامية</b><span>${DEPT}</span></div><div style="text-align:end"><h2>الجدول الأسبوعي للأنشطة${S.f.wkc ? " — " + esc(S.f.wkc) : ""}${S.f.wkg ? " — محافظة " + esc(S.f.wkg) : ""}</h2><span>من السبت ${fmt(isoOf(s))} إلى الجمعة ${fmt(isoOf(e))} م</span></div></div>
+    <div class="sr-h"><div><b>وزارة الأوقاف والشؤون الإسلامية</b><span>${DEPT}</span></div><div style="text-align:end"><h2>الجدول الأسبوعي للأنشطة${S.f.wkc ? "، " + esc(S.f.wkc) : ""}${S.f.wkg ? "، محافظة " + esc(S.f.wkg) : ""}</h2><span>من السبت ${fmt(isoOf(s))} إلى الجمعة ${fmt(isoOf(e))} م</span></div></div>
     ${W.map(x => `<div class="wk-day"><div class="wk-dh"><b>${DAYS[x.d.getDay()]}</b><span class="num">${fmt(x.iso)}</span><span class="chip">${x.L.length}</span></div>
       ${x.L.length ? `<div class="table-wrap"><table class="tbl sr-tbl"><thead><tr><th>#</th><th>الوقت</th><th>الجالية</th><th>المسجد</th><th>المنطقة</th><th>المحاضر</th><th>النوع</th></tr></thead><tbody>${x.L.map(a => `<tr data-open="act:${a.id}"><td class="num">${a.n}</td><td>${esc(a.time || "")}</td><td>${esc(a.comm || "")}</td><td>${esc(a.mosName)}</td><td>${esc(a.area)}</td><td>${esc(a.lect || "")}</td><td>${esc(a.type)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty s">لا توجد أنشطة</div>`}</div>`).join("")}
   </div></div>`;
 }
 function weekText(){
   const W = weekRows();
-  return `📅 جدول أنشطة ${S.f.wkc || "الجاليات"} — من ${fmt(W[0].iso)} إلى ${fmt(W[6].iso)}\n` + W.filter(x => x.L.length).map(x => `\n*${DAYS[x.d.getDay()]} ${fmt(x.iso)}*\n` + x.L.map(a => `• ${a.time || ""} — ${a.mosName} (${a.area}) — ${a.lect || ""}${S.f.wkc ? "" : " — " + a.comm}`).join("\n")).join("\n") + SIGN;
+  return `📅 جدول أنشطة ${S.f.wkc || "الجاليات"}، من ${fmt(W[0].iso)} إلى ${fmt(W[6].iso)}\n` + W.filter(x => x.L.length).map(x => `\n*${DAYS[x.d.getDay()]} ${fmt(x.iso)}*\n` + x.L.map(a => `• ${a.time || ""}، ${a.mosName} (${a.area})، ${a.lect || ""}${S.f.wkc ? "" : "، " + a.comm}`).join("\n")).join("\n") + SIGN;
 }
 function printArea(sel2){ document.querySelectorAll(".print-area.on").forEach(x => x.classList.remove("on")); const el = $(sel2); if (!el) return; el.classList.add("on"); document.body.classList.add("print-any"); setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-any"); el.classList.remove("on"); }, 500); }, 50); }
 
@@ -446,14 +446,14 @@ async function devNotify(title, body){
 }
 function dailyDigest(){
   if (LS.get("digest-day", "") === TODAY) return; const A = alerts(); LS.set("digest-day", TODAY);
-  devNotify("ملخص اليوم — نظام الجاليات", A.map(a => a.t).join(" · "));
+  devNotify("ملخص اليوم، نظام الجاليات", A.map(a => a.t).join(" · "));
 }
 
 /* =============== 8) Voice commands (Arabic speech → Copilot) =============== */
 const SR_API = window.SpeechRecognition || window.webkitSpeechRecognition;
 let VREC = null;
 function voiceStart(target){
-  if (!SR_API) return toast("المتصفح لا يدعم الإدخال الصوتي — استخدم Edge أو Chrome");
+  if (!SR_API) return toast("المتصفح لا يدعم الإدخال الصوتي، استخدم Edge أو Chrome");
   if (VREC) { VREC.stop(); return; }
   const r = VREC = new SR_API(); r.lang = "ar-KW"; r.interimResults = true; r.continuous = false;
   const inp = $(target || "#br-q"); const btn = $("#br-mic"); btn?.classList.add("rec"); let fin = "";
@@ -480,7 +480,7 @@ function reportHTML(ym){
   const amt = serm.reduce((s, r) => s + (+r.amount || 0), 0);
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>تقرير ${MN} ${y}</title><style>body{font-family:'Simplified Arabic',Arial;direction:rtl}h1,h2{color:#1d4d3a}h2{font-size:15pt;border-bottom:2px solid #c9a227;padding-bottom:3px;margin-top:18px}</style></head><body dir="rtl">
 <p style="text-align:center;margin:0">وزارة الأوقاف والشؤون الإسلامية<br>${DEPT}</p>
-<h1 style="text-align:center;font-size:20pt">التقرير الشهري لأنشطة الجاليات — ${MN} ${y} م</h1>
+<h1 style="text-align:center;font-size:20pt">التقرير الشهري لأنشطة الجاليات، ${MN} ${y} م</h1>
 <h2>ملخص الشهر</h2>${tbl(["الأنشطة الجارية", "أنشطة جديدة", "موافقات جديدة", "طلبات واردة", "خطب الجمعة المسجلة"], [[act.length, nw.length, docs.length, reqs.length, serm.filter(r => r.who !== "none").length]])}
 <h2>الأنشطة حسب الجالية</h2>${tbl(["الجالية", "الأنشطة الجارية", "الجديدة هذا الشهر"], Object.entries(byC).sort((a, b) => b[1].a - a[1].a).map(([c, o]) => [c, o.a, o.n]))}
 <h2>الأنشطة حسب المحافظة</h2>${tbl(["المحافظة", "عدد الأنشطة"], GOVS.map(g => [g, act.filter(e => e.gov === g).length]))}
@@ -550,7 +550,7 @@ async function odRun(manual){
     for (const f of ["index.html", "auth.html", "manifest.webmanifest", "sw.js", "icon-v2-512.png", "jaliyat-copilot.zip"]) {
       try { const r = await fetch(f, { cache:"no-store" }); if (!r.ok) continue; await odPut(`${dir}/النظام/${f}`, await r.arrayBuffer(), r.headers.get("content-type") || "application/octet-stream"); n++; } catch (_) {}
     }
-    await odPut(`${dir}/اقرأني.txt`, new TextEncoder().encode(`نظام «إنجاز» — نسخة تلقائية من ${location.href.split("#")[0]}\nآخر تحديث: ${new Date().toLocaleString("ar-KW", { hour12:true })}\nالنسخ: مجلد «النسخ» (إكسل وJSON لكل يوم)، وملفات النظام في «النظام».\n`), "text/plain; charset=utf-8");
+    await odPut(`${dir}/اقرأني.txt`, new TextEncoder().encode(`نظام «إنجاز»، نسخة تلقائية من ${location.href.split("#")[0]}\nآخر تحديث: ${new Date().toLocaleString("ar-KW", { hour12:true })}\nالنسخ: مجلد «النسخ» (إكسل وJSON لكل يوم)، وملفات النظام في «النظام».\n`), "text/plain; charset=utf-8");
     await odCfgSave({ last:new Date().toISOString(), by:S.me?.name || S.me?.username || "", files:n + 1, acct:MS.account?.username || "" });
     if (manual) toast("حُدّثت نسخة إنجاز في OneDrive");
   } catch (e) { OD.err = msErr(e)?.t || String(e?.message || e); if (manual) toast(OD.err); console.warn("onedrive", e); }
@@ -635,14 +635,14 @@ document.addEventListener("click", async ev => {
     const msg = { type:"jaliyat-ask", intake:true, text:INTAKE_PROMPT + `\nبيانات الطلب الحالية في النظام: ${JSON.stringify({ ...r.data, ai:undefined, text:undefined })}`, file }; closeDrawer();
     if (S.view === "copilot" && BR.primed) brPost(msg); else { INTAKE.msg = msg; go("copilot"); } return; }
   if (D.letter) return letterOpen(D.letter);
-  if (D.ltcopy !== undefined) { const x = S.letters[+D.ltcopy]; const tmp = document.createElement("div"); tmp.innerHTML = x.html; return toast(await copyRich(x.html, tmp.innerText) ? "نُسخ نص الكتاب بتنسيقه — الصقه في وثيقة" : "تعذّر النسخ"); }
+  if (D.ltcopy !== undefined) { const x = S.letters[+D.ltcopy]; const tmp = document.createElement("div"); tmp.innerHTML = x.html; return toast(await copyRich(x.html, tmp.innerText) ? "نُسخ نص الكتاب بتنسيقه، الصقه في وثيقة" : "تعذّر النسخ"); }
   if (D.ltsubj !== undefined) { const ok = await cpCopy(S.letters[+D.ltsubj].subj); return toast(ok ? "نُسخ الموضوع" : "تعذّر النسخ"); }
   if (D.ltprint !== undefined) { const w = window.open("", "_blank"); if (!w) return; w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>${esc(S.letters[+D.ltprint].subj)}</title></head><body style="padding:40px">${S.letters[+D.ltprint].html}</body></html>`); w.document.close(); w.print(); return; }
   if (D.wa) { if (D.wa === "req") { const f = rqRead(); const list = f.phone ? [{ name:f.coord, phone:f.phone }] : S.coords.filter(c => c.comm === f.comm && c.phone); return waPick(list, () => waReq()); }
     const e = S.byId.get(D.wa.slice(4)); if (!e) return; return waPick(S.coords.filter(c => c.comm === e.comm && c.phone), c => waAct(e, c)); }
   if (D.wko !== undefined) { S.f.wko = D.wko === "0" ? 0 : (S.f.wko || 0) + +D.wko; return render(); }
   if (D.wkprint !== undefined) return printArea("#wk-sheet");
-  if (D.wktxt !== undefined) { const ok = await cpCopy(weekText()); return toast(ok ? "نُسخ الجدول — الصقه في الواتساب" : "تعذّر النسخ"); }
+  if (D.wktxt !== undefined) { const ok = await cpCopy(weekText()); return toast(ok ? "نُسخ الجدول، الصقه في الواتساب" : "تعذّر النسخ"); }
   if (D.attsave) { const day = $("#att-d").value, c = $("#att-c").value; if (!day || c === "") return toast("اكتب التاريخ وعدد الحضور"); try { await attSave(D.attsave, day, c, $("#att-v").value, $("#att-n").value.trim()); toast("سُجّل الحضور"); const e = S.byId.get(D.attsave); $(".att")?.replaceWith(Object.assign(document.createElement("div"), { innerHTML:attBlock(e) }).firstElementChild); } catch (e) { writeFail(e); } return; }
   if (D.atm) { S.f.atm = D.atm; return render(); }
   if (D.attxl !== undefined) return attXlsx();

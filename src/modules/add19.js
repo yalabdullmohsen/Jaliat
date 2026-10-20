@@ -2,11 +2,11 @@
 Object.assign(TITLES, { whatsapp:"واتساب القسم" });
 S.waMsgs = []; S.waCfg = { on:false }; S.waAdmin = null;
 const waKey = p => String(p || "").replace(/[^\d]/g, "").replace(/^00/, "").replace(/^(\d{8})$/, "965$1");
-async function loadWa(){ S.waCfg = { on:false }; } /* Cloud API set aside: WhatsApp Web inside «إنجاز» replaces it — no server round-trip */
+async function loadWa(){ S.waCfg = { on:false }; } /* Cloud API set aside: WhatsApp Web inside «إنجاز» replaces it، no server round-trip */
 let waCh = null;
 function liveWa(){}
 const waThreads = () => { const m = new Map(); for (const x of S.waMsgs) { const k = waKey(x.phone); if (!m.has(k)) m.set(k, { phone:k, name:"", last:x, n:0, unread:0 }); const t = m.get(k); if (!t.name && x.name) t.name = x.name; t.n++; } return [...m.values()]; };
-const waWho = k => { const c = S.coords.find(c => waKey(c.phone) === k); return c ? `${c.name}${c.comm ? " — " + c.comm : ""}` : ""; };
+const waWho = k => { const c = S.coords.find(c => waKey(c.phone) === k); return c ? `${c.name}${c.comm ? "، " + c.comm : ""}` : ""; };
 const waSeen = () => { try { return JSON.parse(localStorage.getItem("wa-seen") || "{}"); } catch (_) { return {}; } };
 function waMarkSeen(k){ try { const s = waSeen(); s[k] = new Date().toISOString(); localStorage.setItem("wa-seen", JSON.stringify(s)); } catch (_) {} }
 function waUnread(){ const s = waSeen(); return waThreads().filter(t => t.last.dir === "in" && (!s[t.phone] || s[t.phone] < t.last.created_at)).length; }
@@ -22,18 +22,18 @@ function vWhatsApp(){
   const lastIn = msgs.filter(m => m.dir === "in").pop(); const open24 = lastIn && (Date.now() - new Date(lastIn.created_at)) < 24 * 3600e3;
   return `${setup}<div class="wa-wrap panel">
     <div class="wa-side"><div class="wa-sh"><b>المحادثات</b><button type="button" class="btn btn-ghost" data-wanew>${icon("i-plus")} رسالة جديدة</button></div>
-      ${T.map(t => { const un = t.last.dir === "in" && (!seen[t.phone] || seen[t.phone] < t.last.created_at) && t.phone !== sel; return `<button type="button" class="wa-t${t.phone === sel ? " on" : ""}" data-wat="${t.phone}"><span class="wa-av">${esc((t.name || waWho(t.phone) || "؟").trim().charAt(0))}</span><span class="wa-tt"><b>${esc(t.name || waWho(t.phone) || "+" + t.phone)}</b><span class="s">${t.last.dir === "out" ? "أنت: " : ""}${esc(String(t.last.body || (t.last.media?.length ? "📎 مرفق" : "")).slice(0, 60))}</span></span><span class="wa-tm"><span class="s">${waTime(t.last.created_at)}</span>${un ? `<i class="wa-dot"></i>` : ""}</span></button>`; }).join("") || `<div class="empty">لا توجد محادثات بعد${S.waCfg.on ? "" : " — تظهر هنا بعد ربط الرقم"}</div>`}</div>
+      ${T.map(t => { const un = t.last.dir === "in" && (!seen[t.phone] || seen[t.phone] < t.last.created_at) && t.phone !== sel; return `<button type="button" class="wa-t${t.phone === sel ? " on" : ""}" data-wat="${t.phone}"><span class="wa-av">${esc((t.name || waWho(t.phone) || "؟").trim().charAt(0))}</span><span class="wa-tt"><b>${esc(t.name || waWho(t.phone) || "+" + t.phone)}</b><span class="s">${t.last.dir === "out" ? "أنت: " : ""}${esc(String(t.last.body || (t.last.media?.length ? "📎 مرفق" : "")).slice(0, 60))}</span></span><span class="wa-tm"><span class="s">${waTime(t.last.created_at)}</span>${un ? `<i class="wa-dot"></i>` : ""}</span></button>`; }).join("") || `<div class="empty">لا توجد محادثات بعد${S.waCfg.on ? "" : "، تظهر هنا بعد ربط الرقم"}</div>`}</div>
     <div class="wa-main">${sel ? `<div class="wa-mh"><div><b>${esc(T.find(t => t.phone === sel)?.name || waWho(sel) || "+" + sel)}</b><span class="s" dir="ltr">+${sel}</span></div><div class="br-acts">${reqIds.map(id => { const r = S.reqs.find(x => x.id === id); return r ? `<button type="button" class="btn btn-ghost" data-prio-open="req:${id}">الطلب ط-${r.no}</button>` : ""; }).join("")}</div></div>
       <div class="wa-thread" id="wa-thread">${msgs.map(m => `<div class="wa-b ${m.dir}">${m.body ? `<p>${esc(m.body).replace(/\n/g, "<br>")}</p>` : ""}${(m.media || []).map(f => f.path ? `<button type="button" class="chip" data-wamedia="${esc(f.path)}">📎 ${esc(f.name || "مرفق")}</button>` : f.url ? `<a class="chip" href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.filename || "ملف")}</a>` : "").join("")}<span class="wa-meta">${m.dir === "out" && m.sent_by ? esc(pname(m.sent_by)) + " · " : ""}${waTime(m.created_at)}${m.dir === "out" ? ` · ${({ sent:"أُرسلت", delivered:"وصلت", read:"قُرئت", failed:"فشل" })[m.status] || ""}` : ""}</span></div>`).join("")}</div>
-      ${S.canWrite ? `<div class="wa-comp">${open24 || !S.waCfg.on ? "" : `<span class="hint">مرّ أكثر من 24 ساعة على آخر رسالة منه — واتساب يسمح فقط بقالب معتمد، أو افتح المحادثة في تطبيق واتساب.</span>`}<textarea class="f" id="wa-in" rows="2" placeholder="اكتب ردك…"></textarea><div class="br-acts"><button type="button" class="btn btn-primary" data-wasend="${sel}">إرسال من رقم القسم</button><button type="button" class="btn btn-ghost" data-waapp="${sel}">${icon("i-wa")} فتح في واتساب</button></div></div>` : ""}`
+      ${S.canWrite ? `<div class="wa-comp">${open24 || !S.waCfg.on ? "" : `<span class="hint">مرّ أكثر من 24 ساعة على آخر رسالة منه، واتساب يسمح فقط بقالب معتمد، أو افتح المحادثة في تطبيق واتساب.</span>`}<textarea class="f" id="wa-in" rows="2" placeholder="اكتب ردك…"></textarea><div class="br-acts"><button type="button" class="btn btn-primary" data-wasend="${sel}">إرسال من رقم القسم</button><button type="button" class="btn btn-ghost" data-waapp="${sel}">${icon("i-wa")} فتح في واتساب</button></div></div>` : ""}`
       : `<div class="empty">اختر محادثة</div>`}</div></div>`;
 }
 function waSetupCard(){
   const hook = `${SB_URL}/functions/v1/wa-webhook`, c = S.waAdmin || {};
-  return `<div class="panel"><div class="panel-h"><h3>ربط واتساب القسم (مرة واحدة)</h3><span class="s">واتساب الرسمي من Meta — Cloud API</span></div><div class="panel-b wa-setup">
+  return `<div class="panel"><div class="panel-h"><h3>ربط واتساب القسم (مرة واحدة)</h3><span class="s">واتساب الرسمي من Meta، Cloud API</span></div><div class="panel-b wa-setup">
     <ol class="wa-steps"><li>من <b>Meta for Developers</b> أنشئ تطبيق (Business) وأضف منتج <b>WhatsApp</b> وأضف رقم القسم.</li>
       <li>في <b>WhatsApp ← Configuration ← Webhook</b> الصق:<div class="wa-cp"><span>Callback URL</span><code dir="ltr">${esc(hook)}</code><button type="button" class="btn btn-ghost" data-wacopy="${esc(hook)}">نسخ</button></div><div class="wa-cp"><span>Verify token</span><code dir="ltr">${esc(c.verify || "…")}</code><button type="button" class="btn btn-ghost" data-wacopy="${esc(c.verify || "")}">نسخ</button></div>ثم فعّل الاشتراك في <b>messages</b>.</li>
-      <li>الصق القيم الأربع هنا واضغط «ربط» — تُحفظ في الخادم ولا يطّلع عليها أحد من مستخدمي النظام.</li></ol>
+      <li>الصق القيم الأربع هنا واضغط «ربط»، تُحفظ في الخادم ولا يطّلع عليها أحد من مستخدمي النظام.</li></ol>
     <div class="g2">${fld("wa-pid", "Phone number ID", `<input class="f" id="wa-pid" dir="ltr" value="${esc(c.phone_id || "")}">`)}${fld("wa-waba", "WhatsApp Business Account ID", `<input class="f" id="wa-waba" dir="ltr" value="${esc(c.waba_id || "")}">`)}</div>
     <div class="g2">${fld("wa-tok", `Access token دائم ${c.has_token ? "✓ محفوظ" : ""}`, `<input class="f" id="wa-tok" dir="ltr" type="password" placeholder="${c.has_token ? "اتركه فارغاً للإبقاء" : "EAA…"}">`)}${fld("wa-sec", `App secret ${c.has_secret ? "✓ محفوظ" : ""}`, `<input class="f" id="wa-sec" dir="ltr" type="password" placeholder="${c.has_secret ? "اتركه فارغاً للإبقاء" : ""}">`)}</div>
     ${fld("wa-disp", "رقم القسم (للعرض)", `<input class="f" id="wa-disp" dir="ltr" placeholder="+965…" value="${esc(S.waCfg.display || "")}">`)}
@@ -68,7 +68,7 @@ document.addEventListener("click", async ev => {
     try { await waSend(k, txt); if (box) box.value = ""; toast("أُرسلت من رقم القسم"); if (D.wasend2) closeDrawer(); } catch (e) { toast(e.message); } finally { t.disabled = false; } return; }
   if (D.wasave !== undefined) { const v = id => $("#" + id)?.value.trim() || ""; if (!v("wa-pid") && !S.waAdmin?.phone_id) return toast("الصق Phone number ID");
     const { data, error } = await sb.rpc("wa_config_set", { p_token:v("wa-tok"), p_phone_id:v("wa-pid"), p_waba_id:v("wa-waba"), p_app_secret:v("wa-sec"), p_display:v("wa-disp") }); if (error) return writeFail(error);
-    S.waAdmin = data; await loadWa(); render(); return toast(S.waCfg.on ? "رُبط واتساب القسم ✓" : "حُفظ — أكمل القيم الناقصة"); }
+    S.waAdmin = data; await loadWa(); render(); return toast(S.waCfg.on ? "رُبط واتساب القسم ✓" : "حُفظ، أكمل القيم الناقصة"); }
 });
 
 /* ---------- sidebar «واتساب القسم»: one tap opens the chats directly ---------- */
@@ -100,7 +100,7 @@ vWhatsApp = function(){
       <li><a href="jaliyat-copilot.zip" download class="btn btn-primary">⬇ نزّل الجسر</a> ثم افتح الملف من التنزيلات واضغط <b>«استخراج الكل»</b>${has ? " فوق مجلد <b>jaliyat-copilot</b> القديم" : ""}.</li>
       <li>انسخ هذا العنوان والصقه في شريط عنوان Edge: <button type="button" class="btn btn-ghost" data-cpy="edge://extensions">📋 edge://extensions</button></li>
       <li>فعّل <b>«وضع المطوّر»</b> (أسفل يسار الصفحة)، ثم اضغط ${has ? "<b>«إعادة تحميل»</b> على «جسر إنجاز»" : "<b>«تحميل غير المضغوط»</b> واختر مجلد <b>jaliyat-copilot</b> المستخرج"}.</li>
-      <li>ارجع لـ «إنجاز» واضغط <b>F5</b>، ثم «واتساب القسم» وامسح الكود من جوال القسم (الإعدادات ← الأجهزة المرتبطة) — أول مرة فقط.</li>
+      <li>ارجع لـ «إنجاز» واضغط <b>F5</b>، ثم «واتساب القسم» وامسح الكود من جوال القسم (الإعدادات ← الأجهزة المرتبطة)، أول مرة فقط.</li>
     </ol>
     <div class="br-acts"><button type="button" class="btn btn-ghost" data-waopen>افتح واتساب ويب مؤقتاً</button></div></div></div>`;
 };
@@ -110,4 +110,4 @@ afterRender = function(){ _afterRender20(); waEmbed(S.view === "whatsapp" && !S.
 const _boot9w20 = boot9;
 boot9 = function(){ _boot9w20(); setTimeout(() => { if (waEmbedOk() && !isTouchDev() && !$("#wa-embed")) { waEmbed(true); waEmbed(S.view === "whatsapp"); } }, 4000); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-waopen]"); if (t) openWaChats(); });
-document.addEventListener("click", async ev => { const t = ev.target.closest("[data-cpy]"); if (!t) return; try { await navigator.clipboard.writeText(t.dataset.cpy); toast("نُسخ — الصقه في شريط العنوان واضغط Enter"); } catch (_) { toast(t.dataset.cpy); } });
+document.addEventListener("click", async ev => { const t = ev.target.closest("[data-cpy]"); if (!t) return; try { await navigator.clipboard.writeText(t.dataset.cpy); toast("نُسخ، الصقه في شريط العنوان واضغط Enter"); } catch (_) { toast(t.dataset.cpy); } });

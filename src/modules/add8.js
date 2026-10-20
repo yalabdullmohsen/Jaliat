@@ -4,8 +4,8 @@ function sysMarkdown(){
   const c = x => String(x ?? "").replace(/\|/g, "/").replace(/\s+/g, " ").trim() || "—";
   const T = (head, rows) => `| ${head.join(" | ")} |\n|${head.map(() => "---").join("|")}|\n` + rows.map(r => `| ${r.map(c).join(" | ")} |`).join("\n");
   const td = dOf(TODAY);
-  const out = [`# بيانات نظام أنشطة الجاليات`, `وزارة الأوقاف والشؤون الإسلامية — إدارة العلاقات الخارجية — قسم الجاليات ورعاية المهتدين وطلبة البعوث.`,
-    `تاريخ الملف: ${DAYS[td.getDay()]} ${fmt(TODAY)} م — ${hijri(td)}. أسبوع العمل يبدأ السبت. الحالات محسوبة تلقائياً من التواريخ.`,
+  const out = [`# بيانات نظام أنشطة الجاليات`, `وزارة الأوقاف والشؤون الإسلامية، إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث.`,
+    `تاريخ الملف: ${DAYS[td.getDay()]} ${fmt(TODAY)} م، ${hijri(td)}. أسبوع العمل يبدأ السبت. الحالات محسوبة تلقائياً من التواريخ.`,
     `\n## ملخص\n- عدد الأنشطة: ${S.E.length} (جارية ${S.E.filter(RUN).length}، فيها تعارض ${conflicts().length})\n- مساجد خطبة الجمعة: ${S.khatibs.size}\n- الجاليات: ${commNames.length}\n- المساجد المسجلة: ${S.mosques.length}\n- الوثائق: ${S.docs.length}`,
     `\n## الأنشطة (${S.E.length})`, T(["الرقم", "النوع", "الجالية", "المسجد", "المنطقة", "المحافظة", "الأيام", "الوقت", "المحاضر", "العنوان", "من", "إلى", "الحالة", "رقم الوثيقة", "يتعارض مع", "ملاحظات"],
       [...S.E].sort((a, b) => a.n - b.n).map(e => [e.n, e.type, e.comm, e.mosName, e.area, e.gov, daysText(e), e.time, e.lect, e.title, fmt(e.start), fmt(e.end), e.st, e.doc, e.cf.map(x => "#" + x.o.n).join("، "), e.notes])),
@@ -19,7 +19,7 @@ function sysMarkdown(){
   if (typeof SR !== "undefined" && SR.rows?.size) out.push(`\n## سجل خطب الجمعة المسجل (آخر 3 أشهر)`, T(["الجمعة", "المسجد", "من ألقى الخطبة", "النوع", "المكافأة"], [...SR.rows.values()].filter(r => r.fri >= isoOf(new Date(td.getFullYear(), td.getMonth() - 3, 1))).map(r => [fmt(r.fri), S.khatibs.get(r.kh_id)?.mosque, r.name, ({ pri:"أساسي", bak:"احتياط", other:"بديل", none:"لم تُلقَ" })[r.who], r.amount])));
   return out.join("\n");
 }
-let PRIME_MSG = "مرفق ملف «بيانات نظام إنجاز» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والخطباء والمنسقون والوثائق والملاحظات). اعتمد عليه كمصدر رئيسي في كل إجاباتك في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو خطيب أو منسق أو وثيقة فأقصد هذا الملف، ويمكنك أيضاً البحث في ملفاتي وبريدي عند الحاجة. أجب بالعربية بدقة واذكر أرقام الأنشطة والوثائق. لا تلخص الملف الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».";
+let PRIME_MSG = "مرفق ملف «بيانات نظام إنجاز» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والخطباء والمنسقون والوثائق والملاحظات). اعتمد عليه كمصدر رئيسي في كل إجاباتك في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو خطيب أو منسق أو وثيقة فأقصد هذا الملف، ويمكنك أيضاً البحث في ملفاتي وبريدي عند الحاجة. أجب بالعربية بدقة واذكر أرقام الأنشطة والوثائق. لا تلخص الملف الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓، اسألني ما تشاء».";
 brPrime = function(){
   if (BR.primed) return; BR.primed = true;
   const f = $("#br-frame"); if (!f) return;
@@ -50,7 +50,7 @@ vCopilot = function(){
 async function brSave(kind){
   const send = async txt => {
     if (kind === "copy") { const ok = await cpCopy(txt); return toast(ok ? "نُسخ رد Copilot" : "تعذّر النسخ"); }
-    const title = "رد Copilot — " + fmt(TODAY) + " " + (txt.split("\n").find(l => l.trim()) || "").slice(0, 50);
+    const title = "رد Copilot، " + fmt(TODAY) + " " + (txt.split("\n").find(l => l.trim()) || "").slice(0, 50);
     if (kind === "mine") { const { error } = await sb.from("my_notes").insert({ user_id:S.me.id, title, body:txt, color:"b" }); if (error) return writeFail(error); await loadMine(); toast("حُفظ في ملاحظاتك الخاصة"); }
     else { if (!S.canWrite) return toast("صلاحيتك عرض فقط"); await T.put("notes", null, { title, body:txt, prio:"متوسطة", status:"مفتوحة", date:TODAY, comm:"", src:"Microsoft 365 Copilot" }); toast("حُفظ كملاحظة للفريق"); }
   };

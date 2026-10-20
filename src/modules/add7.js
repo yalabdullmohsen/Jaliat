@@ -11,7 +11,7 @@ function vCopilot(){
         <li>افتح في المتصفح الرابط: <code dir="ltr">edge://extensions</code> في Edge، أو <code dir="ltr">chrome://extensions</code> في Chrome.</li>
         <li>فعّل <b>Developer mode / وضع المطوّر</b>.</li>
         <li>اضغط <b>Load unpacked / تحميل غير مضغوط</b> واختر مجلد <b dir="ltr">jaliyat-copilot</b>.</li>
-        <li>ارجع هنا وحدّث الصفحة — يظهر Copilot داخل النظام بحسابك في الوزارة.</li></ol>
+        <li>ارجع هنا وحدّث الصفحة، يظهر Copilot داخل النظام بحسابك في الوزارة.</li></ol>
       <span class="hint">الجسر مجاني، لا يجمع أي بيانات، ويعمل فقط داخل صفحة النظام.</span>
     </div></div>
     ${vCopilotMS()}</div>`;
@@ -29,7 +29,7 @@ function vCopilot(){
 /* give Copilot the system's data once per conversation, automatically */
 function brPrime(){
   if (BR.primed) return; BR.primed = true;
-  const intro = "أنا موظف في قسم الجاليات ورعاية المهتدين وطلبة البعوث بوزارة الأوقاف. هذه بيانات «نظام أنشطة الجاليات» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والحالات والتعارضات). اعتمد عليها في كل إجاباتك القادمة في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو محاضر فأقصد هذه البيانات. لا تلخصها الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓ — اسألني ما تشاء».";
+  const intro = "أنا موظف في قسم الجاليات ورعاية المهتدين وطلبة البعوث بوزارة الأوقاف. هذه بيانات «نظام أنشطة الجاليات» المفتوح أمامي الآن (الأنشطة والمساجد والجاليات والمحاضرون والحالات والتعارضات). اعتمد عليها في كل إجاباتك القادمة في هذه المحادثة، وعندما أقول «النظام» أو أسأل عن نشاط أو جالية أو مسجد أو محاضر فأقصد هذه البيانات. لا تلخصها الآن، ورد فقط بعبارة: «تم استلام بيانات النظام ✓، اسألني ما تشاء».";
   const f = $("#br-frame"); if (f) f.contentWindow.postMessage({ type:"jaliyat-ask", text:`${intro}\n\n${cpData("", 14000)}` }, "https://m365.cloud.microsoft");
 }
 function brSend(q, withData){
@@ -39,7 +39,7 @@ function brSend(q, withData){
   if (!BR.ready) { BR.queue.push(text); $("#br-st").textContent = "سيُرسل فور جاهزية Copilot…"; return; }
   f.contentWindow.postMessage({ type:"jaliyat-ask", text }, "https://m365.cloud.microsoft");
   const qi = $("#br-q"); if (qi) qi.value = "";
-  $("#br-st").textContent = "أُرسل السؤال — الرد يظهر في Copilot";
+  $("#br-st").textContent = "أُرسل السؤال، الرد يظهر في Copilot";
 }
 window.addEventListener("message", e => {
   if (!/^https:\/\/m365\.cloud\.microsoft$/.test(e.origin)) return;

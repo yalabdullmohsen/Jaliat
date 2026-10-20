@@ -86,13 +86,13 @@ async function ocrRun(file){
     const res = parseActs(data.text || "");
     S.ocr = { ...res, preview };
     if (!(data.text || "").trim()) { $("#ocr-st").textContent = "لم أستطع قراءة نص من الصورة. جرّب صورة أوضح ومستقيمة."; return; }
-    if (res.acts.length === 1) { closeDrawer(); actForm(undefined, res.acts[0]); ocrNote(); toast("عُبّئت البيانات من الصورة — راجعها ثم احفظ"); }
+    if (res.acts.length === 1) { closeDrawer(); actForm(undefined, res.acts[0]); ocrNote(); toast("عُبّئت البيانات من الصورة، راجعها ثم احفظ"); }
     else ocrReview();
   } catch (e) { console.error(e); const a = $("#ocr-st"); if (a) a.textContent = e?.message === "load" ? "تعذّر تحميل أداة القراءة. تأكد من الاتصال بالإنترنت ثم حاول مرة أخرى." : "تعذّرت قراءة الصورة. جرّب صورة أخرى."; }
 }
 function ocrNote(){
   const o = S.ocr; if (!o || !$(".drawer-b")) return;
-  $(".drawer-b").insertAdjacentHTML("afterbegin", `<details class="ocr-src"><summary>${icon("i-cam", 15)} عُبّئ من صورة — اضغط لعرض الصورة والنص المقروء</summary><img src="${o.preview}" alt=""><pre>${esc(o.text.trim())}</pre></details>`);
+  $(".drawer-b").insertAdjacentHTML("afterbegin", `<details class="ocr-src"><summary>${icon("i-cam", 15)} عُبّئ من صورة، اضغط لعرض الصورة والنص المقروء</summary><img src="${o.preview}" alt=""><pre>${esc(o.text.trim())}</pre></details>`);
   const miss = []; const v = readAct(); if (!v.comm) miss.push("الجالية"); if (!v.mosque) miss.push("المسجد"); if (!v.days.length) miss.push("اليوم"); if (!v.lect) miss.push("المحاضر");
   if (miss.length) $(".ocr-src").insertAdjacentHTML("afterend", `<div class="check warn"><b>أكمل يدوياً</b><span>لم يُتعرّف من الصورة على: ${miss.join("، ")}</span></div>`);
 }
@@ -109,7 +109,7 @@ function ocrReview(){
 async function ocrAddAll(){
   const o = S.ocr; const sel = [...document.querySelectorAll("[data-oc]")].filter(x => x.checked).map(x => o.acts[+x.dataset.oc]);
   if (!sel.length) return toast("حدّد نشاطاً واحداً على الأقل");
-  const bad = sel.filter(a => !a.comm); if (bad.length) return toast("الجالية غير معروفة — اضغط «مراجعة» واخترها");
+  const bad = sel.filter(a => !a.comm); if (bad.length) return toast("الجالية غير معروفة، اضغط «مراجعة» واخترها");
   const b = $("#ocr-addall"); b.disabled = true;
   let n = Math.max(0, ...[...S.acts.values()].map(a => a.n || 0));
   try { for (const a of sel) { n++; const d = docBy[a.doc]; const body = { ...a, n }; if (d) { if (body.start === d.start) body.start = ""; if (body.end === d.end) body.end = ""; } await T.put("acts", null, body); }

@@ -1,4 +1,4 @@
-/* ================= v15: «مساعد إنجاز» — instant answers from the system's own data, Copilot for deeper work ================= */
+/* ================= v15: «مساعد إنجاز»، instant answers from the system's own data, Copilot for deeper work ================= */
 const AS = { msgs:[], sent:false };
 const nk2 = s => nkey(String(s || "").replace(/^(الجاليه|جاليه|الجالية|جالية)\s*/, ""));
 const runOn = iso => { const d = dOf(iso).getDay(); return S.E.filter(e => e.live && e.start <= iso && e.end >= iso && e.days.includes(d)).sort((a, b) => (a.sl?.[0] || 0) - (b.sl?.[0] || 0)); };
@@ -15,11 +15,11 @@ function answer(q){
   if (has("اولويات", "أولويات", "ماذا افعل", "شو اسوي")) return R("أولويات اليوم", priorities().map(p => ({ t:p.t, s:p.s, go:p.act.go, open:p.act.open })));
   if (has("الغد", "باكر", "بكره", "غدا")) { const L = runOn(addDays(TODAY, 1)); return R(`أنشطة الغد (${L.length})`, L.map(actItem)); }
   if (has("اليوم") && has("نشاط", "انشطه", "أنشطة", "دروس")) { const L = runOn(TODAY); return R(`أنشطة اليوم (${L.length})`, L.map(actItem)); }
-  if (has("تعارض")) { const P = cfPairs(); return R(`التعارضات الجارية (${P.length})`, P.slice(0, 30).map(p => { const f = altFixes(p.a, 1)[0] || altFixes(p.b, 1)[0]; return { t:`#${p.a.n} ↔ #${p.b.n} — ${p.k === "lect" ? "نفس المحاضر" : "نفس المسجد"}`, s:f ? `حل مقترح: ${f.label}` : "لا يوجد وقت بديل خالٍ — غيّر المحاضر أو المسجد", open:`act:${p.a.id}`, bad:true }; }), P.length ? "افتح أي تعارض لتطبيق الحل بضغطة." : "لا توجد تعارضات ✓"); }
-  if (has("موافق", "وثيق") && has("تنتهي", "انتهاء", "منتهي")) { const L = S.docs.filter(d => d.end && d.end >= TODAY && d.end <= addDays(TODAY, 30)).sort((a, b) => a.end.localeCompare(b.end)); return R(`موافقات تنتهي خلال 30 يوماً (${L.length})`, L.map(d => ({ t:`${d.no} — ${d.comm || ""}`, s:`تنتهي ${fmt(d.end)} · ${S.E.filter(e => e.doc === d.no && e.live).length} نشاط مرتبط`, open:`doc:${d.no}` }))); }
+  if (has("تعارض")) { const P = cfPairs(); return R(`التعارضات الجارية (${P.length})`, P.slice(0, 30).map(p => { const f = altFixes(p.a, 1)[0] || altFixes(p.b, 1)[0]; return { t:`#${p.a.n} ↔ #${p.b.n}، ${p.k === "lect" ? "نفس المحاضر" : "نفس المسجد"}`, s:f ? `حل مقترح: ${f.label}` : "لا يوجد وقت بديل خالٍ، غيّر المحاضر أو المسجد", open:`act:${p.a.id}`, bad:true }; }), P.length ? "افتح أي تعارض لتطبيق الحل بضغطة." : "لا توجد تعارضات ✓"); }
+  if (has("موافق", "وثيق") && has("تنتهي", "انتهاء", "منتهي")) { const L = S.docs.filter(d => d.end && d.end >= TODAY && d.end <= addDays(TODAY, 30)).sort((a, b) => a.end.localeCompare(b.end)); return R(`موافقات تنتهي خلال 30 يوماً (${L.length})`, L.map(d => ({ t:`${d.no}، ${d.comm || ""}`, s:`تنتهي ${fmt(d.end)} · ${S.E.filter(e => e.doc === d.no && e.live).length} نشاط مرتبط`, open:`doc:${d.no}` }))); }
   if (has("بلا نشاط", "بدون نشاط")) { const run = new Set(S.E.filter(RUN).map(e => e.comm)); const L = commNames.filter(c => !run.has(c)); return R(`جاليات بلا نشاط جارٍ (${L.length})`, L.map(c => ({ t:c, s:"", go:"comms" }))); }
   if (has("انسب يوم", "أنسب يوم", "افضل يوم")) { const run = S.E.filter(RUN); const L = WEEK.filter(d => d !== 5).map(d => [d, run.filter(e => e.days.includes(d)).length]).sort((a, b) => a[1] - b[1]); return R("أنسب الأيام لجدولة نشاط جديد", L.map(([d, c]) => ({ t:DAYS[d], s:`${c} نشاط جارٍ` }))); }
-  if (has("حجز", "قاع")) { const L = bkLive().filter(b => b.day >= TODAY && b.day <= addDays(TODAY, 7)); return R(`حجوزات القاعات خلال أسبوع (${L.length})`, L.map(b => ({ t:`${hallName(b.hall)} — ${b.data?.title || b.data?.comm || "حجز"}`, s:`${DAYS[dOf(b.day).getDay()]} ${fmt(b.day)} · ${bkSpan(b)}${b.status === "مبدئي" ? " · مبدئي" : ""}`, open:`bk:${b.id}` }))); }
+  if (has("حجز", "قاع")) { const L = bkLive().filter(b => b.day >= TODAY && b.day <= addDays(TODAY, 7)); return R(`حجوزات القاعات خلال أسبوع (${L.length})`, L.map(b => ({ t:`${hallName(b.hall)}، ${b.data?.title || b.data?.comm || "حجز"}`, s:`${DAYS[dOf(b.day).getDay()]} ${fmt(b.day)} · ${bkSpan(b)}${b.status === "مبدئي" ? " · مبدئي" : ""}`, open:`bk:${b.id}` }))); }
   if (has("مهام", "مهمتي", "مهامي")) { const L = S.tasks.filter(t => t.assignee === S.me.id && TK_OPEN.includes(t.status)); return R(`مهامك المفتوحة (${L.length})`, L.map(t => ({ t:`م-${t.no} ${t.title}`, s:`${t.status}${t.due ? " · الموعد " + fmt(t.due) : ""}${late(t) ? " · متأخرة" : ""}`, open:`task:${t.id}`, bad:late(t) }))); }
   if (has("طلب", "الطلبات")) { const L = S.reqs.filter(r => !["معتمد", "مرفوض"].includes(r.status)); return R(`الطلبات المفتوحة (${L.length})`, L.map(r => ({ t:`${rqNo(r)} ${r.data?.org || r.data?.comm || "طلب"}`, s:`${r.status}${r.data?.ack ? "" : " · بلا تأكيد استلام"}`, open:`req:${r.id}` }))); }
   if (has("ملخص", "تقرير", "الاسبوع", "الأسبوع")) { const W = [...Array(7)].map((_, i) => addDays(TODAY, i)); const tot = W.reduce((s, d) => s + runOn(d).length, 0);
@@ -29,14 +29,14 @@ function answer(q){
   if (has("المحاضرين", "محاضرين")) { const lc = {}; S.E.filter(RUN).forEach(e => (e.lect || "").split(" / ").filter(Boolean).forEach(l => lc[l] = (lc[l] || 0) + 1)); return R("أكثر المحاضرين أنشطة جارية", Object.entries(lc).sort((a, b) => b[1] - a[1]).slice(0, 15).map(([l, c]) => ({ t:l, s:`${c} نشاط`, go:"acts", f:F0({ q:l }) }))); }
   /* entity questions: community / mosque / lecturer / khatib / coordinator */
   const k = nkey(q);
-  const ALIAS = { "بنغال":"البنغلاديشية", "بنجلاديش":"البنغلاديشية", "بنغلاديش":"البنغلاديشية", "فلبين":"الفلبينية – تجالوج", "باكستان":"الباكستانية", "سريلانك":"السريلانكية", "افغان":"الأفغانية", "اندونيس":"الإندونيسية", "صين":"الصينية", "فارس":"الفارسية", "ايران":"الفارسية", "اثيوب":"الإثيوبية", "حبش":"الإثيوبية", "مليبار":"الهندية – المليبارية", "مالايالم":"الهندية – مالايالم", "تاميل":"الهندية – التاميلية", "اوردو":"الهندية – الأوردية", "تلغو":"الهندية – التلغو", "غربي":"الغربية", "انجليز":"الغربية" };
+  const ALIAS = { "بنغال":"البنغلاديشية", "بنجلاديش":"البنغلاديشية", "بنغلاديش":"البنغلاديشية", "فلبين":"الفلبينية، تجالوج", "باكستان":"الباكستانية", "سريلانك":"السريلانكية", "افغان":"الأفغانية", "اندونيس":"الإندونيسية", "صين":"الصينية", "فارس":"الفارسية", "ايران":"الفارسية", "اثيوب":"الإثيوبية", "حبش":"الإثيوبية", "مليبار":"الهندية، المليبارية", "مالايالم":"الهندية، مالايالم", "تاميل":"الهندية، التاميلية", "اوردو":"الهندية، الأوردية", "تلغو":"الهندية، التلغو", "غربي":"الغربية", "انجليز":"الغربية" };
   const alias = Object.entries(ALIAS).find(([w, c]) => n.includes(w) && commNames.includes(c))?.[1];
   const comm = alias || commNames.filter(c => nk2(c).length > 3 && k.includes(nk2(c))).sort((a, b) => b.length - a.length)[0] || commNames.find(c => norm(c).split(/[\s–-]+/).some(w => w.length > 4 && n.includes(w)));
-  if (comm && has("منسق", "رقم", "هاتف")) { const L = S.coords.filter(c => c.comm === comm); return R(`منسقو ${comm}`, L.map(c => ({ t:`${c.name} — ${c.role || ""}`, s:c.phone || "", tel:c.phone }))); }
+  if (comm && has("منسق", "رقم", "هاتف")) { const L = S.coords.filter(c => c.comm === comm); return R(`منسقو ${comm}`, L.map(c => ({ t:`${c.name}، ${c.role || ""}`, s:c.phone || "", tel:c.phone }))); }
   if (comm) { const L = S.E.filter(e => e.comm === comm && RUN(e)); return R(`${comm}: ${L.length} نشاط جارٍ`, L.map(actItem), `${S.coords.filter(c => c.comm === comm).length} منسق · اسأل «منسق ${comm}» لأرقامهم.`); }
   const mos = S.mosques.filter(m => nkey(m.name).length > 3 && k.includes(nkey(m.name))).sort((a, b) => b.name.length - a.name.length)[0];
-  if (mos && has("خطيب", "خطبه", "خطبة", "جمعه")) { const kh = khByMosque(mos.name); if (kh) return R(`خطبة الجمعة — مسجد ${kh[1].mosque}`, [{ t:`الأساسي: ${kh[1].pri || "—"}`, s:kh[1].pph || "", tel:kh[1].pph }, { t:`الاحتياط: ${kh[1].bak || "—"}`, s:kh[1].bph || "", tel:kh[1].bph }, { t:"فتح بطاقة المسجد", s:"", open:`kh:${kh[0]}` }]); }
-  if (mos) { const L = S.E.filter(e => e.mosque === mos.id && e.live); return R(`مسجد ${mos.name}${mos.area ? " — " + mos.area : ""}: ${L.length} نشاط`, L.map(actItem)); }
+  if (mos && has("خطيب", "خطبه", "خطبة", "جمعه")) { const kh = khByMosque(mos.name); if (kh) return R(`خطبة الجمعة، مسجد ${kh[1].mosque}`, [{ t:`الأساسي: ${kh[1].pri || "—"}`, s:kh[1].pph || "", tel:kh[1].pph }, { t:`الاحتياط: ${kh[1].bak || "—"}`, s:kh[1].bph || "", tel:kh[1].bph }, { t:"فتح بطاقة المسجد", s:"", open:`kh:${kh[0]}` }]); }
+  if (mos) { const L = S.E.filter(e => e.mosque === mos.id && e.live); return R(`مسجد ${mos.name}${mos.area ? "، " + mos.area : ""}: ${L.length} نشاط`, L.map(actItem)); }
   const lect = [...new Set(S.E.flatMap(e => (e.lect || "").split(" / ")).filter(Boolean))].filter(l => nkey(l).length > 5 && k.includes(nkey(l)))[0];
   if (lect) { const L = S.E.filter(e => (e.lect || "").includes(lect) && e.live); return R(`${lect}: ${L.length} نشاط`, L.map(actItem)); }
   const hits = palSearch(q).filter(x => !["إجراءات", "الصفحات"].includes(x.g)).slice(0, 8);
@@ -61,11 +61,11 @@ function vAssistant(){
 function asAsk(q){ q = String(q || "").trim(); if (!q) return; AS.msgs.push({ q, a:answer(q) }); render(); setTimeout(() => { const t = $("#as-thread"); t?.lastElementChild?.scrollIntoView({ behavior:"smooth", block:"start" }); }, 50); }
 async function asCopilot(i){
   const m = AS.msgs[i]; const q = m?.q || "";
-  const text = `${mobPrompt(q)}\n\nما وجده النظام: ${m?.a?.title || ""}\n${(m?.a?.items || []).slice(0, 25).map(x => "- " + x.t + (x.s ? " — " + x.s : "")).join("\n")}`;
+  const text = `${mobPrompt(q)}\n\nما وجده النظام: ${m?.a?.title || ""}\n${(m?.a?.items || []).slice(0, 25).map(x => "- " + x.t + (x.s ? "، " + x.s : "")).join("\n")}`;
   const file = new File([sysMarkdown()], `بيانات-نظام-إنجاز-${TODAY}.txt`, { type:"text/plain" });
   AS.sent = true;
   if (isMobileDev() && navigator.canShare && navigator.canShare({ files:[file] })) { try { await cpCopy(text); await navigator.share({ files:[file], text }); render(); return; } catch (e) { if (e?.name === "AbortError") { render(); return; } } }
-  await cpCopy(`${text}\n\n${cpData(q, 12000)}`); toast("نُسخ سؤالك مع البيانات — الصقه في Copilot"); window.open("https://m365.cloud.microsoft/chat/", "_blank", "noopener"); render();
+  await cpCopy(`${text}\n\n${cpData(q, 12000)}`); toast("نُسخ سؤالك مع البيانات، الصقه في Copilot"); window.open("https://m365.cloud.microsoft/chat/", "_blank", "noopener"); render();
 }
 function _vCopilot16Install(){ return `<ol class="cp-steps big"><li><a class="btn btn-primary" href="jaliyat-copilot.zip" download>${icon("i-down")} تنزيل الجسر</a> ثم «استخراج الكل».</li><li>افتح <code dir="ltr">${extUrl}</code> وفعّل «وضع المطوّر».</li><li>«تحميل ملحق لم يتم فك حزمته» ← اختر مجلد <b dir="ltr">jaliyat-copilot</b>، ثم حدّث هذه الصفحة.</li></ol>`; }
 const _vCopilot16 = vCopilot;
@@ -78,7 +78,7 @@ document.addEventListener("click", async ev => {
   if (D.asi) { const [i, j] = D.asi.split("|").map(Number); const x = AS.msgs[i]?.a.items[j]; if (!x) return;
     if (x.tel) return location.href = "tel:" + waNum(x.tel);
     if (x.open) return openLink("#" + x.open); if (x.go) return go(x.go, x.f); if (x.run) return x.run.run(); return; }
-  if (D.aspaste !== undefined) { let txt = ""; try { txt = await navigator.clipboard.readText(); } catch (_) {} if (!txt) { txt = prompt("الصق رد Copilot هنا") || ""; } const acts = findActions(txt); if (!acts.length) return toast("لا توجد أوامر تعديل في الرد — إجابة Copilot للعرض فقط"); CPX.list = acts.map(a => ({ a })); cpxRender(); $("#cpx")?.scrollIntoView({ behavior:"smooth", block:"center" }); }
+  if (D.aspaste !== undefined) { let txt = ""; try { txt = await navigator.clipboard.readText(); } catch (_) {} if (!txt) { txt = prompt("الصق رد Copilot هنا") || ""; } const acts = findActions(txt); if (!acts.length) return toast("لا توجد أوامر تعديل في الرد، إجابة Copilot للعرض فقط"); CPX.list = acts.map(a => ({ a })); cpxRender(); $("#cpx")?.scrollIntoView({ behavior:"smooth", block:"center" }); }
 });
 /* voice → assistant input when no bridge */
 const _voiceStart16 = voiceStart;

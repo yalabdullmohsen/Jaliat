@@ -38,10 +38,10 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("bu
   if (D.wainc) { S.waInc = D.wainc; return decWaPaint(); }
   if (D.wasend) return decWaSend(D.wasend);
   if (D.wanext !== undefined) { const sent = S.waSent[S.form?.id] || new Map(), c = waTargets().find(x => !sent.has(waNum(x.phone))); if (!c) return toast("أُرسل القرار لجميع المنسقين ✓"); return decWaSend(waNum(c.phone)); }
-  if (D.wagrp !== undefined) { const d = S.decs.find(x => x.id === S.form?.id); if (!d) return; try { await navigator.clipboard.writeText(waDecText(d, null)); toast("نُسخ النص — الصقه في مجموعة المنسقين"); } catch (_) { toast("تعذّر النسخ"); } }
+  if (D.wagrp !== undefined) { const d = S.decs.find(x => x.id === S.form?.id); if (!d) return; try { await navigator.clipboard.writeText(waDecText(d, null)); toast("نُسخ النص، الصقه في مجموعة المنسقين"); } catch (_) { toast("تعذّر النسخ"); } }
 });
 document.addEventListener("input", ev => { if (ev.target.id === "ws-q") { S.waQ = ev.target.value; decWaPaint(); } });
-NEWF.splice(1, 0, ["v35-wa", "nav:decisions", "القرارات تصل المنسقين بالواتساب", "عند إصدار قرار أو تعميم: «إرسال للمنسقين بالواتساب» — كل ضغطة تفتح محادثة منسق والرسالة جاهزة، ويُسجَّل من وصله.", false, "2026-10-20"]);
+NEWF.splice(1, 0, ["v35-wa", "nav:decisions", "القرارات تصل المنسقين بالواتساب", "عند إصدار قرار أو تعميم: «إرسال للمنسقين بالواتساب»، كل ضغطة تفتح محادثة منسق والرسالة جاهزة، ويُسجَّل من وصله.", false, "2026-10-20"]);
 
 /* ================= v35b: Microsoft account (OneDrive backups) belongs to each «إنجاز» user, never shared ================= */
 // MSAL keeps signed-in Microsoft accounts per browser; pick only the one this user linked himself.
@@ -67,7 +67,7 @@ S.wqOut = null;
 // coordinator name for the letter notes: from the request, else from the community's coordinator (one community per coordinator)
 const _letterData36 = letterData;
 letterData = function(src){ const L = _letterData36(src); if (L && !L.coord) { const c = S.comms.find(x => x.name === L.comm); L.coord = c?.coord || S.coords.find(x => x.comm === L.comm && (x.role || "منسق") === "منسق")?.name || ""; } return L; };
-const WO_ST = { pending:["بانتظار وثيقة", "warn"], working:["جارٍ الحفظ", "warn"], drafted:["حُفظت مسودة في وثيقة ✓", "ok"], failed:["تعذّر — راجعه", "bad"], cancelled:["أُلغي", ""] };
+const WO_ST = { pending:["بانتظار وثيقة", "warn"], working:["جارٍ الحفظ", "warn"], drafted:["حُفظت مسودة في وثيقة ✓", "ok"], failed:["تعذّر، راجعه", "bad"], cancelled:["أُلغي", ""] };
 async function woLoad(){ const { data } = await sb.from("watheqa_outbox").select("id,no,gov,to_whom,subj,status,result,created_by,created_at,done_at").order("created_at", { ascending:false }).limit(60); S.wqOut = data || []; if (S.view === "watheqa") render(); }
 function woGate(src){ const L = letterData(src); if (!L) return ["لا توجد بيانات"]; const m = [];
   if (!L.coord) m.push("اسم المنسق"); if (L.acts.some(a => !a.mosque)) m.push("مسجد غير مسجل في النظام"); if (L.acts.some(a => !a.time)) m.push("وقت النشاط"); if (L.acts.some(a => !a.daily && !(a.days || []).length)) m.push("أيام النشاط"); if (L.acts.some(a => !(a.gov || mosBy[a.mosque]?.gov))) m.push("المحافظة"); return m; }
@@ -75,13 +75,13 @@ const _letterOpen36 = letterOpen;
 letterOpen = function(src){ const req = src === "req" ? S.reqs?.find(r => r.id === S.form?.id) : null; S.ltSrc = { src, reqId:req?.id || null, files:req?.files || [] };
   _letterOpen36(src); if (!S.letters?.length || !S.canWrite) return;
   const miss = woGate(src);
-  $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", miss.length ? `<button class="btn" type="button" disabled title="أكمل: ${esc(miss.join("، "))}">📤 إرسال إلى وثيقة — ينقص: ${esc(miss.join("، "))}</button>` : `<button class="btn btn-ok" type="button" data-ltq>📤 إرسال إلى وثيقة تلقائياً (${S.letters.length})</button>`); };
+  $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", miss.length ? `<button class="btn" type="button" disabled title="أكمل: ${esc(miss.join("، "))}">📤 إرسال إلى وثيقة، ينقص: ${esc(miss.join("، "))}</button>` : `<button class="btn btn-ok" type="button" data-ltq>📤 إرسال إلى وثيقة تلقائياً (${S.letters.length})</button>`); };
 async function woQueue(btn){ if (!S.letters?.length) return; const miss = woGate(S.ltSrc?.src); if (miss.length) return toast("أكمل أولاً: " + miss.join("، "));
   btn.disabled = true; btn.textContent = "جارٍ الإرسال…";
   const attach = []; for (const p of S.ltSrc?.files || []) { const { data } = await sb.storage.from("requests").createSignedUrl(p, 7 * 864e5 / 1000); if (data?.signedUrl) attach.push({ name:p.split("/").pop(), url:data.signedUrl }); }
   const rows = S.letters.map(x => ({ src:S.ltSrc?.src === "req" ? "req" : S.ltSrc?.src, req_id:S.ltSrc?.reqId, gov:x.g, to_whom:x.to, subj:x.subj, note:x.note || null, html:x.html, attach }));
   const { error } = await sb.from("watheqa_outbox").insert(rows); if (error) { btn.disabled = false; return writeFail(error); }
-  closeDrawer(); woLoad(); toast(`أُرسل ${rows.length} ${rows.length > 1 ? "كتب" : "كتاب"} إلى وثيقة — تُحفظ مسودة في السكرتارية خلال ساعتين، ويصلك إشعار`); }
+  closeDrawer(); woLoad(); toast(`أُرسل ${rows.length} ${rows.length > 1 ? "كتب" : "كتاب"} إلى وثيقة، تُحفظ مسودة في السكرتارية خلال ساعتين، ويصلك إشعار`); }
 function woPanel(){ if (!S.wqOut) { woLoad(); return ""; } if (!S.wqOut.length) return "";
   return `<div class="panel wo"><div class="panel-b"><b>📤 الكتب المرسلة من «إنجاز» إلى وثيقة</b><span class="s">تُحفظ مسودة في السكرتارية تلقائياً (أيام الدوام، كل ساعتين)، ثم يراجعها المدير ويرسلها.</span>
     <div class="wo-l">${S.wqOut.slice(0, 20).map(o => { const st = WO_ST[o.status] || [o.status, ""]; return `<div class="wo-i"><span class="num">ك-${o.no}</span><div><b>${esc(o.subj)}</b><span class="s">${esc(o.to_whom)} · ${esc(pname(o.created_by))} · ${fmtTime(o.created_at)}${o.result ? " · " + esc(o.result) : ""}</span></div><span class="chip ${st[1]}">${st[0]}</span>${o.status === "pending" ? `<button type="button" class="lnk bad-t" data-wocancel="${o.id}">إلغاء</button>` : ""}</div>`; }).join("")}</div></div></div>`; }

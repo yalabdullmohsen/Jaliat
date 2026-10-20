@@ -237,7 +237,7 @@ function altSuggest(){
   for (const t of TIMES) { if (t === draft.time || (t.includes("الجمعة") && !friOnly)) continue; if (!clashes({ time:t })) out.push({ l:t, v:{ time:t } }); if (out.length >= 3) break; }
   if (!draft.daily && draft.days.length === 1) for (const d of WEEK) { if (d === draft.days[0] || (d !== 5 && (draft.time || "").includes("الجمعة"))) continue; if (!clashes({ days:[d] })) out.push({ l:`${DAYS[d]}${draft.time ? " · " + draft.time : ""}`, v:{ days:[d] } }); if (out.length >= 7) break; }
   S.form.alts = out;
-  box.innerHTML = out.length ? `<div class="sugg"><span class="lbl">مواعيد بديلة خالية من التعارض — اضغط للتطبيق</span>${out.map((o, i) => `<button type="button" data-alt="${i}">${esc(o.l)}</button>`).join("")}</div>` : "";
+  box.innerHTML = out.length ? `<div class="sugg"><span class="lbl">مواعيد بديلة خالية من التعارض، اضغط للتطبيق</span>${out.map((o, i) => `<button type="button" data-alt="${i}">${esc(o.l)}</button>`).join("")}</div>` : "";
 }
 const _saveAct = saveAct;
 saveAct = async function(){ const wasNew = !S.form?.id; await _saveAct(); if (wasNew && !S.form) LS.del("draft"); };
@@ -354,22 +354,22 @@ const AI_PROMPTS = [
 function aiContext(){
   const L = [], cl = x => String(x ?? "").replace(/\s+/g, " ").trim();
   const td = dOf(TODAY);
-  L.push(`اليوم: ${DAYS[td.getDay()]} ${fmt(TODAY)} م — ${hijri(td)}. أسبوع العمل يبدأ السبت.`);
+  L.push(`اليوم: ${DAYS[td.getDay()]} ${fmt(TODAY)} م، ${hijri(td)}. أسبوع العمل يبدأ السبت.`);
   L.push(`الأنواع: ${TYPES.join("، ")}. الحالات المحسوبة تلقائياً: جارٍ، ينتهي قريباً (خلال ${WARN_DAYS} يوماً)، قادم، منتهٍ، بلا تاريخ، مكتمل، مؤجل، ملغى.`);
-  L.push(`\n## الأنشطة (${S.E.length}) — الرقم | النوع | الجالية | المسجد — المنطقة — المحافظة | الأيام | الوقت | المحاضر | من | إلى | الحالة | الوثيقة | العنوان | يتعارض مع | ملاحظات`);
-  for (const e of S.E) L.push([`#${e.n}`, e.type, e.comm, [e.mosName, e.area, e.gov].filter(Boolean).join(" — "), daysText(e), e.time, e.lect, fmt(e.start), fmt(e.end), e.st, e.doc, e.title, e.cf.map(c => "#" + c.o.n).join("،"), cl(e.notes).slice(0, 160)].map(cl).join(" | "));
-  L.push(`\n## خطباء الجمعة (${S.khatibs.size}) — المسجد | المنطقة | المحافظة | الجالية | الخطيب الأساسي | هاتفه | الخطيب الاحتياط | هاتفه | ملاحظات`);
+  L.push(`\n## الأنشطة (${S.E.length})، الرقم | النوع | الجالية | المسجد، المنطقة، المحافظة | الأيام | الوقت | المحاضر | من | إلى | الحالة | الوثيقة | العنوان | يتعارض مع | ملاحظات`);
+  for (const e of S.E) L.push([`#${e.n}`, e.type, e.comm, [e.mosName, e.area, e.gov].filter(Boolean).join("، "), daysText(e), e.time, e.lect, fmt(e.start), fmt(e.end), e.st, e.doc, e.title, e.cf.map(c => "#" + c.o.n).join("،"), cl(e.notes).slice(0, 160)].map(cl).join(" | "));
+  L.push(`\n## خطباء الجمعة (${S.khatibs.size})، المسجد | المنطقة | المحافظة | الجالية | الخطيب الأساسي | هاتفه | الخطيب الاحتياط | هاتفه | ملاحظات`);
   for (const k of [...S.khatibs.values()].sort((a, b) => (a.n || 0) - (b.n || 0))) L.push([k.mosque, k.area, k.gov, k.label || k.comm, k.pri, k.pph, k.bak, k.bph, k.note].map(cl).join(" | "));
-  L.push(`\n## الوثائق والموافقات (${S.docs.length}) — الرقم | الموضوع | الجالية | من | إلى | ملاحظات`);
+  L.push(`\n## الوثائق والموافقات (${S.docs.length})، الرقم | الموضوع | الجالية | من | إلى | ملاحظات`);
   for (const d of S.docs) L.push([d.no, d.subj, d.comm, fmt(d.start), fmt(d.end), d.notes].map(cl).join(" | "));
-  L.push(`\n## المنسقون — الاسم | الصفة | الجالية | اللغة | الهاتف | الحالة`);
+  L.push(`\n## المنسقون، الاسم | الصفة | الجالية | اللغة | الهاتف | الحالة`);
   for (const c of S.coords) L.push([c.name, c.role, c.comm, c.lang, c.phone, c.status].map(cl).join(" | "));
   L.push(`\n## الجاليات (${S.comms.length}): ${commNames.join("، ")}`);
-  L.push(`\n## المساجد المسجلة (${S.mosques.length}) — المسجد | المنطقة | المحافظة`);
+  L.push(`\n## المساجد المسجلة (${S.mosques.length})، المسجد | المنطقة | المحافظة`);
   for (const m of S.mosques) L.push(["مسجد " + m.name, m.area, m.gov].map(cl).join(" | "));
-  L.push(`\n## الملاحظات — التاريخ | العنوان | الأولوية | الحالة | الجالية | التفاصيل`);
+  L.push(`\n## الملاحظات، التاريخ | العنوان | الأولوية | الحالة | الجالية | التفاصيل`);
   for (const n of S.notes.values()) L.push([fmt(n.date), n.title, n.prio, n.status, n.comm, cl(n.body).slice(0, 300)].map(cl).join(" | "));
-  L.push(`\n## المستخدمون: ${S.profiles.map(p => [p.name, p.title].filter(Boolean).join(" — ")).join("، ")}. المتصلون الآن: ${S.online.map(whoName).join("، ") || "—"}`);
+  L.push(`\n## المستخدمون: ${S.profiles.map(p => [p.name, p.title].filter(Boolean).join("، ")).join("، ")}. المتصلون الآن: ${S.online.map(whoName).join("، ") || "—"}`);
   return L.join("\n");
 }
 function mdInline(s){
@@ -401,7 +401,7 @@ function md(src){
   }
   return out.join("");
 }
-/* old Claude-API assistant page removed (v29) — «مساعد إنجاز» and Copilot replace it */
+/* old Claude-API assistant page removed (v29)، «مساعد إنجاز» and Copilot replace it */
 function afterRender(v){}
 
 /* ---------- clicks ---------- */
@@ -415,7 +415,7 @@ document.addEventListener("click", ev => {
   if (t.id === "theme") return toggleTheme();
   if (t.id === "collapse") return toggleMini();
   if (ds.xf !== undefined) return exportFiltered();
-  if (ds.dup !== undefined && S.form?.kind === "act") { const v = readAct(); const ty = S.form.type; closeDrawer(); actForm(undefined, { ...v, type:ty, status:"مجدول" }); toast("نسخة جديدة — عدّل ما يلزم ثم احفظ"); return; }
+  if (ds.dup !== undefined && S.form?.kind === "act") { const v = readAct(); const ty = S.form.type; closeDrawer(); actForm(undefined, { ...v, type:ty, status:"مجدول" }); toast("نسخة جديدة، عدّل ما يلزم ثم احفظ"); return; }
   if (ds.draft !== undefined) { const dr = LS.get("draft", null); $("#f-draft").innerHTML = ""; if (ds.draft === "1" && dr) fillAct(dr.v); else LS.del("draft"); return; }
   if (ds.fill !== undefined && S.form?.hist) { const h = S.form.hist; const v = { comm:h.comm, gov:h.gov, mosque:h.mosque, time:h.time, type:h.type }; if (!S.form.daily && !S.form.days.size && h.days?.length) Object.assign(v, { days:h.days, daily:h.daily }); fillAct(v); smartBox(""); toast("عُبّئت البيانات من آخر نشاط للمحاضر"); return; }
   if (ds.alt !== undefined && S.form?.alts) { const o = S.form.alts[+ds.alt]; if (o) { fillAct(o.v); toast("طُبّق الموعد البديل"); } return; }

@@ -21,12 +21,12 @@ function vRewardHist(){
       <div class="search"><svg><use href="#i-search"/></svg><input class="f" id="rhq" placeholder="ابحث بالاسم أو الرقم المدني أو الآيبان…" value="${esc(RH.q)}"></div>
       <button class="btn btn-primary" type="button" data-rhprint>${icon("i-doc")} طباعة كشوف البنوك</button><button class="btn" type="button" data-rhxls>${icon("i-down")} إكسل (ورقة لكل بنك)</button></div>
     <div class="kpis">${[["إجمالي المكافآت", kd(sum) + " د.ك"], ["عدد الخطباء", all.length], ["عدد الخطب", cnt], ["البنوك", G.length]].map(([a, b], i) => `<div class="kpi"><span>${a}</span><b class="num">${b}</b>${i === 0 && pr !== null ? `<span class="s">${sum >= pr ? "▲" : "▼"} ${kd(Math.abs(sum - pr))} عن ${monLabel(prev)}</span>` : ""}</div>`).join("")}</div>
-    ${bad ? `<div class="check warn"><b>${bad} آيبان يحتاج تحقق</b><span>طول الآيبان الكويتي 30 خانة — المظلل بالأصفر أقصر أو أطول (كما ورد في الكشف الأصلي).</span></div>` : ""}
+    ${bad ? `<div class="check warn"><b>${bad} آيبان يحتاج تحقق</b><span>طول الآيبان الكويتي 30 خانة، المظلل بالأصفر أقصر أو أطول (كما ورد في الكشف الأصلي).</span></div>` : ""}
     <div class="panel sr-sheet" id="sr-sheet">${G.map(([b, L]) => { const s = L.reduce((x, r) => x + +r.amount, 0), c = L.reduce((x, r) => x + r.count, 0);
-      return `<section class="rh-b"><div class="rh-h"><b>وزارة الشؤون الإسلامية — إدارة العلاقات الخارجية</b><span>قسم الجاليات ورعاية المهتدين وطلبة البعوث</span><h3>كشف مكافآت خطب الجمعة ${rhPeriod(RH.m)}</h3><h4>${esc(b)}</h4></div>
+      return `<section class="rh-b"><div class="rh-h"><b>وزارة الشؤون الإسلامية، إدارة العلاقات الخارجية</b><span>قسم الجاليات ورعاية المهتدين وطلبة البعوث</span><h3>كشف مكافآت خطب الجمعة ${rhPeriod(RH.m)}</h3><h4>${esc(b)}</h4></div>
         <div class="table-wrap"><table class="stbl rh-t"><thead><tr><th>م</th><th>اسم الخطيب</th><th>آيبان</th><th>الرقم المدني</th><th class="c">عدد الخطب</th><th class="c">المبلغ د.ك</th></tr></thead><tbody>
         ${L.map((r, i) => `<tr><td class="n">${i + 1}</td><td class="nm"><button type="button" class="lnk" data-rhp="${esc(r.cid)}">${esc(r.name)}</button></td><td class="num iban${ibanOk(r.iban) ? "" : " bad-i"}" dir="ltr">${esc(r.iban || "—")}</td><td class="num">${esc(r.cid)}</td><td class="c num">${r.count}</td><td class="c num">${kd(r.amount)}</td></tr>`).join("")}
-        </tbody><tfoot><tr><td></td><td class="nm">الإجمالي — ${L.length} خطيب</td><td></td><td></td><td class="c num">${c}</td><td class="c num">${kd(s)}</td></tr></tfoot></table></div>
+        </tbody><tfoot><tr><td></td><td class="nm">الإجمالي، ${L.length} خطيب</td><td></td><td></td><td class="c num">${c}</td><td class="c num">${kd(s)}</td></tr></tfoot></table></div>
         <div class="rh-sign"><span>مدير إدارة العلاقات الخارجية</span><i></i></div></section>`; }).join("")}</div>`; }
 function rhPerson(cid){ const L = RH.rows.filter(r => r.cid === cid).sort((a, b) => a.month.localeCompare(b.month)), k = RH.kb.get(cid) || L[0]; if (!k) return;
   const sum = L.reduce((s, r) => s + +r.amount, 0), cnt = L.reduce((s, r) => s + r.count, 0);
@@ -61,4 +61,4 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
   if (D.rhprint !== undefined) { document.body.classList.add("print-sheet"); setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove("print-sheet"), 500); }, 50); }
 });
 document.addEventListener("input", ev => { if (ev.target.id === "rhq") { RH.q = ev.target.value; const p = ev.target.selectionStart; render(); const i = $("#rhq"); if (i) { i.focus(); i.setSelectionRange(p, p); } } });
-NEWF.splice(1, 0, ["v38-rh", "nav:rewards", "كشوف البنوك في مكافآت الخطباء", "كشوف أبريل–يوليو 2026 أُدخلت (107 خطيب بالآيبان) — تظهر لجميع الموظفين، مقسّمة حسب البنك بنفس نموذج الإدارة: طباعة وإكسل لكل بنك، وسجل كل خطيب، واعتماد كشف الشهر الحالي بضغطة.", false, "2026-10-20"]);
+NEWF.splice(1, 0, ["v38-rh", "nav:rewards", "كشوف البنوك في مكافآت الخطباء", "كشوف أبريل–يوليو 2026 أُدخلت (107 خطيب بالآيبان)، تظهر لجميع الموظفين، مقسّمة حسب البنك بنفس نموذج الإدارة: طباعة وإكسل لكل بنك، وسجل كل خطيب، واعتماد كشف الشهر الحالي بضغطة.", false, "2026-10-20"]);

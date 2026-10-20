@@ -13,7 +13,7 @@ async function arStatusLine(){
   f.innerHTML = `النظام خاص بموظفي القسم. <button type="button" class="lnk" data-arnew>طلب إنشاء حساب</button>`;
   if (!r) return;
   const { data } = await sb.rpc("account_request_status", { p_id:r.id, p_username:r.u }).catch(() => ({}));
-  const m = { pending:["warn", "طلبك بانتظار موافقة مدير النظام"], approved:["ok", `تمت الموافقة على حسابك ✓ — ادخل باسم المستخدم «${r.u}» وكلمة المرور التي اخترتها`], rejected:["bad", "لم تتم الموافقة على طلب الحساب"] }[data];
+  const m = { pending:["warn", "طلبك بانتظار موافقة مدير النظام"], approved:["ok", `تمت الموافقة على حسابك ✓، ادخل باسم المستخدم «${r.u}» وكلمة المرور التي اخترتها`], rejected:["bad", "لم تتم الموافقة على طلب الحساب"] }[data];
   if (!m) return;
   f.insertAdjacentHTML("beforebegin", `<div class="ar-st ${m[0]}" id="ar-st">${esc(m[1])}${data !== "pending" ? ` <button type="button" class="lnk" data-arclear>إخفاء</button>` : ""}</div>`);
   if (data === "approved") { $("#lg-user").value = r.u; }
@@ -58,8 +58,8 @@ function arView(id){
   S.form = { kind:"acctreq", id };
   openDrawer("طلب إنشاء حساب", `<div class="q-meta"><b>${esc(r.name)}</b><span class="s">${esc(r.title || "")}</span><span class="s" dir="ltr">${esc(r.username)}${r.phone ? " · " + esc(r.phone) : ""}</span><span class="s">أُرسل ${ago(r.created_at)}</span></div>
     ${r.status !== "pending" ? `<div class="check ${r.status === "approved" ? "ok" : "warn"}"><b>${r.status === "approved" ? "تمت الموافقة" : "مرفوض"}</b>${r.decided_by ? `<span>بواسطة ${esc(pname(r.decided_by))}</span>` : ""}</div>` :
-    `${fld("ar-role", "الصلاحية عند الموافقة", `<select class="f" id="ar-role"><option value="editor" selected>محرر — يضيف ويعدّل</option><option value="viewer">مشاهد — عرض فقط</option><option value="admin">مدير</option></select>`)}
-    <span class="hint">كلمة المرور اختارها صاحب الطلب ومحفوظة مشفّرة — لا يطّلع عليها أحد.</span>`}`,
+    `${fld("ar-role", "الصلاحية عند الموافقة", `<select class="f" id="ar-role"><option value="editor" selected>محرر، يضيف ويعدّل</option><option value="viewer">مشاهد، عرض فقط</option><option value="admin">مدير</option></select>`)}
+    <span class="hint">كلمة المرور اختارها صاحب الطلب ومحفوظة مشفّرة، لا يطّلع عليها أحد.</span>`}`,
     r.status === "pending" ? `<button class="btn btn-ok" data-arok="${r.id}">موافق</button><button class="btn btn-ghost bad-t" data-arno="${r.id}">غير موافق</button><button class="btn btn-ghost" data-close>لاحقاً</button>` : `<button class="btn btn-ghost" data-close>إغلاق</button>`);
 }
 async function arDecide(id, ok, btn){
@@ -68,7 +68,7 @@ async function arDecide(id, ok, btn){
   btn.disabled = false;
   if (error || data?.error) { let m = data?.error; if (!m) { try { m = (await error.context.json()).error; } catch (_) { m = "تعذّر التنفيذ"; } } return toast(m); }
   const r = S.acctReqs.find(x => x.id === id); if (r) r.status = ok ? "approved" : "rejected";
-  closeDrawer(); toast(ok ? "أُنشئ الحساب ✓ — يقدر صاحبه يدخل الآن" : "رُفض الطلب"); if (/مسبقاً/.test("")) {}; if (ok) loadProfiles?.(); render();
+  closeDrawer(); toast(ok ? "أُنشئ الحساب ✓، يقدر صاحبه يدخل الآن" : "رُفض الطلب"); if (/مسبقاً/.test("")) {}; if (ok) loadProfiles?.(); render();
 }
 let arCh = null;
 const _boot9a = boot9;

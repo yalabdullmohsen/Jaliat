@@ -1,4 +1,4 @@
-/* ================= v25/v26: internal messaging — a fixed, app-like chat (incremental updates, read receipts, typing) ================= */
+/* ================= v25/v26: internal messaging، a fixed, app-like chat (incremental updates, read receipts, typing) ================= */
 Object.assign(TITLES, { chat:"المحادثات" });
 NK.push(["chat_msg", "رسائل المحادثات الخاصة"], ["chat_team", "رسائل محادثة القسم", true]);
 NKIND.unshift(["chat", "i-chat", "--primary", "محادثة"]);
@@ -65,7 +65,7 @@ function chHead(){
 function chMsgsHTML(){
   const sel = S.chatPeer, conv = convOf(sel), team = sel === "team";
   const L = S.chat.filter(m => m.conv === conv).slice(0, 600).sort((a, b) => a.created_at.localeCompare(b.created_at));
-  if (!L.length) return `<div class="ch-empty">${chAv(sel, "lg")}<b>${esc(chatName(sel))}</b><span>${team ? "رسالتك هنا تصل لجميع موظفي القسم." : "ابدأ المحادثة — الرسائل خاصة بينكما فقط."}</span></div>`;
+  if (!L.length) return `<div class="ch-empty">${chAv(sel, "lg")}<b>${esc(chatName(sel))}</b><span>${team ? "رسالتك هنا تصل لجميع موظفي القسم." : "ابدأ المحادثة، الرسائل خاصة بينكما فقط."}</span></div>`;
   const firstUnread = S.chatReads[conv] ? L.find(m => m.from_id !== S.me.id && m.created_at > S.chatReads[conv]) : null;
   const peerRead = S.peerReads[conv] || "";
   let out = "", day = "";
@@ -86,7 +86,7 @@ function chMsgsHTML(){
   const lastMine = !team && [...L].reverse().find(m => m.from_id === S.me.id && !m.deleted && m.id > 0);
   if (lastMine && L[L.length - 1] === lastMine) out += peerRead >= lastMine.created_at
     ? `<div class="ch-seen read"><span class="ch-tick read">✓✓</span> قُرئت ${chWhen(peerRead) === chClock(peerRead) ? "الساعة " + chClock(peerRead) : chWhen(peerRead)}</div>`
-    : `<div class="ch-seen"><span class="ch-tick">✓✓</span> أُرسلت — لم تُقرأ بعد</div>`;
+    : `<div class="ch-seen"><span class="ch-tick">✓✓</span> أُرسلت، لم تُقرأ بعد</div>`;
   return out;
 }
 function chMain(keepDraft){
@@ -114,7 +114,7 @@ function chSize(){ const r = $("#ch-root"); if (!r) return; const vv = window.vi
 window.visualViewport?.addEventListener("resize", () => { if (S.view === "chat") { chSize(); if (chNearBottom()) chToBottom(true); } });
 window.addEventListener("resize", () => { if (S.view === "chat") chSize(); });
 
-/* the generic render() would rebuild the page on every live update — in the chat we update in place instead */
+/* the generic render() would rebuild the page on every live update، in the chat we update in place instead */
 const _render25 = render;
 render = function(){
   if (S.view === "chat" && $("#ch-root") && S.got.size >= 7) { chList(); chatBadge(); if (S.chatPeer && $("#ch-th")) { $("#ch-head").innerHTML = chHead(); chThread(); } return; }
@@ -158,7 +158,7 @@ async function chatSend(){
   const tmp = { ...row, id:-Date.now(), created_at:new Date().toISOString() }; S.chat = [tmp, ...S.chat]; chThread(); chToBottom(); chList(); i.focus();
   const { data, error } = await sb.from("chat_messages").insert(row).select().single();
   S.chat = S.chat.filter(m => m.id !== tmp.id);
-  if (error) { toast("تعذّر الإرسال — تحقق من الاتصال"); if (!i.value) { i.value = body; chFit(); } chThread(); return; }
+  if (error) { toast("تعذّر الإرسال، تحقق من الاتصال"); if (!i.value) { i.value = body; chFit(); } chThread(); return; }
   if (!S.chat.some(m => m.id === data.id)) S.chat = [data, ...S.chat];
   S.chatReads[conv] = data.created_at; sb.from("chat_reads").upsert({ user_id:S.me.id, conv, last_read:data.created_at }).then(() => {});
   if (S.chatPeer === peer) { chThread(); chToBottom(); } chList();
@@ -190,7 +190,7 @@ const _prio25 = priorities;
 priorities = function(){ const P = _prio25(); const n = chatUnreadAll(); if (n) P.push({ w:90, k:"t1", t:`${n} رسالة غير مقروءة في المحادثات`, s:"من زملائك في القسم", act:{ go:"chat", l:"المحادثات" } }); return P.sort((a, b) => b.w - a.w); };
 const _palAll25 = palAll;
 palAll = function(){ const A = _palAll25(); for (const p of S.profiles.filter(p => p.active && p.id !== S.me.id)) A.push({ g:"المحادثات", t:`مراسلة ${p.name || p.username}`, s:p.title || "", ic:"i-chat", run:() => openChat(p.id), txt:"محادثة رسالة مراسلة " + (p.name || "") + " " + p.username }); return A; };
-NEWF.splice(2, 0, ["v25-chat", "nav:chat", "المحادثات الداخلية", "راسل أي زميل برسالة خاصة، أو اكتب في «محادثة القسم» للجميع — مع إشعار فوري وعلامة القراءة ✓✓."]);
+NEWF.splice(2, 0, ["v25-chat", "nav:chat", "المحادثات الداخلية", "راسل أي زميل برسالة خاصة، أو اكتب في «محادثة القسم» للجميع، مع إشعار فوري وعلامة القراءة ✓✓."]);
 document.addEventListener("submit", ev => { if (ev.target.id === "ch-form") { ev.preventDefault(); chatSend(); } });
 document.addEventListener("keydown", ev => { if (ev.target.id === "ch-in" && ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && !matchMedia("(pointer:coarse)").matches) { ev.preventDefault(); chatSend(); } if (ev.key === "Escape" && S.view === "chat" && S.chatPeer && innerWidth < 820) { S.chatPeer = null; chMain(); chList(); chSize(); } });
 document.addEventListener("input", ev => { if (ev.target.id === "ch-in") { chFit(); chTyping(); } if (ev.target.id === "ch-q") chList(); });

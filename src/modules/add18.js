@@ -19,7 +19,7 @@ function grantForm(preset){
     <div class="check"><b>الموظف يأخذ صلاحية إصدار هذا التصريح فقط</b><span>لا يستطيع تغيير اسم الشيخ أو المسجد، ولا إصدار أي تصريح آخر. تصله مهمة وإشعار، وتُغلق المهمة تلقائياً عند الإصدار.</span></div>
     ${fld("g-to", "الموظف المفوَّض", `<select class="f" id="g-to">${people.map(p => `<option value="${p.id}">${esc(p.name || p.username)}</option>`).join("")}</select>`)}
     ${fld("p-sheikh", "اسم الشيخ", `<input class="f" id="p-sheikh" value="${esc(d.sheikh)}">`)}
-    ${fld("p-mosque", "المسجد والمنطقة", `<input class="f" id="p-mosque" value="${esc(d.mosque)}" list="p-mos"><datalist id="p-mos">${S.mosques.map(m => `<option value="${esc("مسجد " + m.name + (m.area ? " — " + m.area : ""))}">`).join("")}</datalist>`)}
+    ${fld("p-mosque", "المسجد والمنطقة", `<input class="f" id="p-mosque" value="${esc(d.mosque)}" list="p-mos"><datalist id="p-mos">${S.mosques.map(m => `<option value="${esc("مسجد " + m.name + (m.area ? "، " + m.area : ""))}">`).join("")}</datalist>`)}
     <div class="g2">${fld("p-topic", "عنوان الدرس (اختياري)", `<input class="f" id="p-topic" value="${esc(d.topic)}">`)}${fld("p-lang", "اللغة (اختياري)", `<input class="f" id="p-lang" value="${esc(d.lang)}">`)}</div>
     <div class="g3">${fld("p-date", "تاريخ الدرس", `<input class="f" type="date" id="p-date" value="${esc(d.date)}">`)}${fld("p-from", "من", `<input class="f" type="time" id="p-from" value="${esc(d.t_from)}">`)}${fld("p-to", "إلى", `<input class="f" type="time" id="p-to" value="${esc(d.t_to)}">`)}</div>
     <div class="g2">${fld("p-dur", "أقصى مدة للتصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("g-note", "توجيه للموظف (اختياري)", `<input class="f" id="g-note" placeholder="مثال: بناءً على كتاب وثيقة 2608-2957">`)}</div>`,
@@ -31,7 +31,7 @@ async function grantSave(){
   const dur = DUR.find(x => x[0] === v("p-dur")) || DUR[0];
   const preset = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), dur:dur[0], until:addDays(v("p-date"), dur[2] - 1), head:S.pAssets.head || "فايز رزقان الرشيدي", act_id:S.form?.act || "" };
   const { data:g, error } = await sb.from("permit_grants").insert({ grantee:v("g-to"), preset, source:S.form?.src || "", note:v("g-note"), expires:addDays(v("p-date"), 3) }).select().single(); if (error) return writeFail(error);
-  const { data:t, error:e2 } = await sb.from("tasks").insert({ title:`إصدار تصريح درس — ${preset.sheikh}`, details:`${preset.mosque}\nتاريخ الدرس: ${fmt(preset.date)}${g.note ? "\n" + g.note : ""}\nصلاحيتك على هذا التصريح فقط.`, assignee:g.grantee, due:preset.date, prio:"عالية", link:`#pgrant:${g.id}` }).select().single();
+  const { data:t, error:e2 } = await sb.from("tasks").insert({ title:`إصدار تصريح درس، ${preset.sheikh}`, details:`${preset.mosque}\nتاريخ الدرس: ${fmt(preset.date)}${g.note ? "\n" + g.note : ""}\nصلاحيتك على هذا التصريح فقط.`, assignee:g.grantee, due:preset.date, prio:"عالية", link:`#pgrant:${g.id}` }).select().single();
   if (!e2 && t) { await sb.from("permit_grants").update({ task_id:t.id }).eq("id", g.id); g.task_id = t.id; S.tasks = [t, ...S.tasks]; }
   S.grants = [g, ...S.grants.filter(x => x.id !== g.id)]; closeDrawer(); render(); toast(`فُوِّض ${pname(g.grantee)} بإصدار التصريح ووصله إشعار`);
 }

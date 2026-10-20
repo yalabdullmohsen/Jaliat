@@ -1,4 +1,4 @@
-/* ================= v20: one connected system — every record shows what it is linked to ================= */
+/* ================= v20: one connected system، every record shows what it is linked to ================= */
 const LK = {
   wqDoc:no => no ? S.wq.filter(w => w.no === no || (w.refs || []).includes(no)) : [],
   wqComm:c => c ? S.wq.filter(w => wqComm(w) === c) : [],
@@ -11,10 +11,10 @@ const LK = {
 const uniq = (a, k = x => x.id) => { const s = new Set(); return a.filter(x => { const v = k(x); if (s.has(v)) return false; s.add(v); return true; }); };
 function lkRow(icon_, t, s, open, chip){ return `<button type="button" class="lk-i" ${open.startsWith("go:") ? `data-go="${open.slice(3)}"` : `data-prio-open="${esc(open)}"`}><svg><use href="#${icon_}"/></svg><span class="lk-t"><b>${esc(t)}</b>${s ? `<span class="s">${esc(s)}</span>` : ""}</span>${chip || ""}</button>`; }
 function lkPanel(title, rows){ rows = rows.filter(Boolean); return rows.length ? `<div class="lk"><div class="lk-h">${icon("i-link", 15)} ${esc(title)} <span class="num">${rows.length}</span></div>${rows.join("")}</div>` : ""; }
-const wqRow = w => lkRow("i-doc", `${w.no} — ${w.subj || ""}`, `${fmt(wqDate(w))} · ${w.sender || ""}`, `wq:${w.id}`, w.approval ? `<span class="chip ok">لا مانع</span>` : "");
-const pmRow = p => { const [st, c] = pStatus(p); return lkRow("i-qr", `تصريح ${p.no} — ${p.data?.sheikh || ""}`, `${p.data?.mosque || ""} · حتى ${fmt(p.until)}`, `permit:${p.id}`, `<span class="chip ${c}">${st}</span>`); };
-const tkRow = t => lkRow("i-list", `مهمة #${t.no} — ${t.title}`, `${pname(t.assignee)} · ${t.status}`, `task:${t.id}`);
-const rqRow = r => lkRow("i-inbox", `طلب ط-${r.no} — ${r.data?.subj || r.data?.org || ""}`, `${r.data?.coord || ""} · ${r.status}`, `req:${r.id}`);
+const wqRow = w => lkRow("i-doc", `${w.no}، ${w.subj || ""}`, `${fmt(wqDate(w))} · ${w.sender || ""}`, `wq:${w.id}`, w.approval ? `<span class="chip ok">لا مانع</span>` : "");
+const pmRow = p => { const [st, c] = pStatus(p); return lkRow("i-qr", `تصريح ${p.no}، ${p.data?.sheikh || ""}`, `${p.data?.mosque || ""} · حتى ${fmt(p.until)}`, `permit:${p.id}`, `<span class="chip ${c}">${st}</span>`); };
+const tkRow = t => lkRow("i-list", `مهمة #${t.no}، ${t.title}`, `${pname(t.assignee)} · ${t.status}`, `task:${t.id}`);
+const rqRow = r => lkRow("i-inbox", `طلب ط-${r.no}، ${r.data?.subj || r.data?.org || ""}`, `${r.data?.coord || ""} · ${r.status}`, `req:${r.id}`);
 const waRow = (ph, L) => { const last = L[0]; return lkRow("i-wa", `محادثة واتساب +${waKey(ph)}`, `${L.length} رسالة · آخرها ${last ? waTime(last.created_at) : ""}`, "go:whatsapp"); };
 
 /* activity drawer: approval letter, permits, tasks, coordinator chat */
@@ -38,7 +38,7 @@ vComm = function(){ const h = _vComm20(), c = S.comm; const acts = S.E.filter(e 
   const perms = uniq(acts.flatMap(LK.permAct)).filter(p => pStatus(p)[0] === "ساري");
   const chats = S.coords.filter(x => x.comm === c && x.phone).map(x => [x.phone, LK.waPhone(x.phone)]).filter(([, L]) => L.length);
   const docs = S.docs.filter(d => d.comm === c && d.end >= TODAY);
-  const body = [lkPanel("موافقات سارية", docs.map(d => lkRow("i-doc", `${d.no} — ${d.subj || ""}`, `حتى ${fmt(d.end)}`, `doc:${d.no}`))),
+  const body = [lkPanel("موافقات سارية", docs.map(d => lkRow("i-doc", `${d.no}، ${d.subj || ""}`, `حتى ${fmt(d.end)}`, `doc:${d.no}`))),
     lkPanel("كتب وثيقة", LK.wqComm(c).slice(0, 8).map(wqRow)), lkPanel("طلبات مفتوحة", LK.reqsComm(c).map(rqRow)),
     lkPanel("تصاريح سارية", perms.map(pmRow)), lkPanel("محادثات واتساب", chats.map(([p, L]) => waRow(p, L)))].join("");
   if (!body) return h;
@@ -48,7 +48,7 @@ vComm = function(){ const h = _vComm20(), c = S.comm; const acts = S.E.filter(e 
 async function wqAddAll(){
   const L = S.wq.filter(w => w.approval && w.no && !docBy[w.no] && !(w.refs || []).some(r => docBy[r]));
   if (!L.length) return toast("لا توجد موافقات غير مسجلة");
-  const add = L.map(w => { const start = wqDate(w) || TODAY; return { no:w.no, date:start, subj:w.subj || "موافقة", comm:wqComm(w), start, end:addMonths(start, 6), notes:"من نظام وثيقة — " + (w.signer || "") }; });
+  const add = L.map(w => { const start = wqDate(w) || TODAY; return { no:w.no, date:start, subj:w.subj || "موافقة", comm:wqComm(w), start, end:addMonths(start, 6), notes:"من نظام وثيقة، " + (w.signer || "") }; });
   try { await T.ref("docs", [...S.docs, ...add]); toast(`سُجّلت ${add.length} موافقة في النظام`); render(); } catch (e) { writeFail(e); }
 }
 const _vWatheqa20 = vWatheqa;
@@ -70,8 +70,8 @@ vHome = function(){ const h = _vHome20(); const i = h.indexOf('<div class="kpis'
 /* assistant: knows the new parts too */
 const _answer20 = answer;
 answer = function(q){ const t = norm(q); const R = (title, items, extra) => ({ title, items:items || [], extra:extra || "" });
-  if (/تصريح|تصاريح/.test(t) && !/تفويض/.test(t)) { const L = S.permits.filter(p => pStatus(p)[0] === "ساري"); return R(`التصاريح السارية (${L.length})`, L.map(p => ({ t:`${p.no} — ${p.data?.sheikh || ""}`, s:`${p.data?.mosque || ""} · حتى ${fmt(p.until)}`, open:`permit:${p.id}` })), S.admin ? "لإصدار تصريح جديد: صفحة «تصاريح الدروس»." : ""); }
-  if (/تفويض/.test(t)) { const L = S.grants.filter(gOpen); return R(`التفويضات المعلّقة (${L.length})`, L.map(g => ({ t:`${g.preset?.sheikh || ""} — ${pname(g.grantee)}`, s:`${g.preset?.mosque || ""} · حتى ${fmt(g.expires)}`, open:`pgrant:${g.id}` }))); }
+  if (/تصريح|تصاريح/.test(t) && !/تفويض/.test(t)) { const L = S.permits.filter(p => pStatus(p)[0] === "ساري"); return R(`التصاريح السارية (${L.length})`, L.map(p => ({ t:`${p.no}، ${p.data?.sheikh || ""}`, s:`${p.data?.mosque || ""} · حتى ${fmt(p.until)}`, open:`permit:${p.id}` })), S.admin ? "لإصدار تصريح جديد: صفحة «تصاريح الدروس»." : ""); }
+  if (/تفويض/.test(t)) { const L = S.grants.filter(gOpen); return R(`التفويضات المعلّقة (${L.length})`, L.map(g => ({ t:`${g.preset?.sheikh || ""}، ${pname(g.grantee)}`, s:`${g.preset?.mosque || ""} · حتى ${fmt(g.expires)}`, open:`pgrant:${g.id}` }))); }
   if (/واتساب|واتس/.test(t)) { const T = waThreads().slice(0, 15); return R(`محادثات واتساب (${waUnread()} بانتظار الرد)`, T.map(x => ({ t:x.name || waWho(x.phone) || "+" + x.phone, s:String(x.last.body || "مرفق").slice(0, 80), go:"whatsapp" }))); }
   return _answer20(q); };
 SUGG.splice(5, 0, ["التصاريح السارية", "i-qr", "التصاريح السارية"]);
