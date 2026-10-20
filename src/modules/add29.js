@@ -153,6 +153,9 @@ function ngApply(){ let st = {}; try { st = JSON.parse(localStorage.getItem("ng"
   document.querySelectorAll("#nav .ng").forEach(g => { const cur = g.querySelector('[aria-current="page"]'); const cl = !cur && (st[g.dataset.g] === undefined ? true : !!st[g.dataset.g]); g.classList.toggle("cl", cl); g.querySelector(".sep")?.setAttribute("aria-expanded", String(!cl));
     const sp = g.querySelector(".sep"); if (sp) { const n = [...g.querySelectorAll(".ng-b .nb")].reduce((a, b) => a + (parseInt(b.textContent) || 0), 0); let d = sp.querySelector(".ng-n"); if (!d) { d = document.createElement("i"); d.className = "ng-n"; sp.appendChild(d); } d.textContent = n || ""; d.hidden = !n || !cl; } }); }
 document.addEventListener("click", ev => { const b = ev.target.closest("#nav [data-ng]"); if (!b) return; ev.stopPropagation(); const g = b.closest(".ng"); const cl = !g.classList.contains("cl");
-  g.classList.toggle("cl", cl); b.setAttribute("aria-expanded", String(!cl)); let st = {}; try { st = JSON.parse(localStorage.getItem("ng") || "{}"); } catch (_) {} st[g.dataset.g] = cl; try { localStorage.setItem("ng", JSON.stringify(st)); } catch (_) {} }, true);
+  g.classList.toggle("cl", cl); b.setAttribute("aria-expanded", String(!cl)); let st = {}; try { st = JSON.parse(localStorage.getItem("ng") || "{}"); } catch (_) {} st[g.dataset.g] = cl;
+  // accordion: opening a group folds the others (except the one holding the open page) so the list stays short
+  if (!cl) document.querySelectorAll("#nav .ng").forEach(o => { if (o !== g && !o.querySelector('[aria-current="page"]')) { o.classList.add("cl"); o.querySelector(".sep")?.setAttribute("aria-expanded", "false"); st[o.dataset.g] = true; } });
+  try { localStorage.setItem("ng", JSON.stringify(st)); } catch (_) {} ngApply(); }, true);
 const _afterRender29ng = afterRender;
 afterRender = function(v){ _afterRender29ng(v); ngApply(); };

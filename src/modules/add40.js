@@ -63,3 +63,31 @@ afterRender = function(v){ _afterRender43(v); backBtn(); };
   document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
   addEventListener("focus", check); setInterval(check, 5 * 60e3);
 })();
+
+/* ================= v47: notifications on EVERY device — a clear card until this device receives them ================= */
+const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+function pushCard(){ try { if (+localStorage.getItem("push-later") > Date.now()) return ""; } catch (_) {}
+  if (S.push.on) return "";
+  if (isIOS() && !isStandalone()) return `<div class="check pc"><b>لتصلك إشعارات «إنجاز» على الآيفون</b><span>اضغط زر المشاركة <b>⬆</b> في Safari ثم <b>«إضافة إلى الشاشة الرئيسية»</b>، وافتح «إنجاز» من أيقونته وفعّل الإشعارات — مرة واحدة.</span><div class="br-acts"><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`;
+  if (!S.push.sup) return "";
+  if ("Notification" in window && Notification.permission === "denied") return `<div class="check pc"><b>الإشعارات موقوفة على هذا الجهاز</b><span>فعّلها من إعدادات المتصفح أو الجهاز لموقع «إنجاز»، ثم حدّث الصفحة.</span></div>`;
+  return `<div class="check pc"><b>فعّل الإشعارات على هذا الجهاز</b><span>تصلك المهام والقرارات وموافقات وثيقة فوراً، حتى و«إنجاز» مغلق.</span><div class="br-acts"><button type="button" class="btn btn-primary" data-pushon>تفعيل الإشعارات</button><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`; }
+const _vHome47 = vHome;
+vHome = function(){ return pushCard() + _vHome47(); };
+document.addEventListener("click", async ev => { const t = ev.target.closest("[data-pushlater]"); if (t) { try { localStorage.setItem("push-later", Date.now() + 7 * 864e5); } catch (_) {} return render(); }
+  if (ev.target.closest(".pc [data-pushon]")) { setTimeout(() => S.view === "home" && render(), 1500); } });
+
+/* ================= v48: sidebar «الأكثر استخداماً» — the pages each employee opens most, one tap away ================= */
+const NAVF_SKIP = new Set(["home", "copilot"]);
+const _go48 = go;
+go = function(v, ...a){ if (v && !NAVF_SKIP.has(v)) { try { const f = JSON.parse(localStorage.getItem("navf") || "{}"); f[v] = (f[v] || 0) + 1; localStorage.setItem("navf", JSON.stringify(f)); } catch (_) {} } return _go48(v, ...a); };
+function navFav(){ const nav = $("#nav"); if (!nav) return; let f = {}; try { f = JSON.parse(localStorage.getItem("navf") || "{}"); } catch (_) {}
+  const top = Object.entries(f).filter(([k, n]) => n >= 2 && nav.querySelector(`.ng button[data-nav="${k}"]`)).sort((a, b) => b[1] - a[1]).slice(0, 4).map(x => x[0]);
+  const sig = top.join(","); let box = $("#nav-fav"); if (box && box.dataset.sig === sig) return markFav(); box?.remove(); if (!top.length) return;
+  const html = top.map(k => { const b = nav.querySelector(`.ng button[data-nav="${k}"]`).cloneNode(true); b.querySelector(".nb")?.remove(); b.classList.add("fav"); return b.outerHTML; }).join("");
+  const after = nav.querySelector('button[data-nav="copilot"]') || nav.querySelector('button[data-nav="home"]');
+  after?.insertAdjacentHTML("afterend", `<div id="nav-fav" data-sig="${sig}"><div class="fav-h">الأكثر استخداماً</div>${html}</div>`); markFav(); }
+function markFav(){ document.querySelectorAll("#nav-fav button[data-nav]").forEach(b => b.setAttribute("aria-current", b.dataset.nav === S.view ? "page" : "false")); }
+const _afterRender48 = afterRender;
+afterRender = function(v){ _afterRender48(v); navFav(); };
