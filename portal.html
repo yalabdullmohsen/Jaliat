@@ -112,6 +112,14 @@ details summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--g);l
 .ov-in{display:grid;justify-items:center;gap:12px;text-align:center;max-width:340px}.ov-dot{width:14px;height:14px;border-radius:50%;background:#c0392b;animation:ovp 1.6s infinite}
 @keyframes ovp{50%{opacity:.25}}.ov-l{font-size:15px;color:#9aa5a0}#ov-t{font-size:56px;font-weight:600;font-variant-numeric:tabular-nums;color:#e9ecea;letter-spacing:1px}
 .ov-m{font-size:13px;color:#7d8883}.ov-in p{font-size:13px;line-height:1.9;color:#6f7a75;margin:6px 0 10px}.ov-stop{border:1px solid #3a3f3d;background:#111;color:#e9ecea;border-radius:14px;height:52px;padding:0 28px;font:inherit;font-weight:600;font-size:16px}
+@keyframes fx-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#app.fx>*{animation:fx-up .32s cubic-bezier(.2,.7,.2,1) both}#app.fx>*:nth-child(2){animation-delay:.04s}#app.fx>*:nth-child(3){animation-delay:.08s}#app.fx>*:nth-child(4){animation-delay:.12s}#app.fx>*:nth-child(n+5){animation-delay:.16s}
+.btn,.seg button,.tabs button,.days button,.jr-s,.rowb .row{transition:background-color .18s,border-color .18s,color .18s,box-shadow .2s,transform .18s}
+.btn:active,.seg button:active,.tabs button:active,.days button:active{transform:scale(.97)}
+.rowb:hover .row{background:color-mix(in srgb,var(--gs) 55%,transparent)}
+.tabs button.on svg{animation:fx-tab .35s cubic-bezier(.2,.7,.2,1)}@keyframes fx-tab{40%{transform:translateY(-3px)}}
+.jr-d{animation:fx-up .25s ease both}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 .spin{display:grid;place-items:center;padding:60px 0;color:var(--mu)}
 </style></head><body>
 <header class="bar"><div class="bar-in"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><div class="bar-t"><b>بوابة المنسقين</b><small id="cm">قسم الجاليات ورعاية المهتدين وطلبة البعوث</small></div><button type="button" class="av" id="av" hidden data-tab="me"></button></div></header>
@@ -279,7 +287,7 @@ h+='<p class="note" style="margin:0 2px 10px">بيانات منسقي الجال
 if(s==="ap"){const P=I.approvals||[];h+=P.length?'<div class="card list">'+P.map(a=>'<div class="row"><div class="tx"><b><bdi dir="ltr">'+e(a.no)+'</bdi></b><span class="sub">'+e(a.subj||"موافقة نشاط")+'</span></div><span class="pill '+(left(a.end)<=45?"w":"")+'">حتى '+fd(a.end)+'</span></div>').join("")+'</div>':'<div class="card empty">لا توجد موافقات سارية.</div>'}
 return h}
 
-function draw(x){nav();const app=$("app");app.innerHTML=x||(tab==="home"?vHome():tab==="new"?vNew():tab==="acts"?vActs():tab==="msg"?vMsg():vMe());window.scrollTo(0,0)}
+let FXK="";function draw(x){nav();const app=$("app");const k=tab+"|"+(x?String(x).slice(0,60):sub[tab]||"");if(k!==FXK){FXK=k;app.classList.remove("fx");void app.offsetWidth;app.classList.add("fx");clearTimeout(app._fx);app._fx=setTimeout(()=>app.classList.remove("fx"),700)}app.innerHTML=x||(tab==="home"?vHome():tab==="new"?vNew():tab==="acts"?vActs():tab==="msg"?vMsg():vMe());window.scrollTo(0,0)}
 function done(no,t,d){FILES=[];draw('<div class="card ok-box">'+okIc+'<h2>'+t+'</h2>'+(no?'<span class="no">رقم الطلب '+no+'</span>':'')+'<p>'+(d||"تتابعون حالة الطلب وردّ القسم من الرئيسية.")+'</p><button class="btn s" data-tab="home" style="max-width:220px">العودة للرئيسية</button></div>');reload()}
 async function reload(){try{const j=await rpc("portal_me",{p_s:S_});if(j.ok)I=j}catch(_){}}
 

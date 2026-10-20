@@ -161,3 +161,22 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .lmap{height:calc(100vh - 220px);min-height:420px;border-radius:16px;border:1px solid var(--line);overflow:hidden;margin-top:10px;z-index:0}
 .lm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 8px 0 3px;vertical-align:middle}
 .ft-tr{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* ---------- motion: quiet, short, and only when a page is entered ---------- */
+@keyframes fx-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fx-in{from{opacity:0}to{opacity:1}}
+@keyframes fx-pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+#view.fx-enter>*{animation:fx-up .32s cubic-bezier(.2,.7,.2,1) both}
+#view.fx-enter>*:nth-child(2){animation-delay:.04s}#view.fx-enter>*:nth-child(3){animation-delay:.08s}#view.fx-enter>*:nth-child(4){animation-delay:.12s}#view.fx-enter>*:nth-child(5){animation-delay:.16s}#view.fx-enter>*:nth-child(n+6){animation-delay:.2s}
+#view.fx-enter .wq-tile,#view.fx-enter .kpi{animation:fx-pop .3s cubic-bezier(.2,.7,.2,1) both}
+#view.fx-enter .wq-tiles>*:nth-child(2){animation-delay:.05s}#view.fx-enter .wq-tiles>*:nth-child(3){animation-delay:.1s}#view.fx-enter .wq-tiles>*:nth-child(4){animation-delay:.15s}
+.drawer:not([hidden]){animation:fx-drawer .28s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fx-drawer{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.scrim:not([hidden]){animation:fx-in .2s ease both}
+.toast{transition:transform .25s cubic-bezier(.2,.7,.2,1),opacity .25s}
+.btn,.seg button,.nav button,.chip,.wq-tile,.pv-r,.rq-card,.li,.prio-i{transition:background-color .18s,border-color .18s,color .18s,box-shadow .2s,transform .18s}
+.btn:active,.seg button:active,.nav button:active{transform:scale(.97)}
+.wq-tile:hover,.rq-card:hover{transform:translateY(-2px);box-shadow:0 1px 2px rgba(20,32,27,.05),0 16px 32px -16px rgba(20,32,27,.18)!important}
+.pv-r:hover,.prio-i:hover{background:color-mix(in srgb,var(--primary-soft) 40%,transparent)}
+.nav button:hover svg{transform:translateX(-2px)}.nav button svg{transition:transform .18s}
+.ng-b{transition:opacity .2s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
