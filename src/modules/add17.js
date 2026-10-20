@@ -41,12 +41,20 @@ function wqStage(w, reply){ const tr = S.wqt.get(w.id); if (tr) return tr.state;
   if (wqDir(w) === "out") { const r = reply.get(w.id); if (!r) return "follow"; return !wqIsJal(w) || S.wqn?.has(r.id) || S.wqn?.has(w.id) || (typeof wqNeeds === "function" && !wqNeeds(r)) ? "done" : "follow"; }
   return typeof wqNeeds === "function" && wqNeeds(w) ? "follow" : S.wqn?.has(w.id) ? "done" : ""; }
 const WQ_STG = { follow:["قيد المتابعة", "warn"], done:["منجز ✓", "ok"] };
+/* search: a letter is found by its number, subject, sides, text — and by the community and coordinator it concerns */
+const _wqK = new WeakMap();
+function wqWho2(w){ const d = docBy[w.no] || (w.refs || []).map(r => docBy[r]).find(Boolean), out = [];
+  const cm = wqCommName(w), lang = cm.replace(/^ال/, ""), comm = d?.comm || (typeof wqComm === "function" ? wqComm(w) : "");
+  if (comm) out.push(comm); if (cm) out.push(cm);
+  for (const c of S.coords) { if ((comm && c.comm === comm) || (lang.length > 3 && norm((c.lang || "") + " " + (c.comm || "")).includes(norm(lang)))) out.push(c.name, c.comm || ""); }
+  return out; }
+function wqKey(w){ let k = _wqK.get(w); if (!k) { k = nkey([w.no, w.subj, w.sender, w.to_whom, w.body, ...wqWho2(w)].join(" ")); _wqK.set(w, k); } return k; }
 function vWatheqa(){
   const reply = wqIndex(), q = nkey(S.f.wqq || ""), tab = S.f.wqt || "all", jal = S.f.wqall !== "1";
   const base = S.wq.filter(w => !jal || wqIsJal(w));
   const ST = new Map(base.map(w => [w.id, wqStage(w, reply)]));
   const C = { sent:base.filter(w => wqDir(w) === "out" && wqDate(w) >= WQ_TRK), follow:base.filter(w => ST.get(w.id) === "follow"), done:base.filter(w => ST.get(w.id) === "done"), in:base.filter(w => wqDir(w) === "in"), wait:base.filter(w => wqDir(w) === "out" && !reply.has(w.id) && ST.get(w.id) === "follow") };
-  let L = tab === "all" ? base : C[tab] || base; if (q) L = L.filter(w => nkey([w.no, w.subj, w.sender, w.to_whom, w.body].join(" ")).includes(q));
+  let L = tab === "all" ? base : C[tab] || base; if (q) L = L.filter(w => wqKey(w).includes(q));
   L = [...L].sort((a, b) => wqDate(b).localeCompare(wqDate(a)));
   const sy = S.wqSync || {}, last = sy.last || sy.last_try, login = sy.state === "login";
   const tiles = [["sent", "الكتب المرسلة", "منذ بداية أكتوبر", C.sent.length, ""], ["follow", "قيد المتابعة", `${C.wait.length} بانتظار الرد · والباقي وصل ردها وتحتاج إبلاغ المنسق`, C.follow.length, "warn"], ["done", "المنجزة", "وصل الرد وأُبلغ المنسق", C.done.length, "ok"], ["in", "الواردة", "كتب وصلتنا من الإدارات", C.in.length, "t1"]];
@@ -58,7 +66,7 @@ function vWatheqa(){
   return `<div class="wq-head panel"><div class="panel-b"><div><b>وثيقة — ${jal ? "كتب الجاليات" : "كل الكتب"}</b><span class="s">${login ? "⚠ جلسة وثيقة منتهية — سجّل دخولك في وثيقة لتستمر المزامنة" : `آخر مزامنة: ${last ? esc(fmtTime(last)) : "لم تتم بعد"}`} · ${base.length} كتاب</span></div>
       <div class="br-acts"><button type="button" class="btn btn-ghost" data-wqall>${jal ? "عرض كل الكتب (الإدارية أيضاً)" : "كتب الجاليات فقط"}</button><button type="button" class="btn" data-ext="${WATHEQA}">فتح وثيقة</button></div></div></div>
     <div class="wq-tiles">${tiles.map(([k, t, s, n, c]) => `<button type="button" class="wq-tile ${c}${tab === k ? " on" : ""}" data-wqt="${tab === k ? "all" : k}"><b class="num">${n}</b><span>${t}</span><small>${s}</small></button>`).join("")}</div>
-    <div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input class="f" id="wqq" data-fk="wqq" placeholder="ابحث برقم الكتاب أو الجالية أو المسجد…" value="${esc(S.f.wqq || "")}"></div>
+    <div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input class="f" id="wqq" data-fk="wqq" placeholder="ابحث برقم الكتاب أو الجالية أو اسم المنسق أو المسجد…" value="${esc(S.f.wqq || "")}"></div>
       ${tab !== "all" ? `<button type="button" class="btn btn-ghost" data-wqt="all">عرض الكل (${base.length})</button>` : ""}</div>
     <div class="wq-list">${groups.map(([m, G]) => `<div class="wq-mh">${m ? monLabel(m) : "بدون تاريخ"} <span class="num">${G.length}</span></div>${G.map(card).join("")}`).join("") || `<div class="empty">لا توجد كتب في هذا التصنيف</div>`}</div>`;
 }
@@ -175,7 +183,7 @@ const _prio17 = priorities;
 priorities = function(){ const P = _prio17(); const n = S.wq.filter(w => w.approval && !docBy[w.no] && !(w.refs || []).some(r => docBy[r])).length; if (n) P.push({ w:78, k:"gold", t:`${n} موافقة في وثيقة غير مسجّلة في النظام`, s:"سجّلها بضغطة لتظهر الأنشطة ومواعيد انتهائها", act:{ go:"watheqa", l:"وثيقة" } }); return P.sort((a, b) => b.w - a.w); };
 const _palAll17 = palAll;
 palAll = function(){ const A = _palAll17(); if (S.admin) A.unshift({ g:"إجراءات", t:"إصدار تصريح درس (باركود)", s:"", ic:"i-badge", run:() => permitForm(), txt:"تصريح باركود درس شيخ" });
-  for (const w of S.wq.slice(0, 400)) A.push({ g:"وثيقة", t:`${w.no} ${w.subj}`, s:[fmt(wqDate(w)), w.sender].filter(Boolean).join(" · "), ic:"i-doc", run:() => { go("watheqa"); wqForm(w.id); }, txt:[w.no, w.subj, w.sender].join(" ") });
+  for (const w of S.wq.slice(0, 400)) A.push({ g:"وثيقة", t:`${w.no} ${w.subj}`, s:[fmt(wqDate(w)), w.sender].filter(Boolean).join(" · "), ic:"i-doc", run:() => { go("watheqa"); wqForm(w.id); }, txt:wqWho2(w).join(" ") + " " + [w.no, w.subj, w.sender].join(" ") });
   for (const p of S.permits.slice(0, 200)) A.push({ g:"التصاريح", t:`${p.no} ${p.data?.sheikh || ""}`, s:p.data?.mosque || "", ic:"i-badge", run:() => { go("permits"); permitView(p.id); }, txt:[p.no, p.data?.sheikh, p.data?.mosque].join(" ") });
   return A; };
 const _boot9w = boot9;
