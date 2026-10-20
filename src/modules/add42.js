@@ -38,7 +38,8 @@ NEWF.splice(1, 0, ["v50-portal", "nav:portal", "بوابة المنسقين ال
 
 /* ---------- coordinator accounts (civil id + PIN) on the portal page ---------- */
 S.pacc = [];
-async function paLoad(){ const { data } = await sb.rpc("staff_portal_accounts"); S.pacc = data || []; }
+async function paLoad(){ const [a, b] = await Promise.all([sb.rpc("staff_portal_accounts"), sb.rpc("staff_portal_signups")]); S.pacc = a.data || []; S.psign = b.data || []; }
+S.psign = [];
 const _boot9s50b = boot9; boot9 = function(){ _boot9s50b(); paLoad().then(() => { if ($("#drawer").hidden && S.view === "portal") render(); }); };
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-pareset],[data-paoff]"); if (!t) return;
   if (t.dataset.sure !== "1") { t.dataset.sure = "1"; t.textContent = "اضغط للتأكيد"; return; }
@@ -70,19 +71,27 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
 
 /* ---------- portal page: one clean layout (link · numbers · tabs) ---------- */
 vPortal = function(){
-  const tab = S.f.pvt || "comms", A = S.pacc, R = S.creps, nw = R.filter(r => !r.seen_at).length, ready = A.filter(a => a.ready).length;
+  const G = S.psign || [], pend = G.filter(g => g.status === "pending").length; const tab = S.f.pvt || (pend ? "sign" : "comms"), A = S.pacc, R = S.creps, nw = R.filter(r => !r.seen_at).length, ready = A.filter(a => a.ready).length;
   const open = S.reqs.filter(r => r.data?.src === "portal" && !["معتمد", "مرفوض", "مكتمل"].includes(r.status)).length;
   const accBy = {}; A.forEach(a => (accBy[a.comm] = accBy[a.comm] || []).push(a));
   const rows = commNames.filter(c => S.portal.some(x => x.comm === c && x.active)).map(c => ({ c, co:S.coords.find(k => k.comm === c && k.phone && k.status !== "سابق"), acc:accBy[c] || [] }))
     .sort((x, y) => (!!y.co - !!x.co) || x.c.localeCompare(y.c, "ar"));
-  const head = `<div class="pv-hd"><div class="pv-l"><b>رابط البوابة الموحّد</b><span dir="ltr">${esc(PT_ONE().replace(/^https?:\/\//, ""))}</span><small>كل منسق ونائبه يدخل بحسابه: الرقم المدني والرمز السري. أول مرة يضغط «فعّل حسابك».</small></div><div class="pv-a"><button type="button" class="btn btn-primary" data-ptone>نسخ الرابط</button></div></div>
-  <div class="wq-tiles pv-t"><button type="button" class="wq-tile ok" data-pvt="accs"><b>${ready}</b><span>حساب مفعّل</span><small>من ${rows.filter(r => r.co).length} منسق</small></button><button type="button" class="wq-tile warn" data-go="inbox"><b>${open}</b><span>طلب مفتوح</span><small>مفتوح في الطلبات الواردة</small></button><button type="button" class="wq-tile${nw ? " bad" : ""}" data-pvt="reps"><b>${nw}</b><span>تقرير جديد</span><small>من ${R.length} تقرير</small></button></div>
-  <div class="toolbar"><div class="seg">${[["comms", "الجاليات", rows.length], ["accs", "الحسابات", A.length], ["reps", "التقارير", R.length]].map(([k, l, n]) => `<button type="button" class="${tab === k ? "on" : ""}" data-pvt="${k}">${l} <span class="num">${n}</span></button>`).join("")}</div>${tab === "comms" ? `<input class="f pv-q" id="pv-q" placeholder="ابحث باسم الجالية أو المنسق" autocomplete="off">` : ""}</div>`;
+  const head = `<div class="pv-hd"><div class="pv-l"><b>رابط البوابة الموحّد</b><span dir="ltr">${esc(PT_ONE().replace(/^https?:\/\//, ""))}</span><small>المنسق الجديد يطلب حساباً من البوابة بإدخال بياناته وبيانات نائبه، ويُعتمد هنا. بعدها يدخل كل منهما برقمه المدني ورمزه السري.</small></div><div class="pv-a"><button type="button" class="btn btn-primary" data-ptone>نسخ الرابط</button></div></div>
+  <div class="wq-tiles pv-t">${pend ? `<button type="button" class="wq-tile bad" data-pvt="sign"><b>${pend}</b><span>طلب حساب جديد</span><small>بانتظار موافقتك</small></button>` : ""}<button type="button" class="wq-tile ok" data-pvt="accs"><b>${ready}</b><span>حساب مفعّل</span><small>من ${rows.filter(r => r.co).length} منسق</small></button><button type="button" class="wq-tile warn" data-go="inbox"><b>${open}</b><span>طلب مفتوح</span><small>مفتوح في الطلبات الواردة</small></button><button type="button" class="wq-tile${nw ? " bad" : ""}" data-pvt="reps"><b>${nw}</b><span>تقرير جديد</span><small>من ${R.length} تقرير</small></button></div>
+  <div class="toolbar"><div class="seg">${[["sign", "طلبات الحسابات", pend], ["comms", "الجاليات", rows.length], ["accs", "الحسابات", A.length], ["reps", "التقارير", R.length]].map(([k, l, n]) => `<button type="button" class="${tab === k ? "on" : ""}" data-pvt="${k}">${l} <span class="num">${n}</span></button>`).join("")}</div>${tab === "comms" ? `<input class="f pv-q" id="pv-q" placeholder="ابحث باسم الجالية أو المنسق" autocomplete="off">` : ""}</div>`;
   let body = "";
   if (tab === "comms") body = `<div class="pv-list">${rows.map(({ c, co, acc }) => { const on = acc.filter(a => a.ready).length;
     return `<div class="pv-r" data-k="${esc((c + " " + (co?.name || "")).toLowerCase())}"><div class="pv-n"><b>${esc(c)}</b><span>${co ? `${esc(co.name)} · <span dir="ltr">${esc(co.phone)}</span>` : "لا يوجد منسق برقم"}</span></div>
       <span class="chip ${on ? "ok" : ""}">${on ? `${on} حساب مفعّل` : "لم يفعّل"}</span>
       <div class="pv-b"><button type="button" class="btn btn-ghost" data-ptopen="${esc(c)}" title="فتح بوابتهم">فتح</button>${co ? `<button type="button" class="btn btn-ghost" data-ptwa="${esc(c)}" title="إرسال الرابط بالواتساب">${icon("i-wa")}</button>` : ""}</div></div>`; }).join("")}</div>`;
+  if (tab === "sign") body = G.length ? `<div class="pv-list">${G.map(g => { const cm = g.comm || g.comm_new || "";
+    return `<div class="pv-r pv-sg${g.status === "pending" ? " pv-new" : ""}"><div class="pv-n"><b>${esc(cm)}${!g.comm ? ` <span class="chip warn">جالية جديدة</span>` : ""}</b>
+      <span><b>المنسق:</b> ${esc(g.name)} · <span dir="ltr">${esc(g.phone)}</span> · مدني ${esc(g.civil)}</span>
+      <span><b>النائب:</b> ${esc(g.dep_name)} · <span dir="ltr">${esc(g.dep_phone)}</span> · مدني ${esc(g.dep_civil)}</span>
+      ${g.notes ? `<span>${esc(g.notes)}</span>` : ""}<span class="s">${fmt(String(g.at).slice(0, 10))}</span>
+      ${g.status === "pending" && S.canWrite ? `<div class="pv-dec"><select class="f" id="sg-c-${g.id}"><option value="">${g.comm ? esc(g.comm) : "إنشاء جالية: " + esc(g.comm_new)}</option>${commNames.filter(c => c !== g.comm).map(c => `<option>${esc(c)}</option>`).join("")}</select><input class="f" id="sg-r-${g.id}" placeholder="سبب الرفض (عند الرفض)"></div>` : ""}</div>
+      ${g.status === "pending" ? (S.canWrite ? `<div class="pv-b pv-bv"><button type="button" class="btn btn-primary" data-sgok="${g.id}">موافقة</button><button type="button" class="btn btn-ghost bad-t" data-sgno="${g.id}">رفض</button></div>` : `<span class="chip warn">بانتظار الموافقة</span>`)
+        : g.status === "approved" ? `<div class="pv-b pv-bv"><span class="chip ok">معتمد</span><button type="button" class="btn btn-ghost" data-sgwa="${g.id}">${icon("i-wa")} إبلاغه</button></div>` : `<span class="chip bad">مرفوض</span>`}</div>`; }).join("")}</div>` : `<div class="empty">لا توجد طلبات حسابات. يقدّمها المنسق من البوابة بزر «طلب حساب جديد».</div>`;
   if (tab === "accs") body = Object.keys(accBy).length ? `<div class="pv-list">${Object.keys(accBy).sort().map(c => accBy[c].map(a => `<div class="pv-r"><div class="pv-n"><b>${esc(a.name)}</b><span>${a.role === "نائب" ? "نائب" : "منسق"} · ${esc(c)}${a.by ? ` · أضافه ${esc(a.by)}` : ""}</span><span dir="ltr" class="s">${esc(a.civil)}${a.phone ? " · " + esc(a.phone) : ""}</span></div>
       <span class="chip ${a.ready ? "ok" : "warn"}">${a.ready ? (a.last ? "آخر دخول " + fmt(String(a.last).slice(0, 10)) : "مفعّل") : "بانتظار التفعيل"}</span>
       ${S.canWrite ? `<div class="pv-b"><button type="button" class="btn btn-ghost" data-pareset="${a.id}">إعادة الرمز</button><button type="button" class="btn btn-ghost bad-t" data-paoff="${a.id}">إيقاف</button></div>` : ""}</div>`).join("")).join("")}</div>` : `<div class="empty">لم يفعّل أي منسق حسابه بعد. أرسل لهم الرابط من تبويب «الجاليات».</div>`;
@@ -92,3 +101,18 @@ vPortal = function(){
   return head + body; };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-pvt]"); if (!t) return; S.f.pvt = t.dataset.pvt; render(); });
 document.addEventListener("input", ev => { if (ev.target.id !== "pv-q") return; const q = ev.target.value.trim().toLowerCase(); document.querySelectorAll(".pv-r[data-k]").forEach(r => { r.hidden = !!q && !r.dataset.k.includes(q); }); });
+
+/* account requests: approve / reject / tell the coordinator */
+const sgMsg = g => `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل / ${g.name}\n\nتم اعتماد حسابكم في بوابة المنسقين للجالية ${g.comm || g.comm_new}.\nالدخول برقمكم المدني والرمز السري الذي اخترتموه:\n${PT_ONE()}\n\nنائب المنسق (${g.dep_name}) يفعّل حسابه من «نائب منسق؟ فعّل حسابك» برقمه المدني وهاتفه.\n\nللاستفسار: 97512995\nوجزاكم الله خيراً${SIGN}`;
+document.addEventListener("click", async ev => { const t = ev.target.closest("[data-sgok],[data-sgno],[data-sgwa]"); if (!t) return;
+  if (t.dataset.sgwa) { const g = S.psign.find(x => x.id === t.dataset.sgwa); if (g) waOpen(g.phone, sgMsg(g)); return; }
+  const id = t.dataset.sgok || t.dataset.sgno, ok = !!t.dataset.sgok, g = S.psign.find(x => x.id === id);
+  if (!ok && !$("#sg-r-" + id)?.value.trim()) { $("#sg-r-" + id)?.focus(); return toast("اكتب سبب الرفض أولاً"); }
+  if (t.dataset.sure !== "1") { t.dataset.sure = "1"; t.textContent = ok ? "تأكيد الموافقة" : "تأكيد الرفض"; return; }
+  t.disabled = true; const { data, error } = await sb.rpc("staff_portal_decide", { p_id:id, p_ok:ok, p_comm:$("#sg-c-" + id)?.value || null, p_reason:$("#sg-r-" + id)?.value.trim() || null });
+  if (error) { t.disabled = false; return writeFail(error); }
+  await Promise.all([paLoad(), loadPortal(), sb.from("refs").select("*").eq("id", "coords").maybeSingle().then(({ data }) => { if (data) { putRow("refs", data); derive(); } })]); render();
+  if (ok && g) { g.comm = data?.comm || g.comm; toast("اعتُمد الحساب — أبلغ المنسق"); waOpen(g.phone, sgMsg(g)); } else toast("رُفض الطلب"); });
+const _prio50s = priorities;
+priorities = function(){ const P = _prio50s(); const n = (S.psign || []).filter(g => g.status === "pending").length;
+  if (n && S.canWrite) P.push({ w:88, k:"gold", t:`${n} طلب حساب جديد في بوابة المنسقين`, s:"منسق ونائبه بانتظار موافقتك", act:{ go:"portal", l:"مراجعة" } }); return P.sort((a, b) => b.w - a.w); };

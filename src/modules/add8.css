@@ -177,3 +177,7 @@ table tbody tr:hover{background:color-mix(in srgb,var(--primary-soft) 45%,transp
 .toolbar:has(.pv-q){flex-wrap:wrap;gap:8px}
 @media (max-width:560px){.toolbar .pv-q{flex:1 1 100%;max-width:none}.pv-hd{padding:12px 14px}}
 @media (max-width:560px){#title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:17px}}
+.pv-sg{align-items:flex-start}.pv-sg .pv-n>span b{color:var(--ink);font-weight:600}
+.pv-dec{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.pv-dec .f{height:38px;font-size:13px}
+.pv-bv{flex-direction:column;align-items:stretch}
+@media (max-width:560px){.pv-dec{grid-template-columns:1fr}.pv-bv{flex-direction:row}}
