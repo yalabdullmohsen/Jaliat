@@ -57,7 +57,9 @@ afterRender = function(v){ _afterRender43(v); backBtn(); };
     try { const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); } catch (_) {}
     if (idle) return location.reload();
     if (!$("#upd-bar")) document.body.insertAdjacentHTML("beforeend", `<button type="button" id="upd-bar" class="upd-bar" onclick="location.reload()">⟳ يوجد تحديث جديد لـ«إنجاز» — اضغط للتحديث</button>`); }
-  ver().then(v => mine = v);
+  const badge = v => { if (!v) return; let e = $("#app-ver"); if (!e) { const a = $("#sugg-btn") || $("#side .side-foot"); if (!a) return; a.insertAdjacentHTML("afterend", `<div id="app-ver" class="app-ver"></div>`); e = $("#app-ver"); } e.textContent = `الإصدار ${v.replace("jaliyat-v", "")} · محدَّث ✓`; };
+  ver().then(v => { mine = v; badge(v); });
+  const _ar46 = afterRender; afterRender = function(x){ _ar46(x); badge(mine); };
   document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
   addEventListener("focus", check); setInterval(check, 5 * 60e3);
 })();
