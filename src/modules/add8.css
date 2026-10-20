@@ -163,3 +163,17 @@ table tbody tr:hover{background:color-mix(in srgb,var(--primary-soft) 45%,transp
 .ce-s{display:inline-grid;place-items:center;min-width:44px;height:28px;border-radius:8px;font-weight:700}.ce-s.ok{background:var(--oks);color:var(--ok)}.ce-s.warn{background:var(--warns);color:var(--warn)}.ce-s.bad{background:var(--bads);color:var(--bad)}
 .cr-l .rq-act.cr-new{border-inline-start:3px solid var(--gold,#946E1F)}
 .cr-l .rq-act span.s{line-height:1.6}
+/* portal page */
+.pv-hd{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.pv-l{display:grid;gap:3px;min-width:0}.pv-l span{font-size:14px;color:var(--brand,#2F6B57);font-weight:700;overflow-wrap:anywhere}.pv-l small{color:var(--muted);font-size:12.5px}
+.pv-t{margin:12px 0 4px}.pv-t .wq-tile b{font-size:24px}
+.pv-q{max-width:320px;flex:1;min-width:180px}
+.pv-list{display:grid;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden;margin-top:8px}
+.pv-r{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}.pv-r:first-child{border-top:0}.pv-r[hidden]{display:none}
+.pv-n{display:grid;gap:1px;flex:1;min-width:0}.pv-n b{font-size:14.5px}.pv-n>span{font-size:12.5px;color:var(--muted)}.pv-n .s{font-size:12.5px}
+.pv-b{display:flex;gap:4px;flex:none}.pv-b .btn{padding:6px 10px;min-height:0;font-size:13px}
+.pv-r>.chip{flex:none}.pv-new{border-inline-start:3px solid #C99A2E}
+@media (max-width:560px){.pv-r{flex-wrap:wrap}.pv-n{flex-basis:100%}.pv-b{margin-inline-start:auto}.pv-hd .pv-a{width:100%}.pv-hd .pv-a .btn{width:100%}.pv-t{grid-template-columns:repeat(3,1fr);gap:6px}.pv-t .wq-tile{padding:10px}.pv-t .wq-tile small{display:none}.pv-q{max-width:none;width:100%}}
+.toolbar:has(.pv-q){flex-wrap:wrap;gap:8px}
+@media (max-width:560px){.toolbar .pv-q{flex:1 1 100%;max-width:none}.pv-hd{padding:12px 14px}}
+@media (max-width:560px){#title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:17px}}

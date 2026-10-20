@@ -24,12 +24,6 @@ const _rqRead50 = rqRead;
 rqRead = function(){ const f = _rqRead50(); const v = $("#rq-reply"); if (v) f.reply = v.value.trim(); return f; };
 
 /* portal page: monthly reports from coordinators */
-const _vPortal50 = vPortal;
-vPortal = function(){ const L = S.creps, nw = L.filter(r => !r.seen_at).length;
-  const rep = `<div class="rq-sec cr-l"><div class="rq-sh"><b>تقارير المنسقين الشهرية ${nw ? `<span class="chip warn">${nw} جديد</span>` : ""}</b></div>${L.slice(0, 60).map(r => { const d = r.data || {};
-    return `<div class="rq-act${r.seen_at ? "" : " cr-new"}"><span><b>${esc(r.comm)}</b> · ${esc(r.period || "")}<br><span class="s">${esc(r.coord || "")}${d.lessons != null ? ` · ${d.lessons} درس` : ""}${d.attend != null ? ` · حضور ${d.attend}` : ""}${d.converts ? ` · ${d.converts} مهتدٍ` : ""}</span>${d.notes ? `<br><span class="s">${esc(d.notes)}</span>` : ""}${d.needs ? `<br><span class="s"><b>الاحتياجات:</b> ${esc(d.needs)}</span>` : ""}</span>${r.seen_at ? `<span class="chip ok">اطُّلع</span>` : `<button type="button" class="btn btn-ghost" data-crseen="${r.id}">اطّلعت</button>`}</div>`; }).join("") || `<div class="empty">لم تصل تقارير بعد — يرسلها المنسق من البوابة</div>`}</div>`;
-  return _vPortal50().replace(`<div class="pt-l">`, `<div class="check"><b>الرابط الموحّد لكل المنسقين</b><span dir="ltr" class="num">${esc(PT_ONE())}</span><span>يدخل المنسق برقم هاتفه المسجّل فتفتح له بوابة جاليته.</span><button type="button" class="btn" data-ptone>نسخ الرابط الموحّد</button></div><div class="check"><span>البوابة الآن كاملة: الرئيسية، طلب جديد أو تجديد، أنشطتي (تعديل أو إيقاف)، مراسلة القسم والتعاميم، التقرير الشهري، وبيانات المنسقين. كل ما يرسله المنسق يصل «الطلبات الواردة»، وردّك في الطلب يظهر له.</span></div>${rep}<div class="pt-l">`); };
-
 const PT_ONE = () => `${location.origin}${location.pathname.replace(/[^/]*$/, "")}portal.html`;
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-ptone]")) return; navigator.clipboard?.writeText(PT_ONE()).then(() => toast("نُسخ الرابط الموحّد")); });
 const _prio50 = priorities;
@@ -46,10 +40,6 @@ NEWF.splice(1, 0, ["v50-portal", "nav:portal", "بوابة المنسقين ال
 S.pacc = [];
 async function paLoad(){ const { data } = await sb.rpc("staff_portal_accounts"); S.pacc = data || []; }
 const _boot9s50b = boot9; boot9 = function(){ _boot9s50b(); paLoad().then(() => { if ($("#drawer").hidden && S.view === "portal") render(); }); };
-const _vPortal50b = vPortal;
-vPortal = function(){ const A = S.pacc, by = {}; A.forEach(a => (by[a.comm] = by[a.comm] || []).push(a));
-  const box = `<div class="rq-sec cr-l"><div class="rq-sh"><b>حسابات المنسقين ونوابهم (${A.length})</b></div><span class="s">يفعّل المنسق حسابه برقمه المدني وهاتفه المسجّل، ويضيف نائبه من حسابه. إن نسي أحدهم رمزه اضغط «إعادة تعيين» فيفعّله من جديد.</span>${Object.keys(by).sort().map(c => `<div class="pa-g"><b class="s">${esc(c)}</b>${by[c].map(a => `<div class="rq-act"><span><b>${esc(a.name)}</b> · ${a.role === "نائب" ? `نائب المنسق${a.by ? ` (أضافه ${esc(a.by)})` : ""}` : "المنسق"}<br><span class="s" dir="ltr">${esc(a.civil)} · ${esc(a.phone || "")}</span> <span class="s">${a.ready ? (a.last ? `آخر دخول ${fmt(String(a.last).slice(0, 10))}` : "مفعّل") : "بانتظار التفعيل"}</span></span>${S.canWrite ? `<button type="button" class="btn btn-ghost" data-pareset="${a.id}">إعادة تعيين الرمز</button><button type="button" class="btn btn-ghost bad-t" data-paoff="${a.id}">إيقاف</button>` : ""}</div>`).join("")}</div>`).join("") || `<div class="empty">لم يفعّل أي منسق حسابه بعد</div>`}</div>`;
-  return _vPortal50b().replace(/يدخل المنسق برقم هاتفه المسجّل فتفتح له بوابة جاليته\./, "يدخل كل منسق ونائبه بحسابه الخاص: الرقم المدني والرمز السري.").replace(`<div class="pt-l">`, box + `<div class="pt-l">`); };
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-pareset],[data-paoff]"); if (!t) return;
   if (t.dataset.sure !== "1") { t.dataset.sure = "1"; t.textContent = "اضغط للتأكيد"; return; }
   const { error } = await sb.rpc("staff_portal_reset", { p_id:t.dataset.pareset || t.dataset.paoff, p_off:!!t.dataset.paoff }); if (error) return writeFail(error);
@@ -77,3 +67,28 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
   const w = window.open("about:blank", "_blank"); const { data, error } = await sb.rpc("staff_portal_open", { p_comm:t.dataset.ptopen });
   if (error || !data?.s) { w?.close(); return writeFail(error || { message:"تعذّر فتح البوابة" }); }
   const u = PT_ONE() + "#s=" + data.s; if (w) w.location = u; else location.href = u; });
+
+/* ---------- portal page: one clean layout (link · numbers · tabs) ---------- */
+vPortal = function(){
+  const tab = S.f.pvt || "comms", A = S.pacc, R = S.creps, nw = R.filter(r => !r.seen_at).length, ready = A.filter(a => a.ready).length;
+  const open = S.reqs.filter(r => r.data?.src === "portal" && !["معتمد", "مرفوض", "مكتمل"].includes(r.status)).length;
+  const accBy = {}; A.forEach(a => (accBy[a.comm] = accBy[a.comm] || []).push(a));
+  const rows = commNames.filter(c => S.portal.some(x => x.comm === c && x.active)).map(c => ({ c, co:S.coords.find(k => k.comm === c && k.phone && k.status !== "سابق"), acc:accBy[c] || [] }))
+    .sort((x, y) => (!!y.co - !!x.co) || x.c.localeCompare(y.c, "ar"));
+  const head = `<div class="pv-hd"><div class="pv-l"><b>رابط البوابة الموحّد</b><span dir="ltr">${esc(PT_ONE().replace(/^https?:\/\//, ""))}</span><small>كل منسق ونائبه يدخل بحسابه: الرقم المدني والرمز السري. أول مرة يضغط «فعّل حسابك».</small></div><div class="pv-a"><button type="button" class="btn btn-primary" data-ptone>نسخ الرابط</button></div></div>
+  <div class="wq-tiles pv-t"><button type="button" class="wq-tile ok" data-pvt="accs"><b>${ready}</b><span>حساب مفعّل</span><small>من ${rows.filter(r => r.co).length} منسق</small></button><button type="button" class="wq-tile warn" data-go="inbox"><b>${open}</b><span>طلب مفتوح</span><small>مفتوح في الطلبات الواردة</small></button><button type="button" class="wq-tile${nw ? " bad" : ""}" data-pvt="reps"><b>${nw}</b><span>تقرير جديد</span><small>من ${R.length} تقرير</small></button></div>
+  <div class="toolbar"><div class="seg">${[["comms", "الجاليات", rows.length], ["accs", "الحسابات", A.length], ["reps", "التقارير", R.length]].map(([k, l, n]) => `<button type="button" class="${tab === k ? "on" : ""}" data-pvt="${k}">${l} <span class="num">${n}</span></button>`).join("")}</div>${tab === "comms" ? `<input class="f pv-q" id="pv-q" placeholder="ابحث باسم الجالية أو المنسق" autocomplete="off">` : ""}</div>`;
+  let body = "";
+  if (tab === "comms") body = `<div class="pv-list">${rows.map(({ c, co, acc }) => { const on = acc.filter(a => a.ready).length;
+    return `<div class="pv-r" data-k="${esc((c + " " + (co?.name || "")).toLowerCase())}"><div class="pv-n"><b>${esc(c)}</b><span>${co ? `${esc(co.name)} · <span dir="ltr">${esc(co.phone)}</span>` : "لا يوجد منسق برقم"}</span></div>
+      <span class="chip ${on ? "ok" : ""}">${on ? `${on} حساب مفعّل` : "لم يفعّل"}</span>
+      <div class="pv-b"><button type="button" class="btn btn-ghost" data-ptopen="${esc(c)}" title="فتح بوابتهم">فتح</button>${co ? `<button type="button" class="btn btn-ghost" data-ptwa="${esc(c)}" title="إرسال الرابط بالواتساب">${icon("i-wa")}</button>` : ""}</div></div>`; }).join("")}</div>`;
+  if (tab === "accs") body = Object.keys(accBy).length ? `<div class="pv-list">${Object.keys(accBy).sort().map(c => accBy[c].map(a => `<div class="pv-r"><div class="pv-n"><b>${esc(a.name)}</b><span>${a.role === "نائب" ? "نائب" : "منسق"} · ${esc(c)}${a.by ? ` · أضافه ${esc(a.by)}` : ""}</span><span dir="ltr" class="s">${esc(a.civil)}${a.phone ? " · " + esc(a.phone) : ""}</span></div>
+      <span class="chip ${a.ready ? "ok" : "warn"}">${a.ready ? (a.last ? "آخر دخول " + fmt(String(a.last).slice(0, 10)) : "مفعّل") : "بانتظار التفعيل"}</span>
+      ${S.canWrite ? `<div class="pv-b"><button type="button" class="btn btn-ghost" data-pareset="${a.id}">إعادة الرمز</button><button type="button" class="btn btn-ghost bad-t" data-paoff="${a.id}">إيقاف</button></div>` : ""}</div>`).join("")).join("")}</div>` : `<div class="empty">لم يفعّل أي منسق حسابه بعد. أرسل لهم الرابط من تبويب «الجاليات».</div>`;
+  if (tab === "reps") body = R.length ? `<div class="pv-list">${R.slice(0, 80).map(r => { const d = r.data || {};
+    return `<div class="pv-r${r.seen_at ? "" : " pv-new"}"><div class="pv-n"><b>${esc(r.comm)} · ${esc(r.period || "")}</b><span>${esc(r.coord || "")}${d.lessons != null ? ` · ${d.lessons} درس` : ""}${d.attend != null ? ` · حضور ${d.attend}` : ""}${d.converts ? ` · ${d.converts} مهتدٍ` : ""}</span>${d.notes ? `<span class="s">${esc(d.notes)}</span>` : ""}${d.needs ? `<span class="s"><b>الاحتياجات:</b> ${esc(d.needs)}</span>` : ""}</div>
+      ${r.seen_at ? `<span class="chip ok">اطُّلع</span>` : `<div class="pv-b"><button type="button" class="btn btn-ghost" data-crseen="${r.id}">اطّلعت</button></div>`}</div>`; }).join("")}</div>` : `<div class="empty">لم تصل تقارير بعد. يرسلها المنسق من البوابة كل شهر.</div>`;
+  return head + body; };
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-pvt]"); if (!t) return; S.f.pvt = t.dataset.pvt; render(); });
+document.addEventListener("input", ev => { if (ev.target.id !== "pv-q") return; const q = ev.target.value.trim().toLowerCase(); document.querySelectorAll(".pv-r[data-k]").forEach(r => { r.hidden = !!q && !r.dataset.k.includes(q); }); });
