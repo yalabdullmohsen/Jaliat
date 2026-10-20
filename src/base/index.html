@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>نظام أنشطة الجاليات</title>
+<meta name="theme-color" content="#0B3A2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="أنشطة الجاليات">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: fixed right sidebar (RTL) + working area of panels; drawer slides from the left for forms. */
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --surface-2:#EEF2EE; --ink:#11241D; --muted:#5E6D66; --line:#DDE4DE;
+  --primary:#0E6B4E; --primary-ink:#FFFFFF; --primary-soft:#E2F0E8; --gold:#A87A12; --gold-soft:#F6EDD5;
+  --side:#0B3A2B; --side-ink:#E8F2EC; --side-muted:#9DBBAE; --side-hi:#145A43;
+  --t1:#1F6FA6; --t1s:#E1EDF7; --t2:#6B4BB0; --t2s:#ECE6F7; --t3:#B8601F; --t3s:#F8E9DC;
+  --ok:#23845A; --oks:#DFF1E7; --warn:#B07A00; --warns:#FBF0D4; --bad:#B8392B; --bads:#F9E1DD;
+  --shadow:0 1px 2px rgba(17,36,29,.06),0 6px 24px rgba(17,36,29,.06); --band:#EAF5EE;
+  --f-display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --f-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1411; --surface:#131E19; --surface-2:#18261F; --ink:#E5EEE9; --muted:#97AA9F; --line:#24352C;
+  --primary:#3DB487; --primary-ink:#06140E; --primary-soft:#163528; --gold:#DDB44C; --gold-soft:#33290F;
+  --side:#08120E; --side-ink:#DCEAE2; --side-muted:#7F998C; --side-hi:#163528;
+  --t1:#6FB0E3; --t1s:#13283A; --t2:#AE93E8; --t2s:#251D3A; --t3:#E79A5E; --t3s:#3A2414;
+  --ok:#55C38E; --oks:#14301F; --warn:#E3B341; --warns:#33290F; --bad:#EE7B6B; --bads:#3A1A16;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 24px rgba(0,0,0,.25); --band:#16291F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1411; --surface:#131E19; --surface-2:#18261F; --ink:#E5EEE9; --muted:#97AA9F; --line:#24352C;
+  --primary:#3DB487; --primary-ink:#06140E; --primary-soft:#163528; --gold:#DDB44C; --gold-soft:#33290F;
+  --side:#08120E; --side-ink:#DCEAE2; --side-muted:#7F998C; --side-hi:#163528;
+  --t1:#6FB0E3; --t1s:#13283A; --t2:#AE93E8; --t2s:#251D3A; --t3:#E79A5E; --t3s:#3A2414;
+  --ok:#55C38E; --oks:#14301F; --warn:#E3B341; --warns:#33290F; --bad:#EE7B6B; --bads:#3A1A16;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 24px rgba(0,0,0,.25); --band:#16291F; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;direction:rtl}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.num{font-family:var(--f-display);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+
+/* ---------- login ---------- */
+.login{min-height:100%;display:grid;place-items:center;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:radial-gradient(1200px 600px at 85% -10%,var(--primary-soft),transparent 60%),var(--bg)}
+.login-card{width:min(440px,100%);background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:36px 32px;display:grid;gap:18px;text-align:center}
+.lg-form{display:grid;gap:14px;text-align:right}
+.lg-form .f{width:100%;font-size:16px;padding:12px 14px}
+.login-card .mark{width:64px;height:64px;margin:0 auto;color:var(--primary)}
+.login-card .org{color:var(--muted);font-size:13px;margin:0}
+.login-card h1{font-size:28px;font-weight:600}
+.login-card .dept{margin:-8px 0 0;color:var(--gold);font-weight:600;font-size:14px}
+.who{display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:14px;padding:12px 14px;text-align:right}
+.who img{width:42px;height:42px;border-radius:50%;flex:none}
+.who b{display:block;font-size:15px}
+.who span{font-size:13px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:10px;padding:10px 18px;font-weight:600;font-size:15px;background:var(--surface-2);color:var(--ink);transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--line)}
+.btn-primary{background:var(--primary);color:var(--primary-ink)}
+.btn-primary:hover{filter:brightness(1.07)}
+.btn-ghost{background:transparent;border-color:var(--line)}
+.btn-danger{background:var(--bads);color:var(--bad)}
+.btn-lg{padding:14px 20px;font-size:16px;border-radius:12px}
+.fine{font-size:12.5px;color:var(--muted);margin:0}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:248px 1fr;min-height:100%}
+.side{background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;gap:6px;padding:20px 14px;position:sticky;top:0;height:100vh;height:100dvh;overflow:auto}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 16px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px}
+.brand svg{width:34px;height:34px;color:var(--gold);flex:none}
+.brand b{font-family:var(--f-display);font-weight:600;font-size:16px;display:block;line-height:1.3}
+.brand span{font-size:11.5px;color:var(--side-muted)}
+.nav{display:grid;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;color:var(--side-ink);padding:9px 12px;border-radius:9px;text-align:right;font-size:14.5px}
+.nav button svg{width:18px;height:18px;opacity:.75;flex:none}
+.nav button:hover{background:rgba(255,255,255,.06)}
+.nav button[aria-current="page"]{background:var(--side-hi);font-weight:600}
+.nav button[aria-current="page"] svg{opacity:1;color:var(--gold)}
+.nav .sep{font-size:11px;letter-spacing:.06em;color:var(--side-muted);padding:14px 12px 4px}
+.side-foot{margin-top:auto;display:grid;gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.me{display:flex;align-items:center;gap:10px;font-size:13px}
+.online{display:grid;gap:4px;font-size:13px;padding-bottom:6px}
+.online small{color:var(--side-muted);font-size:11.5px}
+.on{display:flex;align-items:center;gap:7px}
+.on i{width:8px;height:8px;border-radius:50%;background:#3DB487;box-shadow:0 0 0 3px rgba(61,180,135,.25);flex:none}
+.on small{color:var(--side-muted)}
+.panel .on{color:var(--ink)} .panel .on small{color:var(--muted)}
+.me .av{width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--side);display:grid;place-items:center;font-weight:700;font-family:var(--f-display);flex:none}
+.me small{display:block;color:var(--side-muted);font-size:11.5px}
+.side .btn{background:rgba(255,255,255,.08);color:var(--side-ink);font-size:13.5px;padding:8px 12px}
+.main{min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;padding-block:12px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.top h2{font-size:20px;font-weight:600;flex:1;min-width:0}
+.top .sub{font-size:13px;color:var(--muted);font-family:var(--f-body);font-weight:400;display:block}
+.menu-btn{display:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;align-items:center;justify-content:center}
+.view{padding-block:22px 48px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));display:grid;gap:20px;align-content:start}
+.ro{font-size:12px;background:var(--gold-soft);color:var(--gold);padding:4px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
+
+/* ---------- building blocks ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.panel-h{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.panel-h h3{font-size:15.5px;font-weight:600;flex:1}
+.panel-b{padding:16px 18px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:4px;text-align:right;border-top:3px solid var(--k,var(--primary))}
+button.kpi:hover{box-shadow:var(--shadow)}
+.kpi span{font-size:13px;color:var(--muted)}
+.kpi b{font-family:var(--f-display);font-size:32px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap;background:var(--surface-2);color:var(--muted)}
+.chip.t1{background:var(--t1s);color:var(--t1)} .chip.t2{background:var(--t2s);color:var(--t2)} .chip.t3{background:var(--t3s);color:var(--t3)}
+.chip.ok{background:var(--oks);color:var(--ok)} .chip.warn{background:var(--warns);color:var(--warn)} .chip.bad{background:var(--bads);color:var(--bad)} .chip.gold{background:var(--gold-soft);color:var(--gold)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--muted)}
+.dot.t1{background:var(--t1)} .dot.t2{background:var(--t2)} .dot.t3{background:var(--t3)}
+.list{display:grid}
+.li{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 18px;border-bottom:1px solid var(--line);text-align:right;background:none;border-left:0;border-right:0;border-top:0;width:100%}
+.li:last-child{border-bottom:0}
+button.li:hover{background:var(--surface-2)}
+.li .t{font-weight:600}
+.li .s{font-size:13px;color:var(--muted)}
+.li .time{font-family:var(--f-display);font-size:13px;color:var(--primary);background:var(--primary-soft);padding:4px 10px;border-radius:8px;white-space:nowrap}
+.empty{padding:28px 18px;text-align:center;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.search{flex:1 1 240px;min-width:0;position:relative}
+.search input{width:100%;padding:10px 40px 10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.search svg{position:absolute;right:12px;top:50%;translate:0 -50%;width:18px;height:18px;color:var(--muted)}
+select.f,input.f,textarea.f{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);min-width:0}
+.count{font-size:13px;color:var(--muted);margin-inline-start:auto}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-weight:600;font-size:12.5px;color:var(--muted);text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface-2);position:sticky;top:0}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--surface-2)}
+td .s{display:block;font-size:12.5px;color:var(--muted)}
+.n{font-family:var(--f-display);color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.flag{color:var(--bad);font-weight:700}
+/* khatib table — same look as the department's sheet */
+.kt th{background:#006C35;color:#fff;text-align:center;font-size:13px;border:1px solid #0b5a30}
+.kt td{text-align:center;border:1px solid var(--line);padding:7px 10px;font-size:13.5px}
+.kt tbody tr:nth-child(even) td{background:var(--band)}
+.kt-title{background:#004D26;color:#fff;text-align:center;padding:12px;font-family:var(--f-display);font-weight:600;font-size:18px;border-radius:var(--r) var(--r) 0 0}
+.kt-sub{text-align:center;color:var(--muted);font-size:13px;padding:6px 12px 12px}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(110px,180px) 1fr 44px;gap:10px;align-items:center;font-size:13.5px}
+.bar .track{height:12px;border-radius:6px;background:var(--surface-2);display:flex;overflow:hidden}
+.bar .track i{display:block;height:100%}
+.bar .v{font-family:var(--f-display);text-align:left;font-variant-numeric:tabular-nums}
+.vbars{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;align-items:end;height:180px;padding-top:10px}
+.vbar{display:grid;grid-template-rows:auto 1fr auto;height:100%;text-align:center;font-size:12.5px;gap:4px}
+.vbar .col{align-self:end;background:var(--primary);border-radius:6px 6px 2px 2px;min-height:2px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:right;display:grid;gap:10px}
+.ccard:hover{box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--primary) 40%,var(--line))}
+.ccard h3{font-size:16px;font-weight:600}
+.ccard .s{font-size:13px;color:var(--muted)}
+.ccard .row{display:flex;gap:6px;flex-wrap:wrap}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .hd{text-align:center;font-size:12.5px;color:var(--muted);font-weight:600;padding:4px 0}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:10px;min-height:86px;padding:8px;text-align:right;display:grid;grid-template-rows:auto 1fr auto;gap:4px}
+.day.out{opacity:.4}
+.day.today{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+.day.sel{background:var(--primary-soft)}
+.day .d{display:flex;justify-content:space-between;align-items:baseline}
+.day .d b{font-family:var(--f-display);font-size:16px}
+.day .d small{font-size:11px;color:var(--muted)}
+.day .c{font-family:var(--f-display);font-size:13px;color:var(--primary);font-weight:600}
+.day .ds{display:flex;gap:3px;flex-wrap:wrap}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(5,15,10,.35);z-index:20}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(560px,100%);max-width:100vw;background:var(--surface);z-index:21;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.2);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px)}
+.drawer-h{display:flex;align-items:center;gap:10px;padding:16px 22px;border-bottom:1px solid var(--line)}
+.drawer-h h3{flex:1;font-size:18px;font-weight:600}
+.x{background:none;border:0;width:36px;height:36px;border-radius:9px;font-size:22px;color:var(--muted)}
+.x:hover{background:var(--surface-2)}
+.drawer-b{flex:1;overflow:auto;padding:18px 22px;display:grid;gap:16px;align-content:start}
+.drawer-f{display:flex;gap:10px;align-items:center;padding:14px 22px;border-top:1px solid var(--line);flex-wrap:wrap}
+.fld{display:grid;gap:6px}
+.fld label,.lbl{font-size:13px;font-weight:600;color:var(--muted)}
+.fld .f{width:100%}
+.fld .hint{font-size:12.5px;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{flex:1;border:0;background:none;padding:8px 10px;border-radius:8px;font-weight:600;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.days{display:flex;flex-wrap:wrap;gap:6px}
+.days button{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:999px;font-size:13.5px}
+.days button[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+.check{border-radius:10px;padding:12px 14px;font-size:13.5px;display:grid;gap:4px}
+.check.ok{background:var(--oks);color:var(--ok)} .check.warn{background:var(--warns);color:var(--warn)} .check.bad{background:var(--bads);color:var(--bad)}
+.err{color:var(--bad);font-size:13px}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;translate:-50% 0;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;z-index:30;font-weight:600;font-size:14px}
+.loading{padding:60px 0;text-align:center;color:var(--muted)}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{position:fixed;inset:0 0 0 auto;width:270px;z-index:25;height:auto;transform:translateX(100%);transition:transform .2s;padding-top:calc(20px + env(safe-area-inset-top,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+  .side.open{transform:none}
+  .menu-btn{display:inline-flex}
+  .top{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .view{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .two{grid-template-columns:1fr}
+  .day{min-height:58px;padding:5px}.day .d small{display:none}.day .ds{display:none}
+  .bar{grid-template-columns:minmax(90px,120px) 1fr 36px}
+  .top .btn-primary span{display:none}
+}
+
+/* ---------- phones (iPhone) & tablets ---------- */
+.tabbar{display:none}
+@media (max-width:900px){
+  .side.open + .main::before{content:"";position:fixed;inset:0;background:rgba(5,15,10,.35);z-index:24}
+  input.f,select.f,textarea.f,.search input{font-size:16px}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;inset:auto 0 0 0;z-index:15;background:var(--surface);border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+  .tabbar button{background:none;border:0;display:grid;justify-items:center;gap:2px;padding:8px 2px 6px;font-size:11px;color:var(--muted)}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button[aria-current="page"]{color:var(--primary);font-weight:600}
+  .tabbar .add span.plus{width:42px;height:42px;border-radius:14px;background:var(--primary);color:var(--primary-ink);display:grid;place-items:center;margin-top:-18px;box-shadow:var(--shadow)}
+  .view{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  #add-act{display:none}
+}
+@media (max-width:700px){
+  .kpis{gap:10px}.kpi{padding:12px 14px}.kpi b{font-size:26px}
+  .toolbar select.f{flex:1 1 45%}
+  .top h2{font-size:17px}
+  table.cardify thead{display:none}
+  table.cardify,table.cardify tbody,table.cardify tr,table.cardify td{display:block;width:100%}
+  table.cardify tr{border-bottom:1px solid var(--line);padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px}
+  table.cardify td,table.cardify tbody tr:hover td{border:0;padding:0;background:none}
+  table.cardify tbody tr:hover{background:var(--surface-2)}
+  table.cardify td:nth-child(1){grid-row:span 2}
+  table.cardify td.wide{grid-column:2 / -1}
+  table.cardify td.hide-m{display:none}
+  .drawer-h,.drawer-b,.drawer-f{padding-left:16px;padding-right:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="star" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="14" y="14" width="36" height="36" rx="2"/><rect x="14" y="14" width="36" height="36" rx="2" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="7"/></g></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.6c2.6-.2 4.6 1.4 5.4 4.4"/></g></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></g></symbol>
+  <symbol id="i-dome" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 21V12a8 8 0 0 1 16 0v9z"/><path d="M12 4V2M10 21v-4a2 2 0 0 1 4 0v4"/></g></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h6"/></g></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h16v12l-4 4H4z"/><path d="M16 20v-4h4M8 9h8M8 13h5"/></g></symbol>
+  <symbol id="i-badge" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="4"/><path d="M8.5 12.5 7 21l5-3 5 3-1.5-8.5"/></g></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4" stroke-linecap="round"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4-6.5 8-6.5s7 2.3 8 6.5"/></g></symbol>
+  <symbol id="i-log" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div id="login" class="login" hidden>
+  <div class="login-card">
+    <svg class="mark"><use href="#star"/></svg>
+    <p class="org">وزارة الأوقاف والشؤون الإسلامية · إدارة العلاقات الخارجية</p>
+    <h1>نظام أنشطة الجاليات</h1>
+    <p class="dept">قسم الجاليات ورعاية المهتدين وطلبة البعوث</p>
+    <form id="lg-form" class="lg-form" autocomplete="on" novalidate>
+      <div class="fld"><label for="lg-user">اسم المستخدم</label><input class="f" id="lg-user" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" dir="ltr" required></div>
+      <div class="fld"><label for="lg-pass">كلمة المرور</label><input class="f" id="lg-pass" name="password" type="password" autocomplete="current-password" dir="ltr" required></div>
+      <p class="err" id="lg-err" hidden></p>
+      <button id="lg-go" class="btn btn-primary btn-lg" type="submit">الدخول إلى النظام</button>
+    </form>
+    <p class="fine">النظام خاص بموظفي القسم. الحسابات ينشئها مدير النظام.</p>
+  </div>
+</div>
+
+<div id="app" class="shell" hidden>
+  <aside class="side" id="side">
+    <div class="brand"><svg><use href="#star"/></svg><div><b>أنشطة الجاليات</b><span>قسم الجاليات ورعاية المهتدين</span></div></div>
+    <nav class="nav" id="nav">
+      <button data-nav="home"><svg><use href="#i-home"/></svg>الرئيسية</button>
+      <button data-nav="khatibs"><svg><use href="#i-mic"/></svg>خطباء الجاليات</button>
+      <button data-nav="acts"><svg><use href="#i-list"/></svg>الأنشطة</button>
+      <button data-nav="comms"><svg><use href="#i-people"/></svg>الجاليات</button>
+      <button data-nav="cal"><svg><use href="#i-cal"/></svg>التقويم</button>
+      <button data-nav="stats"><svg><use href="#i-chart"/></svg>الإحصائيات</button>
+      <div class="sep">السجلات</div>
+      <button data-nav="mosques"><svg><use href="#i-dome"/></svg>المساجد</button>
+      <button data-nav="docs"><svg><use href="#i-doc"/></svg>الوثائق</button>
+      <button data-nav="coords"><svg><use href="#i-badge"/></svg>المنسقون</button>
+      <button data-nav="notes"><svg><use href="#i-note"/></svg>الملاحظات</button>
+      <div class="sep admin-only" hidden>الإدارة</div>
+      <button data-nav="users" class="admin-only" hidden><svg><use href="#i-users"/></svg>المستخدمون والصلاحيات</button>
+      <button data-nav="audit"><svg><use href="#i-log"/></svg>سجل التعديلات</button>
+    </nav>
+    <div class="side-foot">
+      <button class="btn" id="install" hidden>تثبيت النظام على هذا الجهاز</button>
+      <button class="btn" id="export"><svg width="16" height="16"><use href="#i-down"/></svg>تصدير إلى إكسل</button>
+      <div class="online" id="online"></div>
+      <div class="me"><span class="av" id="me-av"></span><div><span id="me-name"></span><small id="me-role"></small></div></div>
+      <div style="display:flex;gap:8px"><button class="btn" id="mypass" style="flex:1">كلمة المرور</button><button class="btn" id="logout" style="flex:1">خروج</button></div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <button class="menu-btn" id="menu" aria-label="القائمة"><svg width="20" height="20"><use href="#i-menu"/></svg></button>
+      <h2 id="title"></h2>
+      <span class="ro" id="ro" hidden>عرض فقط</span>
+      <button class="btn btn-primary" id="add-act" hidden><svg width="18" height="18"><use href="#i-plus"/></svg><span>إضافة نشاط</span></button>
+    </header>
+    <section class="view" id="view"><div class="loading">جارٍ تحميل بيانات القسم…</div></section>
+  </div>
+</div>
+
+<nav class="tabbar" id="tabbar" hidden>
+  <button data-nav="home"><svg><use href="#i-home"/></svg>الرئيسية</button>
+  <button data-nav="acts"><svg><use href="#i-list"/></svg>الأنشطة</button>
+  <button class="add" id="tab-add"><span class="plus"><svg width="22" height="22"><use href="#i-plus"/></svg></span>إضافة</button>
+  <button data-nav="cal"><svg><use href="#i-cal"/></svg>التقويم</button>
+  <button data-nav="khatibs"><svg><use href="#i-mic"/></svg>الخطباء</button>
+</nav>
+<div id="scrim" class="scrim" hidden></div>
+<aside id="drawer" class="drawer" hidden role="dialog" aria-modal="true"></aside>
+<div id="toast" class="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script>
+"use strict";
+const SB_URL = "https://nybuospfwbbtejvjivhd.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55YnVvc3Bmd2JidGVqdmppdmhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNTM2NzUsImV4cCI6MjEwNzkyOTY3NX0.raSv5v4repFqwam7C7l0d5mWABVH44REq_oRfDYzgF4";
+const DOMAIN = "jaliyat.local";
+const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "jaliyat-auth" } });
+const T = {
+  async put(tbl, id, data){ const { error } = id ? await sb.from(tbl).upsert({ id, data }) : await sb.from(tbl).insert({ data }); if (error) throw error; },
+  async del(tbl, id){ const { error, count } = await sb.from(tbl).delete({ count: "exact" }).eq("id", id); if (error) throw error; if (count === 0) throw { code: "42501" }; },
+  async ref(r, list){ const { error } = await sb.from("refs").update({ data: { list } }).eq("id", r); if (error) throw error; },
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const DAYS = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const WEEK = [6,0,1,2,3,4,5]; // Saturday first
+const TYPES = ["درس ديني","دورة علمية","محاضرة دينية"];
+const TK = {"درس ديني":"t1","دورة علمية":"t2","محاضرة دينية":"t3"};
+const TPL = {"درس ديني":"دروس دينية","دورة علمية":"دورات علمية","محاضرة دينية":"محاضرات دينية"};
+const GOVS = ["العاصمة","حولي","الفروانية","الأحمدي","الجهراء","مبارك الكبير"];
+const TIMES = ["بعد صلاة الفجر","صباحاً","بعد صلاة الجمعة","بعد صلاة العصر","بعد صلاة المغرب","بين المغرب والعشاء","بعد صلاة العشاء"];
+const STATUS_IN = ["مجدول","مكتمل","مؤجل","ملغى"];
+const WARN_DAYS = 30;
+const S = { acts:new Map(), khatibs:new Map(), notes:new Map(), mosques:[], docs:[], comms:[], coords:[], got:new Set(),
+  db:null, user:null, me:null, canWrite:false, admin:false, owner:false, meta:new Map(), profiles:[], audit:[], view:"home", f:{}, cal:null, comm:null, E:[], byId:new Map() };
+
+/* ---------------- utils ---------------- */
+const pad = n => String(n).padStart(2,"0");
+const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dOf = s => { if(!s) return null; const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const fmt = s => { if(!s) return "—"; const [y,m,d] = s.split("-"); return `${d}/${m}/${y}`; };
+const TODAY = isoOf(new Date());
+const diffDays = (a,b) => Math.round((dOf(b) - dOf(a)) / 864e5);
+let HIJ = null; try { HIJ = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn",{day:"numeric",month:"long",year:"numeric"}); } catch(e) {}
+let HIJD = null; try { HIJD = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn",{day:"numeric"}); } catch(e) {}
+const hijri = d => { try { return HIJ ? HIJ.format(d).replace(/\s?هـ$/,"") + " هـ" : ""; } catch(e) { return ""; } };
+const norm = s => String(s||"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/ـ/g,"").replace(/\s+/g," ").trim();
+const nkey = s => norm(s).replace(/^(الشيخ|مولانا|الدكتور|د\.)\s*/,"").replace(/\s/g,"");
+const lectNames = s => String(s||"").split(/[\/،؛]/).map(nkey).filter(x => x.length > 3);
+function slot(t){
+  t = t || ""; const h = w => t.includes(w);
+  if (h("الفجر") || h("الصبح")) return [270,360];
+  if (h("العصر") && h("المغرب")) return [930,1140];
+  if (h("صباح")) return [480,660];
+  if (h("الجمعة")) return [720,810];
+  if (h("العصر")) return h("العشاء") ? [930,1260] : [930,1050];
+  if (h("بين") || h("المغرب")) return [1050,1140];
+  if (h("العشاء")) return [1140,1260];
+  const m = t.match(/(\d{1,2})(?::(\d\d))?\s*(?:إلى|الى|-|–)\s*(\d{1,2})(?::(\d\d))?/);
+  if (m) { let a = +m[1]*60 + (+m[2]||0), b = +m[3]*60 + (+m[4]||0); if (/م|مساء/.test(t) && a < 720) { a += 720; b += 720; } if (b <= a) b += 720; return [a,b]; }
+  return null;
+}
+const slotName = t => { const s = slot(t); if(!s) return "غير محدد"; const a = s[0];
+  return a < 400 ? "الفجر" : a < 700 ? "الصباح" : a < 900 ? "الجمعة" : a < 1000 ? "العصر" : a < 1130 ? "المغرب" : "العشاء"; };
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2600); }
+const daysText = a => a.daily ? "يومياً" : (a.days||[]).length ? WEEK.filter(d => a.days.includes(d)).map(d => DAYS[d]).join("، ") : "—";
+const typeChip = t => `<span class="chip ${TK[t]||""}">${esc(t||"—")}</span>`;
+const stChip = st => { const c = {"جارٍ":"ok","ينتهي قريباً":"warn","منتهٍ":"bad","قادم":"gold","ملغى":"","مؤجل":"","مكتمل":"ok","بلا تاريخ":"warn"}[st] ?? ""; return `<span class="chip ${c}">${esc(st)}</span>`; };
+
+/* ---------------- derived model ---------------- */
+let docBy = {}, mosBy = {}, commNames = [];
+function derive(){
+  docBy = Object.fromEntries(S.docs.map(d => [d.no, d]));
+  mosBy = Object.fromEntries(S.mosques.map(m => [m.id, m]));
+  commNames = S.comms.map(c => c.name);
+  const E = [];
+  for (const [id, a] of S.acts) E.push(effAct(id, a));
+  E.sort((x,y) => (x.n||0) - (y.n||0));
+  for (let i = 0; i < E.length; i++) for (let j = i+1; j < E.length; j++) {
+    const k = clash(E[i], E[j]); if (k) { E[i].cf.push({o:E[j], k}); E[j].cf.push({o:E[i], k}); }
+  }
+  for (const e of E) e.issues = issues(e);
+  S.E = E; S.byId = new Map(E.map(e => [e.id, e]));
+}
+function effAct(id, a){
+  const d = docBy[a.doc], m = mosBy[a.mosque];
+  const start = a.start || d?.start || "", end = a.end || d?.end || "";
+  let st;
+  if (["ملغى","مؤجل","مكتمل"].includes(a.status)) st = a.status;
+  else if (!start || !end) st = "بلا تاريخ";
+  else if (start > TODAY) st = "قادم";
+  else if (end < TODAY) st = "منتهٍ";
+  else if (diffDays(TODAY, end) <= WARN_DAYS) st = "ينتهي قريباً";
+  else st = "جارٍ";
+  const live = !["ملغى","مؤجل"].includes(a.status) && start && end && end >= start;
+  const days = a.daily ? [0,1,2,3,4,5,6] : (a.days||[]);
+  return { ...a, id, start, end, st, live, days, doc_: d, mos: m, mosName: m ? "مسجد " + m.name : "", area: m?.area || "", gov: a.gov || m?.gov || "",
+           sl: slot(a.time), names: lectNames(a.lect), cf: [] };
+}
+function sameLect(A, B){ for (const x of A) for (const y of B) { if (x === y) return true; if (x.length > 7 && y.length > 7 && (x.includes(y) || y.includes(x))) return true; } return false; }
+function clash(a, b){
+  if (!a.live || !b.live || !a.sl || !b.sl) return null;
+  if (a.start > b.end || b.start > a.end) return null;
+  if (!a.days.some(d => b.days.includes(d))) return null;
+  if (!(a.sl[0] < b.sl[1] && b.sl[0] < a.sl[1])) return null;
+  if (a.names.length && b.names.length && sameLect(a.names, b.names)) return "lect";
+  if (a.mosque && a.mosque === b.mosque) return "mos";
+  return null;
+}
+function issues(e){
+  const out = [];
+  const miss = [!e.type && "النوع", !e.comm && "الجالية", !e.mosque && "المسجد", (!e.start || !e.end) && "التاريخ", (!e.daily && !e.days.length) && "اليوم"].filter(Boolean);
+  if (miss.length) out.push({lv:"bad", t:"ناقص: " + miss.join("، ")});
+  if (e.start && e.end && e.end < e.start) out.push({lv:"bad", t:"تاريخ النهاية قبل البداية"});
+  for (const c of e.cf) out.push({lv:"bad", t: (c.k === "lect" ? "المحاضر نفسه في نشاط آخر بالوقت نفسه" : "نشاط آخر في المسجد نفسه بالوقت نفسه") + ` (رقم ${c.o.n})`});
+  if (!e.sl && e.time !== undefined) out.push({lv:"warn", t:"الوقت غير محدد بدقة"});
+  if (!e.lect) out.push({lv:"warn", t:"المحاضر غير مذكور"});
+  if (e.doc && !e.doc_) out.push({lv:"warn", t:"الوثيقة غير مسجلة"});
+  if ((e.notes||"").includes("⚠")) out.push({lv:"warn", t:"تنبيه في الملاحظات"});
+  return out;
+}
+const onDay = (e, d) => { const s = isoOf(d); return e.live && e.start <= s && e.end >= s && e.days.includes(d.getDay()); };
+const hasBad = e => e.issues.some(i => i.lv === "bad");
+const conflicts = () => S.E.filter(e => e.cf.length);
+
+/* ---------------- views ---------------- */
+const TITLES = {home:"الرئيسية", khatibs:"خطباء الجاليات", acts:"الأنشطة", comms:"الجاليات", comm:"الجالية", cal:"التقويم", stats:"الإحصائيات",
+  mosques:"المساجد", docs:"الوثائق", coords:"المنسقون", notes:"الملاحظات", users:"المستخدمون والصلاحيات", audit:"سجل التعديلات"};
+function go(v, opt){
+  S.view = v; if (opt) Object.assign(S.f, opt);
+  document.querySelectorAll("#nav button,#tabbar button[data-nav]").forEach(b => b.setAttribute("aria-current", b.dataset.nav === (v === "comm" ? "comms" : v) ? "page" : "false"));
+  try { history.replaceState(null, "", "#" + v); } catch(e) {}
+  $("#side").classList.remove("open");
+  render(); window.scrollTo(0,0);
+}
+function render(){
+  const v = S.view; const ready = S.got.size >= 7;
+  if (v === "users" && !S.admin) { S.view = "home"; return render(); }
+  $("#title").innerHTML = esc(v === "comm" && S.comm ? S.comm : TITLES[v]) + (v === "home" ? `<span class="sub">${esc(new Date().toLocaleDateString("ar-EG-u-nu-latn",{weekday:"long"}))} ${fmt(TODAY)} م · ${esc(hijri(new Date()))}</span>` : "");
+  if (!ready) { $("#view").innerHTML = `<div class="loading">جارٍ تحميل بيانات القسم…</div>`; return; }
+  const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit}[v] || vHome;
+  $("#view").innerHTML = fn();
+  const fo = document.getElementById(S.focus); if (fo) { fo.focus(); try { fo.setSelectionRange(fo.value.length, fo.value.length); } catch(e) {} }
+}
+
+function actRow(e){
+  return `<button class="li" data-open="act:${esc(e.id)}"><span class="time">${esc(e.time || "—")}</span>
+    <span><span class="t">${esc(e.mosName || "مسجد غير محدد")}</span> <span class="s">· ${esc(e.area)}</span><br><span class="s">${esc(e.comm || "جالية غير محددة")}${e.lect ? " · " + esc(e.lect) : ""}</span></span>
+    ${typeChip(e.type)}</button>`;
+}
+function vHome(){
+  const E = S.E, now = new Date();
+  const running = E.filter(e => e.st === "جارٍ" || e.st === "ينتهي قريباً").length;
+  const soon = E.filter(e => e.st === "ينتهي قريباً").length;
+  const cf = conflicts().length;
+  const today = E.filter(e => onDay(e, now)).sort((a,b) => (a.sl?.[0] ?? 9999) - (b.sl?.[0] ?? 9999));
+  const miss = E.filter(e => e.issues.some(i => i.t.startsWith("ناقص"))).length;
+  const expDocs = S.docs.filter(d => d.end && d.end >= TODAY && diffDays(TODAY, d.end) <= WARN_DAYS).sort((a,b) => a.end < b.end ? -1 : 1);
+  const t = TYPES.map(x => [x, E.filter(e => e.type === x).length]);
+  return `
+  <div class="kpis">
+    <button class="kpi" data-go="acts" data-f='{"q":"","type":"","st":""}'><span>كل الأنشطة</span><b>${E.length}</b></button>
+    <button class="kpi" style="--k:var(--ok)" data-go="acts" data-f='{"st":"run"}'><span>الجارية الآن</span><b>${running}</b></button>
+    <button class="kpi" style="--k:var(--warn)" data-go="acts" data-f='{"st":"ينتهي قريباً"}'><span>تنتهي خلال ${WARN_DAYS} يوماً</span><b>${soon}</b></button>
+    <button class="kpi" style="--k:var(--bad)" data-go="acts" data-f='{"st":"cf"}'><span>تعارضات</span><b>${cf}</b></button>
+  </div>
+  <div class="grid2">
+    <div class="panel"><div class="panel-h"><h3>أنشطة اليوم</h3><span class="chip">${today.length}</span><button class="btn btn-ghost" data-go="cal">التقويم</button></div>
+      <div class="list">${today.length ? today.slice(0,12).map(actRow).join("") : `<div class="empty">لا توجد أنشطة اليوم</div>`}</div>
+      ${today.length > 12 ? `<div class="panel-b"><button class="btn btn-ghost" data-go="cal">عرض الكل (${today.length})</button></div>` : ""}</div>
+    <div style="display:grid;gap:20px;align-content:start">
+      <div class="panel"><div class="panel-h"><h3>يحتاج انتباهك</h3></div><div class="list">
+        <button class="li" data-go="acts" data-f='{"st":"cf"}'><span class="dot" style="background:var(--bad)"></span><span>تعارض في المحاضر أو المسجد</span><b class="num">${cf}</b></button>
+        <button class="li" data-go="acts" data-f='{"st":"miss"}'><span class="dot" style="background:var(--bad)"></span><span>أنشطة بياناتها ناقصة</span><b class="num">${miss}</b></button>
+        <button class="li" data-go="acts" data-f='{"st":"ينتهي قريباً"}'><span class="dot" style="background:var(--warn)"></span><span>موافقات تنتهي قريباً</span><b class="num">${soon}</b></button>
+        <button class="li" data-go="notes"><span class="dot" style="background:var(--gold)"></span><span>ملاحظات مفتوحة</span><b class="num">${[...S.notes.values()].filter(n => n.status !== "مغلقة").length}</b></button>
+      </div></div>
+      <div class="panel"><div class="panel-h"><h3>حسب النوع</h3></div><div class="panel-b bars">
+        ${t.map(([x,n]) => `<div class="bar"><span>${typeChip(x)}</span><span class="track"><i style="width:${E.length ? n/E.length*100 : 0}%;background:var(--${TK[x]})"></i></span><span class="v">${n}</span></div>`).join("")}
+      </div></div>
+      <div class="panel"><div class="panel-h"><h3>المتصلون الآن</h3><span class="chip ok">${S.online.length}</span></div><div class="panel-b" style="display:grid;gap:8px">${onlineHTML() || `<span class="s">—</span>`}</div></div>
+      <div class="panel"><div class="panel-h"><h3>آخر التعديلات</h3><button class="btn btn-ghost" data-go="audit">السجل الكامل</button></div><div class="list">
+        ${S.audit.slice(0,6).map(x => `<div class="li"><span class="chip ${({INSERT:"ok",UPDATE:"gold",DELETE:"bad"})[x.action]}">${({INSERT:"إضافة",UPDATE:"تعديل",DELETE:"حذف"})[x.action] || ""}</span><span><span class="t">${esc(whoName(x.user_id))}</span><br><span class="s">${esc(x.summary || "")}</span></span><span class="s num">${fmtTime(x.at)}</span></div>`).join("") || `<div class="empty">لا تعديلات بعد</div>`}
+      </div></div>
+      ${expDocs.length ? `<div class="panel"><div class="panel-h"><h3>وثائق تنتهي قريباً</h3></div><div class="list">${expDocs.slice(0,5).map(d => `<button class="li" data-open="doc:${esc(d.no)}"><span class="n">${esc(d.no)}</span><span class="s">${esc(d.subj)}</span><span class="chip warn">${diffDays(TODAY,d.end)} يوم</span></button>`).join("")}</div></div>` : ""}
+    </div>
+  </div>
+`;
+}
+
+function opts(list, sel, all){ return (all !== undefined ? `<option value="">${esc(all)}</option>` : "") + list.map(x => { const [v,l] = Array.isArray(x) ? x : [x,x]; return `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(l)}</option>`; }).join(""); }
+function filterActs(E, f){
+  const q = nkey(f.q || "");
+  return E.filter(e => (!f.type || e.type === f.type) && (!f.comm || e.comm === f.comm) && (!f.gov || e.gov === f.gov)
+    && (f.day === "" || f.day === undefined || e.days.includes(+f.day))
+    && (!f.st || (f.st === "run" ? (e.st === "جارٍ" || e.st === "ينتهي قريباً") : f.st === "cf" ? e.cf.length : f.st === "miss" ? e.issues.some(i => i.t.startsWith("ناقص")) : e.st === f.st))
+    && (!q || nkey([e.mosName, e.area, e.lect, e.comm, e.doc, e.title, e.notes, e.n].join(" ")).includes(q)));
+}
+function actsTable(list, showComm = true){
+  if (!list.length) return `<div class="empty">لا توجد أنشطة مطابقة</div>`;
+  return `<div class="table-wrap"><table class="cardify"><thead><tr><th>#</th><th>النوع</th>${showComm ? "<th>الجالية</th>" : ""}<th>المسجد</th><th>اليوم والوقت</th><th>المحاضر</th><th>الفترة</th><th>الحالة / آخر تعديل</th><th></th></tr></thead><tbody>
+  ${list.map(e => `<tr data-open="act:${esc(e.id)}"><td class="n">${e.n}</td><td>${typeChip(e.type)}</td>${showComm ? `<td class="wide">${esc(e.comm || "—")}</td>` : ""}
+    <td class="wide">${esc(e.mosName || "—")}<span class="s">${esc([e.area, e.gov].filter(Boolean).join(" · "))}</span></td>
+    <td class="wide">${esc(daysText(e))} · ${esc(e.time || "—")}</td><td class="wide">${esc(e.lect || "—")}</td>
+    <td class="num hide-m" style="white-space:nowrap;font-size:13px">${fmt(e.start)}<span class="s">${fmt(e.end)}</span></td><td>${stChip(e.st)}${S.meta.get("acts:" + e.id)?.by ? `<span class="s">${esc(whoName(S.meta.get("acts:" + e.id).by))}</span>` : ""}</td>
+    <td>${hasBad(e) ? `<span class="flag" title="${esc(e.issues.filter(i => i.lv === "bad").map(i => i.t).join(" | "))}">!</span>` : ""}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+function vActs(){
+  const f = S.f; const list = filterActs(S.E, f);
+  return `<div class="toolbar">
+    <div class="search"><svg><use href="#i-search"/></svg><input id="q" class="f" placeholder="ابحث: مسجد، محاضر، رقم وثيقة…" value="${esc(f.q||"")}" data-fk="q"></div>
+    <select class="f" data-fk="type">${opts(TYPES, f.type, "كل الأنواع")}</select>
+    <select class="f" data-fk="comm">${opts(commNames, f.comm, "كل الجاليات")}</select>
+    <select class="f" data-fk="gov">${opts(GOVS, f.gov, "كل المحافظات")}</select>
+    <select class="f" data-fk="day">${opts(WEEK.map(d => [String(d), DAYS[d]]), f.day, "كل الأيام")}</select>
+    <select class="f" data-fk="st">${opts([["run","الجارية"],["ينتهي قريباً","تنتهي قريباً"],["قادم","القادمة"],["منتهٍ","المنتهية"],["cf","فيها تعارض"],["miss","بياناتها ناقصة"]], f.st, "كل الحالات")}</select>
+    <span class="count">${list.length} من ${S.E.length}</span>
+  </div>
+  <div class="panel">${actsTable(list)}</div>`;
+}
+
+function commStats(c){ const L = S.E.filter(e => e.comm === c); return { n:L.length, t:TYPES.map(x => L.filter(e => e.type === x).length), run:L.filter(e => e.st === "جارٍ" || e.st === "ينتهي قريباً").length, cf:L.filter(e => e.cf.length).length, kh:[...S.khatibs.values()].filter(k => k.comm === c).length }; }
+function vComms(){
+  return `<div class="cards">${S.comms.map(c => { const s = commStats(c.name); const co = S.coords.filter(x => x.comm === c.name && x.role === "منسق" && x.status !== "سابق").map(x => x.name);
+    return `<button class="ccard" data-comm="${esc(c.name)}"><div><h3>${esc(c.name)}</h3><span class="s">${esc(co.join("، ") || "بلا منسق مسجل")}</span></div>
+      <div class="row">${s.t.map((n,i) => n ? `<span class="chip ${["t1","t2","t3"][i]}">${n} ${esc(TPL[TYPES[i]])}</span>` : "").join("") || `<span class="chip">لا أنشطة</span>`}
+      ${s.kh ? `<span class="chip gold">${s.kh} خطبة جمعة</span>` : ""}${s.cf ? `<span class="chip bad">${s.cf} تعارض</span>` : ""}</div></button>`; }).join("")}</div>`;
+}
+function vComm(){
+  const c = S.comm; const s = commStats(c); const f = S.f;
+  const co = S.coords.filter(x => x.comm === c && x.status !== "سابق");
+  const list = filterActs(S.E.filter(e => e.comm === c), {type:f.ctype, day:f.cday, gov:f.cgov});
+  const kh = [...S.khatibs.entries()].filter(([,k]) => k.comm === c).sort((a,b) => a[1].n - b[1].n);
+  return `<div><button class="btn btn-ghost" data-go="comms">كل الجاليات</button></div>
+  <div class="panel"><div class="panel-b" style="display:flex;gap:28px;flex-wrap:wrap">
+    ${co.length ? co.map(x => `<div><span class="lbl">${esc(x.role)}</span><div style="font-weight:600;font-size:16px">${esc(x.name)}</div><span class="num" style="color:var(--muted)">${esc(x.phone)}</span></div>`).join("") : `<span class="s">لا يوجد منسق مسجل لهذه الجالية</span>`}
+  </div></div>
+  <div class="kpis"><div class="kpi"><span>الأنشطة</span><b>${s.n}</b></div><div class="kpi" style="--k:var(--ok)"><span>الجارية الآن</span><b>${s.run}</b></div>
+    <div class="kpi" style="--k:var(--gold)"><span>مساجد خطبة الجمعة</span><b>${s.kh}</b></div><div class="kpi" style="--k:var(--bad)"><span>تعارضات</span><b>${s.cf}</b></div></div>
+  <div class="toolbar"><select class="f" data-fk="ctype">${opts(TYPES, f.ctype, "كل الأنواع")}</select><select class="f" data-fk="cday">${opts(WEEK.map(d => [String(d), DAYS[d]]), f.cday, "كل الأيام")}</select>
+    <select class="f" data-fk="cgov">${opts(GOVS, f.cgov, "كل المحافظات")}</select><span class="count">${list.length} نشاط</span></div>
+  <div class="panel">${actsTable(list, false)}</div>
+  <div class="panel"><div class="panel-h"><h3>مساجد خطبة الجمعة</h3><span class="chip">${kh.length}</span></div>
+    ${kh.length ? `<div class="table-wrap"><table class="kt"><thead><tr><th>م</th><th>المسجد</th><th>المنطقة</th><th>المحافظة</th><th>الخطيب الأساسي</th><th>الخطيب الاحتياط</th></tr></thead><tbody>
+    ${kh.map(([id,k],i) => `<tr data-open="kh:${esc(id)}"><td class="n">${i+1}</td><td>${esc(k.mosque)}</td><td>${esc(k.area)}</td><td>${esc(k.gov)}</td><td>${esc(k.pri)}<span class="s num">${esc(k.pph)}</span></td><td>${esc(k.bak)}<span class="s num">${esc(k.bph)}</span></td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">لا توجد خطبة جمعة مسجلة لهذه الجالية</div>`}</div>`;
+}
+
+function vKhatibs(){
+  const f = S.f; const q = nkey(f.kq || "");
+  const rows = [...S.khatibs.entries()].sort((a,b) => (a[1].n||0) - (b[1].n||0))
+    .filter(([,k]) => (!f.kgov || k.gov === f.kgov) && (!f.kcomm || k.comm === f.kcomm) && (!q || nkey(Object.values(k).join(" ")).includes(q)));
+  return `<div class="toolbar">
+    <div class="search"><svg><use href="#i-search"/></svg><input id="kq" class="f" placeholder="ابحث باسم الخطيب أو المسجد أو الهاتف…" value="${esc(f.kq||"")}" data-fk="kq"></div>
+    <select class="f" data-fk="kgov">${opts(GOVS, f.kgov, "كل المحافظات")}</select>
+    <select class="f" data-fk="kcomm">${opts(commNames, f.kcomm, "كل الجاليات")}</select>
+    ${S.canWrite ? `<button class="btn btn-primary" data-new="kh"><svg width="16" height="16"><use href="#i-plus"/></svg>إضافة خطيب</button>` : ""}
+    <span class="count">${rows.length} مسجد</span></div>
+  <div class="panel" style="overflow:hidden"><div class="kt-title">جدول خطباء الجاليات</div><div class="kt-sub">وزارة الشؤون الإسلامية · إدارة العلاقات الخارجية · قسم الجاليات ورعاية المهتدين وطلبة البعوث</div>
+  <div class="table-wrap"><table class="kt"><thead><tr><th>م</th><th>الخطيب الأساسي</th><th>هاتف الأساسي</th><th>مدني الأساسي</th><th>الخطيب الاحتياط</th><th>هاتف الاحتياط</th><th>مدني الاحتياط</th><th>الجالية</th><th>المسجد</th><th>المحافظة</th><th>المنطقة</th><th>ملاحظات</th></tr></thead><tbody>
+  ${rows.map(([id,k],i) => `<tr data-open="kh:${esc(id)}"><td class="n">${i+1}</td><td>${esc(k.pri)}</td><td class="num">${esc(k.pph)}</td><td class="num">${esc(k.pid)}</td><td>${esc(k.bak)}</td><td class="num">${esc(k.bph)}</td><td class="num">${esc(k.bid)}</td><td>${esc(k.label || k.comm)}</td><td>${esc(k.mosque)}</td><td>${esc(k.gov)}</td><td>${esc(k.area)}</td><td>${esc(k.note)}</td></tr>`).join("")}
+  </tbody></table></div></div>`;
+}
+
+function vCal(){
+  if (!S.cal) { const n = new Date(); S.cal = {y:n.getFullYear(), m:n.getMonth(), sel:TODAY}; }
+  const {y, m, sel} = S.cal;
+  const first = new Date(y, m, 1); const off = (first.getDay() + 1) % 7; // Saturday first
+  const cells = [];
+  for (let i = 0; i < 42; i++) { const d = new Date(y, m, 1 - off + i); cells.push(d); }
+  const last = cells.slice(35).every(d => d.getMonth() !== m) ? 35 : 42;
+  const mName = first.toLocaleDateString("ar-EG-u-nu-latn",{month:"long", year:"numeric"});
+  const selD = dOf(sel); const dayList = S.E.filter(e => onDay(e, selD)).sort((a,b) => (a.sl?.[0] ?? 9999) - (b.sl?.[0] ?? 9999));
+  const ft = S.f.caltype || "";
+  return `<div class="toolbar"><button class="btn btn-ghost" data-cal="-1">الشهر السابق</button><h3 style="font-size:18px;min-width:140px;text-align:center">${esc(mName)}</h3><button class="btn btn-ghost" data-cal="1">الشهر التالي</button>
+    <button class="btn btn-ghost" data-cal="0">اليوم</button><select class="f" data-fk="caltype">${opts(TYPES, ft, "كل الأنواع")}</select>
+    <span class="legend" style="margin-inline-start:auto">${TYPES.map(t => `<span><i class="dot ${TK[t]}"></i>${esc(t)}</span>`).join("")}</span></div>
+  <div class="grid2"><div class="panel panel-b"><div class="cal">${WEEK.map(d => `<div class="hd">${DAYS[d]}</div>`).join("")}
+    ${cells.slice(0, last).map(d => { const s = isoOf(d); const L = S.E.filter(e => (!ft || e.type === ft) && onDay(e, d));
+      const c = TYPES.map(t => L.filter(e => e.type === t).length);
+      let hd = ""; try { hd = HIJD ? HIJD.format(d) : ""; } catch(e) {}
+      return `<button class="day${d.getMonth() !== m ? " out" : ""}${s === TODAY ? " today" : ""}${s === sel ? " sel" : ""}" data-day="${s}"><span class="d"><b>${d.getDate()}</b><small>${esc(hd)}</small></span>
+        <span class="c">${L.length ? L.length + " نشاط" : ""}</span><span class="ds">${c.map((n,i) => n ? `<i class="dot t${i+1}"></i>`.repeat(Math.min(n,4)) : "").join("")}</span></button>`; }).join("")}
+  </div></div>
+  <div class="panel"><div class="panel-h"><h3>${esc(selD.toLocaleDateString("ar-EG-u-nu-latn",{weekday:"long"}))} ${fmt(sel)}</h3><span class="chip">${dayList.filter(e => !ft || e.type === ft).length}</span></div>
+    <div class="panel-b" style="padding-top:8px;padding-bottom:0;color:var(--muted);font-size:13px">${esc(hijri(selD))}</div>
+    <div class="list">${dayList.filter(e => !ft || e.type === ft).map(actRow).join("") || `<div class="empty">لا أنشطة في هذا اليوم</div>`}</div></div></div>`;
+}
+
+function barList(rows, total, colorFn){
+  const max = Math.max(1, ...rows.map(r => r[1]));
+  return `<div class="bars">${rows.map(([k, n, parts]) => `<div class="bar"><span>${esc(k)}</span><span class="track">${parts ? parts.map((p,i) => `<i style="width:${p/max*100}%;background:var(--t${i+1})"></i>`).join("") : `<i style="width:${n/max*100}%;background:${colorFn ? colorFn(k) : "var(--primary)"}"></i>`}</span><span class="v">${n}</span></div>`).join("")}</div>`;
+}
+function vStats(){
+  const E = S.E;
+  const byComm = commNames.map(c => { const L = E.filter(e => e.comm === c); return [c, L.length, TYPES.map(t => L.filter(e => e.type === t).length)]; }).filter(r => r[1]).sort((a,b) => b[1]-a[1]);
+  const noComm = E.filter(e => !e.comm).length; if (noComm) byComm.push(["غير محددة", noComm]);
+  const byGov = GOVS.map(g => [g, E.filter(e => e.gov === g).length]).filter(r => r[1]).sort((a,b) => b[1]-a[1]);
+  const byDay = WEEK.map(d => [DAYS[d], E.filter(e => e.live && e.days.includes(d)).length]);
+  const maxD = Math.max(1, ...byDay.map(r => r[1]));
+  const slots = ["الفجر","الصباح","الجمعة","العصر","المغرب","العشاء","غير محدد"].map(s => [s, E.filter(e => slotName(e.time) === s).length]).filter(r => r[1]);
+  const sts = ["جارٍ","ينتهي قريباً","قادم","منتهٍ","بلا تاريخ","مكتمل","مؤجل","ملغى"].map(s => [s, E.filter(e => e.st === s).length]).filter(r => r[1]);
+  const lects = new Set(E.flatMap(e => e.names)).size; const mos = new Set(E.map(e => e.mosque).filter(Boolean)).size;
+  return `<div class="kpis"><div class="kpi"><span>الأنشطة</span><b>${E.length}</b></div><div class="kpi" style="--k:var(--gold)"><span>المساجد المستخدمة</span><b>${mos}</b></div>
+    <div class="kpi" style="--k:var(--t1)"><span>المحاضرون</span><b>${lects}</b></div><div class="kpi" style="--k:var(--t3)"><span>الجاليات النشطة</span><b>${byComm.filter(r => r[0] !== "غير محددة").length}</b></div></div>
+  <div class="grid2"><div class="panel"><div class="panel-h"><h3>الأنشطة حسب الجالية</h3><span class="legend">${TYPES.map(t => `<span><i class="dot ${TK[t]}"></i>${esc(t)}</span>`).join("")}</span></div><div class="panel-b">${barList(byComm)}</div></div>
+  <div style="display:grid;gap:20px;align-content:start">
+    <div class="panel"><div class="panel-h"><h3>حسب المحافظة</h3></div><div class="panel-b">${barList(byGov)}</div></div>
+    <div class="panel"><div class="panel-h"><h3>حسب وقت الصلاة</h3></div><div class="panel-b">${barList(slots, 0, () => "var(--gold)")}</div></div>
+    <div class="panel"><div class="panel-h"><h3>حسب الحالة</h3></div><div class="panel-b">${barList(sts, 0, k => ({"جارٍ":"var(--ok)","ينتهي قريباً":"var(--warn)","منتهٍ":"var(--bad)","بلا تاريخ":"var(--bad)"}[k] || "var(--muted)"))}</div></div>
+  </div></div>
+  <div class="panel"><div class="panel-h"><h3>الأنشطة الجارية حسب أيام الأسبوع</h3></div><div class="panel-b"><div class="vbars">
+    ${byDay.map(([d,n]) => `<div class="vbar"><span class="num">${n}</span><span class="col" style="height:${n/maxD*100}%"></span><span>${esc(d)}</span></div>`).join("")}</div></div></div>`;
+}
+
+function vMosques(){
+  const f = S.f; const q = nkey(f.mq || "");
+  const cnt = {}; S.E.forEach(e => { if (e.mosque) cnt[e.mosque] = (cnt[e.mosque]||0) + 1; });
+  const rows = S.mosques.filter(m => (!f.mgov || m.gov === f.mgov) && (!q || nkey(m.name + m.area).includes(q)));
+  return `<div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input id="mq" class="f" placeholder="ابحث باسم المسجد أو المنطقة…" value="${esc(f.mq||"")}" data-fk="mq"></div>
+    <select class="f" data-fk="mgov">${opts(GOVS, f.mgov, "كل المحافظات")}</select>${S.canWrite ? `<button class="btn btn-primary" data-new="mos"><svg width="16" height="16"><use href="#i-plus"/></svg>إضافة مسجد</button>` : ""}<span class="count">${rows.length} مسجد</span></div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>المسجد</th><th>المنطقة</th><th>المحافظة</th><th>الأنشطة</th></tr></thead><tbody>
+  ${rows.map(m => `<tr data-open="mos:${esc(m.id)}"><td>مسجد ${esc(m.name)}</td><td>${esc(m.area)}</td><td>${esc(m.gov || "—")}</td><td class="num">${cnt[m.id] || ""}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+function vDocs(){
+  const cnt = {}; S.E.forEach(e => { if (e.doc) cnt[e.doc] = (cnt[e.doc]||0) + 1; });
+  const st = d => !d.end ? ["—",""] : d.end < TODAY ? ["منتهية","bad"] : d.start > TODAY ? ["لم تبدأ","gold"] : diffDays(TODAY, d.end) <= WARN_DAYS ? ["تنتهي قريباً","warn"] : ["سارية","ok"];
+  const rows = [...S.docs].sort((a,b) => (a.end||"") < (b.end||"") ? -1 : 1);
+  return `<div class="toolbar">${S.canWrite ? `<button class="btn btn-primary" data-new="doc"><svg width="16" height="16"><use href="#i-plus"/></svg>إضافة وثيقة</button>` : ""}<span class="count">${rows.length} وثيقة</span></div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>رقم الوثيقة</th><th>الموضوع</th><th>من</th><th>إلى</th><th>المتبقي</th><th>الحالة</th><th>الأنشطة</th></tr></thead><tbody>
+  ${rows.map(d => { const [s,c] = st(d); return `<tr data-open="doc:${esc(d.no)}"><td class="num">${esc(d.no)}</td><td>${esc(d.subj)}<span class="s">${esc(d.notes||"")}</span></td><td class="num">${fmt(d.start)}</td><td class="num">${fmt(d.end)}</td>
+    <td class="num">${d.end && d.end >= TODAY ? diffDays(TODAY, d.end) + " يوم" : ""}</td><td><span class="chip ${c}">${s}</span></td><td class="num">${cnt[d.no]||""}</td></tr>`; }).join("")}</tbody></table></div></div>`;
+}
+function vCoords(){
+  return `<div class="toolbar">${S.admin ? `<button class="btn btn-primary" data-new="co"><svg width="16" height="16"><use href="#i-plus"/></svg>إضافة منسق</button>` : ""}<span class="count">${S.coords.length} سجل · حسب كشف المنسقين المعتمد</span></div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الصفة</th><th>الجالية</th><th>اللغة</th><th>الهاتف</th><th>الحالة</th></tr></thead><tbody>
+  ${S.coords.map((c,i) => `<tr data-open="co:${i}"><td style="font-weight:${c.role === "منسق" ? 600 : 400}">${esc(c.name)}</td><td>${c.role === "منسق" ? `<span class="chip ok">منسق</span>` : `<span class="chip">نائب منسق</span>`}</td><td>${esc(c.comm)}</td><td>${esc(c.lang)}</td><td class="num">${esc(c.phone)}</td><td>${esc(c.status)}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+function vNotes(){
+  const f = S.f; const rows = [...S.notes.entries()].filter(([,n]) => !f.nst || (f.nst === "open" ? n.status !== "مغلقة" : n.status === f.nst)).sort((a,b) => (a[1].date||"") < (b[1].date||"") ? 1 : -1);
+  const pc = {"عالية":"bad","متوسطة":"warn","منخفضة":"ok"};
+  return `<div class="toolbar"><select class="f" data-fk="nst">${opts([["open","المفتوحة"],["مغلقة","المغلقة"]], f.nst, "كل الملاحظات")}</select>
+    ${S.canWrite ? `<button class="btn btn-primary" data-new="note"><svg width="16" height="16"><use href="#i-plus"/></svg>ملاحظة جديدة</button>` : ""}<span class="count">${rows.length} ملاحظة</span></div>
+  <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">${rows.map(([id,n]) => `<button class="ccard" data-open="note:${esc(id)}">
+    <div class="row"><span class="chip ${pc[n.prio]||""}">${esc(n.prio||"—")}</span><span class="chip">${esc(n.status||"")}</span><span class="s num" style="margin-inline-start:auto">${fmt(n.date)}</span></div>
+    <h3 style="font-size:15px">${esc(n.title)}</h3><span class="s" style="white-space:pre-line">${esc((n.body||"").slice(0,220))}${(n.body||"").length > 220 ? "…" : ""}</span>
+    ${n.src ? `<span class="s" style="font-size:12px">المصدر: ${esc(n.src)}</span>` : ""}</button>`).join("") || `<div class="empty">لا توجد ملاحظات</div>`}</div>`;
+}
+
+/* ---------------- drawer & forms ---------------- */
+function openDrawer(title, body, foot){
+  const d = $("#drawer");
+  d.innerHTML = `<div class="drawer-h"><h3>${esc(title)}</h3><button class="x" data-close aria-label="إغلاق">×</button></div><div class="drawer-b">${body}</div><div class="drawer-f">${foot || ""}</div>`;
+  d.hidden = false; $("#scrim").hidden = false;
+  const first = d.querySelector("input,select,textarea"); if (first && S.canWrite) first.focus();
+}
+function closeDrawer(){ $("#drawer").hidden = true; $("#scrim").hidden = true; $("#drawer").innerHTML = ""; S.form = null; }
+const dis = () => S.canWrite ? "" : " disabled";
+const fld = (id, label, input, hint) => `<div class="fld"><label for="${id}">${label}</label>${input}${hint ? `<span class="hint" id="${id}-h">${hint}</span>` : ""}</div>`;
+const inp = (id, v, extra = "") => `<input class="f" id="${id}" value="${esc(v ?? "")}"${extra}${dis()}>`;
+const footSave = (del) => S.canWrite ? `<button class="btn btn-primary" data-save>حفظ</button><button class="btn btn-ghost" data-close>إلغاء</button>${del && S.admin ? `<span style="margin-inline-start:auto" id="delwrap"><button class="btn btn-danger" data-del>حذف</button></span>` : ""}` : `<button class="btn btn-ghost" data-close>إغلاق</button>`;
+
+function actForm(id){
+  const a = id ? S.acts.get(id) : { type:"درس ديني", days:[], daily:false, status:"مجدول" };
+  if (!a) return;
+  S.form = { kind:"act", id, days:new Set(a.days||[]), daily:!!a.daily, type:a.type || "درس ديني" };
+  const timeKnown = !a.time || TIMES.includes(a.time);
+  const mos = a.mosque ? mosBy[a.mosque] : null;
+  const gov = a.gov || mos?.gov || "";
+  const e = id ? S.byId.get(id) : null;
+  openDrawer(id ? `نشاط رقم ${a.n}` : "إضافة نشاط", `
+    ${fld("f-doc", "رقم الوثيقة", inp("f-doc", a.doc, ' list="dl-docs" placeholder="مثال: 2609-4783" autocomplete="off"'), " ")}
+    <div class="fld"><span class="lbl">نوع النشاط</span><div class="seg" id="f-type">${TYPES.map(t => `<button type="button" data-type="${t}" aria-pressed="${t === S.form.type}"${dis()}>${t}</button>`).join("")}</div></div>
+    ${fld("f-comm", "الجالية", `<select class="f" id="f-comm"${dis()}>${opts(commNames, a.comm, "اختر الجالية")}</select>`)}
+    <div class="two">${fld("f-gov", "المحافظة", `<select class="f" id="f-gov"${dis()}>${opts(GOVS, gov, "اختر المحافظة")}</select>`)}
+      ${fld("f-mos", "المسجد", `<select class="f" id="f-mos"${dis()}>${mosOpts(gov, a.mosque)}</select>`)}</div>
+    <div class="two" id="newmos" hidden>${fld("f-mname", "اسم المسجد الجديد", inp("f-mname", "", ' placeholder="بدون كلمة مسجد"'))}${fld("f-marea", "المنطقة", inp("f-marea", ""))}</div>
+    <div class="fld"><span class="lbl">اليوم</span><div class="days" id="f-days"><button type="button" data-daily aria-pressed="${S.form.daily}"${dis()}>يومياً</button>${WEEK.map(d => `<button type="button" data-d="${d}" aria-pressed="${!S.form.daily && S.form.days.has(d)}"${dis()}>${DAYS[d]}</button>`).join("")}</div></div>
+    <div class="two">${fld("f-time", "الوقت", `<select class="f" id="f-time"${dis()}>${opts(TIMES, timeKnown ? a.time : "__o", "اختر الوقت")}<option value="__o"${timeKnown ? "" : " selected"}>وقت آخر…</option></select>`)}
+      ${fld("f-time2", "اكتب الوقت", inp("f-time2", timeKnown ? "" : a.time, ' placeholder="مثال: من 7:00 إلى 8:00 م"'))}</div>
+    ${fld("f-lect", "المحاضر", inp("f-lect", a.lect, ' list="dl-lects" autocomplete="off" placeholder="أكثر من محاضر؟ افصل بينهم بـ /"'))}
+    ${fld("f-title", "العنوان أو الموضوع", inp("f-title", a.title, ' placeholder="اختياري"'))}
+    <div class="two">${fld("f-start", "من تاريخ", `<input type="date" class="f" id="f-start" value="${esc(a.start||"")}"${dis()}>`, "فارغ = من الوثيقة")}
+      ${fld("f-end", "إلى تاريخ", `<input type="date" class="f" id="f-end" value="${esc(a.end||"")}"${dis()}>`, "فارغ = من الوثيقة")}</div>
+    ${fld("f-status", "الحالة", `<select class="f" id="f-status"${dis()}>${opts(STATUS_IN, a.status || "مجدول")}</select>`)}
+    ${fld("f-notes", "ملاحظات", `<textarea class="f" id="f-notes" rows="3"${dis()}>${esc(a.notes||"")}</textarea>`)}
+    <div id="f-check"></div>
+    <div id="f-who" class="hint" style="font-size:12.5px;color:var(--muted)"></div>
+    <datalist id="dl-docs">${S.docs.map(d => `<option value="${esc(d.no)}">${esc(d.subj)}</option>`).join("")}</datalist>
+    <datalist id="dl-lects">${[...new Set(S.E.flatMap(x => (x.lect||"").split(" / ")).filter(Boolean))].sort().map(l => `<option value="${esc(l)}">`).join("")}</datalist>`, footSave(!!id));
+  $("#f-time2").closest(".fld").hidden = timeKnown;
+  docHint(); liveCheck();
+  const mt = id && S.meta.get("acts:" + id); if (mt) $("#f-who").textContent = `آخر تعديل: ${whoName(mt.by)} · ${fmtTime(mt.at)}`;
+}
+function mosOpts(gov, sel){
+  const L = S.mosques.filter(m => !gov || m.gov === gov).sort((a,b) => (a.area + a.name).localeCompare(b.area + b.name, "ar"));
+  return `<option value="">اختر المسجد</option>` + L.map(m => `<option value="${esc(m.id)}"${m.id === sel ? " selected" : ""}>مسجد ${esc(m.name)} — ${esc(m.area)}</option>`).join("") + (S.canWrite ? `<option value="__new">+ مسجد غير موجود في القائمة</option>` : "");
+}
+function docHint(){
+  const h = $("#f-doc-h"); if (!h) return; const no = $("#f-doc").value.trim(); const d = docBy[no];
+  h.innerHTML = !no ? "اختر الرقم لتُؤخذ تواريخ السريان تلقائياً" : d ? `<span class="chip ok">مسجلة</span> ${esc(d.subj)} · ${fmt(d.start)} ← ${fmt(d.end)}` : `<span class="chip warn">غير مسجلة</span> اكتب التاريخين أدناه وستُضاف للوثائق عند الحفظ`;
+  ["f-start","f-end"].forEach(k => { const el = $("#" + k); if (el) el.title = d ? fmt(k === "f-start" ? d.start : d.end) : ""; });
+  const hs = $("#f-start-h"), he = $("#f-end-h"); if (hs) hs.textContent = d ? "فارغ = " + fmt(d.start) : "فارغ = من الوثيقة"; if (he) he.textContent = d ? "فارغ = " + fmt(d.end) : "فارغ = من الوثيقة";
+}
+function readAct(){
+  const F = S.form; const t = $("#f-time").value;
+  return { doc:$("#f-doc").value.trim(), type:F.type, comm:$("#f-comm").value, gov:$("#f-gov").value, mosque:$("#f-mos").value === "__new" ? "" : $("#f-mos").value,
+    days:F.daily ? [0,1,2,3,4,5,6] : [...F.days].sort(), daily:F.daily, time:t === "__o" ? $("#f-time2").value.trim() : t, lect:$("#f-lect").value.trim().replace(/\s*\/\s*/g," / "),
+    title:$("#f-title").value.trim(), start:$("#f-start").value, end:$("#f-end").value, status:$("#f-status").value, notes:$("#f-notes").value.trim() };
+}
+function liveCheck(){
+  const box = $("#f-check"); if (!box || !S.form) return;
+  const draft = readAct(); const e = effAct(S.form.id || "__draft", { ...draft, n: S.form.id ? S.acts.get(S.form.id).n : "جديد" });
+  for (const o of S.E) { if (o.id === S.form.id) continue; const k = clash(e, o); if (k) e.cf.push({o, k}); }
+  const iss = issues(e); const bad = iss.filter(i => i.lv === "bad"), warn = iss.filter(i => i.lv === "warn");
+  box.innerHTML = bad.length ? `<div class="check bad"><b>انتبه</b>${bad.map(i => `<span>${esc(i.t)}${i.t.includes("رقم") ? "" : ""}</span>`).join("")}</div>`
+    : warn.length ? `<div class="check warn"><b>ملاحظات</b>${warn.map(i => `<span>${esc(i.t)}</span>`).join("")}</div>` : `<div class="check ok"><b>سليم</b><span>لا تعارض مع بقية الأنشطة</span></div>`;
+}
+async function saveAct(){
+  const v = readAct(); const F = S.form;
+  if (!v.comm) { toast("اختر الجالية"); $("#f-comm").focus(); return; }
+  const ops = [];
+  if ($("#f-mos").value === "__new") {
+    const name = $("#f-mname").value.trim().replace(/^مسجد\s+/,""), area = $("#f-marea").value.trim();
+    if (!name) { toast("اكتب اسم المسجد الجديد"); $("#f-mname").focus(); return; }
+    const ex = S.mosques.find(m => nkey(m.name) === nkey(name) && nkey(m.area) === nkey(area));
+    if (ex) v.mosque = ex.id; else {
+      const nid = "m" + String(Math.max(0, ...S.mosques.map(m => +m.id.slice(1) || 0)) + 1).padStart(3,"0");
+      const list = [...S.mosques, {id:nid, name, area, gov:v.gov}]; v.mosque = nid; ops.push(() => T.ref("mosques", list));
+    }
+  }
+  if (v.doc && !docBy[v.doc] && v.start && v.end) { const list = [...S.docs, {no:v.doc, date:v.start, subj:`موافقة ${v.type} — ${v.comm}`, comm:v.comm, start:v.start, end:v.end, notes:""}]; ops.push(() => T.ref("docs", list)); }
+  const d = docBy[v.doc]; if (d) { if (v.start === d.start) v.start = ""; if (v.end === d.end) v.end = ""; }
+  const n = F.id ? S.acts.get(F.id).n : Math.max(0, ...[...S.acts.values()].map(a => a.n || 0)) + 1;
+  const body = { ...v, n };
+  try {
+    for (const op of ops) await op();
+    await T.put("acts", F.id, body);
+    closeDrawer(); toast(F.id ? "حُفظ التعديل" : `أُضيف النشاط رقم ${n}`);
+  } catch (err) { writeFail(err); }
+}
+function writeFail(err){
+  console.error(err);
+  if (err?.code === "42501") toast("لا تملك صلاحية هذه العملية — اطلبها من مدير النظام");
+  else if (/fetch|network/i.test(err?.message || "")) toast("لا يوجد اتصال بالإنترنت، حاول مرة أخرى");
+  else toast("تعذّر الحفظ، حاول مرة أخرى");
+}
+function delAsk(fn){
+  const w = $("#delwrap"); if (!w) return;
+  w.innerHTML = `<span style="font-size:13px;color:var(--bad);margin-inline-end:8px">تأكيد الحذف؟</span><button class="btn btn-danger" data-delok>نعم، احذف</button>`;
+  S.delFn = fn;
+}
+
+function khForm(id){
+  const k = id ? S.khatibs.get(id) : {};
+  if (!k) return; S.form = {kind:"kh", id};
+  openDrawer(id ? `خطيب: ${k.mosque || ""}` : "إضافة خطيب", `
+    <div class="two">${fld("k-mosque", "المسجد", inp("k-mosque", k.mosque, ' list="dl-mos"'))}${fld("k-area", "المنطقة", inp("k-area", k.area))}</div>
+    <div class="two">${fld("k-gov", "المحافظة", `<select class="f" id="k-gov"${dis()}>${opts(GOVS, k.gov, "اختر")}</select>`)}${fld("k-comm", "الجالية", `<select class="f" id="k-comm"${dis()}>${opts(commNames, k.comm, "اختر")}</select>`)}</div>
+    <div class="two">${fld("k-pri", "الخطيب الأساسي", inp("k-pri", k.pri))}${fld("k-pph", "هاتف الأساسي", inp("k-pph", k.pph, ' inputmode="numeric"'))}</div>
+    ${fld("k-pid", "مدني الأساسي", inp("k-pid", k.pid, ' inputmode="numeric"'))}
+    <div class="two">${fld("k-bak", "الخطيب الاحتياط", inp("k-bak", k.bak))}${fld("k-bph", "هاتف الاحتياط", inp("k-bph", k.bph, ' inputmode="numeric"'))}</div>
+    ${fld("k-bid", "مدني الاحتياط", inp("k-bid", k.bid, ' inputmode="numeric"'))}
+    ${fld("k-note", "ملاحظات", `<textarea class="f" id="k-note" rows="2"${dis()}>${esc(k.note||"")}</textarea>`)}
+    ${id && S.meta.get("khatibs:" + id)?.at ? `<div class="hint">آخر تعديل: ${esc(whoName(S.meta.get("khatibs:" + id).by))} - ${fmtTime(S.meta.get("khatibs:" + id).at)}</div>` : ""}
+    <datalist id="dl-mos">${S.mosques.map(m => `<option value="${esc(m.name)}">${esc(m.area)}</option>`).join("")}</datalist>`, footSave(!!id));
+}
+async function saveKh(){
+  const g = k => $("#k-" + k).value.trim(); const F = S.form;
+  const old = F.id ? S.khatibs.get(F.id) : {};
+  const comm = g("comm");
+  const body = { n: old.n || Math.max(0, ...[...S.khatibs.values()].map(x => x.n||0)) + 1, pri:g("pri"), pph:g("pph"), pid:g("pid"), bak:g("bak"), bph:g("bph"), bid:g("bid"),
+    label: old.comm === comm && old.label ? old.label : comm, comm, mosque:g("mosque"), gov:g("gov"), area:g("area"), note:g("note") };
+  if (!body.mosque || !body.pri) { toast("اكتب المسجد والخطيب الأساسي"); return; }
+  try { await T.put("khatibs", F.id, body); closeDrawer(); toast("حُفظ"); } catch (e) { writeFail(e); }
+}
+function listForm(kind, key){
+  const conf = {
+    mos: {title:"مسجد", ref:"mosques", find:L => L.findIndex(m => m.id === key), fields:[["name","اسم المسجد (بدون كلمة مسجد)"],["area","المنطقة"],["gov","المحافظة",GOVS]]},
+    doc: {title:"وثيقة", ref:"docs", find:L => L.findIndex(d => d.no === key), fields:[["no","رقم الوثيقة"],["subj","الموضوع"],["comm","الجالية",commNames],["date","تاريخ الكتاب","date"],["start","بداية السريان","date"],["end","نهاية السريان","date"],["notes","ملاحظات"]]},
+    co:  {admin:true, title:"منسق", ref:"coords", find:() => key === undefined ? -1 : +key, fields:[["name","الاسم"],["role","الصفة",["منسق","نائب منسق"]],["comm","الجالية",commNames],["lang","اللغة"],["phone","الهاتف"],["status","الحالة",["نشط","موقوف","سابق"]]]},
+  }[kind];
+  const L = S[conf.ref]; const i = key === undefined ? -1 : conf.find(L); const it = i >= 0 ? L[i] : {};
+  S.form = {kind:"list", conf, i}; const keep = S.canWrite; if (conf.admin && !S.admin) S.canWrite = false;
+  openDrawer((i >= 0 ? "تعديل " : "إضافة ") + conf.title, conf.fields.map(([k, l, t]) =>
+    fld("l-" + k, l, Array.isArray(t) ? `<select class="f" id="l-${k}"${dis()}>${opts(t, it[k], "اختر")}</select>` : t === "date" ? `<input type="date" class="f" id="l-${k}" value="${esc(it[k]||"")}"${dis()}>` : inp("l-" + k, it[k]))).join("")
+    + (kind === "mos" && i >= 0 ? `<div class="hint">الأنشطة في هذا المسجد: ${S.E.filter(e => e.mosque === it.id).length}</div>` : ""), footSave(i >= 0 && kind !== "mos"));
+  S.canWrite = keep;
+}
+async function saveList(){
+  const {conf, i} = S.form; const L = [...S[conf.ref]];
+  const it = i >= 0 ? {...L[i]} : {}; for (const [k] of conf.fields) it[k] = ($("#l-" + k).value || "").trim();
+  if (conf.ref === "mosques" && i < 0) it.id = "m" + String(Math.max(0, ...L.map(m => +m.id.slice(1) || 0)) + 1).padStart(3,"0");
+  if (!it[conf.fields[0][0]]) { toast("اكتب " + conf.fields[0][1]); return; }
+  if (i >= 0) L[i] = it; else L.push(it);
+  try { await T.ref(conf.ref, L); closeDrawer(); toast("حُفظ"); } catch (e) { writeFail(e); }
+}
+function noteForm(id){
+  const n = id ? S.notes.get(id) : {date:TODAY, prio:"متوسطة", status:"مفتوحة"}; if (!n) return; S.form = {kind:"note", id};
+  openDrawer(id ? "ملاحظة" : "ملاحظة جديدة", `${fld("n-title", "العنوان", inp("n-title", n.title))}
+    ${fld("n-body", "التفاصيل", `<textarea class="f" id="n-body" rows="7"${dis()}>${esc(n.body||"")}</textarea>`)}
+    <div class="two">${fld("n-prio", "الأولوية", `<select class="f" id="n-prio"${dis()}>${opts(["عالية","متوسطة","منخفضة"], n.prio)}</select>`)}${fld("n-status", "الحالة", `<select class="f" id="n-status"${dis()}>${opts(["مفتوحة","قيد المتابعة","مغلقة"], n.status)}</select>`)}</div>
+    <div class="two">${fld("n-comm", "الجالية", `<select class="f" id="n-comm"${dis()}>${opts(commNames, n.comm, "عامة")}</select>`)}${fld("n-date", "التاريخ", `<input type="date" class="f" id="n-date" value="${esc(n.date||"")}"${dis()}>`)}</div>
+    ${n.src ? `<div class="hint">المصدر: ${esc(n.src)}</div>` : ""}
+    ${id && S.meta.get("notes:" + id)?.at ? `<div class="hint">آخر تعديل: ${esc(whoName(S.meta.get("notes:" + id).by))} - ${fmtTime(S.meta.get("notes:" + id).at)}</div>` : ""}`, footSave(!!id));
+}
+async function saveNote(){
+  const g = k => $("#n-" + k).value.trim(); const F = S.form; const old = F.id ? S.notes.get(F.id) : {};
+  const body = { ...old, title:g("title"), body:g("body"), prio:g("prio"), status:g("status"), comm:g("comm"), date:g("date") };
+  if (!body.title) { toast("اكتب العنوان"); return; }
+  try { await T.put("notes", F.id, body); closeDrawer(); toast("حُفظت الملاحظة"); } catch (e) { writeFail(e); }
+}
+async function doDelete(){
+  const F = S.form; if (!F) return;
+  try {
+    if (F.kind === "act") await T.del("acts", F.id);
+    else if (F.kind === "kh") await T.del("khatibs", F.id);
+    else if (F.kind === "note") await T.del("notes", F.id);
+    else if (F.kind === "user") { await callUsers({ action:"delete", id:F.id }); }
+    else if (F.kind === "list") { const L = [...S[F.conf.ref]]; L.splice(F.i, 1); await T.ref(F.conf.ref, L); }
+    closeDrawer(); toast("حُذف");
+  } catch (e) { if (S.form?.kind === "user") toast(e.message); else writeFail(e); }
+}
+
+/* ---------------- export ---------------- */
+async function exportXlsx(){
+  if (!window.XLSX) { toast("مكتبة إكسل لم تُحمّل"); return; }
+  const wb = XLSX.utils.book_new(); wb.Workbook = {Views:[{RTL:true}]};
+  const add = (name, rows) => { const ws = XLSX.utils.json_to_sheet(rows); ws["!cols"] = Object.keys(rows[0] || {}).map(() => ({wch:20})); XLSX.utils.book_append_sheet(wb, ws, name); };
+  add("الأنشطة", S.E.map(e => ({"م":e.n,"رقم الوثيقة":e.doc,"النوع":e.type,"الجالية":e.comm,"المحافظة":e.gov,"المسجد":e.mosName,"المنطقة":e.area,"اليوم":daysText(e),"الوقت":e.time,"المحاضر":e.lect,"العنوان":e.title,"من":fmt(e.start),"إلى":fmt(e.end),"الحالة":e.st,"التنبيه":e.issues.map(i => i.t).join(" | "),"ملاحظات":e.notes})));
+  add("خطباء الجاليات", [...S.khatibs.values()].sort((a,b) => a.n - b.n).map((k,i) => ({"م":i+1,"الخطيب الأساسي":k.pri,"هاتف الأساسي":k.pph,"مدني الأساسي":k.pid,"الخطيب الاحتياط":k.bak,"هاتف الاحتياط":k.bph,"مدني الاحتياط":k.bid,"الجالية":k.label||k.comm,"المسجد":k.mosque,"المحافظة":k.gov,"المنطقة":k.area,"ملاحظات":k.note})));
+  add("المنسقون", S.coords.map(c => ({"الاسم":c.name,"الصفة":c.role,"الجالية":c.comm,"اللغة":c.lang,"الهاتف":c.phone,"الحالة":c.status})));
+  add("المساجد", S.mosques.map(m => ({"المسجد":"مسجد " + m.name,"المنطقة":m.area,"المحافظة":m.gov})));
+  add("الوثائق", S.docs.map(d => ({"رقم الوثيقة":d.no,"الموضوع":d.subj,"من":fmt(d.start),"إلى":fmt(d.end),"ملاحظات":d.notes})));
+  add("الملاحظات", [...S.notes.values()].map(n => ({"التاريخ":fmt(n.date),"العنوان":n.title,"التفاصيل":n.body,"الأولوية":n.prio,"الحالة":n.status,"المصدر":n.src||""})));
+  const data = XLSX.write(wb, {type:"array", bookType:"xlsx"});
+  const url = URL.createObjectURL(new Blob([data], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  const a = document.createElement("a"); a.href = url; a.download = `أنشطة-الجاليات-${TODAY}.xlsx`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener("click", ev => {
+  const t = ev.target.closest("button,tr,[data-open]"); if (!t) { return; }
+  if (t.id === "scrim") return;
+  const ds = t.dataset;
+  if (ds.nav) return go(ds.nav);
+  if (ds.go) { if (ds.f) { try { Object.assign(S.f, JSON.parse(ds.f)); } catch(e) {} } return go(ds.go); }
+  if (ds.comm) { S.comm = ds.comm; return go("comm"); }
+  if (ds.open) { const [k, id] = ds.open.split(":"); return k === "act" ? actForm(id) : k === "kh" ? khForm(id) : k === "note" ? noteForm(id) : listForm(k, k === "co" ? +id : id); }
+  if (ds.new) return ds.new === "kh" ? khForm() : ds.new === "note" ? noteForm() : ds.new === "user" ? userForm() : listForm(ds.new);
+  if (ds.cal !== undefined) { const c = S.cal; if (ds.cal === "0") { const n = new Date(); S.cal = {y:n.getFullYear(), m:n.getMonth(), sel:TODAY}; } else { const d = new Date(c.y, c.m + +ds.cal, 1); S.cal = {y:d.getFullYear(), m:d.getMonth(), sel:c.sel}; } return render(); }
+  if (ds.day) { S.cal.sel = ds.day; return render(); }
+  if (ds.close !== undefined) return closeDrawer();
+  if (ds.save !== undefined) { const k = S.form?.kind; return k === "act" ? saveAct() : k === "kh" ? saveKh() : k === "note" ? saveNote() : k === "user" ? saveUser() : k === "pass" ? savePass() : saveList(); }
+  if (ds.del !== undefined) return delAsk();
+  if (ds.delok !== undefined) return doDelete();
+  if (ds.type && S.form?.kind === "act" && t.closest("#f-type")) { S.form.type = ds.type; document.querySelectorAll("#f-type button").forEach(b => b.setAttribute("aria-pressed", b.dataset.type === ds.type)); return liveCheck(); }
+  if (ds.daily !== undefined && S.form) { S.form.daily = !S.form.daily; t.setAttribute("aria-pressed", S.form.daily); if (S.form.daily) document.querySelectorAll("#f-days [data-d]").forEach(b => b.setAttribute("aria-pressed","false")); return liveCheck(); }
+  if (ds.d !== undefined && S.form) { const d = +ds.d; S.form.daily = false; $("#f-days [data-daily]").setAttribute("aria-pressed","false"); S.form.days.has(d) ? S.form.days.delete(d) : S.form.days.add(d); t.setAttribute("aria-pressed", S.form.days.has(d)); return liveCheck(); }
+});
+$("#scrim").addEventListener("click", closeDrawer);
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && !$("#drawer").hidden) closeDrawer(); });
+let qT;
+document.addEventListener("input", ev => {
+  const el = ev.target;
+  if (el.dataset.fk && el.tagName === "INPUT") { S.f[el.dataset.fk] = el.value; S.focus = el.id; clearTimeout(qT); qT = setTimeout(render, 180); return; }
+  if (S.form?.kind === "act" && $("#drawer").contains(el)) { if (el.id === "f-doc") docHint(); clearTimeout(qT); qT = setTimeout(liveCheck, 150); }
+});
+document.addEventListener("change", ev => {
+  const el = ev.target;
+  if (el.dataset.fk && el.tagName === "SELECT") { S.f[el.dataset.fk] = el.value; S.focus = null; return render(); }
+  if (el.id === "f-gov") { const cur = $("#f-mos").value; $("#f-mos").innerHTML = mosOpts(el.value, cur); }
+  if (el.id === "f-mos") { $("#newmos").hidden = el.value !== "__new"; const m = mosBy[el.value]; if (m && !$("#f-gov").value) $("#f-gov").value = m.gov; }
+  if (el.id === "f-time") $("#f-time2").closest(".fld").hidden = el.value !== "__o";
+  if (el.id === "f-doc") docHint();
+  if (S.form?.kind === "act" && $("#drawer").contains(el)) liveCheck();
+});
+$("#menu").addEventListener("click", () => $("#side").classList.toggle("open"));
+$("#add-act").addEventListener("click", () => actForm());
+$("#tab-add").addEventListener("click", () => S.canWrite ? actForm() : toast("صلاحيتك عرض فقط"));
+document.querySelector(".main").addEventListener("click", ev => { if ($("#side").classList.contains("open") && !ev.target.closest("#menu")) $("#side").classList.remove("open"); });
+$("#export").addEventListener("click", exportXlsx);
+
+/* ---------------- boot ---------------- */
+const ROLE_AR = {admin:"مدير النظام", editor:"مدخل بيانات", viewer:"اطلاع فقط"};
+function roleName(){ return ROLE_AR[S.me?.role] || ""; }
+function applyRole(){
+  $("#add-act").hidden = !S.canWrite; $("#ro").hidden = S.canWrite;
+  document.querySelectorAll(".admin-only").forEach(x => x.hidden = !S.admin);
+  $("#me-role").textContent = [S.me?.title, roleName()].filter(Boolean).join(" · ");
+  if (!$("#app").hidden) render();
+}
+/* ---------------- people, users & audit ---------------- */
+const whoName = id => { const p = S.profiles.find(x => x.id === id); return p ? (p.name || p.username) : "—"; };
+const whoTitle = id => S.profiles.find(x => x.id === id)?.title || "";
+const TITLES_SUG = ["رئيس القسم","مراقب","باحث دراسات","باحث","منسق جاليات","موظف إداري","مدخل بيانات"];
+const fmtTime = iso => { if (!iso) return ""; const d = new Date(iso); return `${fmt(isoOf(d))} ${d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true}).replace("AM","ص").replace("PM","م")}`; };
+function vUsers(){
+  const rc = {admin:"gold", editor:"ok", viewer:""};
+  return `<div class="toolbar"><button class="btn btn-primary" data-new="user"><svg width="16" height="16"><use href="#i-plus"/></svg>إضافة مستخدم</button><span class="count">${S.profiles.length} مستخدم</span></div>
+  <div class="panel"><div class="panel-b" style="display:grid;gap:6px;font-size:14px">
+    <span><span class="chip gold">مدير النظام</span> كل الصلاحيات: الإضافة والتعديل والحذف، وإدارة المستخدمين، وسجل التعديلات، وكشف المنسقين.</span>
+    <span><span class="chip ok">مدخل بيانات</span> يضيف ويعدّل الأنشطة والخطباء والمساجد والوثائق والملاحظات، ولا يحذف.</span>
+    <span><span class="chip">اطلاع فقط</span> يشاهد كل شيء ويصدّر إلى إكسل، ولا يعدّل.</span></div></div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>المنصب</th><th>اسم المستخدم</th><th>الصلاحية</th><th>الحالة</th><th>متصل</th></tr></thead><tbody>
+  ${S.profiles.map(p => `<tr data-user="${esc(p.id)}"><td style="font-weight:600">${esc(p.name)}${p.id === S.me.id ? ` <span class="chip">أنت</span>` : ""}</td><td>${esc(p.title || "—")}</td><td class="num" dir="ltr" style="text-align:right">${esc(p.username)}</td>
+    <td><span class="chip ${rc[p.role]}">${esc(ROLE_AR[p.role])}</span></td><td>${p.active ? `<span class="chip ok">فعّال</span>` : `<span class="chip bad">موقوف</span>`}</td><td>${S.online.includes(p.id) ? `<span class="chip ok">الآن</span>` : ""}</td></tr>`).join("")}
+  </tbody></table></div></div>`;
+}
+function vAudit(){
+  const A = {INSERT:["إضافة","ok"], UPDATE:["تعديل","gold"], DELETE:["حذف","bad"]};
+  const TB = {acts:"نشاط", khatibs:"خطيب", notes:"ملاحظة", refs:"سجل"};
+  const RF = {mosques:"المساجد", docs:"الوثائق", comms:"الجاليات", coords:"المنسقون"};
+  return `<div class="toolbar"><button class="btn btn-ghost" id="audit-reload">تحديث</button><span class="count">آخر ${S.audit.length} عملية</span></div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>الوقت</th><th>المستخدم</th><th>المنصب</th><th>العملية</th><th>النوع</th><th>التفاصيل</th></tr></thead><tbody>
+  ${S.audit.map(x => `<tr${x.tbl === "acts" && S.acts.has(x.row_id) ? ` data-open="act:${esc(x.row_id)}"` : ""}><td class="num" style="white-space:nowrap">${fmtTime(x.at)}</td><td style="font-weight:600">${esc(whoName(x.user_id))}</td><td style="color:var(--muted)">${esc(whoTitle(x.user_id))}</td>
+    <td><span class="chip ${A[x.action]?.[1] || ""}">${A[x.action]?.[0] || esc(x.action)}</span></td><td>${TB[x.tbl] || esc(x.tbl)}</td><td>${esc(x.tbl === "refs" ? RF[x.summary] || x.summary : x.summary || "")}</td></tr>`).join("") || `<tr><td colspan="6" class="empty">لا توجد عمليات بعد</td></tr>`}
+  </tbody></table></div></div>`;
+}
+let auditT; function loadAuditSoon(){ clearTimeout(auditT); auditT = setTimeout(loadAudit, 800); }
+async function loadAudit(){
+  const { data } = await sb.from("audit").select("*").order("at", { ascending: false }).limit(300);
+  S.audit = data || []; if ((S.view === "audit" || S.view === "home") && $("#drawer").hidden) render();
+}
+async function callUsers(body){
+  const { data, error } = await sb.functions.invoke("manage-users", { body });
+  if (error) { let m = "تعذّرت العملية"; try { m = (await error.context.json()).error || m; } catch (e) {} throw new Error(m); }
+  if (data?.error) throw new Error(data.error);
+  await loadProfiles();
+}
+async function loadProfiles(){
+  const { data } = await sb.from("profiles").select("*").order("created_at");
+  S.profiles = data || []; renderOnline(); if (["users","audit","home"].includes(S.view) && $("#drawer").hidden) render();
+}
+/* who is online now */
+S.online = [];
+let presence = null;
+function joinPresence(){
+  if (presence) sb.removeChannel(presence);
+  presence = sb.channel("online", { config: { presence: { key: S.me.id } } });
+  presence.on("presence", { event: "sync" }, () => { S.online = Object.keys(presence.presenceState()); renderOnline(); if (["users","home"].includes(S.view) && $("#drawer").hidden) render(); });
+  presence.subscribe(async st => { if (st === "SUBSCRIBED") await presence.track({ at: new Date().toISOString() }); });
+}
+function onlineHTML(){
+  return S.online.map(id => `<span class="on"><i></i>${esc(whoName(id))}${whoTitle(id) ? ` <small>${esc(whoTitle(id))}</small>` : ""}</span>`).join("");
+}
+function renderOnline(){ const el = $("#online"); if (el) el.innerHTML = `<small>المتصلون الآن: ${S.online.length}</small>${onlineHTML()}`; }
+function userForm(id){
+  const u = id ? S.profiles.find(p => p.id === id) : { role:"editor", active:true };
+  if (!u) return; S.form = { kind:"user", id };
+  openDrawer(id ? `المستخدم: ${u.name}` : "إضافة مستخدم", `
+    ${fld("u-name", "الاسم الظاهر", `<input class="f" id="u-name" value="${esc(u.name||"")}" placeholder="مثال: أحمد العنزي">`)}
+    ${fld("u-title", "المنصب", `<input class="f" id="u-title" list="dl-titles" value="${esc(u.title||"")}" placeholder="مثال: باحث دراسات">`)}
+    <datalist id="dl-titles">${TITLES_SUG.map(x => `<option value="${x}">`).join("")}</datalist>
+    ${fld("u-user", "اسم المستخدم (للدخول)", `<input class="f" id="u-user" dir="ltr" autocapitalize="none" spellcheck="false" value="${esc(u.username||"")}"${id ? " disabled" : ""} placeholder="ahmad">`, id ? "" : "بحروف إنجليزية صغيرة أو أرقام، بدون مسافات")}
+    ${fld("u-pass", id ? "كلمة مرور جديدة (اتركها فارغة إن لم تتغير)" : "كلمة المرور", `<input class="f" id="u-pass" dir="ltr" autocomplete="new-password" placeholder="6 أحرف على الأقل">`, "أعطها للموظف، ويستطيع تغييرها بعد الدخول")}
+    <div class="fld"><span class="lbl">الصلاحية</span><div class="seg" id="u-role">${["admin","editor","viewer"].map(r => `<button type="button" data-role="${r}" aria-pressed="${u.role === r}">${ROLE_AR[r]}</button>`).join("")}</div></div>
+    ${id ? `<div class="fld"><span class="lbl">الحالة</span><div class="seg" id="u-active"><button type="button" data-act="1" aria-pressed="${!!u.active}">فعّال</button><button type="button" data-act="0" aria-pressed="${!u.active}">موقوف</button></div></div>` : ""}`,
+    `<button class="btn btn-primary" data-save>حفظ</button><button class="btn btn-ghost" data-close>إلغاء</button>${id && id !== S.me.id ? `<span style="margin-inline-start:auto" id="delwrap"><button class="btn btn-danger" data-del>حذف الحساب</button></span>` : ""}`);
+  S.form.role = u.role; S.form.active = u.active;
+}
+async function saveUser(){
+  const F = S.form; const name = $("#u-name").value.trim(), pass = $("#u-pass").value, title = $("#u-title").value.trim();
+  const btn = document.querySelector("[data-save]"); btn.disabled = true;
+  try {
+    if (F.id) await callUsers({ action:"update", id:F.id, name, title, role:F.role, active:F.active, password: pass || undefined });
+    else await callUsers({ action:"create", username:$("#u-user").value.trim().toLowerCase(), name, title, password:pass, role:F.role });
+    closeDrawer(); toast(F.id ? "حُفظ المستخدم" : "أُنشئ الحساب");
+  } catch (e) { toast(e.message); btn.disabled = false; }
+}
+function passForm(){
+  S.form = { kind:"pass" };
+  openDrawer("تغيير كلمة المرور", `${fld("p-new", "كلمة المرور الجديدة", `<input class="f" id="p-new" type="password" dir="ltr" autocomplete="new-password">`)}
+    ${fld("p-new2", "أعد كتابتها", `<input class="f" id="p-new2" type="password" dir="ltr" autocomplete="new-password">`)}`,
+    `<button class="btn btn-primary" data-save>حفظ</button><button class="btn btn-ghost" data-close>إلغاء</button>`);
+}
+async function savePass(){
+  const a = $("#p-new").value, b = $("#p-new2").value;
+  if (a.length < 6) return toast("6 أحرف على الأقل");
+  if (a !== b) return toast("الكلمتان غير متطابقتين");
+  const { error } = await sb.auth.updateUser({ password: a });
+  if (error) return toast("تعذّر التغيير"); closeDrawer(); toast("تغيّرت كلمة المرور");
+}
+document.addEventListener("click", ev => {
+  const t = ev.target.closest("button,tr"); if (!t) return;
+  if (t.dataset.user) return userForm(t.dataset.user);
+  if (t.dataset.role && S.form?.kind === "user") { S.form.role = t.dataset.role; document.querySelectorAll("#u-role button").forEach(b => b.setAttribute("aria-pressed", b.dataset.role === S.form.role)); }
+  if (t.dataset.act !== undefined && S.form?.kind === "user") { S.form.active = t.dataset.act === "1"; document.querySelectorAll("#u-active button").forEach(b => b.setAttribute("aria-pressed", b.dataset.act === t.dataset.act)); }
+  if (t.id === "audit-reload") loadAudit();
+}, true);
+
+/* ---------------- data loading & live updates ---------------- */
+let dirty = false;
+function schedule(){ if (dirty) return; dirty = true; requestAnimationFrame(() => { dirty = false; derive(); if (!$("#app").hidden && !(S.form && !$("#drawer").hidden && document.activeElement && $("#drawer").contains(document.activeElement))) render(); }); }
+function putRow(tbl, row){
+  if (tbl === "refs") { S[row.id] = row.data?.list || []; S.got.add(row.id); return; }
+  S[tbl].set(row.id, row.data); S.meta.set(tbl + ":" + row.id, { by: row.updated_by, at: row.updated_at });
+}
+async function loadAll(){
+  const tabs = ["acts","khatibs","notes","refs"];
+  const res = await Promise.all(tabs.map(t => sb.from(t).select("*").limit(5000)));
+  const err = res.find(r => r.error); if (err) throw err.error;
+  S.acts.clear(); S.khatibs.clear(); S.notes.clear();
+  tabs.forEach((t, i) => { res[i].data.forEach(r => putRow(t, r)); if (t !== "refs") S.got.add(t); });
+  ["mosques","docs","comms","coords"].forEach(r => S.got.add(r));
+  return res[3].data.length === 0;
+}
+let channel = null;
+function live(){
+  if (channel) sb.removeChannel(channel);
+  channel = sb.channel("all");
+  for (const t of ["acts","khatibs","notes","refs"]) channel.on("postgres_changes", { event:"*", schema:"public", table:t }, p => {
+    if (p.eventType === "DELETE") { if (t !== "refs") { S[t].delete(p.old.id); } }
+    else putRow(t, p.new);
+    schedule(); loadAuditSoon();
+  });
+  channel.subscribe();
+}
+async function importSeed(){
+  $("#view").innerHTML = `<div class="loading">جارٍ تجهيز بيانات القسم لأول مرة…</div>`;
+  const r = await fetch("/seed.gz", { cache:"no-store" });
+  const txt = await new Response(r.body.pipeThrough(new DecompressionStream("gzip"))).text();
+  const d = JSON.parse(txt);
+  const ins = async (t, rows) => { for (let i = 0; i < rows.length; i += 100) { const { error } = await sb.from(t).upsert(rows.slice(i, i + 100)); if (error) throw error; } };
+  await ins("acts", Object.entries(d.acts).map(([id, data]) => ({ id, data })));
+  await ins("khatibs", Object.entries(d.khatibs).map(([id, data]) => ({ id, data })));
+  await ins("notes", Object.entries(d.notes).map(([id, data]) => ({ id, data })));
+  await ins("refs", Object.entries(d.refs).map(([id, data]) => ({ id, data })));
+}
+
+/* ---------------- session ---------------- */
+async function start(session){
+  const { data: prof } = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
+  if (!prof || !prof.active) { await sb.auth.signOut(); showLogin("هذا الحساب موقوف أو غير مفعّل. راجع مدير النظام."); return; }
+  S.me = prof; S.admin = prof.role === "admin"; S.owner = S.admin; S.canWrite = prof.role !== "viewer";
+  $("#me-name").textContent = prof.name || prof.username; $("#me-av").textContent = (prof.name || prof.username).trim().charAt(0);
+  S.profiles = [prof];
+  $("#login").hidden = true; $("#app").hidden = false; $("#tabbar").hidden = false;
+  applyRole();
+  const h = (location.hash || "").slice(1);
+  S.view = TITLES[h] && h !== "comm" ? h : "home"; render();
+  try {
+    const empty = await loadAll();
+    if (empty && S.admin) { await importSeed(); await loadAll(); }
+    derive(); live(); await loadProfiles(); joinPresence(); loadAudit();
+    go(S.view);
+  } catch (e) { console.error(e); $("#view").innerHTML = `<div class="empty">تعذّر تحميل البيانات. تأكد من الاتصال بالإنترنت ثم أعد فتح النظام.</div>`; }
+}
+function showLogin(msg){
+  $("#app").hidden = true; $("#tabbar").hidden = true; $("#login").hidden = false;
+  const e = $("#lg-err"); e.hidden = !msg; e.textContent = msg || "";
+}
+$("#lg-form").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const u = $("#lg-user").value.trim().toLowerCase(), p = $("#lg-pass").value;
+  if (!u || !p) return showLogin("اكتب اسم المستخدم وكلمة المرور");
+  const btn = $("#lg-go"); btn.disabled = true; btn.textContent = "جارٍ الدخول…";
+  const email = u.includes("@") ? u : `${u}@${DOMAIN}`;
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: p });
+  btn.disabled = false; btn.textContent = "الدخول إلى النظام";
+  if (error) return showLogin(/fetch|network/i.test(error.message) ? "لا يوجد اتصال بالإنترنت" : "اسم المستخدم أو كلمة المرور غير صحيحة");
+  $("#lg-pass").value = ""; start(data.session);
+});
+$("#logout").addEventListener("click", async () => { if (channel) sb.removeChannel(channel); if (presence) sb.removeChannel(presence); await sb.auth.signOut(); location.hash = ""; location.reload(); });
+$("#mypass").addEventListener("click", passForm);
+
+/* ---------------- install as an app ---------------- */
+let deferredPrompt = null;
+const standalone = () => window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredPrompt = e; $("#install").hidden = false; });
+window.addEventListener("appinstalled", () => { $("#install").hidden = true; toast("ثُبّت النظام على هذا الجهاز"); });
+if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !standalone()) $("#install").hidden = false;
+$("#install").addEventListener("click", async () => {
+  if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; $("#install").hidden = true; return; }
+  openDrawer("تثبيت النظام على الآيفون", `<div style="display:grid;gap:14px;font-size:15px">
+    <span>1. افتح النظام في متصفح <b>Safari</b>.</span><span>2. اضغط زر <b>المشاركة</b> (المربع والسهم للأعلى) أسفل الشاشة.</span>
+    <span>3. اختر <b>«إضافة إلى الشاشة الرئيسية»</b> ثم <b>«إضافة»</b>.</span><span class="hint">يظهر النظام كأيقونة ويفتح كتطبيق مستقل.</span></div>`, `<button class="btn btn-ghost" data-close>تم</button>`);
+});
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+
+(async function boot(){
+  const { data } = await sb.auth.getSession();
+  if (data.session) start(data.session); else showLogin();
+  sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") showLogin(); });
+})();
+
+</script>
+</body>
+</html>

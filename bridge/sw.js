@@ -21,9 +21,13 @@ async function allowTab(tabId, extra) {
 }
 // v2.1: also allow framing for any window (tab or installed app) whose page is the Jaliyat system itself.
 async function allowSystem() {
-  await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1], addRules: [{ id: 1, priority: 1,
+  await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1, 2], addRules: [{ id: 1, priority: 1,
     action: { type: "modifyHeaders", responseHeaders: [{ header: "x-frame-options", operation: "remove" }, { header: "content-security-policy", operation: "remove" }, { header: "content-security-policy-report-only", operation: "remove" }] },
-    condition: { initiatorDomains: ["yalabdullmohsen.github.io"], resourceTypes: ["sub_frame"], requestDomains: HOSTS } }] });
+    condition: { initiatorDomains: ["yalabdullmohsen.github.io"], resourceTypes: ["sub_frame"], requestDomains: HOSTS } },
+    // v2.3: WhatsApp Web refuses to load when it sees it is requested as a frame — present the frame request as a normal page.
+    { id: 2, priority: 2, action: { type: "modifyHeaders", requestHeaders: [{ header: "sec-fetch-dest", operation: "set", value: "document" }, { header: "sec-fetch-site", operation: "set", value: "none" }],
+      responseHeaders: [{ header: "x-frame-options", operation: "remove" }, { header: "content-security-policy", operation: "remove" }, { header: "content-security-policy-report-only", operation: "remove" }, { header: "cross-origin-opener-policy", operation: "remove" }, { header: "cross-origin-embedder-policy", operation: "remove" }] },
+      condition: { initiatorDomains: ["yalabdullmohsen.github.io"], resourceTypes: ["sub_frame"], requestDomains: ["web.whatsapp.com"] } }] });
 }
 chrome.runtime.onInstalled.addListener(() => allowSystem().catch(() => {}));
 chrome.runtime.onStartup.addListener(() => allowSystem().catch(() => {}));
