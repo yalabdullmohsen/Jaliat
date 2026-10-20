@@ -63,7 +63,7 @@ function priorities(){
 }
 function prioPanel(){
   const P = priorities();
-  return `<div class="panel prio"><div class="panel-h"><h3>🎯 أولويات اليوم</h3><span class="chip">${P.length - 1}</span><span class="s">مرتبة حسب الأهمية — كل بند بإجرائه</span></div>
+  return `<div class="panel prio"><div class="panel-h"><h3>أولويات اليوم</h3><span class="chip">${P.length - 1}</span><span class="s">مرتبة حسب الأهمية — كل بند بإجرائه</span></div>
     <div class="prio-l">${P.map((p, i) => `<div class="prio-i ${p.k}"><span class="num pr-n">${i + 1}</span><span class="pr-t"><b>${esc(p.t)}</b>${p.s ? `<br><span class="s">${esc(p.s)}</span>` : ""}</span>
       <button type="button" class="btn" ${p.act.go ? `data-go="${p.act.go}"${p.act.f ? ` data-f="${esc(JSON.stringify(p.act.f))}"` : ""}` : p.act.open ? `data-prio-open="${esc(p.act.open)}"` : `data-tkfrom="${esc(p.act.tkfrom)}"`}>${esc(p.act.l)}</button></div>`).join("")}</div></div>`;
 }

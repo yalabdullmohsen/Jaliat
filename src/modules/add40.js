@@ -24,7 +24,7 @@ function myWorkCard(){ const W = myWork(); if (!W) return "";
   const pct = W.doneN + W.openN ? Math.round(W.doneN / (W.doneN + W.openN) * 100) : 100;
   return `<section class="mw panel"><div class="mw-top"><div><h2>لوحتي — ${esc((S.me.name || S.me.username || "").split(" ")[0])}</h2><span class="s">ما المطلوب منك الآن، وما المتبقي، وما أنجزته هذا الشهر</span></div>
     <div class="mw-p"><div class="mw-ring" style="--p:${pct}"><b class="num">${pct}%</b></div><span>إنجاز الشهر</span></div></div>
-    <div class="mw-g">${col("now", "🔴 المطلوب منك الآن", "متأخر، أو اليوم، أو جديد", W.now, "لا يوجد شيء عاجل ✓")}${col("rest", "⏳ المتبقي", "مهام مفتوحة مواعيدها لاحقاً", W.rest, "لا توجد مهام متبقية")}${col("done", "✅ أنجزته هذا الشهر", "تُحسب في سجل إنجازك", W.done, "لم تُنجز مهام هذا الشهر بعد")}</div></section>`; }
+    <div class="mw-g">${col("now", "المطلوب منك الآن", "متأخر، أو اليوم، أو جديد", W.now, "لا يوجد شيء عاجل ✓")}${col("rest", "المتبقي", "مهام مفتوحة مواعيدها لاحقاً", W.rest, "لا توجد مهام متبقية")}${col("done", "أنجزته هذا الشهر", "تُحسب في سجل إنجازك", W.done, "لم تُنجز مهام هذا الشهر بعد")}</div></section>`; }
 
 /* bridge for every employee on a computer: one card until it is installed */
 function bridgeCard(){ if (isTouchDev() || waEmbedOk()) return ""; try { if (+localStorage.getItem("br-later") > Date.now()) return ""; } catch (_) {}
