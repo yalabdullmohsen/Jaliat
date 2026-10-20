@@ -43,7 +43,7 @@ function crAnalytics(){
 
 /* ---------- sermon recordings (from the coordinators' portal) ---------- */
 S.srecs = [];
-async function srecLoad(){ const { data } = await sb.from("sermon_recs").select("*").order("created_at", { ascending:false }).limit(300); S.srecs = data || []; }
+async function srecLoad(){ const { data } = await sb.from("sermon_recs").select("*").neq("comm", "__test__").order("created_at", { ascending:false }).limit(300); S.srecs = data || []; }
 const _boot9s53 = boot9; boot9 = function(){ _boot9s53(); srecLoad().then(() => { if ($("#drawer").hidden && ["sermrec", "home"].includes(S.view)) render(); }); };
 const SREC_ST = { new:["بانتظار التفريغ", ""], working:["جارٍ التفريغ والترجمة", "warn"], done:["مترجمة", "ok"], error:["تعذّرت الترجمة", "bad"], waiting_key:["الترجمة غير مفعّلة", "warn"] };
 function vSermRec(){ const f = S.f.srf || "all", L = S.srecs.filter(r => f === "all" || (f === "new" ? !r.reviewed_at : f === "flag" ? r.flags && !/لا ملاحظات/.test(r.flags) : true));
