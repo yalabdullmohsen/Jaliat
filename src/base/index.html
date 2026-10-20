@@ -814,7 +814,7 @@ function listForm(kind, key){
   const conf = {
     mos: {title:"مسجد", ref:"mosques", find:L => L.findIndex(m => m.id === key), fields:[["name","اسم المسجد (بدون كلمة مسجد)"],["area","المنطقة"],["gov","المحافظة",GOVS]]},
     doc: {title:"وثيقة", ref:"docs", find:L => L.findIndex(d => d.no === key), fields:[["no","رقم الوثيقة"],["subj","الموضوع"],["comm","الجالية",commNames],["date","تاريخ الكتاب","date"],["start","بداية السريان","date"],["end","نهاية السريان","date"],["notes","ملاحظات"]]},
-    co:  {admin:true, title:"منسق", ref:"coords", find:() => key === undefined ? -1 : +key, fields:[["name","الاسم"],["role","الصفة",["منسق","نائب منسق"]],["comm","الجالية",commNames],["lang","اللغة"],["phone","الهاتف"],["status","الحالة",["نشط","موقوف","سابق"]]]},
+    co:  {admin:true, title:"منسق", ref:"coords", find:() => key === undefined ? -1 : +key, fields:[["name","الاسم"],["role","الصفة",["منسق","نائب منسق"]],["comm","الجالية",commNames],["lang","اللغة"],["phone","الهاتف"],["email","البريد الإلكتروني"],["status","الحالة",["نشط","موقوف","سابق"]]]},
   }[kind];
   const L = S[conf.ref]; const i = key === undefined ? -1 : conf.find(L); const it = i >= 0 ? L[i] : {};
   S.form = {kind:"list", conf, i}; const keep = S.canWrite; if (conf.admin && !S.admin) S.canWrite = false;
