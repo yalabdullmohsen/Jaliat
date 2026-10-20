@@ -117,7 +117,7 @@ const TABS=[["home","الرئيسية"],["new","طلب جديد"],["acts","أن�
 let I=null,tab="home",sub={msg:"ask",me:"acc"},kind="جديد",acts=[{}],ref="",team=[],view=null,mode="in";
 const left=d=>Math.round((new Date(String(d).slice(0,10)+"T00:00")-new Date(new Date().toDateString()))/864e5);
 const daysTxt=a=>a.daily?"يومياً":(a.days||[]).map(d=>DAYS[d]).filter(Boolean).join("، ");
-const roleTx=r=>r==="نائب"?"نائب المنسق":r==="القسم"?"قسم الجاليات":"المنسق";
+const roleTx=r=>r==="نائب"?"نائب المنسق":"المنسق";
 const okIc='<div class="ok-ic"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>';
 const field=(label,input,opt)=>'<label class="f"><span>'+label+(opt?' <i>(اختياري)</i>':'')+'</span>'+input+'</label>';
 const errBox=id=>'<p class="err" id="'+id+'" hidden></p>';
@@ -125,7 +125,7 @@ function err(m,id){const x=$(id||"er");if(x){x.textContent=m;x.hidden=false;x.sc
 
 function nav(){$("tabs").innerHTML='<div class="tabs-in">'+TABS.map(([k,t])=>'<button type="button" data-tab="'+k+'" class="'+(tab===k?"on":"")+'"><svg viewBox="0 0 24 24">'+IC[k]+'</svg>'+t+'</button>').join("")+'</div>'}
 function reqRow(q){const st=q.status==="مرفوض"?"no":["معتمد","مكتمل"].includes(q.status)?"":"w";
-return'<div class="row"><div class="tx"><b>'+e(q.kind)+' · '+e(q.subj)+'</b><span class="sub">طلب رقم '+e(q.no)+' · '+fd(q.date||q.at)+(q.by?' · '+e(q.by.name)+(q.by.role==="نائب"?' (النائب)':q.by.role==="القسم"?' (القسم)':''):'')+'</span>'+(q.reply?'<div class="rep"><b>ردّ القسم</b>'+e(q.reply)+'</div>':'')+'</div><span class="pill '+st+'">'+e(q.stage)+'</span></div>'}
+return'<div class="row"><div class="tx"><b>'+e(q.kind)+' · '+e(q.subj)+'</b><span class="sub">طلب رقم '+e(q.no)+' · '+fd(q.date||q.at)+(q.by?' · '+e(q.by.name)+(q.by.role==="نائب"?' (النائب)':''):'')+'</span>'+(q.reply?'<div class="rep"><b>ردّ القسم</b>'+e(q.reply)+'</div>':'')+'</div><span class="pill '+st+'">'+e(q.stage)+'</span></div>'}
 
 /* الرئيسية */
 function vHome(){const ap=I.approvals||[],soon=ap.filter(a=>left(a.end)<=45),R=I.requests||[],open=R.filter(q=>!["معتمد","مرفوض","مكتمل"].includes(q.status)),m=I.me||{};
