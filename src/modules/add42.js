@@ -71,3 +71,9 @@ function lockApp(){ try { localStorage.setItem("jl-lock", "1"); } catch (_) {} i
   $("#lk-form").addEventListener("submit", ev => { ev.preventDefault(); if ($("#lk-p").value === "9740") unlockApp(); else { $("#lk-e").hidden = false; $("#lk-p").value = ""; } }); }
 function unlockApp(){ try { localStorage.removeItem("jl-lock"); } catch (_) {} $("#lk-box")?.remove(); idleReset(); }
 const _boot9s50c = boot9; boot9 = function(){ _boot9s50c(); let l = null; try { l = localStorage.getItem("jl-lock"); } catch (_) {} if (l) lockApp(); };
+
+/* staff open any community's portal directly (no coordinator account needed) */
+document.addEventListener("click", async ev => { const t = ev.target.closest("[data-ptopen]"); if (!t) return;
+  const w = window.open("about:blank", "_blank"); const { data, error } = await sb.rpc("staff_portal_open", { p_comm:t.dataset.ptopen });
+  if (error || !data?.s) { w?.close(); return writeFail(error || { message:"تعذّر فتح البوابة" }); }
+  const u = PT_ONE() + "#s=" + data.s; if (w) w.location = u; else location.href = u; });

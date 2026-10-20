@@ -48,7 +48,7 @@ if(soon.length)h+='<div class="c"><h2>موافقات تنتهي قريباً</h2
 h+='<div class="c"><h2>آخر طلباتي</h2>'+(R.slice(0,6).map(reqItem).join("")||'<div class="empty">لا توجد طلبات بعد</div>')+'</div>';
 if((I.circulars||[]).length)h+='<div class="c"><h2>تعاميم القسم</h2>'+I.circulars.slice(0,3).map(c=>'<div class="it"><div><b>'+e(c.title)+'</b><br><span>'+e(c.kind)+' ق-'+e(c.no)+' · '+fd(c.at)+'</span></div></div>').join("")+'<button type="button" class="btn s sm" data-tab="msg">عرض كل التعاميم</button></div>';
 return h}
-function reqItem(q){return'<div class="it"><div><b>ط-'+e(q.no)+' · '+e(q.kind)+'</b><br><span>'+e(q.subj)+' · '+fd(q.date||q.at)+(q.by?' · بواسطة '+e(q.by.name)+(q.by.role==="نائب"?' (نائب)':''):'')+'</span>'+(q.reply?'<div class="rep">ردّ القسم: '+e(q.reply)+'</div>':'')+'</div><span class="chip'+(q.status==="مرفوض"?" no":q.status==="جديد"?" w":"")+'">'+e(q.stage)+'</span></div>'}
+function reqItem(q){return'<div class="it"><div><b>ط-'+e(q.no)+' · '+e(q.kind)+'</b><br><span>'+e(q.subj)+' · '+fd(q.date||q.at)+(q.by?' · بواسطة '+e(q.by.name)+(q.by.role==="نائب"?' (نائب)':q.by.role==="القسم"?' (القسم)':''):'')+'</span>'+(q.reply?'<div class="rep">ردّ القسم: '+e(q.reply)+'</div>':'')+'</div><span class="chip'+(q.status==="مرفوض"?" no":q.status==="جديد"?" w":"")+'">'+e(q.stage)+'</span></div>'}
 
 /* ---- طلب جديد / تجديد ---- */
 function actHTML(a,i){const g=[...new Set(I.mosques.map(m=>m.gov).filter(Boolean))];const ms=I.mosques.filter(m=>!a.gov||m.gov===a.gov);
@@ -76,8 +76,8 @@ return'<form data-form="ask" class="c"><h2>مراسلة القسم</h2><span cla
 '<div class="c"><h2>تعاميم وتوجيهات القسم</h2>'+((I.circulars||[]).map(c=>'<div class="it" style="display:block"><b>'+e(c.title)+'</b><br><span>'+e(c.kind)+' ق-'+e(c.no)+' · '+fd(c.at)+'</span>'+(c.body?'<p style="margin:6px 0 0;font-size:14px">'+e(c.body).replace(/\n/g,"<br>")+'</p>':'')+'</div>').join("")||'<div class="empty">لا توجد تعاميم</div>')+'</div>'}
 
 /* ---- بياناتي ---- */
-function vAcc(){const m=I.me||{},A=I.accounts||[];return'<div class="c"><h2>حسابي</h2><div class="it"><div><b>'+e(m.name)+'</b><br><span>'+(m.role==="نائب"?"نائب المنسق":"المنسق")+' · '+e(I.comm)+'</span></div><button type="button" class="btn s sm" data-out>خروج</button></div>'+
-(m.role==="منسق"?'<h3>نواب المنسق</h3><span class="hint">النائب يدخل بحسابه ويدير الطلبات، ويظهر اسمه على كل ما يرسله.</span>'+A.filter(a=>a.role==="نائب").map(a=>'<div class="it"><div><b>'+e(a.name)+'</b><br><span dir="ltr">'+e(a.phone)+'</span> <span class="chip'+(a.ready?'':' w')+'">'+(a.ready?'مفعّل':'بانتظار تفعيله')+'</span></div><button type="button" class="btn s sm" data-depoff="'+e(a.id)+'">إزالة</button></div>').join("")+
+function vAcc(){const m=I.me||{},A=I.accounts||[];return'<div class="c"><h2>حسابي</h2><div class="it"><div><b>'+e(m.name)+'</b><br><span>'+(m.role==="نائب"?"نائب المنسق":m.role==="القسم"?"قسم الجاليات (دخول الإدارة)":"المنسق")+' · '+e(I.comm)+'</span></div><button type="button" class="btn s sm" data-out>خروج</button></div>'+
+(m.role!=="نائب"?'<h3>نواب المنسق</h3><span class="hint">النائب يدخل بحسابه ويدير الطلبات، ويظهر اسمه على كل ما يرسله.</span>'+A.filter(a=>a.role==="نائب").map(a=>'<div class="it"><div><b>'+e(a.name)+'</b><br><span dir="ltr">'+e(a.phone)+'</span> <span class="chip'+(a.ready?'':' w')+'">'+(a.ready?'مفعّل':'بانتظار تفعيله')+'</span></div><button type="button" class="btn s sm" data-depoff="'+e(a.id)+'">إزالة</button></div>').join("")+
 '<form data-form="dep" style="display:grid;gap:8px"><div class="g2"><label>اسم النائب<input id="dn"></label><label>رقمه المدني<input id="dc" inputmode="numeric" dir="ltr" maxlength="12"></label></div><label>هاتفه<input id="dp" inputmode="tel" dir="ltr"></label><p class="err" id="erd" hidden></p><button class="btn s" type="submit">+ إضافة نائب</button><span class="hint">بعدها يفتح النائب الرابط ويختار «تفعيل الحساب» برقمه المدني وهاتفه.</span></form>':'')+
 '<details><summary class="mu">تغيير الرمز السري</summary><form data-form="pin" style="display:grid;gap:8px;margin-top:8px"><div class="g2"><label>الرمز الحالي<input id="po" type="password" inputmode="numeric" dir="ltr"></label><label>الرمز الجديد<input id="pn" type="password" inputmode="numeric" dir="ltr"></label></div><p class="err" id="erp" hidden></p><button class="btn s" type="submit">حفظ الرمز</button></form></details></div>'}
 function vMore(){if(!team.length)team=(I.team||[]).map(t=>({...t}));if(!team.length)team=[{name:"",role:"منسق",phone:""}];
@@ -123,5 +123,5 @@ if(F==="login"){const c=v("lc").replace(/\D/g,"");if(c.length!==12)throw new Err
 if(F==="dep"){const r=await sendSimple("portal_me_deputy",{p_s:TK,p_name:v("dn"),p_civil:v("dc"),p_phone:v("dp")},"erd");if(r){await reload();draw()}}
 if(F==="pin"){const r=await sendSimple("portal_me_pin",{p_s:TK,p_old:v("po"),p_new:v("pn")},"erp");if(r){alert("تم تغيير الرمز")}}
 }catch(x){if(F==="login")login(x.message);else err(x.message,F==="dep"?"erd":"erp")}finally{if(b)b.disabled=false}},true);
-const t0=LS.g("s");if(t0)enter(t0);else login();
+const hs=(location.hash.match(/^#s=([0-9a-f]+)/)||[])[1];if(hs)history.replaceState(null,"",location.pathname);const t0=hs||LS.g("s");if(t0)enter(t0);else login();
 </script></body></html>

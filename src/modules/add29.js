@@ -82,7 +82,7 @@ function vPortal(){
   return `<div class="check"><b>بوابة المنسقين</b><span>لكل جالية رابط خاص. أرسله للمنسق، فيقدّم طلب درس جديد أو تجديد بنفسه من جواله، ويصلكم مرتباً في «الطلبات الواردة» برقم ط-.</span></div>
     <div class="pt-l">${commNames.map(c => { const u = portalURL(c), co = S.coords.find(k => k.comm === c && k.phone && k.status !== "سابق");
       return `<div class="pt-i"><div><b>${esc(c)}</b><span>${co ? esc(co.name) + " · " + esc(co.phone) : "لا يوجد منسق برقم"}</span></div>
-        <div class="pt-a">${u ? `<button type="button" class="btn" data-ptcopy="${esc(c)}">نسخ الرابط</button>${co ? `<button type="button" class="btn rn-send" data-ptwa="${esc(c)}">${icon("i-wa")} إرسال للمنسق</button>` : ""}` : `<span class="s">—</span>`}</div></div>`; }).join("")}</div>`;
+        <div class="pt-a">${u ? `<button type="button" class="btn btn-primary" data-ptopen="${esc(c)}">فتح بوابتهم</button><button type="button" class="btn" data-ptcopy="${esc(c)}">نسخ الرابط</button>${co ? `<button type="button" class="btn rn-send" data-ptwa="${esc(c)}">${icon("i-wa")} إرسال للمنسق</button>` : ""}` : `<span class="s">—</span>`}</div></div>`; }).join("")}</div>`;
 }
 const portalMsg = (c, co) => `السلام عليكم ورحمة الله وبركاته\n${co ? `الأخ الفاضل / ${co.name}` : `منسق الجالية ${c}`}\n\nيسرّنا أن نرسل لكم رابط بوابة المنسقين، ومن خلالها تقدّمون طلبات الدروس الجديدة والتجديد والتعديل والإيقاف، وتتابعون طلباتكم وردود القسم، وترسلون التقرير الشهري، وتضيفون نائبكم:\n${portalURL(c)}\n\nأول مرة: اختاروا «فعّل حسابك» واكتبوا رقمكم المدني ورقم هاتفكم المسجّل لدينا، ثم اختاروا رمزاً سرياً لكم.\n\nوجزاكم الله خيراً${SIGN}`;
 // renewal reminders now carry the portal link so the coordinator can renew in one tap
