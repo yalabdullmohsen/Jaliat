@@ -35,8 +35,8 @@
 **خطب الجمعة**
 - `khatibs` (id, data jsonb) — المسجد والخطيب الأساسي والاحتياط
 - `sermons` (fri, kh_id, who, amount) — تسجيل كل خطبة
-- `khatib_bank` (cid, name, iban, bank) — سجل الآيبان (للمدير فقط)
-- `reward_history` (month, cid, count, amount, bank, iban) — كشوف البنوك المعتمدة (للمدير فقط)
+- `khatib_bank` (cid, name, iban, bank) — سجل الآيبان (قراءة لكل الموظفين، تعديل للمحرر والمدير)
+- `reward_history` (month, cid, count, amount, bank, iban) — كشوف البنوك المعتمدة (قراءة لكل الموظفين)
 
 **النظام**
 - `audit` — سجل كل تعديل · `backups` — نسخة يومية (`take_backup()`) آخر 45 يوماً
