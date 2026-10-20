@@ -108,6 +108,10 @@ details summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--g);l
 .rec-t{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}.rec audio{width:100%}
 .note-card{display:flex;gap:12px;align-items:center;padding:14px 16px}.note-card .tx{flex:1;display:grid}.note-card b{font-size:14.5px}.note-card span{font-size:12.5px;color:var(--mu)}
 .list>.rowb+.rowb .row{border-top:1px solid var(--line)}
+#rec-ov{position:fixed;inset:0;z-index:50;background:#000;color:#d7dcd9;display:grid;place-items:center;padding:24px}
+.ov-in{display:grid;justify-items:center;gap:12px;text-align:center;max-width:340px}.ov-dot{width:14px;height:14px;border-radius:50%;background:#c0392b;animation:ovp 1.6s infinite}
+@keyframes ovp{50%{opacity:.25}}.ov-l{font-size:15px;color:#9aa5a0}#ov-t{font-size:56px;font-weight:600;font-variant-numeric:tabular-nums;color:#e9ecea;letter-spacing:1px}
+.ov-m{font-size:13px;color:#7d8883}.ov-in p{font-size:13px;line-height:1.9;color:#6f7a75;margin:6px 0 10px}.ov-stop{border:1px solid #3a3f3d;background:#111;color:#e9ecea;border-radius:14px;height:52px;padding:0 28px;font:inherit;font-weight:600;font-size:16px}
 .spin{display:grid;place-items:center;padding:60px 0;color:var(--mu)}
 </style></head><body>
 <header class="bar"><div class="bar-in"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><div class="bar-t"><b>بوابة المنسقين</b><small id="cm">قسم الجاليات ورعاية المهتدين وطلبة البعوث</small></div><button type="button" class="av" id="av" hidden data-tab="me"></button></div></header>
@@ -209,7 +213,7 @@ const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 let SERMS=null;
 function vSerm(){if(SERMS===null){SERMS=[];rpc("portal_me_sermons",{p_s:S_}).then(x=>{SERMS=x||[];if(tab==="msg"&&sub.msg==="serm"){const y=scrollY;draw();scrollTo(0,y)}}).catch(()=>{})}
  const r=REC||{},mm=n=>String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");
- return'<form data-form="serm" class="card pad"><p class="note">سجّلوا خطبة الجمعة كاملة من الجوال داخل المسجد، أو ارفعوا ملفاً صوتياً. يطّلع عليها القسم مترجمة إلى العربية.</p>'+
+ return'<form data-form="serm" class="card pad"><p class="note">سجّلوا خطبة الجمعة من الجوال داخل المسجد (حتى ساعة)، أو ارفعوا ملفاً صوتياً. الشاشة تبقى مضاءة أثناء التسجيل. يطّلع عليها القسم مترجمة إلى العربية.</p>'+
  '<div class="rec">'+(r.url?'<audio controls src="'+r.url+'"></audio><span class="note">'+(r.path?"جاهز للإرسال · "+mm(r.secs||0):"جارٍ رفع التسجيل…")+'</span><button type="button" class="link dz" data-recclear>حذف وإعادة التسجيل</button>':
  '<button type="button" class="rec-b'+(r.on?" on":"")+'" data-rec aria-label="تسجيل"><svg viewBox="0 0 24 24">'+(r.on?'<rect x="7" y="7" width="10" height="10" rx="2"/>':'<path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/>')+'</svg></button><span class="rec-t" id="rec-t">'+(r.on?mm(r.secs||0):"00:00")+'</span><span class="note">'+(r.on?"جارٍ التسجيل، اضغط للإيقاف":"اضغط لبدء التسجيل")+'</span><label class="link">أو ارفعوا ملفاً صوتياً<input type="file" id="rec-f" accept="audio/*" hidden></label>')+'</div>'+
  field("اسم الخطيب",'<input id="sk" value="'+e(LS.g("sk"))+'">')+'<div class="g2">'+field("المسجد",'<select id="sm"><option value="">اختر المسجد</option>'+(I.mosques||[]).map(m=>'<option>'+e(m.name)+'</option>').join("")+'</select>')+field("الجمعة",'<select id="sf">'+fridays().map(d=>'<option value="'+iso(d)+'">'+fd(iso(d))+'</option>').join("")+'</select>')+'</div>'+
@@ -218,12 +222,23 @@ function vSerm(){if(SERMS===null){SERMS=[];rpc("portal_me_sermons",{p_s:S_}).the
 async function upAudio(blob,secs){REC={url:URL.createObjectURL(blob),secs:secs||0};draw();
  try{const type=(blob.type||"audio/webm").split(";")[0];const r=await fetch(FN,{method:"POST",headers:{"Content-Type":"application/json",apikey:K,Authorization:"Bearer "+K},body:JSON.stringify({s:S_,type,size:blob.size})}).then(r=>r.json());if(!r.ok)throw new Error(r.msg);
   const up=await fetch(r.url,{method:"PUT",headers:{"Content-Type":type},body:blob});if(!up.ok)throw new Error("تعذّر رفع التسجيل");REC.path=r.path}catch(x){REC=null;alert(x.message||"تعذّر رفع التسجيل")}if(tab==="msg"){const y=scrollY;draw();scrollTo(0,y)}}
+const REC_MAX=3600;let WL=null;
+async function wakeOn(){try{if("wakeLock" in navigator){WL=await navigator.wakeLock.request("screen");WL.addEventListener("release",()=>{WL=null})}}catch(_){}}
+function wakeOff(){try{WL&&WL.release()}catch(_){}WL=null}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&REC&&REC.on&&!WL)wakeOn()});
+const mmss=n=>String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");
+function recScreen(){let o=$("rec-ov");if(!REC||!REC.on){if(o)o.remove();return}if(!o){o=document.createElement("div");o.id="rec-ov";document.body.appendChild(o)}
+ o.innerHTML='<div class="ov-in"><span class="ov-dot"></span><span class="ov-l">جارٍ تسجيل الخطبة</span><b id="ov-t">'+mmss(REC.secs||0)+'</b><span class="ov-m">الحد ساعة واحدة · يتوقف تلقائياً</span><p>اتركوا الجوال على هذه الشاشة. الشاشة الداكنة توفّر البطارية، ولا يُستهلك إنترنت أثناء التسجيل، ويُرفع الملف بعد الإيقاف.</p><button type="button" class="ov-stop" data-rec>إيقاف التسجيل</button></div>'}
 async function recToggle(){if(REC&&REC.on){REC.mr.stop();return}
- try{const st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});const mt=["audio/webm;codecs=opus","audio/mp4","audio/webm"].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||"";
-  const mr=new MediaRecorder(st,mt?{mimeType:mt,audioBitsPerSecond:32000}:{}),ch=[];REC={on:true,mr,secs:0};const t0=Date.now();REC.tm=setInterval(()=>{REC.secs=Math.round((Date.now()-t0)/1000);const x=$("rec-t");if(x)x.textContent=String(Math.floor(REC.secs/60)).padStart(2,"0")+":"+String(REC.secs%60).padStart(2,"0")},1000);
-  mr.ondataavailable=ev=>{if(ev.data.size)ch.push(ev.data)};mr.onstop=()=>{clearInterval(REC.tm);st.getTracks().forEach(t=>t.stop());const secs=REC.secs;upAudio(new Blob(ch,{type:mr.mimeType||"audio/webm"}),secs)};mr.start(1000);draw()}
- catch(x){REC=null;alert("لم يُسمح باستخدام الميكروفون. فعّلوه من إعدادات المتصفح، أو ارفعوا ملفاً صوتياً.")}}
-document.addEventListener("change",ev=>{if(ev.target.id!=="rec-f")return;const f=ev.target.files[0];if(!f)return;if(!/^audio\//.test(f.type))return alert("اختاروا ملفاً صوتياً");const a=new Audio(URL.createObjectURL(f));a.onloadedmetadata=()=>upAudio(f,Math.round(a.duration||0));a.onerror=()=>upAudio(f,0)},true);
+ try{const st=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,sampleRate:16000,echoCancellation:false,noiseSuppression:false,autoGainControl:true}});
+  const mt=["audio/webm;codecs=opus","audio/mp4;codecs=mp4a.40.2","audio/mp4","audio/webm"].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||"";
+  const mr=new MediaRecorder(st,mt?{mimeType:mt,audioBitsPerSecond:24000}:{audioBitsPerSecond:24000}),ch=[];REC={on:true,mr,secs:0};const t0=Date.now();
+  REC.tm=setInterval(()=>{REC.secs=Math.round((Date.now()-t0)/1000);const x=$("ov-t");if(x)x.textContent=mmss(REC.secs);if(REC.secs>=REC_MAX&&mr.state==="recording")mr.stop()},1000);
+  mr.ondataavailable=ev=>{if(ev.data.size)ch.push(ev.data)};
+  mr.onstop=()=>{clearInterval(REC.tm);st.getTracks().forEach(t=>t.stop());wakeOff();const secs=Math.min(REC.secs,REC_MAX);REC.on=false;recScreen();upAudio(new Blob(ch,{type:mr.mimeType||"audio/webm"}),secs)};
+  mr.start(30000);await wakeOn();recScreen();draw()}
+ catch(x){REC=null;wakeOff();recScreen();alert("لم يُسمح باستخدام الميكروفون. فعّلوه من إعدادات المتصفح، أو ارفعوا ملفاً صوتياً.")}}
+document.addEventListener("change",ev=>{if(ev.target.id!=="rec-f")return;const f=ev.target.files[0];if(!f)return;if(!/^audio\//.test(f.type))return alert("اختاروا ملفاً صوتياً");const a=new Audio(URL.createObjectURL(f));a.onloadedmetadata=()=>{if(a.duration>REC_MAX+60)return alert("مدة التسجيل أكثر من ساعة. ارفعوا خطبة لا تتجاوز ساعة.");upAudio(f,Math.round(a.duration||0))};a.onerror=()=>upAudio(f,0)},true);
 document.addEventListener("click",ev=>{if(!ev.target.closest("[data-recclear]"))return;REC=null;draw()},true);
 function vMsg(){const s=sub.msg,R=(I.requests||[]).filter(q=>q.kind==="استفسار"),ym=new Date().toISOString().slice(0,7),sent=(I.reports||[]).some(r=>r.period===ym);
 let h='<div class="seg" style="margin-bottom:14px">'+[["ask","مراسلة القسم"],["serm","خطبة الجمعة"],["rep","التقرير"],["circ","التعاميم"]].map(([k,t])=>'<button type="button" data-sub="'+k+'" class="'+(s===k?"on":"")+'">'+t+'</button>').join("")+'</div>';
