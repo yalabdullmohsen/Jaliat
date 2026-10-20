@@ -1,6 +1,6 @@
 import asyncio, json, os, edge_tts
 L = json.load(open("lines.json"))
-VOICES = {"v6hamdan":"ar-AE-HamdanNeural","v6brian":"en-US-BrianMultilingualNeural"}
+VOICES = {"v7hamdan":"ar-AE-HamdanNeural","v7brian":"en-US-BrianMultilingualNeural"}
 async def main():
     for vk, v in VOICES.items():
         os.makedirs(f"out/{vk}", exist_ok=True)
