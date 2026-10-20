@@ -181,3 +181,7 @@ table tbody tr:hover{background:color-mix(in srgb,var(--primary-soft) 45%,transp
 .pv-dec{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.pv-dec .f{height:38px;font-size:13px}
 .pv-bv{flex-direction:column;align-items:stretch}
 @media (max-width:560px){.pv-dec{grid-template-columns:1fr}.pv-bv{flex-direction:row}}
+/* mobile: page title keeps its room; tab rows scroll instead of wrapping */
+@media (max-width:560px){#refresh-btn{display:none}.top .btn,.top button{min-width:0}#title{font-size:16px;flex:1 1 auto}
+.toolbar .seg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}.toolbar .seg::-webkit-scrollbar{display:none}.toolbar .seg button{white-space:nowrap;flex:none}}
+@media (max-width:560px){.toolbar{min-width:0;max-width:100%}.toolbar .seg{min-width:0;flex:1 1 100%;width:100%}.pv-t{grid-template-columns:repeat(2,1fr)}.pv-t .wq-tile span{font-size:13px}}
