@@ -161,3 +161,5 @@ table tbody tr:hover{background:color-mix(in srgb,var(--primary-soft) 45%,transp
 .ms-p{display:flex;flex-wrap:wrap;gap:8px 16px;padding:12px 14px;border-top:1px solid var(--line);font-size:13.5px}
 .ce-t td.nm{display:grid;gap:2px}.ce-t td.nm .s{font-size:12px}
 .ce-s{display:inline-grid;place-items:center;min-width:44px;height:28px;border-radius:8px;font-weight:700}.ce-s.ok{background:var(--oks);color:var(--ok)}.ce-s.warn{background:var(--warns);color:var(--warn)}.ce-s.bad{background:var(--bads);color:var(--bad)}
+.cr-l .rq-act.cr-new{border-inline-start:3px solid var(--gold,#946E1F)}
+.cr-l .rq-act span.s{line-height:1.6}
