@@ -90,7 +90,7 @@ if os.environ.get("NEXT_MSG"):
     import datetime as _dt
     _cl.insert(0, [_hl.md5(os.environ["NEXT_MSG"].encode()).hexdigest()[:8], _dt.datetime.now(_dt.timezone(_dt.timedelta(hours=3))).isoformat(timespec="seconds"), os.environ["NEXT_MSG"]])
 CHANGELOG_JS = "const CHANGELOG = " + _json.dumps(_cl, ensure_ascii=False) + ";\n"
-js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add31.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js"))
+js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add31.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js", "add45.js"))
 R('</style>\n\n</head>', css + '</style>\n\n</head>')
 R('(async function boot(){', '/* ===== v9 ===== */\n' + CHANGELOG_JS + js + '\n(async function boot(){')
 # --- logo #3: progress ring + check ---
