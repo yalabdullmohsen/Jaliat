@@ -48,3 +48,16 @@ document.addEventListener("keydown", ev => { if (ev.altKey && ev.key === "ArrowL
 document.addEventListener("mouseup", ev => { if (ev.button === 3) { ev.preventDefault(); goBack(); } });
 const _afterRender43 = afterRender;
 afterRender = function(v){ _afterRender43(v); backBtn(); };
+
+/* ================= v46: phones & installed apps pick up a new release on their own ================= */
+(function(){ let mine = null, busy = false;
+  async function ver(){ try { const t = await (await fetch("sw.js?t=" + Date.now(), { cache:"no-store" })).text(); return (t.match(/jaliyat-v\d+/) || [])[0] || null; } catch (_) { return null; } }
+  async function check(){ if (busy || document.hidden) return; busy = true; const v = await ver(); busy = false; if (!v) return; if (!mine) { mine = v; return; } if (v === mine) return;
+    const idle = $("#drawer")?.hidden !== false && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName) && !S.waPop;
+    try { const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); } catch (_) {}
+    if (idle) return location.reload();
+    if (!$("#upd-bar")) document.body.insertAdjacentHTML("beforeend", `<button type="button" id="upd-bar" class="upd-bar" onclick="location.reload()">⟳ يوجد تحديث جديد لـ«إنجاز» — اضغط للتحديث</button>`); }
+  ver().then(v => mine = v);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+  addEventListener("focus", check); setInterval(check, 5 * 60e3);
+})();

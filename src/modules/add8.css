@@ -129,3 +129,5 @@ table tbody tr:hover{background:color-mix(in srgb,var(--primary-soft) 45%,transp
 .wq2.out .wq-d i{background:var(--oks);color:var(--ok)}.wq2.in .wq-d i{background:var(--t1s);color:var(--t1)}
 .wf-s.now{border-color:var(--warn);box-shadow:none}.wf-s.ok i{background:var(--ok)}.wf-s.now i{background:var(--warn);color:#fff}
 .tk.late{border-inline-start-color:var(--bad)!important}
+.upd-bar{position:fixed;inset-inline:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:300;background:var(--primary);color:var(--primary-ink);border:0;border-radius:12px;padding:12px 16px;font:inherit;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+@media (min-width:900px){.upd-bar{inset-inline:auto 24px;bottom:24px}}
