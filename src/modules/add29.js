@@ -77,14 +77,14 @@ function rpPrint(){ const f = $("#rp-frame"); try { f.contentWindow.focus(); f.c
 /* ---------- 6) coordinators portal links ---------- */
 S.portal = [];
 async function loadPortal(){ const { data } = await sb.from("coord_links").select("*"); S.portal = data || []; }
-const portalURL = comm => { const l = S.portal.find(x => x.comm === comm && x.active); return l ? `${location.origin}${location.pathname.replace(/[^/]*$/, "")}portal.html#${l.token}` : ""; };
+const portalURL = comm => { const l = S.portal.find(x => x.comm === comm && x.active); return l ? `${location.origin}${location.pathname.replace(/[^/]*$/, "")}portal.html` : ""; };
 function vPortal(){
   return `<div class="check"><b>بوابة المنسقين</b><span>لكل جالية رابط خاص. أرسله للمنسق، فيقدّم طلب درس جديد أو تجديد بنفسه من جواله، ويصلكم مرتباً في «الطلبات الواردة» برقم ط-.</span></div>
     <div class="pt-l">${commNames.map(c => { const u = portalURL(c), co = S.coords.find(k => k.comm === c && k.phone && k.status !== "سابق");
       return `<div class="pt-i"><div><b>${esc(c)}</b><span>${co ? esc(co.name) + " · " + esc(co.phone) : "لا يوجد منسق برقم"}</span></div>
         <div class="pt-a">${u ? `<button type="button" class="btn" data-ptcopy="${esc(c)}">نسخ الرابط</button>${co ? `<button type="button" class="btn rn-send" data-ptwa="${esc(c)}">${icon("i-wa")} إرسال للمنسق</button>` : ""}` : `<span class="s">—</span>`}</div></div>`; }).join("")}</div>`;
 }
-const portalMsg = (c, co) => `السلام عليكم ورحمة الله وبركاته\n${co ? `الأخ الفاضل / ${co.name}` : `منسق الجالية ${c}`}\n\nيسرّنا أن نرسل لكم رابط بوابة المنسقين الخاص بالجالية ${c}، ومن خلاله يمكنكم تقديم طلبات الدروس والمحاضرات الجديدة أو تجديدها مباشرة:\n${portalURL(c)}\n\nوجزاكم الله خيراً${SIGN}`;
+const portalMsg = (c, co) => `السلام عليكم ورحمة الله وبركاته\n${co ? `الأخ الفاضل / ${co.name}` : `منسق الجالية ${c}`}\n\nيسرّنا أن نرسل لكم رابط بوابة المنسقين، ومن خلالها تقدّمون طلبات الدروس الجديدة والتجديد والتعديل والإيقاف، وتتابعون طلباتكم وردود القسم، وترسلون التقرير الشهري، وتضيفون نائبكم:\n${portalURL(c)}\n\nأول مرة: اختاروا «فعّل حسابك» واكتبوا رقمكم المدني ورقم هاتفكم المسجّل لدينا، ثم اختاروا رمزاً سرياً لكم.\n\nوجزاكم الله خيراً${SIGN}`;
 // renewal reminders now carry the portal link so the coordinator can renew in one tap
 const _renewMsg29 = renewMsg;
 renewMsg = function(x, c){ const m = _renewMsg29(x, c), u = portalURL(x.comm); return u ? m.replace(/\n\nوجزاكم الله خيراً/, `\n\nلتقديم طلب التجديد مباشرة:\n${u}\n\nوجزاكم الله خيراً`) : m; };
@@ -112,7 +112,7 @@ document.addEventListener("click", ev => {
 let idleT = null; const IDLE = 30 * 60e3;
 function idleReset(){ S.lastAct = Date.now(); }
 ["pointerdown", "keydown", "touchstart", "scroll"].forEach(e => document.addEventListener(e, idleReset, { passive:true, capture:true }));
-setInterval(async () => { if (!S.admin || !S.me || !S.lastAct) return; if (Date.now() - S.lastAct > IDLE) { S.lastAct = 0; try { await sb.auth.signOut(); } catch (_) {} location.hash = ""; location.reload(); } }, 60e3);
+setInterval(() => { if (!S.me || !S.lastAct) return; if (Date.now() - S.lastAct > IDLE) { S.lastAct = 0; if (typeof lockApp === "function") lockApp(); } }, 60e3);
 
 /* ---------- wiring ---------- */
 const _openLink29 = openLink;

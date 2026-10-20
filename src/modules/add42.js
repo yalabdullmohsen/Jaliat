@@ -41,3 +41,33 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
   const r = S.creps.find(x => String(x.id) === id); if (r) r.seen_at = new Date().toISOString(); render(); });
 
 NEWF.splice(1, 0, ["v50-portal", "nav:portal", "بوابة المنسقين الكاملة", "المنسق من رابطه: يتابع طلباته وردودكم، يطلب نشاطاً جديداً أو تجديداً أو تعديلاً أو إيقافاً، يحدّث بيانات منسقيه، يقرأ التعاميم، يراسل القسم، ويرسل تقريره الشهري. اكتب ردّك في الطلب الوارد فيظهر له.", false, "2026-10-20"]);
+
+/* ---------- coordinator accounts (civil id + PIN) on the portal page ---------- */
+S.pacc = [];
+async function paLoad(){ const { data } = await sb.rpc("staff_portal_accounts"); S.pacc = data || []; }
+const _boot9s50b = boot9; boot9 = function(){ _boot9s50b(); paLoad().then(() => { if ($("#drawer").hidden && S.view === "portal") render(); }); };
+const _vPortal50b = vPortal;
+vPortal = function(){ const A = S.pacc, by = {}; A.forEach(a => (by[a.comm] = by[a.comm] || []).push(a));
+  const box = `<div class="rq-sec cr-l"><div class="rq-sh"><b>حسابات المنسقين ونوابهم (${A.length})</b></div><span class="s">يفعّل المنسق حسابه برقمه المدني وهاتفه المسجّل، ويضيف نائبه من حسابه. إن نسي أحدهم رمزه اضغط «إعادة تعيين» فيفعّله من جديد.</span>${Object.keys(by).sort().map(c => `<div class="pa-g"><b class="s">${esc(c)}</b>${by[c].map(a => `<div class="rq-act"><span><b>${esc(a.name)}</b> · ${a.role === "نائب" ? `نائب المنسق${a.by ? ` (أضافه ${esc(a.by)})` : ""}` : "المنسق"}<br><span class="s" dir="ltr">${esc(a.civil)} · ${esc(a.phone || "")}</span> <span class="s">${a.ready ? (a.last ? `آخر دخول ${fmt(String(a.last).slice(0, 10))}` : "مفعّل") : "بانتظار التفعيل"}</span></span>${S.canWrite ? `<button type="button" class="btn btn-ghost" data-pareset="${a.id}">إعادة تعيين الرمز</button><button type="button" class="btn btn-ghost bad-t" data-paoff="${a.id}">إيقاف</button>` : ""}</div>`).join("")}</div>`).join("") || `<div class="empty">لم يفعّل أي منسق حسابه بعد</div>`}</div>`;
+  return _vPortal50b().replace(/يدخل المنسق برقم هاتفه المسجّل فتفتح له بوابة جاليته\./, "يدخل كل منسق ونائبه بحسابه الخاص: الرقم المدني والرمز السري.").replace(`<div class="pt-l">`, box + `<div class="pt-l">`); };
+document.addEventListener("click", async ev => { const t = ev.target.closest("[data-pareset],[data-paoff]"); if (!t) return;
+  if (t.dataset.sure !== "1") { t.dataset.sure = "1"; t.textContent = "اضغط للتأكيد"; return; }
+  const { error } = await sb.rpc("staff_portal_reset", { p_id:t.dataset.pareset || t.dataset.paoff, p_off:!!t.dataset.paoff }); if (error) return writeFail(error);
+  await paLoad(); render(); toast(t.dataset.paoff ? "أُوقف الحساب" : "أُعيد التعيين — يفعّله صاحبه برقمه المدني وهاتفه"); });
+
+/* request drawer: who sent it (coordinator or deputy) */
+const _reqForm50b = reqForm;
+reqForm = async function(id){ await _reqForm50b(id); const r = S.reqs.find(x => x.id === id), b = r?.data?.by; if (!b) return; const h = $("#rq-org")?.closest(".g2");
+  if (h) h.insertAdjacentHTML("beforebegin", `<div class="check"><b>قدّمه عبر البوابة: ${esc(b.name)}</b><span>${b.role === "نائب" ? "نائب المنسق" : "المنسق"}</span></div>`); };
+const _vInbox50b = vInbox;
+vInbox = function(){ let h = _vInbox50b(); for (const r of S.reqs) { const b = r.data?.by; if (b?.role === "نائب") h = h.replace(`data-rq="${r.id}"><div class="rq-h">`, `data-rq="${r.id}"><div class="rq-h"><span class="chip">النائب</span>`); } return h; };
+
+/* ---------- staff quick code: after idle the app locks; 9740 opens it again (the session stays) ---------- */
+function lockApp(){ try { localStorage.setItem("jl-lock", "1"); } catch (_) {} if ($("#lk-box")) return;
+  const b = document.createElement("div"); b.id = "lk-box"; b.className = "ra";
+  b.innerHTML = `<form class="ra-c" id="lk-form"><b>رمز موظفي القسم</b><span>اكتب الرمز للمتابعة</span><input class="f num" id="lk-p" type="password" inputmode="numeric" dir="ltr" maxlength="8" autocomplete="off"><p class="err" id="lk-e" hidden>الرمز غير صحيح</p><button class="btn btn-primary" type="submit">دخول</button></form>`;
+  document.body.appendChild(b); setTimeout(() => $("#lk-p")?.focus(), 30);
+  $("#lk-p").addEventListener("input", ev => { if (ev.target.value === "9740") unlockApp(); });
+  $("#lk-form").addEventListener("submit", ev => { ev.preventDefault(); if ($("#lk-p").value === "9740") unlockApp(); else { $("#lk-e").hidden = false; $("#lk-p").value = ""; } }); }
+function unlockApp(){ try { localStorage.removeItem("jl-lock"); } catch (_) {} $("#lk-box")?.remove(); idleReset(); }
+const _boot9s50c = boot9; boot9 = function(){ _boot9s50c(); let l = null; try { l = localStorage.getItem("jl-lock"); } catch (_) {} if (l) lockApp(); };
