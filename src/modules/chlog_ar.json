@@ -1,0 +1,20 @@
+{
+"IBAN issue notes in rewards sheet": "ملاحظة تحت كل آيبان فيه خطأ في كشف المكافآت",
+"v68: remove identity re-confirmation prompt": "إلغاء نافذة «تأكيد الهوية»",
+"v67: rewards sheet (name, civil id, IBAN, count, amount), 3 approval lines, formatted Excel": "كشف المكافآت الجديد: الاسم، الرقم المدني، الآيبان، عدد الخطب، المبلغ، مع ثلاث خانات اعتماد وتصدير إكسل منسّق",
+"v66b: bigger signature & name stamp on permits": "توقيع وختم أوضح على التصاريح",
+"v66: permit opens only on its days & prayer window (verify page), default 6 months, name stamp, ministry name": "باركود التصريح يفتح في أيامه ووقت صلاته فقط، ومدته الافتراضية 6 أشهر",
+"v65b: coordinators portal under communities & mosques": "نقل بوابة المنسقين إلى «الجاليات والمساجد»",
+"v65: head-of-section signature on permits, changeable by the head only": "توقيع رئيس القسم على التصاريح، ولا يغيّره إلا هو",
+"v64: permit time by prayer period": "وقت التصريح حسب الصلاة (بعد الفجر، بعد الظهر…)",
+"v63: permit filled by AI from the attached letter or a Watheqa approval": "إصدار التصريح بالذكاء الاصطناعي من الكتاب المرفق أو موافقة وثيقة",
+"v62: guide for every page (on-screen tours, page guide button, ? marks, guide center) + one-press approve & notify": "دليل استخدام لكل صفحة بأسهم تفاعلية، واعتماد وإبلاغ المنسق بضغطة واحدة",
+"v61: guided tours, first: Friday sermon recordings": "شرح تفاعلي على الشاشة، أوله تسجيل خطب الجمعة",
+"v60: cancel the 9740 idle lock screen": "إلغاء شاشة القفل ورمز 9740",
+"v59: OneDrive save for every employee (full copy of all tables + site), sidebar always open, remove most-used": "حفظ نسخة كاملة في OneDrive لكل موظف، والقائمة الجانبية مفتوحة دائماً، وإزالة «الأكثر استخداماً»",
+"v58: remove Decisions, Recommendations and Field visits pages (data kept)": "إزالة صفحات القرارات والتوصيات والزيارات الميدانية (البيانات محفوظة)",
+"v57: Watheqa letters split into our requests vs mosque replies (approval/refusal) + today summary": "وثيقة: فصل طلباتنا عن ردود إدارة المساجد (موافقة أو رفض) مع ملخص اليوم",
+"docs: rewards visibility": "",
+"ignore local build output": "",
+"تحديث الكاش v29": ""
+}

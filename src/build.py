@@ -89,8 +89,14 @@ _cl = [[_hl.md5(x[2].encode()).hexdigest()[:8], x[1], x[2]] for x in (l.split("|
 if os.environ.get("NEXT_MSG"):
     import datetime as _dt
     _cl.insert(0, [_hl.md5(os.environ["NEXT_MSG"].encode()).hexdigest()[:8], _dt.datetime.now(_dt.timezone(_dt.timedelta(hours=3))).isoformat(timespec="seconds"), os.environ["NEXT_MSG"]])
+_AR = _json.load(open(os.path.join(M, "chlog_ar.json"), encoding="utf8"))
+import re as _re
+def _ar(t):
+    t = _AR.get(t, t)
+    return t if _re.search("[\u0600-\u06FF]", t) and not _re.match(r"(Merge|wip|docs:)", t, _re.I) else ""
+_cl = [[c[0], c[1], _ar(c[2])] for c in _cl]; _cl = [c for c in _cl if c[2]]
 CHANGELOG_JS = "const CHANGELOG = " + _json.dumps(_cl, ensure_ascii=False) + ";\n"
-js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add31.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js", "add45.js", "add46.js","add47.js","add48.js","add49.js","add50.js","add51.js","add52.js","add53.js","add54.js","add55.js"))
+js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add31.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js", "add45.js", "add46.js","add47.js","add48.js","add49.js","add50.js","add51.js","add52.js","add53.js","add54.js","add55.js","add56.js"))
 R('</style>\n\n</head>', css + '</style>\n\n</head>')
 R('(async function boot(){', '/* ===== v9 ===== */\n' + CHANGELOG_JS + js + '\n(async function boot(){')
 # --- logo #3: progress ring + check ---

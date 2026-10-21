@@ -257,3 +257,42 @@ tbody td{border-bottom:1px solid var(--line-2)}
 
 .ib-iss{display:block;font:600 11px/1.4 inherit;color:#A63F33;margin-top:2px;white-space:normal}
 @media print{.ib-iss{display:none}}
+
+/* ===== v69: light-green sidebar (light theme), readable dark text ===== */
+:root:not([data-theme="dark"]){--side:#E6F4EC;--side-2:#D9EEE2;--side-hi:#C5E5D3;--side-ink:#123A2C;--side-muted:#3E6153}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){--side:#0A100E;--side-2:#070C0A;--side-hi:#16211D;--side-ink:#E6ECE9;--side-muted:#8E9A95}}
+:root:not([data-theme="dark"]) #side.side{color:var(--side-ink);border-inline-end:1px solid #CFE6D9;scrollbar-color:rgba(18,58,44,.18) transparent}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]) #side.side{color:var(--side-ink);border-inline-end:0}}
+.side-lt #side .brand,.side-lt #side .side-foot,.side-lt #nav-fav{border-color:rgba(18,58,44,.12)!important}
+.side-lt #side .brand b,.side-lt #side .brand strong{color:var(--side-ink)!important}
+.side-lt #side .nav button{color:var(--side-muted)!important}
+.side-lt #side .nav button svg{color:#2E6F55;stroke:#2E6F55}
+.side-lt #side .nav button:hover{background:rgba(18,58,44,.07)!important;color:var(--side-ink)!important}
+.side-lt #side .nav button[aria-current="page"]{background:#FFFFFF!important;color:#0F5440!important;font-weight:700;box-shadow:0 1px 3px rgba(18,58,44,.12),inset 3px 0 0 #0F5440!important}
+.side-lt #side .nav button[aria-current="page"] svg{color:#0F5440;stroke:#0F5440}
+.side-lt #side .nav .sep,.side-lt #side .nav .ng:not(.cl)>.sep{color:var(--side-ink)!important}
+.side-lt #side .nav .sep:hover{background:rgba(18,58,44,.06)!important;color:var(--side-ink)!important}
+.side-lt #side .nav .ng+.ng{border-top-color:rgba(18,58,44,.10)}
+.side-lt #side .nav .ng-b{border-inline-start-color:rgba(18,58,44,.14)}
+.side-lt #side .nav-q input{background:#FFFFFF!important;border:1px solid #C9E2D4!important;color:var(--side-ink)!important}
+.side-lt #side .nav-q svg{color:var(--side-muted)}
+.side-lt #side .btn,.side-lt #side .side-foot .btn{background:#FFFFFF!important;border:1px solid #C9E2D4!important;color:var(--side-ink)!important}
+.side-lt #side .kbd{background:#fff;border-color:#C9E2D4;color:var(--side-muted)}
+.side-lt #side span,.side-lt #side small{color:inherit}
+.side-lt #side .brand span{color:var(--side-muted)!important}
+.side-lt #side::-webkit-scrollbar-thumb{background:rgba(18,58,44,.18)}
+
+/* ===== v69: «جديد» popup on phones = a bottom sheet that scrolls, never covers the page ===== */
+@media (max-width:700px){
+  .nf-tip{left:12px!important;right:12px!important;width:auto!important;top:auto!important;bottom:calc(76px + env(safe-area-inset-bottom))!important;max-height:min(60vh,460px);overflow:auto;-webkit-overflow-scrolling:touch}
+  .nf-tip .btn{position:sticky;bottom:0}
+}
+.nf-tip span{overflow-wrap:anywhere}
+@media (max-width:700px){#odx-bar{width:50px;height:50px;padding:0;border-radius:50%;font-size:0;display:grid;place-items:center}#odx-bar::before{content:"☁︎";font-size:22px;line-height:1}}
+/* ===== v69: nothing may widen the page on a phone: tab bars scroll inside themselves ===== */
+.rn-seg,.seg,.stabs{max-width:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.rn-seg::-webkit-scrollbar,.seg::-webkit-scrollbar,.stabs::-webkit-scrollbar{display:none}
+.rn-seg>*,.seg>*,.stabs>*{flex-shrink:0}
+#view{min-width:0;max-width:100%}
+@media (max-width:760px){#view{overflow-x:clip}}
+.as,.avx,.avx-step{grid-template-columns:minmax(0,1fr)}.as>*,.avx>*,.avx-step>*{min-width:0}
