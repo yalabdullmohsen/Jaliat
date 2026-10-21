@@ -199,3 +199,12 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .sp2-h .btn{white-space:nowrap;flex:none}
 /* the progress-bar helper «.mini» must never restyle the collapsed shell */
 .shell.mini{display:grid;min-width:0;gap:0;align-items:stretch}
+/* v57 watheqa kinds */
+.wqk .panel-b{display:grid;gap:12px}
+.wqk-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}.wqk-h b{font-size:15px}.wqk-h span{color:var(--muted);font-size:13px}
+.wqk-l{display:grid;gap:6px;margin-top:8px}
+.wqk-r{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;align-items:center;text-align:start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;font:inherit;color:inherit}
+.wqk-r .chip{grid-row:span 2}.wqk-r b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wqk-seg{overflow-x:auto;flex-wrap:nowrap;max-width:100%}.wqk-seg button{white-space:nowrap}
+.wq-d.k-ok i{background:var(--oks)!important;color:var(--ok)!important}.wq-d.k-bad i{background:var(--bads)!important;color:var(--bad)!important}
+.wqk-r bdi{white-space:nowrap}
