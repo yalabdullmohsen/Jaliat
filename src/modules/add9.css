@@ -208,3 +208,4 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .wqk-seg{overflow-x:auto;flex-wrap:nowrap;max-width:100%}.wqk-seg button{white-space:nowrap}
 .wq-d.k-ok i{background:var(--oks)!important;color:var(--ok)!important}.wq-d.k-bad i{background:var(--bads)!important;color:var(--bad)!important}
 .wqk-r bdi{white-space:nowrap}
+[data-go="decisions"],[data-go="recs"],[data-vsnew],#nav [data-nav="decisions"],#nav [data-nav="recs"],#nav [data-nav="visits"]{display:none!important}

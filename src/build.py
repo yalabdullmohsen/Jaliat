@@ -90,7 +90,7 @@ if os.environ.get("NEXT_MSG"):
     import datetime as _dt
     _cl.insert(0, [_hl.md5(os.environ["NEXT_MSG"].encode()).hexdigest()[:8], _dt.datetime.now(_dt.timezone(_dt.timedelta(hours=3))).isoformat(timespec="seconds"), os.environ["NEXT_MSG"]])
 CHANGELOG_JS = "const CHANGELOG = " + _json.dumps(_cl, ensure_ascii=False) + ";\n"
-js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add31.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js", "add45.js", "add46.js","add47.js"))
+js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add31.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js", "add45.js", "add46.js","add47.js","add48.js"))
 R('</style>\n\n</head>', css + '</style>\n\n</head>')
 R('(async function boot(){', '/* ===== v9 ===== */\n' + CHANGELOG_JS + js + '\n(async function boot(){')
 # --- logo #3: progress ring + check ---
@@ -111,7 +111,8 @@ _nav = s[_na:_nb]
 _btn = {}
 for m in re.finditer(r'\n\s*(<button[^>]*?(?:data-nav="([a-z]+)"|data-ext="[^"]*")[^>]*>.*?</button>)', _nav):
     _btn[m.group(2) or "wq-ext"] = m.group(1)
-_groups = [("", ["home", "copilot"]), ("القرارات", ["decisions", "recs"]), ("العمل اليومي", ["tasks", "fix", "questions", "inbox", "watheqa", "permits", "visits"]), ("التواصل", ["whatsapp", "chat", "renew"]), ("الأنشطة والجدولة", ["avail", "docs", "portal", "acts", "cal", "lmap", "weekly", "halls"]),
+for _k in ("decisions", "recs", "visits"): _btn.pop(_k, None)
+_groups = [("", ["home", "copilot"]), ("العمل اليومي", ["tasks", "fix", "questions", "inbox", "watheqa", "permits"]), ("التواصل", ["whatsapp", "chat", "renew"]), ("الأنشطة والجدولة", ["avail", "docs", "portal", "acts", "cal", "lmap", "weekly", "halls"]),
            ("الجاليات والمساجد", ["comms", "coords", "coordeval", "mosques"]), ("خطب الجمعة", ["khatibs", "rewards", "sermrec"]), ("التقارير والسجلات", ["report", "stats", "notes", "mine", "changes"]), ("الإدارة", ["users", "backups", "audit"])]
 _out = ['<nav class="nav" id="nav">']
 _used = set()
