@@ -11,3 +11,6 @@ navFav = function(){ $("#nav-fav")?.remove(); };
 /* sidebar always open: every group expanded, no folding (Yousef's request) */
 ngApply = function(){ document.querySelectorAll("#nav .ng").forEach(g => { g.classList.remove("cl"); g.querySelector(".sep")?.setAttribute("aria-expanded", "true"); const d = g.querySelector(".ng-n"); if (d) d.hidden = true; }); };
 try { if (!LS.get("mini58", false)) { $("#app")?.classList.remove("mini"); LS.set("mini", false); LS.set("mini58", true); } localStorage.removeItem("ng"); } catch (_) {}
+/* the 9740 idle lock screen is cancelled (Yousef's request): never shown, and any saved lock is cleared */
+lockApp = function(){ try { localStorage.removeItem("jl-lock"); } catch (_) {} $("#lk-box")?.remove(); };
+try { localStorage.removeItem("jl-lock"); } catch (_) {}
