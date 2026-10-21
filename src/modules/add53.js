@@ -23,3 +23,7 @@ permitIssue = async function(){ const p = $("#p-pray")?.value; if (!p) return _p
 /* the AI reading fills the prayer period too */
 if (typeof prFill === "function") { const _prFill64 = prFill; prFill = function(i){ _prFill64(i); const x = PR.items[i]; const p = prayerOf(x?.prayer) || prayerOf(x?.from); const s = $("#p-pray"); if (s && p) { s.value = p; s.classList.add("pr-filled"); prPraySync(); } }; }
 NEWF.splice(1, 0, ["v64-pray", "nav:permits", "وقت التصريح بالصلاة", "وقت التصريح صار فترة بعد الصلاة: بعد الفجر، الظهر، العصر، المغرب، العشاء، أو الجمعة، ويظهر هكذا في التصريح وصفحة التحقق.", false, "2026-10-21"]);
+/* the signature & stamp on permits belong to the head of section: only he can change them (also enforced in the database) */
+const isHead = () => S.me?.username === "fayez";
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-passets],[data-pasave]"); if (!t || isHead()) return; ev.preventDefault(); ev.stopImmediatePropagation(); toast("التوقيع والختم يغيّرهما رئيس القسم فقط"); }, true);
+const _afterRender64 = afterRender; afterRender = function(v){ _afterRender64(v); if (v === "permits" && !isHead()) { const b = $("[data-passets]"); if (b) { b.disabled = true; b.title = "يغيّرهما رئيس القسم فقط"; b.textContent = "🔒 التوقيع والختم (رئيس القسم)"; } } };
