@@ -1,15 +1,16 @@
 /* ===== v67: rewards sheet = الاسم، الرقم المدني، الآيبان، عدد الخطب، المبلغ · approval line «اعتماد» ×3 · a properly formatted Excel ===== */
 const SIGN3 = ["اعتماد الموظف", "اعتماد رئيس القسم", "اعتماد مدير الإدارة"];
-function srRows(sheet){ return sheet.map(p => { const k = RH.kb.get(String(p.pid || "")) || {}; return { name:k.name || p.name || "", pid:String(p.pid || ""), iban:k.iban || "", bank:k.bank || "", n:p.n, sum:p.sum }; }); }
+function srRows(sheet){ return sheet.map(p => { const k = RH.kb.get(String(p.pid || "")) || {}; return { name:k.name || p.name || "", pid:String(p.pid || ""), iban:k.iban || "", bank:k.bank || "", issue:k.issue || "", n:p.n, sum:p.sum }; }); }
 srSheetHTML = function(sheet, y, m, sum, cnt){
   if (!RH.loaded) { rhLoad().then(() => { if (S.view === "rewards") render(); }); }
-  const R = srRows(sheet), noIban = R.filter(r => !ibanOk(r.iban)).length;
+  const R = srRows(sheet), noIban = R.filter(r => !ibanOk(r.iban)).length, iss = R.filter(r => r.issue && ibanOk(r.iban)).length;
   return `<div class="toolbar"><button class="btn btn-primary" data-srprint>${icon("i-doc")} طباعة الكشف</button><button class="btn btn-ghost" data-srxls>${icon("i-down")} تصدير إكسل</button><span class="count">${R.length} خطيب · ${cnt} خطبة</span></div>
   ${noIban ? `<div class="check warn"><b>${noIban} خطيب بلا آيبان صحيح</b><span>أكمله من «كشوف البنوك المعتمدة» ← سجل الآيبان، ليظهر في الكشف.</span></div>` : ""}
+  ${iss ? `<div class="check warn"><b>${iss} آيبان عليه ملاحظة</b><span>الملاحظة مكتوبة تحت الآيبان في الجدول، راجعها قبل الاعتماد.</span></div>` : ""}
   <div class="panel sr-sheet" id="sr-sheet"><div class="sr-h"><div><b>وزارة الشؤون الإسلامية</b><span>إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
     <h2>كشف مكافآت خطباء الجاليات عن شهر ${MONTHS[m]} ${y}</h2><span class="s">قيمة الخطبة الواحدة: ${SR.rate ? kd(SR.rate) + " د.ك" : "غير محددة"}</span></div>
     <div class="table-wrap"><table class="stbl sr-tbl sr-tbl5"><thead><tr><th>م</th><th>الاسم</th><th>الرقم المدني</th><th>الآيبان</th><th class="c">عدد الخطب</th><th class="c">المبلغ (د.ك)</th></tr></thead><tbody>
-    ${R.map((r, i) => `<tr><td class="n">${i + 1}</td><td class="nm">${esc(r.name || "—")}</td><td class="num">${esc(r.pid)}</td><td class="num iban${ibanOk(r.iban) ? "" : " bad-i"}" dir="ltr">${esc(r.iban || "—")}</td><td class="c num"><b>${r.n}</b></td><td class="c num"><b>${SR.rate ? kd(r.sum) : "—"}</b></td></tr>`).join("") || `<tr><td colspan="6" class="empty">لا توجد خطب مسجلة لهذا الشهر، سجّلها من تبويب «تسجيل الخطب»</td></tr>`}
+    ${R.map((r, i) => `<tr><td class="n">${i + 1}</td><td class="nm">${esc(r.name || "—")}</td><td class="num">${esc(r.pid)}</td><td class="num iban${ibanOk(r.iban) && !r.issue ? "" : " bad-i"}" dir="ltr"${r.issue ? ` title="${esc(r.issue)}"` : ""}>${esc(r.iban || "—")}${r.issue ? `<small class="ib-iss" dir="rtl">⚠ ${esc(r.issue)}</small>` : ""}</td><td class="c num"><b>${r.n}</b></td><td class="c num"><b>${SR.rate ? kd(r.sum) : "—"}</b></td></tr>`).join("") || `<tr><td colspan="6" class="empty">لا توجد خطب مسجلة لهذا الشهر، سجّلها من تبويب «تسجيل الخطب»</td></tr>`}
     </tbody><tfoot><tr><td></td><td class="nm">الإجمالي</td><td></td><td></td><td class="c num">${cnt}</td><td class="c num">${SR.rate ? kd(sum) : "—"}</td></tr></tfoot></table></div>
     <div class="sr-sign">${SIGN3.map(s => `<div><span>${s}</span><i></i></div>`).join("")}</div></div>`; };
 
