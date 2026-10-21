@@ -3,7 +3,7 @@ const PD_ALL = [6, 0, 1, 2, 3, 4, 5];
 function daysOfText(t){ const s = String(t || ""); if (/يومي|كل يوم|طوال الأسبوع/.test(s)) return [...PD_ALL];
   const M = [["الأحد", 0], ["الاثنين", 1], ["الإثنين", 1], ["الثلاثاء", 2], ["الاربعاء", 3], ["الأربعاء", 3], ["الخميس", 4], ["الجمعة", 5], ["السبت", 6]];
   return [...new Set(M.filter(([n]) => s.includes(n.replace(/^ال/, ""))).map(x => x[1]))]; }
-const pdText = d => !d?.length || d.length === 7 ? "يومياً" : "كل " + WEEK.filter(x => d.includes(x)).map(x => DAYS[x]).join(" و");
+const pdText = d => !d?.length || d.length === 7 ? "يومياً" : "كل " + WEEK.filter(x => d.includes(x)).map(x => DAYS[x].replace(/^ال/, "")).join(" و");
 const _permitForm66 = permitForm;
 permitForm = function(preset, grant){ _permitForm66(preset, grant); if (S.form?.kind !== "permit") return;
   const act = preset?.act_id ? S.byId?.get(preset.act_id) : null;
