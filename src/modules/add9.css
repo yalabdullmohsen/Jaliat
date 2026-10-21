@@ -296,3 +296,4 @@ tbody td{border-bottom:1px solid var(--line-2)}
 #view{min-width:0;max-width:100%}
 @media (max-width:760px){#view{overflow-x:clip}}
 .as,.avx,.avx-step{grid-template-columns:minmax(0,1fr)}.as>*,.avx>*,.avx-step>*{min-width:0}
+.side-lt #side .nb,.side-lt #side .ng-n,.side-lt #side .nav .nb span{color:#fff!important;opacity:1!important}
