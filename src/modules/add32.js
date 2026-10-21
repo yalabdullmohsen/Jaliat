@@ -34,6 +34,6 @@ document.addEventListener("paste", ev => { if (S.form?.kind === "intake" && S.fo
 NEWF.splice(1, 0, ["v32-paste", "nav:inbox", "لصق نص الطلب", "في «استقبال طلب»: خيار جديد «لصق نص»، الصق الطلب من الواتساب أو الإيميل واضغط «إدخال تلقائي»، فيُسجَّل الطلب وأنشطته ويظهر لك تأكيد.", false, "2026-10-20"]);
 /* «الاقتراحات»، أسفل القائمة تحت «خروج»: اقتراح سريع يصل لرئيس القسم */
 (function(){ const lo = document.getElementById("logout"); if (!lo || document.getElementById("sugg-btn")) return;
-  lo.parentElement.insertAdjacentHTML("afterend", `<button class="btn sugg-btn" id="sugg-btn" type="button">💡 <span>الاقتراحات</span></button>`); })();
-document.addEventListener("click", ev => { if (ev.target.closest("#sugg-btn")) { $("#side")?.classList.remove("open"); recForm(null, { kind:"مقترح تطوير" }); } });
+  lo.parentElement.insertAdjacentHTML("afterend", `<button class="btn sugg-btn" id="sugg-btn" type="button"><span>الاقتراحات</span></button>`); })();
+document.addEventListener("click", ev => { if (ev.target.closest("#sugg-btn")) { $("#side")?.classList.remove("open"); const hd = S.profiles.find(p => p.username === "fayez") || S.profiles.find(p => p.role === "مدير"); qForm(null, { to:hd?.id, body:"💡 اقتراح: " }); } });
 NEWF.splice(1, 0, ["v32-sugg", "id:sugg-btn", "الاقتراحات", "أسفل القائمة: اكتب اقتراحك لتطوير العمل أو النظام، ويصل لرئيس القسم مباشرة ويتابعه في «التوصيات».", false, "2026-10-20"]);

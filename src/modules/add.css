@@ -1,8 +1,6 @@
 /* ===== v9: wide screens, smart features, assistant ===== */
 .nav button span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav button .kbd{flex:none}
-.nav .ai-nav{background:linear-gradient(90deg,rgba(221,180,76,.18),rgba(61,180,135,.10));margin-top:2px}
-.nav .ai-nav svg{color:var(--gold);opacity:1}
 .brand{position:relative}
 .collapse{margin-inline-start:auto;background:rgba(255,255,255,.06);border:0;color:var(--side-muted);width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
 .collapse:hover{color:var(--side-ink);background:rgba(255,255,255,.12)}
@@ -19,8 +17,6 @@
 .bub a:hover{text-decoration:underline}
 .kbd{font-family:var(--f-display);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:0 6px;color:var(--muted);background:var(--surface-2);line-height:18px;white-space:nowrap}
 .side .kbd{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:var(--side-muted)}
-.top .ai-btn{background:var(--gold-soft);color:var(--gold)}
-.top .ai-btn svg{width:18px;height:18px}
 /* collapsed sidebar (desktop) */
 @media (min-width:901px){
   .shell.mini{grid-template-columns:76px 1fr}
@@ -121,8 +117,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
 .ai-box{position:sticky;bottom:12px;display:flex;gap:10px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:var(--shadow);max-width:1100px;width:100%}
 .ai-box textarea{flex:1;border:0;background:none;resize:none;outline:none;max-height:200px;min-height:44px;padding:10px 8px;font-size:15.5px}
 .ai-box .btn{height:44px}
-.ai-setup{max-width:720px}
-@media (max-width:900px){.ai-box{bottom:calc(76px + env(safe-area-inset-bottom,0px))}.ai{min-height:auto}.top .finder{flex:1 1 auto}.top .finder .kbd{display:none}.top .ai-btn span{display:none}}
+@media (max-width:900px){.ai-box{bottom:calc(76px + env(safe-area-inset-bottom,0px))}.ai{min-height:auto}.top .finder{flex:1 1 auto}.top .finder .kbd{display:none}}
 @media (max-width:700px){.week{grid-template-columns:repeat(7,minmax(64px,1fr));overflow-x:auto;padding-bottom:4px}.kpis.k6{grid-template-columns:repeat(2,minmax(0,1fr))}.top .finder span{display:none}.top .finder{flex:0 0 auto}}
 @media (max-width:1100px){.home-grid{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:700px){.home .home-col:first-child .li{grid-template-columns:auto minmax(0,1fr)}.home .home-col:first-child .li > .chip:last-child{display:none}}

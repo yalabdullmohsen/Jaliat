@@ -42,7 +42,6 @@ document.addEventListener("click", ev => { if (ev.target.closest("#nav button[da
 
 /* ================= v41: every WhatsApp message is sent from «واتساب القسم» inside «إنجاز» (full page, no going outside) ================= */
 S.waPop = null;
-function decWaNextFor(id){ S.form = { kind:"decwa", id }; const sent = S.waSent[id] || new Map(), c = waTargets().find(x => !sent.has(waNum(x.phone))); if (!c) { toast("أُرسل القرار لجميع المنسقين ✓"); return waBack(); } decWaSend(waNum(c.phone)); }
 function waBack(){ const b = S.waPop?.back; S.waPop = null; document.body.classList.remove("wa-q"); go(b && b !== "whatsapp" ? b : "home"); }
 function waInside(phone, text, next, name){ const n = waNum(phone); if (n.length < 10) return toast("لا يوجد رقم هاتف صحيح");
   if (!waEmbedOk() || isTouchDev()) { if (isTouchDev()) return window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`, "_blank", "noopener"); toast("ركّب «جسر إنجاز» 2.3 ليُرسل من واتساب داخل النظام، من صفحة «واتساب القسم»"); return window.open(`https://web.whatsapp.com/send?phone=${n}&text=${encodeURIComponent(text)}`, "enjaz-whatsapp"); }

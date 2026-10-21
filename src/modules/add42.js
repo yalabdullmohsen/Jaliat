@@ -53,15 +53,6 @@ reqForm = async function(id){ await _reqForm50b(id); const r = S.reqs.find(x => 
 const _vInbox50b = vInbox;
 vInbox = function(){ let h = _vInbox50b(); for (const r of S.reqs) { const b = r.data?.by; if (b?.role === "نائب") h = h.replace(`data-rq="${r.id}"><div class="rq-h">`, `data-rq="${r.id}"><div class="rq-h"><span class="chip">النائب</span>`); } return h; };
 
-/* ---------- staff quick code: after idle the app locks; 9740 opens it again (the session stays) ---------- */
-function lockApp(){ try { localStorage.setItem("jl-lock", "1"); } catch (_) {} if ($("#lk-box")) return;
-  const b = document.createElement("div"); b.id = "lk-box"; b.className = "ra";
-  b.innerHTML = `<form class="ra-c" id="lk-form"><b>رمز موظفي القسم</b><span>اكتب الرمز للمتابعة</span><input class="f num" id="lk-p" type="password" inputmode="numeric" dir="ltr" maxlength="8" autocomplete="off"><p class="err" id="lk-e" hidden>الرمز غير صحيح</p><button class="btn btn-primary" type="submit">دخول</button></form>`;
-  document.body.appendChild(b); setTimeout(() => $("#lk-p")?.focus(), 30);
-  $("#lk-p").addEventListener("input", ev => { if (ev.target.value === "9740") unlockApp(); });
-  $("#lk-form").addEventListener("submit", ev => { ev.preventDefault(); if ($("#lk-p").value === "9740") unlockApp(); else { $("#lk-e").hidden = false; $("#lk-p").value = ""; } }); }
-function unlockApp(){ try { localStorage.removeItem("jl-lock"); } catch (_) {} $("#lk-box")?.remove(); idleReset(); }
-const _boot9s50c = boot9; boot9 = function(){ _boot9s50c(); let l = null; try { l = localStorage.getItem("jl-lock"); } catch (_) {} if (l) lockApp(); };
 
 /* staff open any community's portal directly (no coordinator account needed) */
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-ptopen]"); if (!t) return;

@@ -93,7 +93,7 @@ tourEl = function(s){ if (s.txt) { const e = [...document.querySelectorAll(s.sel
 function tourStartAt(k, i){ if (!TOURS[k]) return; TR.k = k; TR.i = i || 0; closeDrawer?.(); tourShow(); };
 
 /* «دليل الصفحة» in the top bar of every page */
-function guideBtn(){ const top = $("header.top"); if (!top || $("#guide-btn")) return; top.querySelector("#finder")?.insertAdjacentHTML("afterend", `<button type="button" class="btn btn-ghost" id="guide-btn" title="شرح هذه الصفحة خطوة بخطوة على الشاشة">📘 <span>دليل الصفحة</span></button>`); }
+function guideBtn(){ const top = $("header.top"); if (!top || $("#guide-btn")) return; top.querySelector("#finder")?.insertAdjacentHTML("afterend", `<button type="button" class="btn btn-ghost" id="guide-btn" title="شرح هذه الصفحة خطوة بخطوة على الشاشة"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 21V5M9 7h6"/></svg><span>دليل الصفحة</span></button>`); }
 /* small «؟» marks next to every part a guide explains */
 function guidePins(v){ document.querySelectorAll(".g-pin").forEach(p => p.remove()); const k = tourKey(v); if (!k || TR.k) return;
   TOURS[k].steps.forEach((s, i) => { if (!s.sel || s.sel.startsWith("#nav") || s.sel === "#add-act" || s.sel === "#finder" || s.sel === "#bell" || s.sel === "#ocr-top") return; if (s.go && s.go !== v) return;

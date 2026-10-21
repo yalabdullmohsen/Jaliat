@@ -1,47 +1,7 @@
-/* ================= v35: decisions / circulars → coordinators on WhatsApp (one tap each + log) ================= */
-S.waSent = S.waSent || {};
-const waTargets = () => { const all = S.coords.filter(c => c.phone && waNum(c.phone).length >= 10 && c.status !== "موقوف");
-  return S.waInc === "all" ? all : all.filter(c => (c.role || "منسق") === "منسق"); };
-function waDecText(d, c){
-  const hi = c ? `الأخ الفاضل/ ${c.name} حفظه الله${c.lang ? `\n${c.role || "منسق"} جالية ${c.lang}` : ""}` : "الإخوة الأفاضل منسقو الجاليات حفظهم الله";
-  return `السلام عليكم ورحمة الله وبركاته\n${hi}\n\nنحيطكم علماً بـ${d.kind === "تعميم" ? "التعميم" : d.kind === "توجيه" ? "التوجيه" : "القرار"} الصادر عن القسم برقم ق-${d.no}:\n\n*${d.title}*${d.body ? `\n${d.body}` : ""}\n\nنرجو الاطلاع والعمل بموجبه، وجزاكم الله خيراً.${SIGN}`; }
-async function waSentLoad(id){ const { data } = await sb.from("wa_sends").select("phone,sent_at").eq("ref", id); S.waSent[id] = new Map((data || []).map(r => [waNum(r.phone), r.sent_at])); }
-function decWaBody(d){ const L = waTargets(), sent = S.waSent[d.id] || new Map(), q = norm(S.waQ || "");
-  const V = L.filter(c => !q || norm([c.name, c.comm, c.lang].join(" ")).includes(q)), n = L.filter(c => sent.has(waNum(c.phone))).length;
-  return `<div class="ws-top"><div class="seg"><button type="button" data-wainc="co" class="${S.waInc !== "all" ? "on" : ""}">المنسقون</button><button type="button" data-wainc="all" class="${S.waInc === "all" ? "on" : ""}">المنسقون ونوابهم</button></div><span class="chip ${n === L.length ? "ok" : ""}">أُرسل ${n} من ${L.length}</span></div>
-    <div class="ws-bar"><i style="width:${L.length ? n / L.length * 100 : 0}%"></i></div>
-    <div class="ws-acts"><button type="button" class="btn btn-primary" data-wanext>📲 إرسال للتالي</button><button type="button" class="btn" data-wagrp>📋 نسخ نص للمجموعة</button></div>
-    <span class="hint">كل ضغطة تفتح محادثة المنسق في واتساب والرسالة جاهزة، اضغط «إرسال» هناك ثم ارجع واضغط «إرسال للتالي».</span>
-    <div class="search"><svg><use href="#i-search"/></svg><input class="f" id="ws-q" placeholder="ابحث باسم المنسق أو الجالية…" value="${esc(S.waQ || "")}"></div>
-    <div class="ws-l">${V.map(c => { const k = waNum(c.phone), at = sent.get(k); return `<div class="ws-i${at ? " done" : ""}"><div><b>${esc(c.name)}</b><span class="s">${esc(c.comm || c.lang || "")}${c.role && c.role !== "منسق" ? " · " + esc(c.role) : ""}</span></div>${at ? `<span class="chip ok">✓ ${fmtTime(at)}</span>` : ""}<button type="button" class="btn ${at ? "btn-ghost" : ""}" data-wasend="${k}">${at ? "إعادة" : "إرسال"}</button></div>`; }).join("") || `<div class="empty s">لا يوجد منسقون بأرقام صحيحة</div>`}</div>`; }
-async function decWa(id){ const d = S.decs.find(x => x.id === id); if (!d) return; S.form = { kind:"decwa", id }; S.waQ = "";
-  openDrawer(`إرسال ق-${d.no} للمنسقين بالواتساب`, `<details class="ws-pv"><summary>نص الرسالة</summary><div class="q-body">${esc(waDecText(d, { name:"(اسم المنسق)", lang:"(الجالية)" })).replace(/\n/g, "<br>")}</div></details><div id="ws-box"><div class="empty s">جارٍ التحميل…</div></div>`, `<button class="btn btn-ghost" data-close>إغلاق</button>`);
-  await waSentLoad(id); decWaPaint(); }
-function decWaPaint(){ const d = S.decs.find(x => x.id === S.form?.id), box = $("#ws-box"); if (!d || !box) return; const f = document.activeElement?.id === "ws-q"; box.innerHTML = decWaBody(d); if (f) { const i = $("#ws-q"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }
+/* ================= v35: WhatsApp helpers (send to a coordinator) ================= */
 function waGo(phone, text){ const n = waNum(phone);
   if (isTouchDev()) return window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
   window.open(`https://web.whatsapp.com/send?phone=${n}&text=${encodeURIComponent(text)}`, "enjaz-whatsapp"); }
-async function decWaSend(k){ const d = S.decs.find(x => x.id === S.form?.id), c = waTargets().find(x => waNum(x.phone) === k) || S.coords.find(x => waNum(x.phone) === k); if (!d || !c) return;
-  waGo(c.phone, waDecText(d, c), () => decWaNextFor(d.id), c.name);
-  const { error } = await sb.from("wa_sends").insert({ kind:"decision", ref:d.id, phone:k, name:c.name, comm:c.comm || null }); if (error) return writeFail(error);
-  (S.waSent[d.id] = S.waSent[d.id] || new Map()).set(k, new Date().toISOString()); decWaPaint(); }
-/* decision card: admin button + count */
-const _decCard35 = decCard;
-decCard = function(d){ const h = _decCard35(d); if (!S.admin || d.cancelled) return h; return h.replace('<div class="dc-f">', `<div class="dc-f"><button type="button" class="lnk" data-decwa="${d.id}">📲 إرسال للمنسقين بالواتساب</button>`); };
-/* new decision: optional "send to coordinators" right after issuing */
-const _decForm35 = decForm;
-decForm = function(){ _decForm35(); const h = $("#dc-b")?.closest(".fld"); if (h) h.insertAdjacentHTML("afterend", `<label class="ws-chk"><input type="checkbox" id="dc-wa" checked> إرسال للمنسقين بالواتساب بعد الإصدار</label>`); };
-const _decSave35 = decSave;
-decSave = async function(){ const wa = $("#dc-wa")?.checked, top = S.decs[0]; await _decSave35(); if (wa && S.decs[0] && S.decs[0] !== top) decWa(S.decs[0].id); };
-document.addEventListener("click", async ev => { const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
-  if (D.decwa) return decWa(D.decwa);
-  if (D.wainc) { S.waInc = D.wainc; return decWaPaint(); }
-  if (D.wasend) return decWaSend(D.wasend);
-  if (D.wanext !== undefined) { const sent = S.waSent[S.form?.id] || new Map(), c = waTargets().find(x => !sent.has(waNum(x.phone))); if (!c) return toast("أُرسل القرار لجميع المنسقين ✓"); return decWaSend(waNum(c.phone)); }
-  if (D.wagrp !== undefined) { const d = S.decs.find(x => x.id === S.form?.id); if (!d) return; try { await navigator.clipboard.writeText(waDecText(d, null)); toast("نُسخ النص، الصقه في مجموعة المنسقين"); } catch (_) { toast("تعذّر النسخ"); } }
-});
-document.addEventListener("input", ev => { if (ev.target.id === "ws-q") { S.waQ = ev.target.value; decWaPaint(); } });
-NEWF.splice(1, 0, ["v35-wa", "nav:decisions", "القرارات تصل المنسقين بالواتساب", "عند إصدار قرار أو تعميم: «إرسال للمنسقين بالواتساب»، كل ضغطة تفتح محادثة منسق والرسالة جاهزة، ويُسجَّل من وصله.", false, "2026-10-20"]);
 
 /* ================= v35b: Microsoft account (OneDrive backups) belongs to each «إنجاز» user, never shared ================= */
 // MSAL keeps signed-in Microsoft accounts per browser; pick only the one this user linked himself.

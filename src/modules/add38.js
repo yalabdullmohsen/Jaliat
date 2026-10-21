@@ -1,7 +1,8 @@
 /* ================= v38: approved reward sheets per bank (history Apr 2026→) + IBAN register ================= */
 const RH = { rows:[], kb:new Map(), loaded:false, m:"", q:"" };
 const BANK_ORD = ["بيت التمويل الكويتي", "بنك الكويت الدولي", "بنك الكويت الوطني", "البنك التجاري", "بنك الخليج", "بنك برقان", "بنك وربة", "بنك بوبيان", "البنك الأهلي"];
-const ibanOk = i => /^KW\d{2}[A-Z]{4}[A-Z0-9]{22}$/.test(i || "");
+const ibanOk = i => { i = String(i || "").replace(/\s/g, "").toUpperCase(); if (!/^KW\d{2}[A-Z]{4}[A-Z0-9]{22}$/.test(i)) return false;
+  const r = (i.slice(4) + i.slice(0, 4)).replace(/[A-Z]/g, c => c.charCodeAt(0) - 55); let m = 0; for (const d of r) m = (m * 10 + +d) % 97; return m === 1; };
 async function rhLoad(){ const [a, b] = await Promise.all([sb.from("reward_history").select("*").order("month", { ascending:false }).limit(5000), sb.from("khatib_bank").select("*").limit(3000)]);
   RH.rows = a.data || []; RH.kb = new Map((b.data || []).map(r => [r.cid, r])); RH.loaded = true; }
 const rhMonths = () => [...new Set(RH.rows.map(r => r.month))].sort().reverse();

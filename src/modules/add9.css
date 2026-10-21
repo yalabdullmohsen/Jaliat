@@ -381,3 +381,15 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .side-dk .stbl th,.side-dk table th{background:#1C2420}
 .side-dk .hx{background:linear-gradient(120deg,#0E4D3A 0%,#0A3226 100%)!important;box-shadow:0 0 0 1px #1F5A46}
 .side-dk .btn-primary{color:#06120D}
+
+/* ===== v72: calmer screen — fewer loud extras ===== */
+.g-pin{width:18px;height:18px;font-size:11px;line-height:18px;background:var(--surface);color:var(--muted);border:1px solid var(--line);box-shadow:none;opacity:.55;top:-7px;inset-inline-start:-7px}
+.g-pin:hover,.g-pin:focus-visible{opacity:1;background:var(--gold);color:#fff;border-color:var(--gold)}
+#guide-btn svg{flex:none}
+.br-all{padding:10px 14px!important;display:flex!important;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.br-all b{font-size:13.5px}.br-all>span{font-size:12.5px;flex:1 1 260px}
+.br-all .br-acts{margin:0!important}
+.br-all .btn{padding:6px 12px;font-size:12.5px}
+@media (min-width:701px){#odx-bar{width:46px;height:46px;padding:0;border-radius:50%;font-size:0;display:grid;place-items:center;opacity:.92}
+  #odx-bar::before{content:"☁︎";font-size:20px;line-height:1}
+  #odx-bar:hover{width:auto;padding:0 16px;border-radius:12px;font-size:13.5px}#odx-bar:hover::before{content:"";font-size:0}}
