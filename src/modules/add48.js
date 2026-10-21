@@ -14,3 +14,5 @@ try { if (!LS.get("mini58", false)) { $("#app")?.classList.remove("mini"); LS.se
 /* the 9740 idle lock screen is cancelled (Yousef's request): never shown, and any saved lock is cleared */
 lockApp = function(){ try { localStorage.removeItem("jl-lock"); } catch (_) {} $("#lk-box")?.remove(); };
 try { localStorage.removeItem("jl-lock"); } catch (_) {}
+/* «تأكيد الهوية» (re-typing the password before sensitive actions) removed for good (Yousef's request) */
+S.authAt = 8.64e15; reauth = function(then){ S.authAt = 8.64e15; $("#ra-box")?.remove(); then(); };
