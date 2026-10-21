@@ -297,3 +297,51 @@ tbody td{border-bottom:1px solid var(--line-2)}
 @media (max-width:760px){#view{overflow-x:clip}}
 .as,.avx,.avx-step{grid-template-columns:minmax(0,1fr)}.as>*,.avx>*,.avx-step>*{min-width:0}
 .side-lt #side .nb,.side-lt #side .ng-n,.side-lt #side .nav .nb span{color:#fff!important;opacity:1!important}
+
+/* ===================== v70: «عاجي ملكي» (approved) — light theme only ===================== */
+:root:not([data-theme="dark"]){
+  --bg:#FAF7F0; --surface:#FFFFFF; --surface-2:#F4EFE4; --line:#ECE5D6; --line-2:#F2ECE0; --ink:#1C1A15; --muted:#7A7262;
+  --primary:#0E4D3A; --primary-2:#0A3C2D; --primary-ink:#FFFFFF; --primary-soft:#E6EFE9; --gold:#B8924A; --gold-soft:#F6EEDC;
+  --ok:#1F7A55; --oks:#E3F2EA; --bad:#B4503F; --bads:#F8E6E1; --warn:#9A6B17; --warns:#F8EDD7;
+  --side:#FFFFFF; --side-2:#FFFFFF; --side-hi:#0E4D3A; --side-ink:#1C1A15; --side-muted:#5E574A;
+  --shadow-s:0 1px 2px rgba(40,30,10,.04); --shadow:0 1px 2px rgba(40,30,10,.03),0 14px 30px -22px rgba(40,30,10,.28); --band:#F4EFE4;
+  --f-display:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif; --r:16px }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){--f-display:"IBM Plex Sans Arabic",sans-serif}}
+/* headings in Kufi */
+.side-lt .top h1,.side-lt .panel-h h3,.side-lt .mw-top h2,.side-lt h2.pg,.side-lt .brand b,.side-lt .brand strong,.side-lt .hx h2{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif;font-weight:700;letter-spacing:-.005em}
+.side-lt .panel-h h3{font-size:15.5px}
+/* sidebar: white, royal green current page with gold icon */
+.side-lt #side.side{background:#FFFFFF!important;border-inline-end:1px solid #ECE5D6!important;box-shadow:none}
+.side-lt #side .brand,.side-lt #side .side-foot,.side-lt #nav-fav{border-color:#ECE5D6!important}
+.side-lt #side .nav button{color:#3A352B!important;font-weight:500}
+.side-lt #side .nav button svg{color:#8A806D!important;stroke:#8A806D!important}
+.side-lt #side .nav button:hover{background:#F6F1E6!important;color:#1C1A15!important}
+.side-lt #side .nav button[aria-current="page"]{background:#0E4D3A!important;color:#FFFFFF!important;font-weight:700;box-shadow:0 8px 18px -10px rgba(14,77,58,.7)!important}
+.side-lt #side .nav button[aria-current="page"] svg{color:#D9B66E!important;stroke:#D9B66E!important}
+.side-lt #side .nav .sep,.side-lt #side .nav .ng:not(.cl)>.sep{color:#8A806D!important;font-size:12px;font-weight:700}
+.side-lt #side .nav .ng-b{border-inline-start-color:#ECE5D6}
+.side-lt #side .nav-q input{background:#F4EFE4!important;border:1px solid transparent!important;color:#1C1A15!important}
+.side-lt #side .btn,.side-lt #side .side-foot .btn{background:#FFFFFF!important;border:1px solid #ECE5D6!important;color:#1C1A15!important}
+.side-lt #side .brand span{color:#7A7262!important}
+/* cards and controls */
+.side-lt .panel,.side-lt .card,.side-lt .kpi,.side-lt .mw{border-radius:18px}
+.side-lt .btn-primary{box-shadow:0 8px 18px -10px rgba(14,77,58,.7)}
+.side-lt .top{background:rgba(250,247,240,.92);backdrop-filter:saturate(1.2) blur(8px)}
+.side-lt .stbl th,.side-lt table th{background:#F4EFE4}
+/* home hero */
+.hx{position:relative;overflow:hidden;border-radius:24px;padding:26px 30px;background:linear-gradient(120deg,#0E4D3A 0%,#0A3C2D 100%);color:#fff;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center;margin-bottom:16px}
+.hx:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 12% 30%,rgba(255,255,255,.10),transparent 40%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.06'%3E%3Cpath d='M40 0l11.7 28.3L80 40 51.7 51.7 40 80 28.3 51.7 0 40l28.3-11.7z'/%3E%3C/g%3E%3C/svg%3E")}
+.hx-t{position:relative;z-index:1;min-width:0}
+.hx small{color:#D9B66E;font-weight:700;font-size:12.5px}
+.hx h2{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif;font-size:25px;line-height:1.5;margin:4px 0 6px;color:#fff}
+.hx p{opacity:.85;font-size:14px;margin:0;max-width:640px}
+.hx-a{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.hx-b{border:0;background:#fff;color:#0A3C2D;border-radius:12px;padding:9px 16px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer}
+.hx-b.o{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22)}
+.hx-r{position:relative;z-index:1;width:124px;height:124px}
+.hx-r svg{width:100%;height:100%}
+.hx-r b{position:absolute;inset:0;display:grid;place-items:center;font-family:"Noto Kufi Arabic",sans-serif;font-size:27px;color:#fff}
+.hx-r span{position:absolute;bottom:26px;width:100%;text-align:center;font-size:11px;opacity:.8}
+.hx ~ .mw .mw-p{display:none}
+@media (max-width:700px){.hx{padding:20px;border-radius:20px;gap:12px}.hx h2{font-size:19px}.hx p{font-size:13px}.hx-r{width:88px;height:88px}.hx-r b{font-size:19px}.hx-r span{bottom:14px;font-size:10px}}
+:root[data-theme="dark"] .hx{background:linear-gradient(120deg,#163A2E,#0F2A21)}
