@@ -46,6 +46,17 @@ S.srecs = []; S.ftopics = [];
 async function srecLoad(){ sb.from("friday_topics").select("*").order("fri", { ascending:false }).limit(30).then(({ data }) => { S.ftopics = data || []; if (S.view === "sermrec" && $("#drawer").hidden) render(); }); const { data } = await sb.from("sermon_recs").select("*").neq("comm", "__test__").order("created_at", { ascending:false }).limit(300); S.srecs = data || []; }
 const _boot9s53 = boot9; boot9 = function(){ _boot9s53(); srecLoad().then(() => { if ($("#drawer").hidden && ["sermrec", "home"].includes(S.view)) render(); }); };
 const SREC_ST = { new:["بانتظار التفريغ", ""], working:["جارٍ التفريغ والترجمة", "warn"], done:["مترجمة", "ok"], error:["تعذّرت الترجمة", "bad"], waiting_key:["الترجمة غير مفعّلة", "warn"] };
+const kwT = d => d ? new Date(d).toLocaleTimeString("ar-KW-u-nu-latn", { hour:"numeric", minute:"2-digit", second:"2-digit", hour12:true, timeZone:"Asia/Kuwait" }) : "—";
+const kwD = d => d ? new Date(d).toLocaleDateString("ar-KW-u-nu-latn", { weekday:"long", day:"2-digit", month:"2-digit", year:"numeric", timeZone:"Asia/Kuwait" }) : "—";
+const mmss2 = n => `${Math.floor((n || 0) / 60)}:${String((n || 0) % 60).padStart(2, "0")}`;
+function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, en = p.ended || (st && r.secs ? new Date(+new Date(st) + r.secs * 1000).toISOString() : null);
+  const ok = p.rule ? p.in_rule !== false : null;
+  const rule = p.rule === "friday" ? `وقت الخطبة ${kwT(p.win_open).replace(/:\d\d (?=[صم])/, " ")} – ${kwT(p.win_close).replace(/:\d\d (?=[صم])/, " ")}` : p.rule === "lesson_day" ? `في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "بطلب من القسم" : "";
+  return `<div class="sr-pf${ok === false ? " bad" : ok ? " ok" : ""}">
+    <div><span>التاريخ</span><b>${kwD(st)}</b></div><div><span>بدأ التسجيل</span><b class="num">${kwT(st)}</b></div><div><span>انتهى</span><b class="num">${kwT(en)}</b></div>
+    <div><span>المدة</span><b class="num">${mmss2(r.secs)}</b></div><div><span>وصل للقسم</span><b class="num">${kwT(p.sent || r.created_at)}</b></div>
+    <div><span>سجّله</span><b>${esc(p.by || "—")}</b></div>
+    <p>${ok === null ? "سُجّل قبل تفعيل الضوابط الصارمة" : `${ok ? "✓" : "⚠"} تسجيل مباشر من البوابة، بلا إرفاق ملف${rule ? "، " + rule : ""}${ok === false ? " — خارج الوقت المسموح" : ""}`}</p></div>`; }
 function vSermRec(){ const f = S.f.srf || "all", L = S.srecs.filter(r => f === "all" || (f === "new" ? !r.reviewed_at : f === "flag" ? r.flags && !/لا ملاحظات/.test(r.flags) : f === "off" ? r.adherence && r.adherence !== "ملتزم" : true));
   const wk = S.srecs.some(r => r.status === "waiting_key");
   return `${wk ? `<div class="check"><b>الترجمة التلقائية تحتاج تفعيلاً</b><span>التسجيلات تصل وتُسمع الآن. للترجمة المجانية: مفتاح Gemini مجاني من aistudio.google.com يُضاف باسم GEMINI_API_KEY في Supabase (Edge Functions ثم Secrets)، ثم «إعادة الترجمة».</span></div>` : ""}
@@ -53,7 +64,7 @@ function vSermRec(){ const f = S.f.srf || "all", L = S.srecs.filter(r => f === "
   <div class="toolbar"><div class="seg">${[["all", "الكل", S.srecs.length], ["off", "خرج عن الموضوع", S.srecs.filter(r => r.adherence && r.adherence !== "ملتزم").length], ["new", "لم يُطّلع عليها", S.srecs.filter(r => !r.reviewed_at).length], ["flag", "فيها ملاحظات", S.srecs.filter(r => r.flags && !/لا ملاحظات/.test(r.flags)).length]].map(([k, l, n]) => `<button type="button" class="${f === k ? "on" : ""}" data-srf="${k}">${l} <span class="num">${n}</span></button>`).join("")}</div></div>
   <div class="sr-l">${L.map(r => { const st = r.status === "working" && r.seg ? [`جارٍ الترجمة: الجزء ${r.seg + 1}${r.segs ? " من " + r.segs : ""}`, "warn"] : SREC_ST[r.status] || SREC_ST.new, fl = r.flags && !/لا ملاحظات/.test(r.flags);
     return `<div class="panel sr-i"><div class="sr-h"><div><b>${esc(r.khatib || "خطيب")}</b><span class="s">${esc(r.comm)}${r.mosque ? " · " + esc(r.mosque) : ""} · ${r.fri ? fmt(r.fri) : fmt(String(r.created_at).slice(0, 10))}${r.lang ? " · " + esc(r.lang) : ""}${r.secs ? " · " + Math.round(r.secs / 60) + " دقيقة" : ""}</span></div>
-      <div class="sr-c">${r.kind === "lesson" ? `<span class="chip gold">درس</span>` : ""}<span class="chip ${st[1]}">${st[0]}</span>${r.reviewed_at ? `<span class="chip ok">اطُّلع عليها</span>` : ""}</div></div>
+      <div class="sr-c">${r.kind === "lesson" ? `<span class="chip gold">درس</span>` : ""}<span class="chip ${st[1]}">${st[0]}</span>${r.reviewed_at ? `<span class="chip ok">اطُّلع عليها</span>` : ""}</div></div>${srProof(r)}
       <div class="sr-a" id="sra-${r.id}"><button type="button" class="btn" data-srplay="${r.id}">${icon("i-mic")} استماع</button></div>
       ${r.adherence ? `<div class="sr-adh ${r.adherence === "ملتزم" ? "ok" : r.adherence === "خرج جزئياً" ? "warn" : "bad"}"><div><b>${esc(r.adherence)}</b>${r.adherence_score != null ? `<span>${r.adherence_score}% التزام بموضوع الخطبة</span>` : ""}</div>${r.adherence_note ? `<p>${esc(r.adherence_note)}</p>` : ""}</div>` : r.adherence_note ? `<span class="s bad-t">${esc(r.adherence_note)}</span>` : ""}
       ${fl ? `<div class="check"><b>ملاحظات تستحق الانتباه</b><span>${esc(r.flags)}</span></div>` : ""}
