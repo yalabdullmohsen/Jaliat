@@ -496,7 +496,6 @@ function reportDownload(ym){ ym = ym || TODAY.slice(0, 7); const b = new Blob(["
 S.bk = null;
 async function bkLoad(){ const { data, error } = await sb.from("backups").select("id,at").order("at", { ascending:false }).limit(60); S.bk = error ? [] : data || []; if (S.view === "backups") render(); }
 function vBackups(){
-  if (!S.admin) return `<div class="empty">هذه الصفحة لمدير النظام</div>`;
   if (!S.bk) { bkLoad(); return `<div class="empty">جارٍ التحميل…</div>`; }
   return odCard() + `<div class="toolbar"><span class="count">نسخة احتياطية تلقائية كل ليلة الساعة 3:00 ص، وتُحفظ آخر 45 يوماً</span><button class="btn btn-primary" type="button" data-bknow>نسخة احتياطية الآن</button></div>
   <div class="panel"><div class="list">${S.bk.map(b => `<div class="li"><span><span class="t num">${new Date(b.at).toLocaleString("ar-KW", { dateStyle:"full", timeStyle:"short", hour12:true })}</span></span><button type="button" class="btn" data-bkxl="${b.id}">${icon("i-down")} تنزيل إكسل</button></div>`).join("") || `<div class="empty">لا توجد نسخ بعد</div>`}</div></div>`;

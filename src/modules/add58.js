@@ -29,3 +29,5 @@ async function cmSave(btn){ const g0 = $("#cm-g").value, grp = g0 === "__new" ? 
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;
   if (t.dataset.cmnew !== undefined) return cmForm(); if (t.dataset.cmsave !== undefined) return cmSave(t); });
 document.addEventListener("change", ev => { if (ev.target.id === "cm-g") { const w = $("#cm-gn-w"); if (w) w.hidden = ev.target.value !== "__new"; } });
+/* backups page for every employee (view + take a copy + download); the rest of «الإدارة» stays with the managers */
+const _ngA73 = ngApply; ngApply = function(){ _ngA73(); if (S.admin || !S.me) return; const b = $('#nav [data-nav="backups"]'); if (b) { b.hidden = false; b.classList.remove("admin-only"); const g = b.closest(".ng"); if (g) { g.hidden = false; g.classList.remove("admin-only"); g.querySelectorAll("[data-nav]").forEach(x => { if (x !== b) x.hidden = true; }); } } };
