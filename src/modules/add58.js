@@ -31,3 +31,8 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 document.addEventListener("change", ev => { if (ev.target.id === "cm-g") { const w = $("#cm-gn-w"); if (w) w.hidden = ev.target.value !== "__new"; } });
 /* backups page for every employee (view + take a copy + download); the rest of «الإدارة» stays with the managers */
 const _ngA73 = ngApply; ngApply = function(){ _ngA73(); if (S.admin || !S.me) return; const b = $('#nav [data-nav="backups"]'); if (b) { b.hidden = false; b.classList.remove("admin-only"); const g = b.closest(".ng"); if (g) { g.hidden = false; g.classList.remove("admin-only"); g.querySelectorAll("[data-nav]").forEach(x => { if (x !== b) x.hidden = true; }); } } };
+/* every employee can delete an activity (Yousef's decision) */
+const _actForm73 = actForm;
+actForm = function(id, preset){ const r = _actForm73(id, preset);
+  if (id && !S.admin && S.canWrite && S.form?.kind === "act" && !$("#delwrap")) $(".drawer-f")?.insertAdjacentHTML("beforeend", `<span style="margin-inline-start:auto" id="delwrap"><button class="btn btn-danger" data-del>حذف</button></span>`);
+  return r; };
