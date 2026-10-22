@@ -28,13 +28,13 @@ const PT_ONE = () => `${location.origin}${location.pathname.replace(/[^/]*$/, ""
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-ptone]")) return; navigator.clipboard?.writeText(PT_ONE()).then(() => toast("نُسخ الرابط الموحّد")); });
 const _prio50 = priorities;
 priorities = function(){ const P = _prio50(); const n = S.creps.filter(r => !r.seen_at).length;
-  if (n) P.push({ w:70, k:"gold", t:`${n} تقرير شهري جديد من المنسقين`, s:"وصل من بوابة المنسقين", act:{ go:"portal", l:"عرضها" } }); return P.sort((a, b) => b.w - a.w); };
+  if (n) P.push({ w:70, k:"gold", t:`${n} تقرير شهري جديد من المنسقين`, s:"وصل من بوابة إنجاز", act:{ go:"portal", l:"عرضها" } }); return P.sort((a, b) => b.w - a.w); };
 
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-crseen]"); if (!t) return;
   const id = t.dataset.crseen; const { error } = await sb.from("coord_reports").update({ seen_by:S.me?.id, seen_at:new Date().toISOString() }).eq("id", id); if (error) return writeFail(error);
   const r = S.creps.find(x => String(x.id) === id); if (r) r.seen_at = new Date().toISOString(); render(); });
 
-NEWF.splice(1, 0, ["v50-portal", "nav:portal", "بوابة المنسقين الكاملة", "المنسق من رابطه: يتابع طلباته وردودكم، يطلب نشاطاً جديداً أو تجديداً أو تعديلاً أو إيقافاً، يحدّث بيانات منسقيه، يقرأ التعاميم، يراسل القسم، ويرسل تقريره الشهري. اكتب ردّك في الطلب الوارد فيظهر له.", false, "2026-10-20"]);
+NEWF.splice(1, 0, ["v50-portal", "nav:portal", "بوابة إنجاز الكاملة", "المنسق من رابطه: يتابع طلباته وردودكم، يطلب نشاطاً جديداً أو تجديداً أو تعديلاً أو إيقافاً، يحدّث بيانات منسقيه، يقرأ التعاميم، يراسل القسم، ويرسل تقريره الشهري. اكتب ردّك في الطلب الوارد فيظهر له.", false, "2026-10-20"]);
 
 /* ---------- coordinator accounts (civil id + PIN) on the portal page ---------- */
 S.pacc = [];
@@ -95,7 +95,7 @@ document.addEventListener("click", ev => { const t = ev.target.closest("[data-pv
 document.addEventListener("input", ev => { if (ev.target.id !== "pv-q") return; const q = ev.target.value.trim().toLowerCase(); document.querySelectorAll(".pv-r[data-k]").forEach(r => { r.hidden = !!q && !r.dataset.k.includes(q); }); });
 
 /* account requests: approve / reject / tell the coordinator */
-const sgMsg = g => `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل / ${g.name}\n\nتم اعتماد حسابكم في بوابة المنسقين للجالية ${g.comm || g.comm_new}.\nالدخول برقمكم المدني والرمز السري الذي اخترتموه:\n${PT_ONE()}\n\nنائب المنسق (${g.dep_name}) يفعّل حسابه من «نائب منسق؟ فعّل حسابك» برقمه المدني وهاتفه.\n\nللاستفسار: 97512995\nوجزاكم الله خيراً${SIGN}`;
+const sgMsg = g => `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل / ${g.name}\n\nتم اعتماد حسابكم في بوابة إنجاز للجالية ${g.comm || g.comm_new}.\nالدخول برقمكم المدني والرمز السري الذي اخترتموه:\n${PT_ONE()}\n\nنائب المنسق (${g.dep_name}) يفعّل حسابه من «نائب منسق؟ فعّل حسابك» برقمه المدني وهاتفه.\n\nللاستفسار: 97512995\nوجزاكم الله خيراً${SIGN}`;
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-sgok],[data-sgno],[data-sgwa]"); if (!t) return;
   if (t.dataset.sgwa) { const g = S.psign.find(x => x.id === t.dataset.sgwa); if (g) waOpen(g.phone, sgMsg(g)); return; }
   const id = t.dataset.sgok || t.dataset.sgno, ok = !!t.dataset.sgok, g = S.psign.find(x => x.id === id);
@@ -107,5 +107,5 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
   if (ok && g) { g.comm = data?.comm || g.comm; toast("اعتُمد الحساب، أبلغ المنسق"); waOpen(g.phone, sgMsg(g)); } else toast("رُفض الطلب"); });
 const _prio50s = priorities;
 priorities = function(){ const P = _prio50s(); const n = (S.psign || []).filter(g => g.status === "pending").length;
-  if (n && S.canWrite) P.push({ w:88, k:"gold", t:`${n} طلب حساب جديد في بوابة المنسقين`, s:"منسق ونائبه بانتظار موافقتك", act:{ go:"portal", l:"مراجعة" } }); return P.sort((a, b) => b.w - a.w); };
+  if (n && S.canWrite) P.push({ w:88, k:"gold", t:`${n} طلب حساب جديد في بوابة إنجاز`, s:"منسق ونائبه بانتظار موافقتك", act:{ go:"portal", l:"مراجعة" } }); return P.sort((a, b) => b.w - a.w); };
 NEWF.splice(1, 0, ["v52-id", "nav:home", "هوية «إنجاز» الجديدة", "ألوان أعمق وأهدأ، وأرقام أوضح، وبطاقات نظيفة بلا خطوط ملوّنة، وشريط علوي ثابت، وعبارات مرتبة بلا شَخطات.", false, "2026-10-20"]);

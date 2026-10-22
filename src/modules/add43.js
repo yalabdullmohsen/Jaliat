@@ -75,9 +75,9 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
   if (D.srretry) { const { error } = await sb.rpc("staff_sermon_retry", { p_id:D.srretry }); if (error) return writeFail(error); toast("أُعيد إرسالها للترجمة"); setTimeout(async () => { await srecLoad(); render(); }, 4000); } });
 const _prio53s = priorities;
 priorities = function(){ const P = _prio53s(); const n = S.srecs.filter(r => !r.reviewed_at).length;
-  if (n) P.push({ w:60, k:"gold", t:`${n} تسجيل خطبة لم يُطّلع عليه`, s:"من بوابة المنسقين، مع الترجمة العربية", act:{ go:"sermrec", l:"استماع" } }); return P.sort((a, b) => b.w - a.w); };
+  if (n) P.push({ w:60, k:"gold", t:`${n} تسجيل خطبة لم يُطّلع عليه`, s:"من بوابة إنجاز، مع الترجمة العربية", act:{ go:"sermrec", l:"استماع" } }); return P.sort((a, b) => b.w - a.w); };
 
-NEWF.splice(1, 0, ["v53-journey", "nav:inbox", "رحلة الطلب وتسجيلات الخطب", "داخل كل طلب: خريطة رحلته وأين وصل ومتى يكتمل عادةً، ومدة انتظار كل طلب على بطاقته. وصفحة «تسجيلات الخطب» لسماع خطب الجاليات مع ترجمتها، و«التحليل» في بوابة المنسقين لتقاريرهم الشهرية.", false, "2026-10-20"]);
+NEWF.splice(1, 0, ["v53-journey", "nav:inbox", "رحلة الطلب وتسجيلات الخطب", "داخل كل طلب: خريطة رحلته وأين وصل ومتى يكتمل عادةً، ومدة انتظار كل طلب على بطاقته. وصفحة «تسجيلات الخطب» لسماع خطب الجاليات مع ترجمتها، و«التحليل» في بوابة إنجاز لتقاريرهم الشهرية.", false, "2026-10-20"]);
 
 /* the week's official sermon topic: sermons are compared against it automatically */
 function lastFri(off = 0){ const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 2) % 7) - 7 * off); return isoOf(d); }

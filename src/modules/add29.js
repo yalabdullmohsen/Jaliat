@@ -1,5 +1,5 @@
 /* ================= v29: data completion · renewal letter · monthly PDF · coordinators portal links · admin protection ================= */
-Object.assign(TITLES, { fix:"إكمال البيانات", report:"التقرير الشهري", portal:"بوابة المنسقين" });
+Object.assign(TITLES, { fix:"إكمال البيانات", report:"التقرير الشهري", portal:"بوابة إنجاز" });
 
 /* ---------- 1) mosques with the same name always show their area ---------- */
 const _derive29 = derive;
@@ -46,12 +46,12 @@ S.portal = [];
 async function loadPortal(){ const { data } = await sb.from("coord_links").select("*"); S.portal = data || []; }
 const portalURL = comm => { const l = S.portal.find(x => x.comm === comm && x.active); return l ? `${location.origin}${location.pathname.replace(/[^/]*$/, "")}portal.html` : ""; };
 function vPortal(){
-  return `<div class="check"><b>بوابة المنسقين</b><span>لكل جالية رابط خاص. أرسله للمنسق، فيقدّم طلب درس جديد أو تجديد بنفسه من جواله، ويصلكم مرتباً في «الطلبات الواردة» برقم ط-.</span></div>
+  return `<div class="check"><b>بوابة إنجاز</b><span>لكل جالية رابط خاص. أرسله للمنسق، فيقدّم طلب درس جديد أو تجديد بنفسه من جواله، ويصلكم مرتباً في «الطلبات الواردة» برقم ط-.</span></div>
     <div class="pt-l">${commNames.map(c => { const u = portalURL(c), co = S.coords.find(k => k.comm === c && k.phone && k.status !== "سابق");
       return `<div class="pt-i"><div><b>${esc(c)}</b><span>${co ? esc(co.name) + " · " + esc(co.phone) : "لا يوجد منسق برقم"}</span></div>
         <div class="pt-a">${u ? `<button type="button" class="btn btn-primary" data-ptopen="${esc(c)}">فتح بوابتهم</button><button type="button" class="btn" data-ptcopy="${esc(c)}">نسخ الرابط</button>${co ? `<button type="button" class="btn rn-send" data-ptwa="${esc(c)}">${icon("i-wa")} إرسال للمنسق</button>` : ""}` : `<span class="s">—</span>`}</div></div>`; }).join("")}</div>`;
 }
-const portalMsg = (c, co) => `السلام عليكم ورحمة الله وبركاته\n${co ? `الأخ الفاضل / ${co.name}` : `منسق الجالية ${c}`}\n\nيسرّنا أن نرسل لكم رابط بوابة المنسقين، ومن خلالها تقدّمون طلبات الدروس الجديدة والتجديد والتعديل والإيقاف، وتتابعون طلباتكم وردود القسم، وترسلون التقرير الشهري، وتضيفون نائبكم:\n${portalURL(c)}\n\nأول مرة: اختاروا «طلب حساب جديد» وأدخلوا بيانات المنسق ونائب المنسق، ويعتمده القسم ثم تدخلون برقمكم المدني والرمز السري.\nللاستفسار واتساب: 97512995\n\nوجزاكم الله خيراً${SIGN}`;
+const portalMsg = (c, co) => `السلام عليكم ورحمة الله وبركاته\n${co ? `الأخ الفاضل / ${co.name}` : `منسق الجالية ${c}`}\n\nيسرّنا أن نرسل لكم رابط بوابة إنجاز، ومن خلالها تقدّمون طلبات الدروس الجديدة والتجديد والتعديل والإيقاف، وتتابعون طلباتكم وردود القسم، وترسلون التقرير الشهري، وتضيفون نائبكم:\n${portalURL(c)}\n\nأول مرة: اختاروا «طلب حساب جديد» وأدخلوا بيانات المنسق ونائب المنسق، ويعتمده القسم ثم تدخلون برقمكم المدني والرمز السري.\nللاستفسار واتساب: 97512995\n\nوجزاكم الله خيراً${SIGN}`;
 // renewal reminders now carry the portal link so the coordinator can renew in one tap
 const _renewMsg29 = renewMsg;
 renewMsg = function(x, c){ const m = _renewMsg29(x, c), u = portalURL(x.comm); return u ? m.replace(/\n\nوجزاكم الله خيراً/, `\n\nلتقديم طلب التجديد مباشرة:\n${u}\n\nوجزاكم الله خيراً`) : m; };
@@ -69,10 +69,10 @@ boot9 = function(){ _boot9v29(); Promise.all([loadPortal()]).then(() => { if (["
 const _prio29 = priorities;
 priorities = function(){ return _prio29().map(p => /بياناته ناقصة/.test(p.t) ? { ...p, act:{ go:"fix", l:"إكمالها" } } : p); };
 const _palAll29 = palAll;
-palAll = function(){ const A = _palAll29(); A.unshift({ g:"إجراءات", t:"التقرير الشهري (PDF)", s:"", ic:"i-doc", run:() => go("report"), txt:"تقرير شهري pdf الإدارة" }, { g:"إجراءات", t:"إكمال البيانات الناقصة", s:"", ic:"i-list", run:() => go("fix"), txt:"ناقص إكمال بيانات" }, { g:"إجراءات", t:"بوابة المنسقين (روابط الجاليات)", s:"", ic:"i-link", run:() => go("portal"), txt:"بوابة منسق رابط طلب" }); return A; };
+palAll = function(){ const A = _palAll29(); A.unshift({ g:"إجراءات", t:"التقرير الشهري (PDF)", s:"", ic:"i-doc", run:() => go("report"), txt:"تقرير شهري pdf الإدارة" }, { g:"إجراءات", t:"إكمال البيانات الناقصة", s:"", ic:"i-list", run:() => go("fix"), txt:"ناقص إكمال بيانات" }, { g:"إجراءات", t:"بوابة إنجاز (روابط الجاليات)", s:"", ic:"i-link", run:() => go("portal"), txt:"بوابة منسق رابط طلب" }); return A; };
 NEWF.splice(1, 0, ["v29-fix", "nav:fix", "إكمال البيانات", "كل نشاط أو جالية أو منسق بياناته ناقصة في مكان واحد، اضغط وأكمل.", false, "2026-10-20"],
   ["v29-report", "nav:report", "التقرير الشهري PDF", "تقرير رسمي لكل شهر جاهز للطباعة أو الحفظ PDF، ويصل إشعار للمدراء أول كل شهر.", false, "2026-10-20"],
-  ["v29-portal", "nav:portal", "بوابة المنسقين", "رابط خاص لكل جالية يرسله المنسق منه طلب درس جديد أو تجديد، ويصل مرتباً للطلبات الواردة.", false, "2026-10-20"]);
+  ["v29-portal", "nav:portal", "بوابة إنجاز", "رابط خاص لكل جالية يرسله المنسق منه طلب درس جديد أو تجديد، ويصل مرتباً للطلبات الواردة.", false, "2026-10-20"]);
 document.addEventListener("change", ev => { if (ev.target.id === "rp-m") { S.repMonth = ev.target.value; rpFill(); } });
 document.addEventListener("click", async ev => { const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
   if (D.fixt) { S.f.fixt = D.fixt; return render(); }
