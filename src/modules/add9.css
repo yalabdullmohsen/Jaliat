@@ -399,3 +399,11 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .sr-pf p{grid-column:1/-1;margin:2px 0 0;font-size:12.5px;color:var(--muted)}
 .sr-pf.ok{border-color:color-mix(in srgb,var(--ok) 35%,var(--line))}.sr-pf.ok p{color:var(--ok);font-weight:600}
 .sr-pf.bad{border-color:var(--bad);background:var(--bads)}.sr-pf.bad p{color:var(--bad);font-weight:700}
+.sd-l{display:grid;gap:12px}.sd-i{padding:14px 16px}
+.sd-h{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}.sd-h b{font-size:16px}
+.sd-k{display:flex;gap:14px;flex-wrap:wrap}.sd-k div{display:grid;text-align:center}.sd-k span{font-size:11.5px;color:var(--muted)}.sd-k b{font-size:15px}
+.sd-s{margin:10px 0 6px;padding-inline-start:18px;display:grid;gap:3px;font-size:13.5px}
+.sd-d summary{cursor:pointer;color:var(--primary);font-size:13px;font-weight:600}.sd-d>div{max-height:280px;overflow:auto;font-size:12.5px;display:grid;gap:3px;margin-top:6px;color:var(--muted)}
+.sd-f{display:flex;justify-content:flex-end;margin-top:8px}
+.sd-idle{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}.sd-idle:last-child{border:0}
+.sd-h .s{margin-inline-start:8px}

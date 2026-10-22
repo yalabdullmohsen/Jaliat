@@ -19,7 +19,7 @@ R('''  const r = await fetch("/seed.gz", { cache:"no-store" });
 
 # --- hooks into the core ---
 R('const TODAY = isoOf(new Date());', 'let TODAY = isoOf(new Date());')
-R('users:vUsers, audit:vAudit}[v] || vHome;', 'users:vUsers, audit:vAudit, mine:vMine, copilot:vCopilot, rewards:vRewards, inbox:vInbox, weekly:vWeekly, backups:vBackups, odsave:vOdSave, guide:vGuide, halls:vHalls, tasks:vTasks, questions:vQuestions, watheqa:vWatheqa, permits:vPermits, whatsapp:vWhatsApp, chat:vChat, changes:vChanges, avail:vAvail, renew:vRenew, fix:vFix, report:vReport, portal:vPortal, coordeval:vCoordEval, sermrec:vSermRec, lmap:vLmap}[v] || vHome;')
+R('users:vUsers, audit:vAudit}[v] || vHome;', 'users:vUsers, audit:vAudit, mine:vMine, copilot:vCopilot, rewards:vRewards, inbox:vInbox, weekly:vWeekly, backups:vBackups, odsave:vOdSave, guide:vGuide, staffday:vStaffDay, halls:vHalls, tasks:vTasks, questions:vQuestions, watheqa:vWatheqa, permits:vPermits, whatsapp:vWhatsApp, chat:vChat, changes:vChanges, avail:vAvail, renew:vRenew, fix:vFix, report:vReport, portal:vPortal, coordeval:vCoordEval, sermrec:vSermRec, lmap:vLmap}[v] || vHome;')
 R('''  $("#view").innerHTML = fn();
 ''', '''  $("#view").innerHTML = fn();
   if (typeof afterRender === "function") afterRender(v);
@@ -96,7 +96,7 @@ def _ar(t):
     return t if _re.search("[\u0600-\u06FF]", t) and not _re.match(r"(Merge|wip|docs:)", t, _re.I) else ""
 _cl = [[c[0], c[1], _ar(c[2])] for c in _cl]; _cl = [c for c in _cl if c[2]]
 CHANGELOG_JS = "const CHANGELOG = " + _json.dumps(_cl, ensure_ascii=False) + ";\n"
-js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js", "add45.js", "add46.js","add47.js","add48.js","add49.js","add50.js","add51.js","add52.js","add53.js","add54.js","add55.js","add56.js","add57.js","add58.js"))
+js = "\n".join(open(os.path.join(M, f), encoding="utf8").read() for f in ("add.js", "add2.js", "add3.js", "add4.js", "add5.js", "add6.js", "add7.js", "add8.js", "add9.js", "add10.js", "add11.js", "add12.js", "add13.js", "add14.js", "add15.js", "add16.js", "add17.js", "add18.js", "add19.js", "add20.js", "add21.js", "add22.js", "add23.js", "add24.js", "add25.js", "add26.js", "add27.js", "add28.js", "add29.js", "add30.js", "add32.js", "add34.js", "add35.js", "add37.js", "add38.js", "add39.js", "add40.js", "add41.js", "add42.js", "add43.js", "add44.js", "add45.js", "add46.js","add47.js","add48.js","add49.js","add50.js","add51.js","add52.js","add53.js","add54.js","add55.js","add56.js","add57.js","add58.js","add59.js"))
 R('</style>\n\n</head>', css + '</style>\n\n</head>')
 R('(async function boot(){', '/* ===== v9 ===== */\n' + CHANGELOG_JS + js + '\n(async function boot(){')
 # --- logo #3: progress ring + check ---
@@ -119,9 +119,10 @@ for m in re.finditer(r'\n\s*(<button[^>]*?(?:data-nav="([a-z]+)"|data-ext="[^"]*
     _btn[m.group(2) or "wq-ext"] = m.group(1)
 for _k in ("decisions", "recs", "visits"): _btn.pop(_k, None)
 _btn["guide"] = '<button data-nav="guide"><svg><use href="#i-doc"/></svg><span>الدليل</span></button>'
+_btn["staffday"] = '<button data-nav="staffday"><svg><use href="#i-users"/></svg><span>نشاط الموظفين</span></button>'
 _btn["odsave"] = '<button data-nav="odsave"><svg><use href="#i-down"/></svg><span>الحفظ في OneDrive</span></button>'
 _groups = [("", ["home", "guide", "copilot"]), ("العمل اليومي", ["tasks", "fix", "questions", "inbox", "watheqa", "permits"]), ("التواصل", ["whatsapp", "chat", "renew"]), ("الأنشطة والجدولة", ["avail", "docs", "acts", "cal", "lmap", "weekly", "halls"]),
-           ("الجاليات والمساجد", ["portal", "comms", "coords", "coordeval", "mosques"]), ("خطب الجمعة", ["khatibs", "rewards", "sermrec"]), ("التقارير والسجلات", ["odsave", "report", "stats", "notes", "mine", "changes"]), ("الإدارة", ["users", "backups", "audit"])]
+           ("الجاليات والمساجد", ["portal", "comms", "coords", "coordeval", "mosques"]), ("خطب الجمعة", ["khatibs", "rewards", "sermrec"]), ("التقارير والسجلات", ["odsave", "report", "stats", "notes", "mine", "changes"]), ("الإدارة", ["staffday", "users", "backups", "audit"])]
 _out = ['<nav class="nav" id="nav">']
 _used = set()
 _rest = [v for k, v in _btn.items() if k not in sum([g[1] for g in _groups], [])]
