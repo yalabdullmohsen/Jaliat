@@ -408,3 +408,5 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .sd-idle{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}.sd-idle:last-child{border:0}
 .sd-h .s{margin-inline-start:8px}
 .side-lt .brand svg,.side-lt #side .brand svg{color:#0E4D3A!important}
+/* refresh button on phones too (Yousef's request) */
+@media (max-width:560px){#refresh-btn{display:inline-grid!important;place-items:center}.top{gap:6px}.top .btn,.top>button{padding-inline:8px}#title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
