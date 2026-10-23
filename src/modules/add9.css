@@ -407,3 +407,4 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .sd-f{display:flex;justify-content:flex-end;margin-top:8px}
 .sd-idle{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}.sd-idle:last-child{border:0}
 .sd-h .s{margin-inline-start:8px}
+.side-lt .brand svg,.side-lt #side .brand svg{color:#0E4D3A!important}
