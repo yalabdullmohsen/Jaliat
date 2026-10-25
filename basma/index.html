@@ -67,7 +67,11 @@ button{font:inherit;cursor:pointer;color:inherit}
 .lead{margin:0;color:var(--muted);font-size:.92rem;text-align:center}
 
 /* البصمة الجاية */
-.next{text-align:center;padding:18px 16px}
+.next{text-align:center;padding:14px 16px 18px}
+.nhead{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:right}
+.nhead .lbl{font-size:.9rem;color:var(--muted);min-width:0}
+.nt{flex:none;font-size:1rem;font-weight:700;font-variant-numeric:tabular-nums;padding:3px 10px;border-radius:99px;background:var(--surface-2)}
+.next.taw .nt{color:var(--gold);background:var(--gold-soft)} .next.out .nt{color:var(--bad);background:var(--bads)} .next.end .nt{color:var(--primary)}
 .next .lbl{font-size:.9rem;color:var(--muted)}
 .next .big{font-size:2.8rem;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;margin:2px 0}
 .next .cd{display:inline-block;font-size:.88rem;font-weight:600;padding:3px 12px;border-radius:999px}
@@ -200,8 +204,7 @@ button{font:inherit;cursor:pointer;color:inherit}
   <!-- اليوم -->
   <section id="v-day" class="view">
     <div class="card next" id="next" hidden>
-      <div class="lbl" id="nLbl"></div>
-      <div class="big" id="nTime"></div>
+      <div class="nhead"><span class="lbl" id="nLbl"></span><span class="nt" id="nTime"></span></div>
       <div class="tick" id="nTick" aria-live="off"></div>
       <div class="tbar"><i id="nBar"></i></div>
       <span class="cd" id="nCd"></span>
