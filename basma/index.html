@@ -268,6 +268,14 @@ button{font:inherit;cursor:pointer;color:inherit}
         <button class="btn" id="rGo" type="button">استرجاع</button>
       </div>
     </div>
+    <div class="f"><span>مكان الدوام</span>
+      <small id="geoTx">ما حددت مكان الدوام. إذا حددته، ما تقدر تسجل البصمة إلا وأنت فيه.</small>
+      <button class="btn ghost" id="geoSet" type="button">أنا الحين في الدوام — احفظ هذا المكان</button>
+      <div class="seg" data-k="geoOn" id="geoSeg" hidden>
+        <button type="button" data-v="1">البصمة في مكان الدوام فقط</button>
+        <button type="button" data-v="0">من أي مكان</button>
+      </div>
+    </div>
     <details class="help"><summary>طريقة التثبيت والإشعارات</summary>
       <b>آيفون</b>
       <ol><li>افتح injazkwt.com/basma من <b>سفاري</b>.</li><li>زر المشاركة ⬆︎ ← «إضافة إلى الشاشة الرئيسية».</li><li>افتح «بصمة إنجاز» من الشاشة الرئيسية، واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
@@ -429,9 +437,44 @@ async function syncReminders() {
 }
 
 const NAMES = { in: 'الدخول', taw: 'التواجد', out: 'الخروج' };
-async function record(kind, m) {
+// ---- مكان الدوام: البصمة داخل 200 متر من الموقع المحفوظ ----
+const GEO_R = 200;
+function distM(a, b) { const R = 6371e3, t = x => x * Math.PI / 180, dLa = t(b.lat - a.lat), dLo = t(b.lng - a.lng);
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(t(a.lat)) * Math.cos(t(b.lat)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+function here() { return new Promise((ok, no) => {
+  if (!navigator.geolocation) return no(new Error('nogeo'));
+  navigator.geolocation.getCurrentPosition(p => ok({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }), e => no(e), { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+}); }
+async function checkPlace() {
+  if (!settings.geo || String(settings.geoOn) !== '1') return true;
+  try {
+    const p = await here(), d = distM(p, settings.geo);
+    if (d <= GEO_R + Math.min(p.acc || 0, 100)) return true;
+    toast(`أنت بعيد عن مكان الدوام (${Math.round(d)} م). البصمة تنسجل بس وأنت فيه`); return false;
+  } catch (e) { toast('اسمح للموقع حتى نتأكد إنك في مكان الدوام'); return false; }
+}
+function applyGeo() {
+  const g = settings.geo;
+  $('geoSeg').hidden = !g;
+  $('geoTx').textContent = g ? (String(settings.geoOn) === '1' ? 'محفوظ ✓ البصمة تنسجل بس وأنت داخل 200 متر من مكان الدوام.' : 'محفوظ، والبصمة الحين مسموحة من أي مكان.') : 'ما حددت مكان الدوام. إذا حددته، ما تقدر تسجل البصمة إلا وأنت فيه.';
+  $('geoSet').textContent = g ? 'غيّر مكان الدوام لمكاني الحالي' : 'أنا الحين في الدوام — احفظ هذا المكان';
+}
+$('geoSet').addEventListener('click', async () => {
+  $('geoSet').disabled = true;
+  try {
+    const p = await here();
+    if (p.acc > 150) toast('دقة الموقع ضعيفة، جرّب قرب نافذة أو برا المبنى');
+    settings.geo = { lat: +p.lat.toFixed(6), lng: +p.lng.toFixed(6) }; settings.geoOn = 1;
+    store.set('settings', settings); store.set('dirtySet', true); pushCloud(); applySettings(); applyGeo();
+    toast('حفظت مكان الدوام ✓');
+  } catch { toast('ما قدرت أحدد موقعك. اسمح للموقع من الإعدادات'); }
+  finally { $('geoSet').disabled = false; }
+});
+
+async function record(kind, m, fromEdit) {
   if (!inWindow(m)) return toast('البصمة تفتح من 6:30 ص إلى 4:59 م');
   if (kind === 'in' && m < 420) m = 420;
+  if (!fromEdit && !(await checkPlace())) return;
   const k = dayKey(new Date());
   log[k] = log[k] || {};
   log[k][kind] = m; saveLog(); markDirty(k); pushCloud(); render();
@@ -490,7 +533,7 @@ function closeEditor() { editing = null; $('editor').hidden = true; $('punches')
 $('eBack').addEventListener('click', closeEditor);
 $('eSave').addEventListener('click', () => {
   const v = $('eTime').value; if (!v) return toast('اختر الوقت');
-  const [h, m] = v.split(':').map(Number); const kind = editing; closeEditor(); record(kind, h * 60 + m);
+  const [h, m] = v.split(':').map(Number); const kind = editing; closeEditor(); record(kind, h * 60 + m, true);
 });
 $('eDel').addEventListener('click', async () => {
   const k = dayKey(new Date()), kind = editing; closeEditor();
@@ -568,10 +611,11 @@ document.querySelector('.tabs').addEventListener('click', e => { const b = e.tar
 function applySettings() {
   document.querySelectorAll('.seg').forEach(s => s.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(String(settings[s.dataset.k]) === b.dataset.v))));
   $('rule').textContent = RULES[settings.type](settings.g);
+  if ($('geoTx')) applyGeo();
 }
 document.querySelectorAll('.seg').forEach(s => s.addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
-  settings[s.dataset.k] = s.dataset.k === 'taw' ? Number(b.dataset.v) : b.dataset.v;
+  settings[s.dataset.k] = s.dataset.k === 'taw' || s.dataset.k === 'geoOn' ? Number(b.dataset.v) : b.dataset.v;
   store.set('settings', settings); store.set('dirtySet', true); pushCloud(); applySettings(); render();
   if (log[dayKey(new Date())]?.in != null) { try { await syncReminders(); toast('حدّثت أوقات اليوم'); } catch {} }
   else toast('انحفظ');
