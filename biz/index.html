@@ -342,7 +342,7 @@ const VIEWS = {
     const items = [m.clients && ['clients', label('clients'), 'سجل العملاء وبيانات التواصل'], m.news && ['news', label('news'), 'إعلانات للفريق وللبوابة'],
       ['team', 'الفريق والأقسام', 'الموظفون وصلاحياتهم ورمز الانضمام'], ['settings', isAdmin() ? 'الإعدادات' : 'حسابي', isAdmin() ? 'الاسم واللون والدوام ورابط البوابة' : 'كلمة المرور والخروج']].filter(Boolean);
     el.innerHTML = `<h2 style="margin:0">المزيد</h2><section class="card"><div class="list">${items.map(([k, l, s]) => `<div class="row" data-go="${k}" style="cursor:pointer"><div class="tx"><b>${esc(l)}</b><div class="sub">${s}</div></div><span class="muted">‹</span></div>`).join('')}</div></section>
-      <p class="muted sm" style="text-align:center">بصمة الحضور لموظفيك: <a class="link" href="../basma/" target="_blank" rel="noopener">بصمة إنجاز</a></p>`;
+      <section class="card" style="margin-top:12px"><div class="list"><a class="row" href="../basma/" target="_blank" rel="noopener" style="cursor:pointer;text-decoration:none;color:inherit"><img src="../basma/logo-64.png" alt="" width="40" height="40" style="border-radius:10px;flex:none"><div class="tx"><b>بصمة إنجاز</b><div class="sub">تذكير ببصمات الدخول والتواجد والخروج لك ولفريقك</div></div><span class="muted">‹</span></a></div></section>`;
   },
 
   async clients(el) {
