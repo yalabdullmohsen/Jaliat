@@ -134,6 +134,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .bar{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--primary);border-radius:99px}
 .late-card.warn .bar i{background:var(--gold)} .late-card.over .bar i{background:var(--bad)} .late-card.over .lc-h b{color:var(--bad)}
+.lb{align-self:flex-start;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--primary-soft);color:var(--primary)} .lb.warn{background:var(--gold-soft);color:var(--gold)} .lb.over{background:var(--bads);color:var(--bad)}
 .late-card small{color:var(--muted);font-size:.8rem}
 .legend{font-size:.8rem;color:var(--muted);margin:10px 0 0}
 
@@ -218,8 +219,9 @@ button{font:inherit;cursor:pointer;color:inherit}
       <div class="st" id="sMissBox"><b id="sMiss">0</b><span>بصمات ناقصة</span></div>
     </div>
     <div class="card late-card" id="lateCard">
-      <div class="lc-h"><span>رصيد دقائق التأخير</span><b id="lateTx">0 من 105</b></div>
+      <div class="lc-h"><span>تأخير الشهر</span><b id="lateTx">0 من 105</b></div>
       <div class="bar"><i id="lateBar"></i></div>
+      <span class="lb" id="lateBand"></span>
       <small id="lateNote">المسموح 105 دقيقة بالشهر، وتنحسب من 9:31 ص.</small>
     </div>
     <button class="btn ghost" id="xls" type="button">تنزيل التقرير ملف إكسل</button>
@@ -247,14 +249,6 @@ button{font:inherit;cursor:pointer;color:inherit}
       <div class="seg" data-k="g">
         <button type="button" data-v="m">رجل</button>
         <button type="button" data-v="f">امرأة</button>
-      </div>
-    </div>
-    <div class="f"><span>ذكّرني بالتواجد بعد الدخول بـ</span>
-      <div class="seg" data-k="taw">
-        <button type="button" data-v="90">1:30</button>
-        <button type="button" data-v="120">2:00</button>
-        <button type="button" data-v="150">2:30</button>
-        <button type="button" data-v="180">3:00</button>
       </div>
     </div>
     <div class="f"><span>رمزك الخاص</span>
@@ -362,12 +356,33 @@ function exitMinutes(e, g, type) {
 }
 // دقائق التأخير تُحسب من 9:31 (الصباحي وتخفيف البداية) أو 7:31 (تخفيف النهاية)، بحد 105 دقيقة بالشهر
 const lateAfter = t => t === 'end' ? 450 : 570;
-const LATE_CAP = 105;
+const LATE_CAP = 105; // ربع يوم عمل (420 دقيقة ÷ 4) — المادة 18
+// تأخير اليوم: الدخول بعد بداية التأخير + عدم إثبات التواجد في نافذته (يُحسب من انقضاء الساعتين حتى إثباته)
+function dayLate(k, late) {
+  const d = log[k] || {}, isToday = k === dayKey(new Date());
+  let entry = 0, taw = 0;
+  if (d.in != null && d.in > late) entry = d.in - late;
+  if (d.in != null) {
+    const s = d.in + 120, e = d.in + 180;
+    if (d.taw != null && d.taw > e) taw = d.taw - s;
+    else if (d.taw == null && !(isToday && nowMin() < e)) taw = Math.max(0, (d.out ?? Math.min(nowMin(), CLOSE)) - s);
+    if (isToday && d.taw == null && nowMin() < e) taw = 0;
+  }
+  return { entry, taw, total: entry + taw };
+}
+// شرائح الحرمان من المرتب بحسب مجموع تأخير الشهر — المادتان 18 و19
+function band(m) {
+  if (m <= 105) return { t: 'لا حرمان من المرتب', c: '' };
+  if (m <= 210) return { t: 'حرمان أجر ربع يوم', c: 'warn' };
+  if (m <= 315) return { t: 'حرمان أجر نصف يوم', c: 'over' };
+  if (m <= 420) return { t: 'حرمان أجر ثلاثة أرباع يوم', c: 'over' };
+  return { t: 'حرمان من الأجر + إحالة للتحقيق', c: 'over' };
+}
 // البصمة تفتح من 6:30 ص إلى 4:59 م (الدخول قبل 7:00 يُحسب 7:00)
 const OPEN = 390, CLOSE = 1019;
 const inWindow = m => m >= OPEN && m <= CLOSE;
 const RULES = {
-  reg: g => `الدخول من 7:00 إلى 9:00، والخروج بعد ${g === 'f' ? '6 ساعات وربع' : '6 ساعات ونص'}.`,
+  reg: g => `الدخول المرن 7:00–9:00 والخروج بعد ${g === 'f' ? '6:15' : '6:30'} ساعة، والسماح 9:01–9:30 والخروج ${g === 'f' ? '3:45' : '4:00'}، والتأخير من 9:31. التواجد خلال ساعة بعد مرور ساعتين من الدخول.`,
   start: g => `الدخول من 9:00 إلى 9:30، والخروج بعد ${g === 'f' ? '4 ساعات و45 دقيقة' : '5 ساعات'}.`,
   end: g => `الدخول من 7:00 إلى 7:30، والخروج بعد ${g === 'f' ? '4 ساعات و45 دقيقة' : '5 ساعات'}.`,
 };
@@ -418,15 +433,16 @@ function fail(e) {
 // الأوقات المطلوبة لليوم حسب وقت الدخول
 function targets(d) {
   if (!d || d.in == null) return null;
-  return { taw: d.in + Number(settings.taw), out: exitMinutes(d.in, settings.g, settings.type) };
+  // قرار مجلس الخدمة المدنية 6/2024: إثبات التواجد خلال الستين دقيقة التالية لانقضاء ساعتين من بداية الدوام
+  return { taw: d.in + 120, tawEnd: d.in + 180, out: exitMinutes(d.in, settings.g, settings.type) };
 }
 
 // يضبط التذكيرات الباقية لليوم حسب البصمات المسجّلة
 async function syncReminders() {
   const d = log[dayKey(new Date())], t = targets(d), now = Date.now(), items = [];
   if (t) {
-    if (d.taw == null && atToday(t.taw) > now) items.push({ kind: 'taw', due_at: atToday(t.taw).toISOString(), title: 'بصمة التواجد', body: fmt(t.taw) });
-    if (d.taw == null && atToday(t.taw + 15) > now) items.push({ kind: 'taw-2', due_at: atToday(t.taw + 15).toISOString(), title: 'نسيت بصمة التواجد؟', body: `موعدها كان ${fmt(t.taw)}` });
+    if (d.taw == null && atToday(t.taw) > now) items.push({ kind: 'taw', due_at: atToday(t.taw).toISOString(), title: 'بصمة التواجد فتحت', body: `من ${fmt(t.taw)} إلى ${fmt(t.tawEnd)}` });
+    if (d.taw == null && atToday(t.tawEnd - 15) > now) items.push({ kind: 'taw-2', due_at: atToday(t.tawEnd - 15).toISOString(), title: 'باقي 15 دقيقة على إغلاق التواجد', body: `النافذة تنقفل ${fmt(t.tawEnd)}` });
     if (d.out == null) {
       if (atToday(t.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(t.out - 10).toISOString(), title: 'الخروج بعد 10 دقائق', body: fmt(t.out) });
       if (atToday(t.out) > now) items.push({ kind: 'out', due_at: atToday(t.out).toISOString(), title: 'بصمة الخروج', body: fmt(t.out) });
@@ -499,7 +515,7 @@ function render() {
   if (!t) box.hidden = true;
   else {
     box.hidden = false; box.className = 'card next';
-    if (d.taw == null && n < t.taw + 60) { box.classList.add('taw'); $('nLbl').textContent = 'بصمة التواجد'; $('nTime').textContent = fmt(t.taw); $('nCd').textContent = n < t.taw ? left(atToday(t.taw) - ms) : 'حان وقتها'; $('nCd').hidden = false; }
+    if (d.taw == null && n < t.tawEnd) { box.classList.add('taw'); $('nLbl').textContent = `بصمة التواجد (تنقفل ${fmt(t.tawEnd)})`; $('nTime').textContent = fmt(t.taw); $('nCd').textContent = n < t.taw ? left(atToday(t.taw) - ms) : `مفتوحة الحين، باقي ${left(atToday(t.tawEnd) - ms).replace('بعد ', '')}`; $('nCd').hidden = false; }
     else if (d.out == null) { box.classList.add('out'); $('nLbl').textContent = 'بصمة الخروج'; $('nTime').textContent = fmt(t.out); $('nCd').textContent = n < t.out ? left(atToday(t.out) - ms) : 'حان وقتها'; $('nCd').hidden = false; }
     else { box.classList.add('end'); $('nLbl').textContent = 'خلصت بصمات اليوم'; $('nTime').textContent = 'الله يعطيك العافية'; $('nCd').hidden = true; }
   }
@@ -508,7 +524,7 @@ function render() {
   $('punches').innerHTML = ['in', 'taw', 'out'].map(kind => {
     const v = d[kind], done = v != null;
     const open = inWindow(n);
-    const due = !open ? 'البصمة تفتح 6:30 ص – 4:59 م' : kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
+    const due = !open ? 'البصمة تفتح 6:30 ص – 4:59 م' : kind === 'taw' && t ? `من ${fmt(t.taw)} إلى ${fmt(t.tawEnd)}` : kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
     return `<div class="p p-${kind}${done ? ' is-done' : ''}${kind === nextKind ? ' is-next' : ''}">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[kind]}</svg></span>
       <div class="tx"><div class="nm">${NAMES[kind]}</div><div class="sub">${done ? 'تم ✓' : due}</div></div>
@@ -557,7 +573,7 @@ function renderReport() {
     const d = log[k], dt = new Date(k + 'T12:00:00'), isToday = k === todayK, t = targets(d);
     const cell = kind => {
       const v = d[kind];
-      if (v != null) return `<td class="${kind === 'in' && v > late ? 'late' : ''}">${fmtShort(v)}</td>`;
+      if (v != null) return `<td class="${(kind === 'in' && v > late) || (kind === 'taw' && d.in != null && v > d.in + 180) ? 'late' : ''}">${fmtShort(v)}</td>`;
       const waiting = isToday && (!t || n < (kind === 'taw' ? t.taw : t.out) + 60);
       if (!waiting) miss++;
       return waiting ? '<td class="wait">·</td>' : '<td class="miss">—</td>';
@@ -569,13 +585,15 @@ function renderReport() {
   $('sAvg').textContent = cnt ? fmtShort(Math.round(sum / cnt)) : '—';
   $('sMiss').textContent = miss; $('sMissBox').classList.toggle('warn', miss > 0);
   let lateMin = 0;
-  for (const k of days) { const v = log[k].in; if (v != null && v > late) lateMin += Math.min(v - late, LATE_CAP); }
+  for (const k of days) lateMin += dayLate(k, late).total;
   const pct = Math.min(100, Math.round(lateMin / LATE_CAP * 100));
   $('lateTx').textContent = `${lateMin} من ${LATE_CAP} دقيقة`;
   $('lateBar').style.width = pct + '%';
-  $('lateCard').classList.toggle('warn', lateMin >= LATE_CAP * .7 && lateMin <= LATE_CAP);
+  $('lateCard').classList.toggle('warn', lateMin >= LATE_CAP * .7 && lateMin <= LATE_CAP * 2);
   $('lateCard').classList.toggle('over', lateMin > LATE_CAP);
-  $('lateNote').textContent = lateMin > LATE_CAP ? `تجاوزت المسموح بـ${lateMin - LATE_CAP} دقيقة` : `باقي لك ${LATE_CAP - lateMin} دقيقة هذا الشهر. التأخير ينحسب من ${settings.type === 'end' ? '7:31' : '9:31'} ص.`;
+  const bd = band(lateMin);
+  $('lateNote').textContent = lateMin > LATE_CAP ? `تجاوزت حد ربع اليوم بـ${lateMin - LATE_CAP} دقيقة: ${bd.t}.` : `باقي ${LATE_CAP - lateMin} دقيقة قبل حد ربع اليوم. التأخير يبدأ ${settings.type === 'end' ? '7:31' : '9:31'} ص، وعدم إثبات التواجد في نافذته يدخل في التأخير.`;
+  $('lateBand').textContent = bd.t; $('lateBand').className = 'lb ' + bd.c;
   $('rEmpty').hidden = days.length > 0; $('legend').hidden = !days.length; $('tbl').hidden = !days.length;
 }
 $('xls').addEventListener('click', async () => {
@@ -587,7 +605,7 @@ $('xls').addEventListener('click', async () => {
       const d = log[k], dt = new Date(k + 'T12:00:00');
       return { 'التاريخ': `${dt.getDate()}/${dt.getMonth() + 1}/${dt.getFullYear()}`, 'اليوم': new Intl.DateTimeFormat('ar-KW', { weekday: 'long' }).format(dt),
         'الدخول': d.in != null ? fmt(d.in) : '', 'التواجد': d.taw != null ? fmt(d.taw) : '', 'الخروج': d.out != null ? fmt(d.out) : '',
-        'دقائق التأخير': d.in != null && d.in > late ? Math.min(d.in - late, LATE_CAP) : 0 };
+        'دقائق التأخير': dayLate(k, late).total };
     });
     if (!rows.length) return toast('ما فيه بصمات في هذا الشهر');
     const ws = XLSX.utils.json_to_sheet(rows); ws['!cols'] = [{ wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 13 }];
