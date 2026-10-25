@@ -162,6 +162,7 @@ dialog .db{padding:16px;max-height:70vh;overflow:auto}
 <dialog id="dlg"><div class="dh"><h3 id="dlgT"></h3><button class="link" type="button" id="dlgX" aria-label="إغلاق">✕</button></div><div class="db" id="dlgB"></div></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
 
+<script src="catalog.js"></script>
 <script>
 const API = 'https://pelkiufonckxdhdlqfas.supabase.co/functions/v1/api';
 const $ = id => document.getElementById(id);
@@ -208,6 +209,7 @@ function renderAuth() {
   if (AUTH === 'signup') h = `<h2 style="margin:0">سجّل جهتك</h2><p class="muted sm" style="margin:-6px 0 0">تصير أنت مدير النظام، وتضيف موظفيك برمز الانضمام.</p>
     ${F('اسم الجهة', '<input name="org_name" required placeholder="مثال: إدارة الخدمات العامة">')}
     <div class="f"><span>نوع الجهة</span><div class="kinds">${Object.entries(KINDS).map(([k, v], i) => `<label><input type="radio" name="kind" value="${k}"${i === 3 ? ' checked' : ''}><span>${v}</span></label>`).join('')}</div></div>
+    ${F('مجال العمل', `<select name="sector">${Object.keys(window.BIZ_SECTORS || { 'عام': 1 }).map(s => `<option>${esc(s)}</option>`).join('')}</select>`)}
     ${F('اسمك', '<input name="name" autocomplete="name" required>')}${em}${pw('new-password')}<p class="err" id="aErr" hidden></p><button class="btn" type="submit">إنشاء النظام</button>`;
   if (AUTH === 'join') h = `<h2 style="margin:0">انضم لجهتك</h2><p class="muted sm" style="margin:-6px 0 0">خذ رمز الانضمام من مدير النظام في جهتك.</p>
     ${F('رمز الجهة', '<input name="code" dir="ltr" autocapitalize="characters" placeholder="8 أحرف" required>')}${F('اسمك', '<input name="name" autocomplete="name" required>')}${em}${pw('new-password')}<p class="err" id="aErr" hidden></p><button class="btn" type="submit">انضمام</button>`;
@@ -495,6 +497,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
   $('authView').hidden = false; renderAuth();
 })();
 </script>
+<script src="modules.js"></script>
 <script src="../brand/brand.js" data-app="biz" defer></script>
 </body>
 </html>

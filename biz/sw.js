@@ -1,5 +1,5 @@
-const C = 'biz-v4';
-self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(['./', 'index.html', 'manifest.webmanifest', 'logo-192.png', 'logo-180.png'])).catch(() => {})); });
+const C = 'biz-v5';
+self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(['./', 'index.html', 'manifest.webmanifest', 'logo-192.png', 'logo-180.png', 'catalog.js', 'modules.js'])).catch(() => {})); });
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('biz-') && k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {
   const q = e.request, u = new URL(q.url);
