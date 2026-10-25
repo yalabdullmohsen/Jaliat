@@ -1,0 +1,58 @@
+/* ===================== v80: engineer's finish — same «عاجي ملكي» identity, refined details ===================== */
+/* palette: same colours, slightly clearer secondary text and warmer hairlines */
+:root:not([data-theme="dark"]){ --muted:#6F6756; --line:#EAE2D2; --line-2:#F1EBDE; --shadow:0 1px 2px rgba(40,30,10,.035),0 16px 32px -24px rgba(40,30,10,.30); --shadow-h:0 2px 4px rgba(40,30,10,.05),0 22px 40px -26px rgba(40,30,10,.38) }
+:root[data-theme="dark"]{ --muted:#ADA592; --shadow-h:0 2px 4px rgba(0,0,0,.4),0 22px 40px -26px rgba(0,0,0,.7) }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){ --muted:#ADA592 }}
+::selection{background:color-mix(in srgb,var(--gold) 30%,transparent)}
+html{scrollbar-color:color-mix(in srgb,var(--ink) 18%,transparent) transparent}
+:focus-visible{outline:2px solid color-mix(in srgb,var(--primary) 70%,var(--gold));outline-offset:2px}
+.num,.kpi b,td,.chip{font-variant-numeric:tabular-nums}
+
+/* page title: date on one calm line */
+#title .sub{font-size:12.5px;letter-spacing:.01em}#title .sub bdi{display:block;white-space:nowrap;line-height:1.55}#title .sub i{display:none}
+
+/* sidebar brand + small labels never stretch */
+#side .brand span{font-size:11.5px;line-height:1.45}
+#side .nav button>.kbd{flex:0 0 auto!important;width:auto!important;padding:1px 7px;font-size:10.5px;border-radius:6px;background:var(--gold-soft);color:var(--gold);border:0}
+
+/* stat tiles: royal number, gold hairline, gentle lift */
+.ht-stats .kpi{position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.ht-stats .kpi b{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif;color:var(--k,var(--primary));font-weight:700}
+:root[data-theme="dark"] .ht-stats .kpi b{color:var(--k,var(--ink))}
+.ht-stats .kpi span{color:var(--muted);font-weight:600}
+@media (hover:hover){.ht-stats .kpi:hover,.panel.prio .prio-i:hover{transform:translateY(-2px);box-shadow:var(--shadow-h)!important;border-color:color-mix(in srgb,var(--gold) 35%,var(--line))!important}}
+
+/* panel headers: short gold rule under the title — the finishing touch */
+.panel-h h3{position:relative}
+.panel-h h3::after{content:"";position:absolute;bottom:-6px;inset-inline-start:0;width:22px;height:2px;border-radius:2px;background:var(--gold);opacity:.75}
+.panel-h{padding-bottom:16px}
+
+/* hero: month ring labelled, softer pattern */
+.hx{box-shadow:0 24px 48px -30px rgba(14,77,58,.55)}
+.hx h2{letter-spacing:-.01em}
+.hx-b{transition:transform .15s ease,box-shadow .15s ease}.hx-b:hover{transform:translateY(-1px);box-shadow:0 8px 18px -10px rgba(0,0,0,.45)}
+
+/* help «؟» pins sit inside the card corner, quiet until needed */
+.g-pin{opacity:0!important;transition:opacity .15s;z-index:2}
+*:hover>.g-pin,.g-pin:focus-visible{opacity:1!important}
+@media (hover:none){.g-pin{opacity:.45!important}}
+
+/* tables: readable rows, calm hover */
+tbody tr{transition:background .12s}
+@media (hover:hover){tbody tr:hover td{background:color-mix(in srgb,var(--gold-soft) 45%,transparent)}}
+thead th{letter-spacing:.01em}
+
+/* buttons: one height, crisp edges */
+.btn{transition:background .15s,border-color .15s,box-shadow .15s,transform .12s}
+.btn:active,.hx-b:active,.kpi:active{transform:translateY(1px)}
+.btn-ghost:hover{border-color:color-mix(in srgb,var(--gold) 40%,var(--line))}
+
+/* chips & badges a touch more refined */
+.chip{letter-spacing:.01em}
+.nf-b{box-shadow:0 2px 6px -2px rgba(184,146,74,.6)}
+
+/* mobile bottom bar: lighter divider, centred add button with gold ring */
+@media (max-width:700px){
+  .tabbar,.bnav,#bnav{border-top:1px solid var(--line)!important;box-shadow:0 -10px 24px -18px rgba(40,30,10,.25)!important}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

@@ -471,7 +471,7 @@ function go(v, opt){
 function render(){
   const v = S.view; const ready = S.got.size >= 7;
   if (v === "users" && !S.admin) { S.view = "home"; return render(); }
-  $("#title").innerHTML = esc(v === "comm" && S.comm ? S.comm : TITLES[v]) + (v === "home" ? `<span class="sub">${esc(new Date().toLocaleDateString("ar-EG-u-nu-latn",{weekday:"long"}))} ${fmt(TODAY)} م · ${esc(hijri(new Date()))}</span>` : "");
+  $("#title").innerHTML = esc(v === "comm" && S.comm ? S.comm : TITLES[v]) + (v === "home" ? `<span class="sub"><bdi>${esc(new Date().toLocaleDateString("ar-EG-u-nu-latn",{weekday:"long"}))} ${fmt(TODAY)} م</bdi> <i aria-hidden="true">·</i> <bdi>${esc(hijri(new Date()))}</bdi></span>` : "");
   if (!ready) { $("#view").innerHTML = `<div class="loading">جارٍ تحميل بيانات القسم…</div>`; return; }
   const fn = {home:vHome, khatibs:vKhatibs, acts:vActs, comms:vComms, comm:vComm, cal:vCal, stats:vStats, mosques:vMosques, docs:vDocs, coords:vCoords, notes:vNotes, users:vUsers, audit:vAudit}[v] || vHome;
   $("#view").innerHTML = fn();
