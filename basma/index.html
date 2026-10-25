@@ -73,6 +73,12 @@ button{font:inherit;cursor:pointer;color:inherit}
 .next .cd{display:inline-block;font-size:.88rem;font-weight:600;padding:3px 12px;border-radius:999px}
 .next.taw .big{color:var(--gold)} .next.taw .cd{background:var(--gold-soft);color:var(--gold)}
 .next.out .big{color:var(--bad)} .next.out .cd{background:var(--bads);color:var(--bad)}
+.tick{font:700 2rem/1.1 var(--f);font-variant-numeric:tabular-nums;direction:ltr;letter-spacing:.04em;margin:6px 0 8px}
+.tick small{font-size:.8rem;font-weight:600;color:var(--muted);letter-spacing:0;direction:rtl;display:block;margin-top:2px}
+.tbar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:0 auto 10px;max-width:260px}
+.tbar i{display:block;height:100%;width:0;border-radius:99px;transition:width 1s linear}
+.next.taw .tbar i{background:var(--gold)} .next.out .tbar i{background:var(--bad)}
+.next.taw .tick{color:var(--gold)} .next.out .tick{color:var(--bad)}
 .next.end .big{color:var(--primary);font-size:1.5rem}
 
 /* البصمات الثلاث */
@@ -96,6 +102,13 @@ button{font:inherit;cursor:pointer;color:inherit}
 .p .done b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums;line-height:1.2}
 .p .done span{font-size:.78rem;color:var(--primary);font-weight:600}
 .p.is-done{background:var(--surface-2);box-shadow:none}
+.perm{display:flex;flex-direction:column;gap:10px}
+.perm .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.perm .sub{font-size:.82rem;color:var(--muted)}
+.perm .pi{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--surface-2);border-radius:10px;font-weight:600;font-variant-numeric:tabular-nums}
+.perm .permAdd .row{display:flex;gap:8px}
+.perm .permAdd label{flex:1;display:flex;flex-direction:column;gap:4px;font-size:.85rem;font-weight:600}
+.perm .permAdd input{text-align:center;font:600 1.05rem var(--f);padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
 .p.is-next{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary),var(--shadow)}
 
 /* محرّر الوقت */
@@ -189,6 +202,8 @@ button{font:inherit;cursor:pointer;color:inherit}
     <div class="card next" id="next" hidden>
       <div class="lbl" id="nLbl"></div>
       <div class="big" id="nTime"></div>
+      <div class="tick" id="nTick" aria-live="off"></div>
+      <div class="tbar"><i id="nBar"></i></div>
       <span class="cd" id="nCd"></span>
     </div>
     <p class="lead" id="lead">بعد كل بصمة اضغط زرها، ونذكّرك بالبصمة اللي بعدها.</p>
@@ -203,6 +218,16 @@ button{font:inherit;cursor:pointer;color:inherit}
         <button class="link mute" id="eDel" type="button">حذف البصمة</button>
         <button class="link" id="eBack" type="button">رجوع</button>
       </div>
+    </div>
+    <div class="card perm" id="permCard">
+      <div class="ph"><b>الاستئذان</b><span class="sub" id="permQuota"></span></div>
+      <div id="permList"></div>
+      <div class="permAdd" id="permAdd" hidden>
+        <div class="row"><label>من <input type="time" id="pFrom" dir="ltr" min="06:30" max="16:59"></label><label>إلى <input type="time" id="pTo" dir="ltr" min="06:30" max="16:59"></label></div>
+        <div class="links"><button class="btn" id="pSave" type="button">حفظ الاستئذان</button><button class="link" id="pCancel" type="button">رجوع</button></div>
+      </div>
+      <button class="btn ghost" id="pNew" type="button">+ استئذان اليوم</button>
+      <small class="sub">الاستئذان المعتمد: 4 مرات و12 ساعة بالشهر. إذا وقع في نافذة التواجد تُعفى منها.</small>
     </div>
   </section>
 
@@ -224,6 +249,7 @@ button{font:inherit;cursor:pointer;color:inherit}
       <span class="lb" id="lateBand"></span>
       <small id="lateNote">المسموح 105 دقيقة بالشهر، وتنحسب من 9:31 ص.</small>
     </div>
+    <div class="card late-card" id="permRepBox"><div class="lc-h"><span>الاستئذان هذا الشهر</span><b id="permRep"></b></div></div>
     <button class="btn ghost" id="xls" type="button">تنزيل التقرير ملف إكسل</button>
     <div class="card" style="padding:12px 14px">
       <table class="tbl" id="tbl">
@@ -316,7 +342,7 @@ async function pushCloud() {
   pushing = (async () => {
     const dirty = store.get('dirty', []), dirtySet = store.get('dirtySet', false);
     if (!dirty.length && !dirtySet) return;
-    const days = dirty.map(day => ({ day, in: log[day]?.in ?? null, taw: log[day]?.taw ?? null, out: log[day]?.out ?? null }));
+    const days = dirty.map(day => ({ day, in: log[day]?.in ?? null, taw: log[day]?.taw ?? null, out: log[day]?.out ?? null, perms: log[day]?.perms || [] }));
     try {
       await call({ action: 'save', key: KEY, settings, days });
       const left = store.get('dirty', []).filter(d => !dirty.includes(d));
@@ -333,7 +359,7 @@ async function pullCloud() {
     const dirty = new Set(store.get('dirty', []));
     for (const d of r.days) {
       if (dirty.has(d.day)) continue;
-      const v = {}; if (d.in_min != null) v.in = d.in_min; if (d.taw_min != null) v.taw = d.taw_min; if (d.out_min != null) v.out = d.out_min;
+      const v = {}; if (d.in_min != null) v.in = d.in_min; if (d.taw_min != null) v.taw = d.taw_min; if (d.out_min != null) v.out = d.out_min; if (Array.isArray(d.perms) && d.perms.length) v.perms = d.perms;
       log[d.day] = v;
     }
     const serverDays = new Set(r.days.map(d => d.day));
@@ -361,15 +387,24 @@ const LATE_CAP = 105; // ربع يوم عمل (420 دقيقة ÷ 4) — الما
 function dayLate(k, late) {
   const d = log[k] || {}, isToday = k === dayKey(new Date());
   let entry = 0, taw = 0;
-  if (d.in != null && d.in > late) entry = d.in - late;
+  if (d.in != null && d.in > late) entry = Math.max(0, d.in - late - permsOf(k).reduce((a, p) => a + overlap(p.from, p.to, late, d.in), 0));
   if (d.in != null) {
     const s = d.in + 120, e = d.in + 180;
     if (d.taw != null && d.taw > e) taw = d.taw - s;
     else if (d.taw == null && !(isToday && nowMin() < e)) taw = Math.max(0, (d.out ?? Math.min(nowMin(), CLOSE)) - s);
     if (isToday && d.taw == null && nowMin() < e) taw = 0;
   }
+  if (tawExempt(k)) taw = 0;
   return { entry, taw, total: entry + taw };
 }
+// ---- الاستئذان: 4 مرات و12 ساعة بالشهر للدوام الصباحي (تعميم الأوقاف 13/2025) ----
+const PERM_MAX = 4, PERM_MIN = 720;
+const overlap = (a1, a2, b1, b2) => Math.max(0, Math.min(a2, b2) - Math.max(a1, b1));
+const permsOf = k => (log[k] && log[k].perms) || [];
+// الاستئذان اللي يقع أي جزء منه في نافذة التواجد يعفي منها (قرار مجلس الخدمة المدنية 6/2024)
+const tawExempt = k => { const d = log[k]; if (!d || d.in == null) return false; return permsOf(k).some(p => overlap(p.from, p.to, d.in + 120, d.in + 180) > 0 || (p.from <= d.in + 180 && p.to >= d.in + 120)); };
+function monthPerms(prefix) { let n = 0, m = 0; for (const k of Object.keys(log)) if (k.startsWith(prefix)) for (const p of permsOf(k)) { n++; m += p.to - p.from; } return { n, m }; }
+const hm = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
 // شرائح الحرمان من المرتب بحسب مجموع تأخير الشهر — المادتان 18 و19
 function band(m) {
   if (m <= 105) return { t: 'لا حرمان من المرتب', c: '' };
@@ -441,8 +476,10 @@ function targets(d) {
 async function syncReminders() {
   const d = log[dayKey(new Date())], t = targets(d), now = Date.now(), items = [];
   if (t) {
-    if (d.taw == null && atToday(t.taw) > now) items.push({ kind: 'taw', due_at: atToday(t.taw).toISOString(), title: 'بصمة التواجد فتحت', body: `من ${fmt(t.taw)} إلى ${fmt(t.tawEnd)}` });
-    if (d.taw == null && atToday(t.tawEnd - 15) > now) items.push({ kind: 'taw-2', due_at: atToday(t.tawEnd - 15).toISOString(), title: 'باقي 15 دقيقة على إغلاق التواجد', body: `النافذة تنقفل ${fmt(t.tawEnd)}` });
+    const ex = tawExempt(dayKey(new Date()));
+    for (const p of (d.perms || [])) if (atToday(p.to - 5) > now && p.to < t.out) items.push({ kind: 'perm', due_at: atToday(p.to - 5).toISOString(), title: 'الاستئذان يخلص بعد 5 دقائق', body: `بصمة دخول عند الرجوع ${fmt(p.to)}` });
+    if (!ex && d.taw == null && atToday(t.taw) > now) items.push({ kind: 'taw', due_at: atToday(t.taw).toISOString(), title: 'بصمة التواجد فتحت', body: `من ${fmt(t.taw)} إلى ${fmt(t.tawEnd)}` });
+    if (!ex && d.taw == null && atToday(t.tawEnd - 15) > now) items.push({ kind: 'taw-2', due_at: atToday(t.tawEnd - 15).toISOString(), title: 'باقي 15 دقيقة على إغلاق التواجد', body: `النافذة تنقفل ${fmt(t.tawEnd)}` });
     if (d.out == null) {
       if (atToday(t.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(t.out - 10).toISOString(), title: 'الخروج بعد 10 دقائق', body: fmt(t.out) });
       if (atToday(t.out) > now) items.push({ kind: 'out', due_at: atToday(t.out).toISOString(), title: 'بصمة الخروج', body: fmt(t.out) });
@@ -515,16 +552,18 @@ function render() {
   if (!t) box.hidden = true;
   else {
     box.hidden = false; box.className = 'card next';
-    if (d.taw == null && n < t.tawEnd) { box.classList.add('taw'); $('nLbl').textContent = `بصمة التواجد (تنقفل ${fmt(t.tawEnd)})`; $('nTime').textContent = fmt(t.taw); $('nCd').textContent = n < t.taw ? left(atToday(t.taw) - ms) : `مفتوحة الحين، باقي ${left(atToday(t.tawEnd) - ms).replace('بعد ', '')}`; $('nCd').hidden = false; }
-    else if (d.out == null) { box.classList.add('out'); $('nLbl').textContent = 'بصمة الخروج'; $('nTime').textContent = fmt(t.out); $('nCd').textContent = n < t.out ? left(atToday(t.out) - ms) : 'حان وقتها'; $('nCd').hidden = false; }
+    TICK = null;
+    if (d.taw == null && n < t.tawEnd && !tawExempt(dayKey(new Date()))) { TICK = n < t.taw ? { to: atToday(t.taw), from: atToday(d.in), lbl: 'باقي على فتح التواجد' } : { to: atToday(t.tawEnd), from: atToday(t.taw), lbl: 'باقي على إغلاق التواجد' }; box.classList.add('taw'); $('nLbl').textContent = `بصمة التواجد (تنقفل ${fmt(t.tawEnd)})`; $('nTime').textContent = fmt(t.taw); $('nCd').textContent = n < t.taw ? left(atToday(t.taw) - ms) : `مفتوحة الحين، باقي ${left(atToday(t.tawEnd) - ms).replace('بعد ', '')}`; $('nCd').hidden = false; }
+    else if (d.out == null) { if (n < t.out) TICK = { to: atToday(t.out), from: atToday(d.taw ?? d.in), lbl: 'باقي على الخروج' }; box.classList.add('out'); $('nLbl').textContent = 'بصمة الخروج'; $('nTime').textContent = fmt(t.out); $('nCd').textContent = n < t.out ? left(atToday(t.out) - ms) : 'حان وقتها'; $('nCd').hidden = false; }
     else { box.classList.add('end'); $('nLbl').textContent = 'خلصت بصمات اليوم'; $('nTime').textContent = 'الله يعطيك العافية'; $('nCd').hidden = true; }
   }
   $('lead').hidden = !!t;
-  const nextKind = d.in == null ? 'in' : d.taw == null ? 'taw' : d.out == null ? 'out' : null;
+  const nextKind = d.in == null ? 'in' : (d.taw == null && !tawExempt(dayKey(new Date()))) ? 'taw' : d.out == null ? 'out' : null;
+  renderPerms();
   $('punches').innerHTML = ['in', 'taw', 'out'].map(kind => {
     const v = d[kind], done = v != null;
     const open = inWindow(n);
-    const due = !open ? 'البصمة تفتح 6:30 ص – 4:59 م' : kind === 'taw' && t ? `من ${fmt(t.taw)} إلى ${fmt(t.tawEnd)}` : kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
+    const due = !open ? 'البصمة تفتح 6:30 ص – 4:59 م' : kind === 'taw' && tawExempt(dayKey(new Date())) ? 'معفى اليوم بسبب الاستئذان' : kind === 'taw' && t ? `من ${fmt(t.taw)} إلى ${fmt(t.tawEnd)}` : kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
     return `<div class="p p-${kind}${done ? ' is-done' : ''}${kind === nextKind ? ' is-next' : ''}">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[kind]}</svg></span>
       <div class="tx"><div class="nm">${NAMES[kind]}</div><div class="sub">${done ? 'تم ✓' : due}</div></div>
@@ -537,6 +576,46 @@ $('punches').addEventListener('click', e => {
   const r = e.target.closest('[data-rec]'), ed = e.target.closest('[data-edit]');
   if (r) record(r.dataset.rec, nowMin());
   else if (ed) openEditor(ed.dataset.edit);
+});
+// عداد حيّ يتحرك كل ثانية للبصمة الجاية
+let TICK = null;
+function tick() {
+  const el = $('nTick'); if (!el) return;
+  if (!TICK || $('next').hidden) { el.hidden = true; $('nBar').parentElement.hidden = true; return; }
+  const left = TICK.to - Date.now();
+  if (left <= 0) { TICK = null; render(); return; }
+  const s = Math.floor(left / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+  el.hidden = false; $('nBar').parentElement.hidden = false; $('nCd').hidden = true;
+  el.innerHTML = `${h ? h + ':' : ''}${pad(m)}:${pad(sec)}<small>${TICK.lbl}</small>`;
+  const span = TICK.to - TICK.from; $('nBar').style.width = span > 0 ? Math.min(100, Math.max(0, (1 - left / span) * 100)).toFixed(1) + '%' : '0%';
+}
+setInterval(tick, 1000);
+function renderPerms() {
+  setTimeout(tick, 0);
+  const k = dayKey(new Date()), q = monthPerms(k.slice(0, 8));
+  $('permQuota').textContent = `هذا الشهر: ${q.n} من ${PERM_MAX} · ${hm(q.m)} من 12:00 ساعة`;
+  $('permQuota').style.color = q.n > PERM_MAX || q.m > PERM_MIN ? 'var(--bad)' : '';
+  $('permList').innerHTML = permsOf(k).map((p, i) => `<div class="pi"><span>${fmt(p.from)} – ${fmt(p.to)} <span class="sub">(${hm(p.to - p.from)})</span></span><button class="link mute" data-pdel="${i}" type="button">حذف</button></div>`).join('');
+}
+$('pNew').addEventListener('click', () => { const n = Math.max(OPEN, Math.min(nowMin(), CLOSE - 60)); $('pFrom').value = `${pad(Math.floor(n / 60))}:${pad(n % 60)}`; $('pTo').value = `${pad(Math.floor((n + 60) / 60))}:${pad((n + 60) % 60)}`; $('permAdd').hidden = false; $('pNew').hidden = true; });
+$('pCancel').addEventListener('click', () => { $('permAdd').hidden = true; $('pNew').hidden = false; });
+$('pSave').addEventListener('click', async () => {
+  const toM = v => { const [h, m] = (v || '').split(':').map(Number); return h * 60 + m; };
+  const from = toM($('pFrom').value), to = toM($('pTo').value);
+  if (!(from >= OPEN && to <= CLOSE && to > from)) return toast('اختر وقت صحيح بين 6:30 ص و4:59 م');
+  const k = dayKey(new Date()), q = monthPerms(k.slice(0, 8));
+  log[k] = log[k] || {}; log[k].perms = permsOf(k).concat([{ from, to }]).sort((a, b) => a.from - b.from);
+  saveLog(); markDirty(k); pushCloud(); $('permAdd').hidden = true; $('pNew').hidden = false; render();
+  if (q.n + 1 > PERM_MAX || q.m + (to - from) > PERM_MIN) toast('انحفظ، لكنك تجاوزت حد الاستئذان الشهري (4 مرات / 12 ساعة)'); else toast('انحفظ الاستئذان ✓');
+  try { await syncReminders(); } catch {}
+});
+$('permList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-pdel]'); if (!b) return;
+  const k = dayKey(new Date()); const arr = permsOf(k).slice(); arr.splice(+b.dataset.pdel, 1);
+  if (arr.length) log[k].perms = arr; else delete log[k].perms;
+  if (!Object.keys(log[k]).length) delete log[k];
+  saveLog(); markDirty(k); pushCloud(); render(); toast('حذفت الاستئذان');
+  try { await syncReminders(); } catch {}
 });
 function openEditor(kind) {
   editing = kind;
@@ -574,6 +653,7 @@ function renderReport() {
     const cell = kind => {
       const v = d[kind];
       if (v != null) return `<td class="${(kind === 'in' && v > late) || (kind === 'taw' && d.in != null && v > d.in + 180) ? 'late' : ''}">${fmtShort(v)}</td>`;
+      if (kind === 'taw' && tawExempt(k)) return '<td class="wait">استئذان</td>';
       const waiting = isToday && (!t || n < (kind === 'taw' ? t.taw : t.out) + 60);
       if (!waiting) miss++;
       return waiting ? '<td class="wait">·</td>' : '<td class="miss">—</td>';
@@ -591,6 +671,9 @@ function renderReport() {
   $('lateBar').style.width = pct + '%';
   $('lateCard').classList.toggle('warn', lateMin >= LATE_CAP * .7 && lateMin <= LATE_CAP * 2);
   $('lateCard').classList.toggle('over', lateMin > LATE_CAP);
+  const pq = monthPerms(prefix);
+  $('permRep').textContent = `${pq.n} من ${PERM_MAX} مرات · ${hm(pq.m)} من 12:00 ساعة`;
+  $('permRepBox').classList.toggle('over', pq.n > PERM_MAX || pq.m > PERM_MIN);
   const bd = band(lateMin);
   $('lateNote').textContent = lateMin > LATE_CAP ? `تجاوزت حد ربع اليوم بـ${lateMin - LATE_CAP} دقيقة: ${bd.t}.` : `باقي ${LATE_CAP - lateMin} دقيقة قبل حد ربع اليوم. التأخير يبدأ ${settings.type === 'end' ? '7:31' : '9:31'} ص، وعدم إثبات التواجد في نافذته يدخل في التأخير.`;
   $('lateBand').textContent = bd.t; $('lateBand').className = 'lb ' + bd.c;
@@ -605,6 +688,7 @@ $('xls').addEventListener('click', async () => {
       const d = log[k], dt = new Date(k + 'T12:00:00');
       return { 'التاريخ': `${dt.getDate()}/${dt.getMonth() + 1}/${dt.getFullYear()}`, 'اليوم': new Intl.DateTimeFormat('ar-KW', { weekday: 'long' }).format(dt),
         'الدخول': d.in != null ? fmt(d.in) : '', 'التواجد': d.taw != null ? fmt(d.taw) : '', 'الخروج': d.out != null ? fmt(d.out) : '',
+        'الاستئذان': permsOf(k).map(p => `${fmt(p.from)}-${fmt(p.to)}`).join('، '),
         'دقائق التأخير': dayLate(k, late).total };
     });
     if (!rows.length) return toast('ما فيه بصمات في هذا الشهر');
