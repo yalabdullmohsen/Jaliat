@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>إنجاز أعمال</title>
+<meta name="description" content="إنجاز أعمال: نظام المهام والحجوزات والطلبات للجهات الحكومية والمؤسسات والهيئات والشركات.">
+<meta name="author" content="يوسف عبد المحسن المطيري">
+<meta name="theme-color" content="#1E3A31">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="إنجاز أعمال">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="logo-180.png">
+<link rel="icon" type="image/png" href="logo-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+/* منظومة إنجاز «عاجي ملكي» — --accent يأخذ لون الجهة */
+:root{
+  --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#F2F1EC; --ink:#1F2A25; --muted:#6C7872; --line:#E6E3DB;
+  --accent:#2F6B57; --accent-ink:#FFFFFF; --gold:#957631; --gold-soft:#F5EFE0;
+  --ok:#2F7D57; --oks:#E6F2EC; --warn:#946E1F; --warns:#F7F0E1; --bad:#B0564A; --bads:#F7E9E6;
+  --side:#1E3A31; --side-ink:#F2F6F4; --side-muted:#B9CCC3;
+  --shadow:0 1px 2px rgba(31,42,37,.04),0 6px 20px rgba(31,42,37,.05);
+  --f:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#111614; --surface:#181E1B; --surface-2:#1E2522; --ink:#E2E8E5; --muted:#97A39D; --line:#28302C;
+  --gold:#D3B46C; --gold-soft:#2A2517; --ok:#7CBF9E; --oks:#1B2A23; --warn:#D9B76A; --warns:#2B2618; --bad:#E39488; --bads:#2E1D1A;
+  --side:#0F1513; --side-ink:#E2E8E5; --side-muted:#97A39D; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+}}
+*{box-sizing:border-box} [hidden]{display:none!important} html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 40%,transparent);outline-offset:2px}
+.top{background:var(--side);color:var(--side-ink);padding-top:env(safe-area-inset-top,0px)}
+.top .in{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;padding-block:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top img{width:40px;height:40px;border-radius:10px;box-shadow:0 0 0 1px rgba(211,180,108,.45);flex:none}
+.top .t{flex:1;min-width:0}
+.top h1{margin:0;font-size:1.15rem;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top small{color:var(--side-muted);font-size:.82rem}
+.ibtn{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:var(--side-ink);display:grid;place-items:center;flex:none;cursor:pointer}
+.ibtn svg{width:20px;height:20px}
+.wrap{max-width:860px;margin:0 auto;padding-block:16px calc(96px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.h h2{margin:0;font-size:1.15rem}
+.muted{color:var(--muted)} .sm{font-size:.85rem}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:700;background:var(--accent);color:var(--accent-ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.ghost{background:var(--surface-2);color:var(--ink)}
+.btn.bad{background:var(--bads);color:var(--bad)}
+.btn.sm{padding:7px 12px;font-size:.88rem}
+.btn:disabled{opacity:.55}
+.link{background:none;border:0;color:var(--accent);font-weight:600;cursor:pointer;padding:4px}
+.form{display:grid;gap:12px}
+.f{display:grid;gap:5px} .f>span{font-size:.88rem;font-weight:600}
+.f input,.f select,.f textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:1rem}
+.f textarea{min-height:84px;resize:vertical}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.g2{grid-template-columns:1fr}}
+.err{color:var(--bad);font-size:.9rem;margin:0}
+.seg{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:3px;overflow-x:auto}
+.seg button{flex:1;border:0;background:none;border-radius:8px;padding:8px 10px;font-size:.88rem;font-weight:600;color:var(--muted);white-space:nowrap;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .tx{flex:1;min-width:0}
+.row b{display:block;line-height:1.4}
+.row .sub{font-size:.84rem;color:var(--muted)}
+.pill{display:inline-block;font-size:.76rem;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap}
+.p-new{background:var(--warns);color:var(--warn)} .p-doing,.p-review,.p-pending{background:var(--gold-soft);color:var(--gold)}
+.p-done,.p-confirmed{background:var(--oks);color:var(--ok)} .p-rejected,.p-cancelled{background:var(--bads);color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.st{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer}
+.st b{display:block;font-size:1.6rem;line-height:1.2;color:var(--accent);font-variant-numeric:tabular-nums}
+.st span{font-size:.82rem;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:18px 8px;margin:0}
+.nav{position:fixed;inset-inline:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav .in{max-width:860px;margin:0 auto;display:flex;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.nav button{flex:1;border:0;background:none;padding:8px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;min-width:0}
+.nav button svg{width:22px;height:22px}
+.nav button[aria-current="page"]{color:var(--accent)}
+.auth{max-width:440px;margin:0 auto;padding-block:28px 40px;display:flex;flex-direction:column;gap:16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hero{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.hero img{width:72px;height:72px;border-radius:18px;box-shadow:0 0 0 1px rgba(211,180,108,.5)}
+.hero h1{margin:0;font-size:1.7rem}
+.hero p{margin:0;color:var(--muted);max-width:36ch}
+.kinds{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.kinds label{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;font-weight:600;cursor:pointer;background:var(--surface-2)}
+.kinds input{position:absolute;inset:0;width:1px;height:1px;margin:0;opacity:0;pointer-events:none}
+.kinds input:checked+span{color:var(--accent)}
+.kinds label:has(input:checked){border-color:var(--accent);background:var(--surface)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+.sw button[aria-pressed="true"]{border-color:var(--ink)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.tog:first-of-type{border-top:0}
+.tog input{width:46px;height:26px;accent-color:var(--accent)}
+.code{font:700 1.15rem var(--f);letter-spacing:.1em;direction:ltr;background:var(--surface-2);padding:8px 12px;border-radius:10px}
+.copyrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.copyrow .url{direction:ltr;font-size:.85rem;background:var(--surface-2);padding:8px 10px;border-radius:10px;flex:1;min-width:0;overflow-wrap:anywhere}
+dialog{border:0;border-radius:16px;padding:0;max-width:min(520px,calc(100% - 24px));width:100%;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+dialog .dh{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+dialog .dh h3{margin:0;font-size:1.05rem}
+dialog .db{padding:16px;max-height:70vh;overflow:auto}
+#toast{position:fixed;left:0;right:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));margin:0 auto;width:max-content;max-width:calc(100% - 32px);background:var(--side);color:var(--side-ink);
+  padding:10px 16px;border-radius:12px;font-weight:600;font-size:.92rem;text-align:center;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:50}
+#toast.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<!-- الدخول -->
+<div id="authView" hidden>
+  <div class="auth">
+    <div class="hero">
+      <img src="logo-192.png" alt="">
+      <h1>إنجاز أعمال</h1>
+      <p>المهام والحجوزات وطلبات العملاء لجهتك في مكان واحد. لكل جهة نظامها وبياناتها الخاصة.</p>
+    </div>
+    <div class="seg" id="authTabs">
+      <button type="button" data-a="login" aria-pressed="true">دخول</button>
+      <button type="button" data-a="signup" aria-pressed="false">سجّل جهتك</button>
+      <button type="button" data-a="join" aria-pressed="false">انضم لجهة</button>
+    </div>
+    <form class="card form" id="authForm" novalidate></form>
+  </div>
+</div>
+
+<!-- النظام -->
+<div id="appView" hidden>
+  <header class="top"><div class="in">
+    <img id="orgLogo" src="logo-180.png" alt="">
+    <div class="t"><h1 id="orgName"></h1><small id="orgSub"></small></div>
+    <button class="ibtn" id="refresh" type="button" aria-label="تحديث"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 21v-5h-5"/></svg></button>
+  </div></header>
+  <main class="wrap" id="view"></main>
+  <nav class="nav"><div class="in" id="nav"></div></nav>
+</div>
+
+<dialog id="dlg"><div class="dh"><h3 id="dlgT"></h3><button class="link" type="button" id="dlgX" aria-label="إغلاق">✕</button></div><div class="db" id="dlgB"></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const API = 'https://pelkiufonckxdhdlqfas.supabase.co/functions/v1/api';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const LS = { g(k) { try { return localStorage.getItem('biz.' + k); } catch { return null; } }, s(k, v) { try { v == null ? localStorage.removeItem('biz.' + k) : localStorage.setItem('biz.' + k, v); } catch {} } };
+let TOKEN = LS.g('t'), ME = null, ORG = null, PEOPLE = [], DEPTS = [], VIEW = 'home', CACHE = {};
+
+const KINDS = { gov: 'جهة حكومية', inst: 'مؤسسة', authority: 'هيئة', company: 'شركة' };
+const MODS = { tasks: 'المهام', bookings: 'الحجوزات', requests: 'طلبات العملاء', clients: 'العملاء', news: 'التعاميم' };
+const ST = { new: 'جديدة', doing: 'قيد التنفيذ', done: 'منجزة', review: 'قيد المراجعة', rejected: 'مرفوض', pending: 'بانتظار الموافقة', confirmed: 'مؤكد', cancelled: 'ملغي' };
+const COLORS = ['#2F6B57', '#1F5F8B', '#6B4BB0', '#9B3D4A', '#B8601F', '#3D5A6B', '#957631', '#1E3A31'];
+const ROLE = { owner: 'المالك', admin: 'مدير', member: 'موظف' };
+const label = k => (ORG?.labels?.[k]) || MODS[k];
+const isAdmin = () => ME && (ME.role === 'owner' || ME.role === 'admin');
+const pad = n => String(n).padStart(2, '0');
+const fmtT = d => { d = new Date(d); let h = d.getHours(); const ap = h < 12 ? 'ص' : 'م'; h = h % 12 || 12; return `${h}:${pad(d.getMinutes())} ${ap}`; };
+const fmtD = d => new Intl.DateTimeFormat('ar-KW-u-nu-latn', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(d));
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const who = id => PEOPLE.find(p => p.id === id)?.name || '—';
+const deptName = id => DEPTS.find(d => d.id === id)?.name || '';
+
+let toastT;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 3000); }
+async function call(action, body = {}) {
+  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, token: TOKEN, ...body }) });
+  const j = await r.json().catch(() => ({ error: 'تعذّر الاتصال' }));
+  if (r.status === 401) { logout(true); throw new Error(j.error); }
+  if (!r.ok) throw new Error(j.error || 'صار خطأ');
+  return j;
+}
+const list = async t => (CACHE[t] = (await call('list', { table: t })).rows);
+const save = (t, row) => call('save', { table: t, row });
+
+/* ---------------- الدخول والتسجيل ---------------- */
+let AUTH = 'login';
+function renderAuth() {
+  document.querySelectorAll('#authTabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.a === AUTH)));
+  const F = (l, h) => `<label class="f"><span>${l}</span>${h}</label>`;
+  const em = F('البريد الإلكتروني', '<input name="email" type="email" dir="ltr" autocomplete="email" required>');
+  const pw = (n = 'current-password') => F('كلمة المرور', `<input name="password" type="password" dir="ltr" autocomplete="${n}" minlength="8" placeholder="8 أحرف على الأقل" required>`);
+  let h = '';
+  if (AUTH === 'login') h = `<h2 style="margin:0">دخول</h2>${em}${pw()}<p class="err" id="aErr" hidden></p><button class="btn" type="submit">دخول</button>`;
+  if (AUTH === 'signup') h = `<h2 style="margin:0">سجّل جهتك</h2><p class="muted sm" style="margin:-6px 0 0">تصير أنت مدير النظام، وتضيف موظفيك برمز الانضمام.</p>
+    ${F('اسم الجهة', '<input name="org_name" required placeholder="مثال: إدارة الخدمات العامة">')}
+    <div class="f"><span>نوع الجهة</span><div class="kinds">${Object.entries(KINDS).map(([k, v], i) => `<label><input type="radio" name="kind" value="${k}"${i === 3 ? ' checked' : ''}><span>${v}</span></label>`).join('')}</div></div>
+    ${F('اسمك', '<input name="name" autocomplete="name" required>')}${em}${pw('new-password')}<p class="err" id="aErr" hidden></p><button class="btn" type="submit">إنشاء النظام</button>`;
+  if (AUTH === 'join') h = `<h2 style="margin:0">انضم لجهتك</h2><p class="muted sm" style="margin:-6px 0 0">خذ رمز الانضمام من مدير النظام في جهتك.</p>
+    ${F('رمز الجهة', '<input name="code" dir="ltr" autocapitalize="characters" placeholder="8 أحرف" required>')}${F('اسمك', '<input name="name" autocomplete="name" required>')}${em}${pw('new-password')}<p class="err" id="aErr" hidden></p><button class="btn" type="submit">انضمام</button>`;
+  $('authForm').innerHTML = h;
+}
+$('authTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { AUTH = b.dataset.a; renderAuth(); } });
+$('authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = Object.fromEntries(new FormData(e.target)); const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true;
+  try { const r = await call(AUTH, fd); TOKEN = r.token; LS.s('t', TOKEN); await boot(); }
+  catch (err) { const el = $('aErr'); el.textContent = err.message; el.hidden = false; }
+  finally { btn.disabled = false; }
+});
+function logout(silent) { if (!silent) call('logout').catch(() => {}); TOKEN = null; LS.s('t', null); ME = null; $('appView').hidden = true; $('authView').hidden = false; AUTH = 'login'; renderAuth(); }
+
+/* ---------------- الهيكل ---------------- */
+const IC = {
+  home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  tasks: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>',
+  bookings: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  requests: '<path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/>',
+  more: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
+};
+function renderNav() {
+  const m = ORG.modules || {};
+  const items = [['home', 'الرئيسية']].concat(['tasks', 'bookings', 'requests'].filter(k => m[k]).map(k => [k, label(k)])).concat([['more', 'المزيد']]);
+  $('nav').innerHTML = items.map(([k, l]) => `<button type="button" data-go="${k}"${VIEW === k || (k === 'more' && ['clients', 'team', 'settings', 'news'].includes(VIEW)) ? ' aria-current="page"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><span>${esc(l)}</span></button>`).join('');
+}
+function applyOrg() {
+  document.documentElement.style.setProperty('--accent', ORG.color || '#2F6B57');
+  $('orgName').textContent = ORG.name; $('orgSub').textContent = `${KINDS[ORG.kind] || ''} · ${ME.name} (${ROLE[ME.role]})`;
+  document.title = ORG.name + ' — إنجاز أعمال';
+}
+async function boot() {
+  const r = await call('me'); ME = r.me; ORG = r.org; PEOPLE = r.people; DEPTS = r.depts; CACHE = {};
+  $('authView').hidden = true; $('appView').hidden = false; applyOrg(); go(location.hash.slice(1) || 'home');
+}
+async function go(v) {
+  VIEW = v; if (location.hash.slice(1) !== v) history.replaceState(null, '', '#' + v); renderNav();
+  const el = $('view'); el.innerHTML = '<p class="empty">جارٍ التحميل…</p>';
+  try { await (VIEWS[v] || VIEWS.home)(el); } catch (e) { el.innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
+  window.scrollTo(0, 0);
+}
+$('nav').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
+$('view').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
+$('refresh').addEventListener('click', () => boot().catch(() => {}));
+
+function dialog(title, html, onReady) { $('dlgT').textContent = title; $('dlgB').innerHTML = html; $('dlg').showModal(); onReady && onReady($('dlgB')); }
+$('dlgX').addEventListener('click', () => $('dlg').close());
+const pill = s => `<span class="pill p-${s}">${ST[s] || s}</span>`;
+const opt = (arr, sel, empty) => (empty ? `<option value="">${empty}</option>` : '') + arr.map(([v, l]) => `<option value="${esc(v)}"${v === sel ? ' selected' : ''}>${esc(l)}</option>`).join('');
+const formData = f => Object.fromEntries(new FormData(f));
+
+/* ---------------- الصفحات ---------------- */
+const VIEWS = {
+  async home(el) {
+    const m = ORG.modules, today = new Date();
+    const [tasks, bookings, reqs, clients, news] = await Promise.all([
+      m.tasks ? list('tasks') : [], m.bookings ? call('list', { table: 'bookings', from: new Date(today.setHours(0, 0, 0, 0)).toISOString(), to: new Date(today.setHours(23, 59, 59, 0)).toISOString() }).then(r => r.rows) : [],
+      m.requests ? list('requests') : [], m.clients ? list('clients') : [], m.news ? list('news') : []]);
+    const mine = tasks.filter(t => t.assignee === ME.id && t.status !== 'done');
+    const tiles = [];
+    if (m.tasks) tiles.push(['tasks', mine.length, 'مهامي المفتوحة']);
+    if (m.bookings) tiles.push(['bookings', bookings.filter(b => b.status !== 'cancelled').length, 'حجوزات اليوم']);
+    if (m.requests) tiles.push(['requests', reqs.filter(r => r.status === 'new').length, 'طلبات جديدة']);
+    if (m.clients) tiles.push(['clients', clients.length, label('clients')]);
+    el.innerHTML = `<div class="h"><h2>أهلًا ${esc(ME.name.split(' ')[0])}</h2><span class="muted sm">${fmtD(new Date())}</span></div>
+      ${tiles.length ? `<div class="stats">${tiles.map(([k, n, l]) => `<div class="st" data-go="${k}"><b>${n}</b><span>${esc(l)}</span></div>`).join('')}</div>` : ''}
+      ${m.tasks ? `<section class="card"><div class="h"><h2>مهامي</h2><button class="link" data-go="tasks">الكل</button></div>
+        <div class="list">${mine.slice(0, 5).map(taskRow).join('') || '<p class="empty">ما عندك مهام مفتوحة.</p>'}</div></section>` : ''}
+      ${m.news ? `<section class="card"><div class="h"><h2>${esc(label('news'))}</h2>${isAdmin() ? '<button class="link" data-go="news">إدارة</button>' : ''}</div>
+        <div class="list">${news.slice(0, 3).map(n => `<div class="row"><div class="tx"><b>${esc(n.title)}</b><div class="sub">${esc(n.body || '')}</div><div class="sub">${fmtD(n.created_at)}</div></div></div>`).join('') || '<p class="empty">ما فيه تعاميم.</p>'}</div></section>` : ''}
+      ${isAdmin() && PEOPLE.length < 2 ? `<section class="card"><h2 style="margin:0 0 6px">ابدأ بإضافة فريقك</h2><p class="muted" style="margin:0 0 10px">أرسل لموظفيك رمز الانضمام، يدخلون من «انضم لجهة».</p><div class="copyrow"><span class="code">${esc(ORG.join_code)}</span><button class="btn sm" data-copy="${esc(ORG.join_code)}">نسخ الرمز</button></div></section>` : ''}`;
+  },
+
+  async tasks(el) {
+    const rows = await list('tasks'); let f = VIEW_F.tasks || 'mine';
+    const draw = () => {
+      const filt = { mine: t => t.assignee === ME.id && t.status !== 'done', open: t => t.status !== 'done', done: t => t.status === 'done', all: () => true }[f];
+      el.innerHTML = `<div class="h"><h2>${esc(label('tasks'))}</h2><button class="btn sm" id="addT">+ مهمة</button></div>
+        <div class="seg" id="tf">${[['mine', 'مهامي'], ['open', 'المفتوحة'], ['done', 'المنجزة'], ['all', 'الكل']].map(([k, l]) => `<button type="button" data-f="${k}" aria-pressed="${k === f}">${l}</button>`).join('')}</div>
+        <section class="card"><div class="list">${rows.filter(filt).map(taskRow).join('') || '<p class="empty">ما فيه مهام هنا.</p>'}</div></section>`;
+      $('tf').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { f = VIEW_F.tasks = b.dataset.f; draw(); } };
+      $('addT').onclick = () => taskForm();
+      el.querySelectorAll('[data-task]').forEach(r => r.onclick = () => taskForm(rows.find(t => t.id === r.dataset.task)));
+    };
+    draw();
+  },
+
+  async bookings(el) {
+    const day = VIEW_F.day || ymd(new Date());
+    const from = new Date(day + 'T00:00:00'), to = new Date(day + 'T23:59:59');
+    const [res, bk] = await Promise.all([list('resources'), call('list', { table: 'bookings', from: from.toISOString(), to: to.toISOString() }).then(r => r.rows)]);
+    el.innerHTML = `<div class="h"><h2>${esc(label('bookings'))}</h2><button class="btn sm" id="addB"${res.length ? '' : ' disabled'}>+ حجز</button></div>
+      <div class="card" style="display:flex;gap:8px;align-items:center;padding:10px 12px">
+        <button class="btn ghost sm" id="dPrev" aria-label="اليوم السابق">›</button>
+        <input type="date" id="dPick" value="${day}" style="flex:1;min-width:0;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);text-align:center">
+        <button class="btn ghost sm" id="dNext" aria-label="اليوم التالي">‹</button></div>
+      ${res.length ? res.map(r => { const items = bk.filter(b => b.resource_id === r.id);
+        return `<section class="card"><div class="h"><h2 style="font-size:1rem">${esc(r.name)}</h2><span class="muted sm">${esc(r.kind || '')}</span></div>
+          <div class="list">${items.map(b => `<div class="row" data-bk="${b.id}" style="cursor:pointer"><div class="tx"><b>${fmtT(b.starts)} – ${fmtT(b.ends)} · ${esc(b.title)}</b><div class="sub">${esc(b.client_name || who(b.created_by))}${b.phone ? ' · ' + esc(b.phone) : ''}</div></div>${pill(b.status)}</div>`).join('') || '<p class="empty" style="padding:8px">متاح طول اليوم.</p>'}</div></section>`; }).join('')
+        : `<section class="card"><p class="empty">${isAdmin() ? 'أضف أول قاعة أو مورد يُحجز (قاعة، سيارة، جهاز).' : 'ما فيه موارد للحجز بعد. اطلب من مدير النظام إضافتها.'}</p></section>`}
+      ${isAdmin() ? `<button class="btn ghost" id="mngR">إدارة القاعات والموارد</button>` : ''}`;
+    const setDay = d => { VIEW_F.day = d; go('bookings'); };
+    $('dPick').onchange = e => setDay(e.target.value);
+    $('dPrev').onclick = () => { const d = new Date(day + 'T12:00:00'); d.setDate(d.getDate() - 1); setDay(ymd(d)); };
+    $('dNext').onclick = () => { const d = new Date(day + 'T12:00:00'); d.setDate(d.getDate() + 1); setDay(ymd(d)); };
+    $('addB').onclick = () => bookingForm(res, day);
+    el.querySelectorAll('[data-bk]').forEach(r => r.onclick = () => bookingForm(res, day, bk.find(b => b.id === r.dataset.bk)));
+    if ($('mngR')) $('mngR').onclick = () => resourcesDlg(res);
+  },
+
+  async requests(el) {
+    const rows = await list('requests'); let f = VIEW_F.req || 'new';
+    const draw = () => {
+      const items = rows.filter(r => f === 'all' || r.status === f);
+      el.innerHTML = `<div class="h"><h2>${esc(label('requests'))}</h2><button class="btn ghost sm" data-go="settings">رابط البوابة</button></div>
+        <div class="seg" id="rf">${[['new', 'جديدة'], ['review', 'قيد المراجعة'], ['done', 'منجزة'], ['rejected', 'مرفوضة'], ['all', 'الكل']].map(([k, l]) => `<button type="button" data-f="${k}" aria-pressed="${k === f}">${l}</button>`).join('')}</div>
+        <section class="card"><div class="list">${items.map(r => `<div class="row" data-rq="${r.id}" style="cursor:pointer"><div class="tx"><b>${esc(r.subject)}</b><div class="sub">${esc(r.client_name)} · ${esc(r.phone)} · رقم ${esc(r.code)} · ${fmtD(r.created_at)}</div></div>${pill(r.status)}</div>`).join('') || '<p class="empty">ما فيه طلبات هنا. العملاء يرسلون طلباتهم من بوابة جهتك.</p>'}</div></section>`;
+      $('rf').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { f = VIEW_F.req = b.dataset.f; draw(); } };
+      el.querySelectorAll('[data-rq]').forEach(x => x.onclick = () => requestDlg(rows.find(r => r.id === x.dataset.rq)));
+    };
+    draw();
+  },
+
+  async more(el) {
+    const m = ORG.modules;
+    const items = [m.clients && ['clients', label('clients'), 'سجل العملاء وبيانات التواصل'], m.news && ['news', label('news'), 'إعلانات للفريق وللبوابة'],
+      ['team', 'الفريق والأقسام', 'الموظفون وصلاحياتهم ورمز الانضمام'], ['settings', isAdmin() ? 'الإعدادات وتصميم النظام' : 'حسابي', isAdmin() ? 'الاسم واللون والمزايا ورابط البوابة' : 'كلمة المرور والخروج']].filter(Boolean);
+    el.innerHTML = `<h2 style="margin:0">المزيد</h2><section class="card"><div class="list">${items.map(([k, l, s]) => `<div class="row" data-go="${k}" style="cursor:pointer"><div class="tx"><b>${esc(l)}</b><div class="sub">${s}</div></div><span class="muted">‹</span></div>`).join('')}</div></section>
+      <p class="muted sm" style="text-align:center">بصمة الحضور لموظفيك: <a class="link" href="../basma/" target="_blank" rel="noopener">بصمة إنجاز</a></p>`;
+  },
+
+  async clients(el) {
+    const rows = await list('clients'); let q = '';
+    const draw = () => {
+      const items = rows.filter(c => !q || (c.name + ' ' + (c.phone || '')).includes(q));
+      el.innerHTML = `<div class="h"><h2>${esc(label('clients'))}</h2><button class="btn sm" id="addC">+ عميل</button></div>
+        <input id="cq" placeholder="ابحث بالاسم أو الهاتف" value="${esc(q)}" style="padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)">
+        <section class="card"><div class="list">${items.map(c => `<div class="row" data-cl="${c.id}" style="cursor:pointer"><div class="tx"><b>${esc(c.name)}</b><div class="sub" dir="auto">${esc([c.phone, c.email].filter(Boolean).join(' · '))}</div></div></div>`).join('') || '<p class="empty">ما فيه عملاء بعد.</p>'}</div></section>`;
+      $('cq').oninput = e => { q = e.target.value.trim(); const p = e.target.selectionStart; draw(); $('cq').focus(); $('cq').setSelectionRange(p, p); };
+      $('addC').onclick = () => clientForm();
+      el.querySelectorAll('[data-cl]').forEach(x => x.onclick = () => clientForm(rows.find(c => c.id === x.dataset.cl)));
+    };
+    draw();
+  },
+
+  async news(el) {
+    const rows = await list('news');
+    el.innerHTML = `<div class="h"><h2>${esc(label('news'))}</h2>${isAdmin() ? '<button class="btn sm" id="addN">+ تعميم</button>' : ''}</div>
+      <section class="card"><div class="list">${rows.map(n => `<div class="row"><div class="tx"><b>${esc(n.title)}</b><div class="sub">${esc(n.body || '')}</div><div class="sub">${fmtD(n.created_at)} · ${esc(who(n.created_by))}</div></div>${isAdmin() ? `<button class="link" data-del="${n.id}">حذف</button>` : ''}</div>`).join('') || '<p class="empty">ما فيه تعاميم.</p>'}</div></section>`;
+    if ($('addN')) $('addN').onclick = () => dialog('تعميم جديد', `<form class="form" id="nf"><label class="f"><span>العنوان</span><input name="title" required></label><label class="f"><span>التفاصيل</span><textarea name="body"></textarea></label><p class="muted sm" style="margin:0">يظهر لفريقك، وفي بوابة العملاء.</p><button class="btn">نشر</button></form>`,
+      b => b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('news', formData(e.target)); $('dlg').close(); toast('نُشر ✓'); go('news'); } catch (er) { toast(er.message); } });
+    el.querySelectorAll('[data-del]').forEach(x => x.onclick = async () => { try { await call('remove', { table: 'news', id: x.dataset.del }); toast('حُذف'); go('news'); } catch (er) { toast(er.message); } });
+  },
+
+  async team(el) {
+    el.innerHTML = `<div class="h"><h2>الفريق والأقسام</h2></div>
+      ${isAdmin() ? `<section class="card"><h2 style="margin:0 0 4px;font-size:1rem">أضف موظفين</h2><p class="muted sm" style="margin:0 0 10px">أرسل لهم الرابط والرمز. يدخلون من «انضم لجهة» ويسجلون بأنفسهم.</p>
+        <div class="copyrow"><span class="code">${esc(ORG.join_code)}</span><button class="btn sm" data-copy="${esc(location.origin + location.pathname)}\nرمز الجهة: ${esc(ORG.join_code)}">نسخ الدعوة</button><button class="link" id="newCode">رمز جديد</button></div></section>` : ''}
+      <section class="card"><div class="h"><h2 style="font-size:1rem">الأقسام</h2>${isAdmin() ? '<button class="btn sm ghost" id="addD">+ قسم</button>' : ''}</div>
+        <div class="list">${DEPTS.map(d => `<div class="row"><div class="tx"><b>${esc(d.name)}</b><div class="sub">${PEOPLE.filter(p => p.dept_id === d.id).length} موظف</div></div>${isAdmin() ? `<button class="link" data-dd="${d.id}">حذف</button>` : ''}</div>`).join('') || '<p class="empty">ما فيه أقسام بعد.</p>'}</div></section>
+      <section class="card"><h2 style="margin:0 0 4px;font-size:1rem">الموظفون (${PEOPLE.length})</h2><div class="list">${PEOPLE.map(p => `<div class="row"${isAdmin() ? ` data-pp="${p.id}" style="cursor:pointer"` : ''}><div class="tx"><b>${esc(p.name)}${p.active ? '' : ' <span class="pill p-cancelled">موقوف</span>'}</b><div class="sub">${esc([ROLE[p.role], p.title, deptName(p.dept_id)].filter(Boolean).join(' · '))}</div></div></div>`).join('')}</div></section>`;
+    if ($('newCode')) $('newCode').onclick = async () => { try { ORG = (await call('org_update', { new_code: true })).org; toast('صار عندك رمز جديد، والقديم توقف'); go('team'); } catch (e) { toast(e.message); } };
+    if ($('addD')) $('addD').onclick = () => dialog('قسم جديد', `<form class="form"><label class="f"><span>اسم القسم</span><input name="name" required></label><button class="btn">إضافة</button></form>`,
+      b => b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('depts', formData(e.target)); $('dlg').close(); await boot(); go('team'); } catch (er) { toast(er.message); } });
+    el.querySelectorAll('[data-dd]').forEach(x => x.onclick = async () => { try { await call('remove', { table: 'depts', id: x.dataset.dd }); await boot(); go('team'); } catch (er) { toast(er.message); } });
+    el.querySelectorAll('[data-pp]').forEach(x => x.onclick = () => memberDlg(PEOPLE.find(p => p.id === x.dataset.pp)));
+  },
+
+  async settings(el) {
+    const portal = location.origin + location.pathname.replace(/[^/]*$/, '') + 'portal/?o=' + ORG.slug;
+    el.innerHTML = `<h2 style="margin:0">${isAdmin() ? 'الإعدادات وتصميم النظام' : 'حسابي'}</h2>
+      ${isAdmin() ? `<form class="card form" id="orgF">
+        <h2 style="margin:0;font-size:1rem">هوية الجهة</h2>
+        <label class="f"><span>اسم الجهة</span><input name="name" value="${esc(ORG.name)}" required></label>
+        <div class="f"><span>نوع الجهة</span><div class="kinds">${Object.entries(KINDS).map(([k, v]) => `<label><input type="radio" name="kind" value="${k}"${ORG.kind === k ? ' checked' : ''}><span>${v}</span></label>`).join('')}</div></div>
+        <div class="f"><span>لون النظام</span><div class="sw" id="sw">${COLORS.map(c => `<button type="button" data-c="${c}" style="background:${c}" aria-label="${c}" aria-pressed="${c === ORG.color}"></button>`).join('')}</div></div>
+        <h2 style="margin:6px 0 0;font-size:1rem">صمّم نظامك</h2><p class="muted sm" style="margin:-6px 0 0">فعّل المزايا اللي تحتاجها جهتك، وسمّها بالأسماء اللي تستخدمونها.</p>
+        <div>${Object.entries(MODS).map(([k, v]) => `<div class="tog"><input type="checkbox" name="m_${k}" id="m_${k}"${ORG.modules[k] ? ' checked' : ''} aria-label="${v}"><input name="l_${k}" value="${esc(label(k))}" style="flex:1;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)" aria-label="اسم ${v}"></div>`).join('')}</div>
+        <div class="g2"><label class="f"><span>بداية الدوام</span><input type="time" name="ws" value="${esc(ORG.work?.start || '07:30')}" dir="ltr"></label><label class="f"><span>نهاية الدوام</span><input type="time" name="we" value="${esc(ORG.work?.end || '14:30')}" dir="ltr"></label></div>
+        <button class="btn">حفظ</button></form>
+      <section class="card"><h2 style="margin:0 0 4px;font-size:1rem">بوابة العملاء</h2><p class="muted sm" style="margin:0 0 10px">رابط جهتك للعملاء: يرسلون طلباتهم ويحجزون ويتابعون بدون حساب.</p>
+        <div class="copyrow"><span class="url">${esc(portal)}</span><button class="btn sm" data-copy="${esc(portal)}">نسخ</button><a class="btn ghost sm" href="${esc(portal)}" target="_blank" rel="noopener">فتح</a></div></section>` : ''}
+      <form class="card form" id="pwF"><h2 style="margin:0;font-size:1rem">كلمة المرور</h2>
+        <label class="f"><span>الحالية</span><input type="password" name="old" dir="ltr" autocomplete="current-password" required></label>
+        <label class="f"><span>الجديدة</span><input type="password" name="new" dir="ltr" minlength="8" autocomplete="new-password" required></label>
+        <button class="btn ghost">تغيير</button></form>
+      <button class="btn bad" id="out">تسجيل الخروج</button>`;
+    let color = ORG.color;
+    if ($('sw')) $('sw').onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; color = b.dataset.c; document.documentElement.style.setProperty('--accent', color); $('sw').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); };
+    if ($('orgF')) $('orgF').onsubmit = async e => {
+      e.preventDefault(); const d = formData(e.target);
+      const modules = {}, labels = {}; for (const k of Object.keys(MODS)) { modules[k] = !!d['m_' + k]; if (d['l_' + k] && d['l_' + k] !== MODS[k]) labels[k] = d['l_' + k]; }
+      try { ORG = (await call('org_update', { name: d.name, kind: d.kind, color, modules, labels, work: { start: d.ws, end: d.we } })).org; applyOrg(); renderNav(); toast('انحفظ ✓'); } catch (er) { toast(er.message); }
+    };
+    $('pwF').onsubmit = async e => { e.preventDefault(); try { await call('password', formData(e.target)); e.target.reset(); toast('تغيّرت كلمة المرور ✓'); } catch (er) { toast(er.message); } };
+    $('out').onclick = () => logout();
+  },
+};
+const VIEW_F = {};
+
+/* ---------------- النماذج ---------------- */
+function taskRow(t) {
+  return `<div class="row" data-task="${t.id}" style="cursor:pointer"><div class="tx"><b>${esc(t.title)}</b><div class="sub">${esc([t.assignee ? who(t.assignee) : 'بدون تكليف', deptName(t.dept_id), t.due ? 'موعدها ' + fmtD(t.due) : ''].filter(Boolean).join(' · '))}</div></div>${pill(t.status)}</div>`;
+}
+function taskForm(t) {
+  const people = PEOPLE.filter(p => p.active).map(p => [p.id, p.name]);
+  dialog(t ? 'مهمة' : 'مهمة جديدة', `<form class="form">
+    <label class="f"><span>المهمة</span><input name="title" value="${esc(t?.title)}" required></label>
+    <label class="f"><span>التفاصيل</span><textarea name="details">${esc(t?.details)}</textarea></label>
+    <div class="g2"><label class="f"><span>المكلّف</span><select name="assignee">${opt(people, t ? t.assignee : ME.id, 'بدون')}</select></label>
+    <label class="f"><span>القسم</span><select name="dept_id">${opt(DEPTS.map(d => [d.id, d.name]), t?.dept_id ?? ME.dept_id, 'بدون')}</select></label></div>
+    <div class="g2"><label class="f"><span>الموعد</span><input type="date" name="due" value="${esc(t?.due)}"></label>
+    <label class="f"><span>الحالة</span><select name="status">${opt(Object.entries({ new: ST.new, doing: ST.doing, done: ST.done }), t?.status || 'new')}</select></label></div>
+    <button class="btn">${t ? 'حفظ' : 'إضافة'}</button>${t && (isAdmin() || t.created_by === ME.id) ? '<button type="button" class="btn bad" id="delT">حذف المهمة</button>' : ''}</form>`,
+    b => {
+      b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('tasks', { ...formData(e.target), id: t?.id }); $('dlg').close(); toast('انحفظ ✓'); go('tasks'); } catch (er) { toast(er.message); } };
+      if (b.querySelector('#delT')) b.querySelector('#delT').onclick = async () => { try { await call('remove', { table: 'tasks', id: t.id }); $('dlg').close(); go('tasks'); } catch (er) { toast(er.message); } };
+    });
+}
+function bookingForm(res, day, bk) {
+  const t = d => d ? `${pad(new Date(d).getHours())}:${pad(new Date(d).getMinutes())}` : '';
+  dialog(bk ? 'حجز' : 'حجز جديد', `<form class="form">
+    <label class="f"><span>المورد</span><select name="resource_id">${opt(res.map(r => [r.id, r.name]), bk?.resource_id)}</select></label>
+    <label class="f"><span>الغرض</span><input name="title" value="${esc(bk?.title)}" required placeholder="مثال: اجتماع اللجنة"></label>
+    <div class="g2"><label class="f"><span>اليوم</span><input type="date" name="day" value="${bk ? ymd(new Date(bk.starts)) : day}" required></label>
+    <div class="g2"><label class="f"><span>من</span><input type="time" name="from" value="${t(bk?.starts) || '09:00'}" required></label><label class="f"><span>إلى</span><input type="time" name="to" value="${t(bk?.ends) || '10:00'}" required></label></div></div>
+    <div class="g2"><label class="f"><span>اسم العميل (اختياري)</span><input name="client_name" value="${esc(bk?.client_name)}"></label><label class="f"><span>الهاتف</span><input name="phone" dir="ltr" value="${esc(bk?.phone)}"></label></div>
+    ${bk ? `<label class="f"><span>الحالة</span><select name="status">${opt(Object.entries({ pending: ST.pending, confirmed: ST.confirmed, cancelled: ST.cancelled }), bk.status)}</select></label>` : ''}
+    <p class="err" id="bErr" hidden></p><button class="btn">${bk ? 'حفظ' : 'احجز'}</button></form>`,
+    b => b.querySelector('form').onsubmit = async e => {
+      e.preventDefault(); const d = formData(e.target);
+      const row = { id: bk?.id, resource_id: d.resource_id, title: d.title, client_name: d.client_name, phone: d.phone, starts: new Date(`${d.day}T${d.from}:00`).toISOString(), ends: new Date(`${d.day}T${d.to}:00`).toISOString() };
+      if (d.status) row.status = d.status;
+      try { await save('bookings', row); $('dlg').close(); toast('انحفظ ✓'); VIEW_F.day = d.day; go('bookings'); } catch (er) { const x = b.querySelector('#bErr'); x.textContent = er.message; x.hidden = false; }
+    });
+}
+function resourcesDlg(res) {
+  dialog('القاعات والموارد', `<div class="list">${res.map(r => `<div class="row"><div class="tx"><b>${esc(r.name)}</b><div class="sub">${esc(r.kind || '')}${r.public ? ' · يظهر في البوابة' : ''}</div></div><button class="link" data-rd="${r.id}">حذف</button></div>`).join('') || '<p class="empty">ما فيه موارد.</p>'}</div>
+    <form class="form" style="margin-top:12px"><div class="g2"><label class="f"><span>الاسم</span><input name="name" required placeholder="قاعة الاجتماعات"></label><label class="f"><span>النوع</span><input name="kind" placeholder="قاعة / سيارة / جهاز"></label></div>
+    <label class="tog" style="border:0"><span>يقدر العملاء يطلبون حجزه من البوابة</span><input type="checkbox" name="public" checked></label><button class="btn">إضافة</button></form>`,
+    b => {
+      b.querySelector('form').onsubmit = async e => { e.preventDefault(); const d = formData(e.target); try { await save('resources', { name: d.name, kind: d.kind, public: !!d.public }); $('dlg').close(); go('bookings'); } catch (er) { toast(er.message); } };
+      b.querySelectorAll('[data-rd]').forEach(x => x.onclick = async () => { try { await call('remove', { table: 'resources', id: x.dataset.rd }); $('dlg').close(); go('bookings'); } catch (er) { toast(er.message); } });
+    });
+}
+function requestDlg(r) {
+  dialog('طلب رقم ' + r.code, `<div class="form"><div><b>${esc(r.subject)}</b><p class="muted" style="margin:4px 0;white-space:pre-wrap">${esc(r.details || '')}</p><p class="sub muted" style="margin:0">${esc(r.client_name)} · <span dir="ltr">${esc(r.phone)}</span> · ${fmtD(r.created_at)}</p></div>
+    <form class="form"><label class="f"><span>الحالة</span><select name="status">${opt(Object.entries({ new: ST.new, review: ST.review, done: ST.done, rejected: ST.rejected }), r.status)}</select></label>
+    <label class="f"><span>الرد للعميل (يشوفه في البوابة)</span><textarea name="reply">${esc(r.reply)}</textarea></label><button class="btn">حفظ</button></form></div>`,
+    b => b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('requests', { ...formData(e.target), id: r.id }); $('dlg').close(); toast('انحفظ ✓'); go('requests'); } catch (er) { toast(er.message); } });
+}
+function clientForm(c) {
+  dialog(c ? 'عميل' : 'عميل جديد', `<form class="form"><label class="f"><span>الاسم</span><input name="name" value="${esc(c?.name)}" required></label>
+    <div class="g2"><label class="f"><span>الهاتف</span><input name="phone" dir="ltr" value="${esc(c?.phone)}"></label><label class="f"><span>البريد</span><input name="email" type="email" dir="ltr" value="${esc(c?.email)}"></label></div>
+    <label class="f"><span>ملاحظات</span><textarea name="notes">${esc(c?.notes)}</textarea></label><button class="btn">حفظ</button>${c ? '<button type="button" class="btn bad" id="delC">حذف</button>' : ''}</form>`,
+    b => {
+      b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('clients', { ...formData(e.target), id: c?.id }); $('dlg').close(); toast('انحفظ ✓'); go('clients'); } catch (er) { toast(er.message); } };
+      if (b.querySelector('#delC')) b.querySelector('#delC').onclick = async () => { try { await call('remove', { table: 'clients', id: c.id }); $('dlg').close(); go('clients'); } catch (er) { toast(er.message); } };
+    });
+}
+function memberDlg(p) {
+  dialog(p.name, `<form class="form"><p class="muted sm" style="margin:0" dir="ltr">${esc(p.email)}</p>
+    ${p.role !== 'owner' ? `<label class="f"><span>الصلاحية</span><select name="role">${opt([['member', 'موظف'], ['admin', 'مدير']], p.role)}</select></label>` : ''}
+    <label class="f"><span>المسمى الوظيفي</span><input name="title" value="${esc(p.title)}"></label>
+    <label class="f"><span>القسم</span><select name="dept_id">${opt(DEPTS.map(d => [d.id, d.name]), p.dept_id, 'بدون')}</select></label>
+    ${p.role !== 'owner' && p.id !== ME.id ? `<label class="tog" style="border:0"><span>الحساب فعّال</span><input type="checkbox" name="active"${p.active ? ' checked' : ''}></label>` : ''}
+    <button class="btn">حفظ</button></form>`,
+    b => b.querySelector('form').onsubmit = async e => {
+      e.preventDefault(); const d = formData(e.target); const body = { id: p.id, title: d.title, dept_id: d.dept_id || null };
+      if (d.role) body.role = d.role; if (p.role !== 'owner' && p.id !== ME.id) body.active = !!d.active;
+      try { await call('member_update', body); $('dlg').close(); await boot(); go('team'); } catch (er) { toast(er.message); }
+    });
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-copy]'); if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.copy); toast('انْسخ ✓'); } catch { toast(b.dataset.copy); }
+});
+
+/* ---------------- البدء ---------------- */
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+(async () => {
+  if (TOKEN) { try { await boot(); return; } catch {} }
+  $('authView').hidden = false; renderAuth();
+})();
+</script>
+<script src="../brand/brand.js" data-app="biz" defer></script>
+</body>
+</html>
