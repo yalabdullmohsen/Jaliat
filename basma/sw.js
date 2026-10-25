@@ -1,4 +1,4 @@
-const C = 'basma-v23';
+const C = 'basma-v25';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'logo-192.png', 'logo-180.png', 'logo-64.png'];
 
 self.addEventListener('install', e => {

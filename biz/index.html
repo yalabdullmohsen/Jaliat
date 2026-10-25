@@ -13,21 +13,21 @@
 <link rel="apple-touch-icon" href="logo-180.png">
 <link rel="icon" type="image/png" href="logo-64.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
 /* منظومة إنجاز «عاجي ملكي» — --accent يأخذ لون الجهة */
 :root{
-  --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#F2F1EC; --ink:#1F2A25; --muted:#6C7872; --line:#E6E3DB;
-  --accent:#2F6B57; --accent-ink:#FFFFFF; --accent-fg:var(--accent); --gold:#957631; --gold-soft:#F5EFE0;
-  --ok:#2F7D57; --oks:#E6F2EC; --warn:#946E1F; --warns:#F7F0E1; --bad:#B0564A; --bads:#F7E9E6;
-  --side:#1E3A31; --side-ink:#F2F6F4; --side-muted:#B9CCC3;
-  --shadow:0 1px 2px rgba(31,42,37,.04),0 6px 20px rgba(31,42,37,.05);
-  --f:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif; color-scheme:light;
+  --bg:#F3F4F6; --surface:#FFFFFF; --surface-2:#F3F4F6; --ink:#0B0B0F; --muted:#6B7280; --line:#E5E7EB;
+  --accent:#2563EB; --accent-ink:#FFFFFF; --accent-fg:var(--accent); --gold:#B45309; --gold-soft:#FEF3C7;
+  --ok:#16A34A; --oks:#DCFCE7; --warn:#B45309; --warns:#FEF3C7; --bad:#DC2626; --bads:#FEE2E2;
+  --side:#0B0B0F; --side-ink:#FFFFFF; --side-muted:#9CA3AF;
+  --shadow:0 1px 2px rgba(11,11,15,.04);
+  --f:"Noto Sans Arabic","Segoe UI",Tahoma,sans-serif; color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#111614; --surface:#181E1B; --surface-2:#1E2522; --ink:#E2E8E5; --muted:#97A39D; --line:#28302C;
-  --gold:#D3B46C; --gold-soft:#2A2517; --ok:#7CBF9E; --oks:#1B2A23; --warn:#D9B76A; --warns:#2B2618; --bad:#E39488; --bads:#2E1D1A;
-  --side:#0F1513; --side-ink:#E2E8E5; --side-muted:#97A39D; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+  --bg:#0B0B0F; --surface:#14151A; --surface-2:#1B1C22; --ink:#F3F4F6; --muted:#9CA3AF; --line:#26272E;
+  --gold:#FBBF24; --gold-soft:#2A2410; --ok:#4ADE80; --oks:#11261A; --warn:#FBBF24; --warns:#2A2410; --bad:#F87171; --bads:#2D1517;
+  --side:#000000; --side-ink:#F3F4F6; --side-muted:#9CA3AF; --shadow:none; color-scheme:dark;
   --accent-fg:color-mix(in srgb,var(--accent) 55%,#ffffff);
 }}
 *{box-sizing:border-box} [hidden]{display:none!important} html,body{margin:0}
@@ -173,7 +173,7 @@ let TOKEN = LS.g('t'), ME = null, ORG = null, PEOPLE = [], DEPTS = [], VIEW = 'h
 const KINDS = { gov: 'جهة حكومية', inst: 'مؤسسة', authority: 'هيئة', company: 'شركة' };
 const MODS = { tasks: 'المهام', bookings: 'الحجوزات', requests: 'طلبات العملاء', clients: 'العملاء', news: 'التعاميم' };
 const ST = { new: 'جديدة', doing: 'قيد التنفيذ', done: 'منجزة', review: 'قيد المراجعة', rejected: 'مرفوض', pending: 'بانتظار الموافقة', confirmed: 'مؤكد', cancelled: 'ملغي' };
-const COLORS = ['#2F6B57', '#1F5F8B', '#6B4BB0', '#9B3D4A', '#B8601F', '#3D5A6B', '#957631', '#1E3A31'];
+const COLORS = ['#2563EB', '#0F766E', '#7C3AED', '#DC2626', '#EA580C', '#0B0B0F', '#CA8A04', '#475569'];
 const ROLE = { owner: 'المالك', admin: 'مدير', member: 'موظف' };
 const label = k => (ORG?.labels?.[k]) || MODS[k];
 const isAdmin = () => ME && (ME.role === 'owner' || ME.role === 'admin');
@@ -241,7 +241,7 @@ function renderNav() {
   $('nav').innerHTML = items.map(([k, l]) => `<button type="button" data-go="${k}"${VIEW === k || (k === 'more' && ['clients', 'team', 'settings', 'news'].includes(VIEW)) ? ' aria-current="page"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><span>${esc(l)}</span></button>`).join('');
 }
 function applyOrg() {
-  document.documentElement.style.setProperty('--accent', ORG.color || '#2F6B57');
+  document.documentElement.style.setProperty('--accent', ORG.color || '#2563EB');
   $('orgName').textContent = ORG.name; $('orgSub').textContent = `${KINDS[ORG.kind] || ''} · ${ME.name} (${ROLE[ME.role]})`;
   document.title = ORG.name + ' — إنجاز أعمال';
 }
