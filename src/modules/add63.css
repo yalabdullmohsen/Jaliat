@@ -1,0 +1,71 @@
+/* ===================== v81: macOS feel — same «عاجي ملكي» colours, MacBook-style surfaces ===================== */
+/* system font first on Apple devices (SF Arabic), Plex elsewhere */
+:root{ --f-body:-apple-system,BlinkMacSystemFont,"SF Arabic","SF Pro Text","IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --mac-r:12px; --mac-rs:8px; --mac-hair:0 0 0 .5px rgba(40,30,10,.10);
+  --mac-sh:0 0 0 .5px rgba(40,30,10,.08),0 1px 2px rgba(40,30,10,.04),0 10px 28px -14px rgba(40,30,10,.18);
+  --mac-sh-h:0 0 0 .5px rgba(40,30,10,.10),0 2px 4px rgba(40,30,10,.05),0 18px 40px -18px rgba(40,30,10,.26);
+  --mac-glass:rgba(250,247,240,.72); --mac-focus:0 0 0 3.5px color-mix(in srgb,var(--primary) 28%,transparent) }
+:root[data-theme="dark"]{ --mac-hair:0 0 0 .5px rgba(255,255,255,.08);
+  --mac-sh:0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.4),0 12px 30px -14px rgba(0,0,0,.6);
+  --mac-sh-h:0 0 0 .5px rgba(255,255,255,.10),0 2px 4px rgba(0,0,0,.45),0 20px 44px -18px rgba(0,0,0,.75);
+  --mac-glass:rgba(22,28,25,.70) }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){ --mac-glass:rgba(22,28,25,.70) }}
+body{font-family:var(--f-body);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+html{accent-color:var(--primary)}
+
+/* sidebar like Finder: frosted glass, rounded selection */
+:root #side.side{background:var(--mac-glass)!important;-webkit-backdrop-filter:saturate(1.8) blur(24px);backdrop-filter:saturate(1.8) blur(24px)}
+:root #side .nav button{border-radius:var(--mac-rs)!important;min-height:32px;padding-block:5px!important;transition:background .12s}
+:root #side .nav button[aria-current="page"]{box-shadow:none!important}
+:root #side .nav-q input{border-radius:var(--mac-rs)!important;height:30px}
+:root #side .nav .sep{font-size:11px!important;letter-spacing:.02em;opacity:.85}
+
+/* toolbar like a Mac window title bar */
+:root .top{background:var(--mac-glass)!important;-webkit-backdrop-filter:saturate(1.8) blur(20px)!important;backdrop-filter:saturate(1.8) blur(20px)!important;border-bottom:.5px solid color-mix(in srgb,var(--ink) 12%,transparent)!important;box-shadow:none!important}
+:root .top .btn,:root .top .finder,:root .top .menu-btn,:root .top .back-btn{border-radius:var(--mac-rs)!important;box-shadow:var(--mac-hair)!important;border-color:transparent!important}
+:root .top .finder{box-shadow:none!important}
+
+/* windows (cards & panels): Mac radius + layered shadow instead of borders */
+:root .panel,:root .card,:root .kpi,:root .mw,:root .wq-tile,:root .check,:root .rq-card,:root .dc,:root .rc,:root .lt,:root .hall-c,:root .sp-i,:root .pv-list,:root .pv-hd,:root .wo-i,:root .wq-i{border-radius:var(--mac-r)!important;border-color:transparent!important;box-shadow:var(--mac-sh)!important}
+@media (hover:hover){:root .kpi:hover,:root .wq-tile:hover,:root .rq-card:hover{box-shadow:var(--mac-sh-h)!important}}
+:root .hx{border-radius:16px!important}
+:root .panel-h{border-bottom:.5px solid color-mix(in srgb,var(--ink) 10%,transparent)!important}
+
+/* push buttons */
+:root .btn{border-radius:var(--mac-rs)!important;font-weight:600;letter-spacing:0}
+:root .btn-ghost,:root .btn:not(.btn-primary):not(.btn-ok){background:var(--surface);box-shadow:var(--mac-hair),0 1px 1px rgba(40,30,10,.05);border-color:transparent!important}
+:root .btn-primary,:root .btn-ok{background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 88%,#fff),var(--primary))!important;box-shadow:0 0 0 .5px color-mix(in srgb,var(--primary) 80%,#000),0 1px 2px rgba(0,0,0,.15)!important;border:0!important}
+:root .hx-b{border-radius:var(--mac-rs)!important}
+
+/* fields & focus ring like macOS */
+:root .f,:root input.f,:root select.f,:root textarea.f{border-radius:7px!important;border-color:transparent!important;box-shadow:var(--mac-hair),inset 0 1px 1px rgba(40,30,10,.04)!important}
+:root .f:focus,:root input.f:focus,:root select.f:focus,:root textarea.f:focus{outline:0;box-shadow:0 0 0 .5px var(--primary),var(--mac-focus)!important}
+:root :focus-visible{outline:0;box-shadow:var(--mac-focus)!important;border-radius:var(--mac-rs)}
+
+/* segmented controls like macOS */
+:root .seg,:root .rn-seg,:root .stabs{border-radius:9px!important;padding:2px!important;background:color-mix(in srgb,var(--ink) 6%,var(--surface))!important;border:0!important}
+:root .seg button,:root .rn-seg button,:root .stabs button{border-radius:7px!important}
+:root .seg button.on,:root .rn-seg button.on,:root .stabs button.on{background:var(--surface)!important;box-shadow:0 0 0 .5px rgba(40,30,10,.10),0 1px 2px rgba(40,30,10,.12)!important}
+
+/* tables: Finder list rows */
+:root thead th{background:transparent!important;border-bottom:.5px solid color-mix(in srgb,var(--ink) 14%,transparent)!important;font-size:12px}
+:root tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--ink) 2.2%,transparent)}
+:root tbody td{border-bottom:0!important}
+
+/* sheets & popovers */
+:root .drawer{border-radius:14px 0 0 14px;box-shadow:0 0 0 .5px rgba(0,0,0,.12),-30px 0 60px -20px rgba(0,0,0,.28)!important}
+[dir="rtl"] .drawer,:root[dir="rtl"] .drawer{border-radius:0 14px 14px 0}
+:root .toast{border-radius:12px!important;background:color-mix(in srgb,var(--ink) 88%,transparent)!important;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+:root .chip{border-radius:6px!important}
+:root .nf-b,:root .nb,:root .ng-n{border-radius:999px!important}
+
+/* thin overlay scrollbars */
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 22%,transparent);border-radius:10px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background-color:color-mix(in srgb,var(--ink) 38%,transparent)}
+
+/* phone: iOS-style frosted tab bar */
+@media (max-width:700px){
+  :root .tabbar{background:color-mix(in srgb,var(--bg) 96%,transparent)!important;-webkit-backdrop-filter:saturate(1.8) blur(20px);backdrop-filter:saturate(1.8) blur(20px);border-top:.5px solid color-mix(in srgb,var(--ink) 12%,transparent)!important;box-shadow:none!important}
+  :root .panel,:root .card,:root .kpi,:root .mw{border-radius:14px!important}
+}
