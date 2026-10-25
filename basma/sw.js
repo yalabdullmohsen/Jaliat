@@ -1,4 +1,4 @@
-const C = 'basma-v8';
+const C = 'basma-v9';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'logo-192.png', 'logo-180.png', 'logo-64.png'];
 
 self.addEventListener('install', e => {
@@ -22,8 +22,8 @@ self.addEventListener('fetch', e => {
 
 self.addEventListener('push', e => {
   let d = {};
-  try { d = e.data ? e.data.json() : {}; } catch { d = { title: 'تذكير البصمة', body: e.data && e.data.text() }; }
-  e.waitUntil(self.registration.showNotification(d.title || 'تذكير البصمة', {
+  try { d = e.data ? e.data.json() : {}; } catch { d = { title: 'بصمة إنجاز', body: e.data && e.data.text() }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'بصمة إنجاز', {
     body: d.body || '',
     tag: d.tag || 'basma',
     icon: 'logo-192.png',

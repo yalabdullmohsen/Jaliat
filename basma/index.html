@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>تذكير البصمة</title>
+<title>بصمة إنجاز</title>
+<meta name="author" content="يوسف عبد المحسن المطيري">
 <meta name="theme-color" content="#1E3A31">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="البصمة">
+<meta name="apple-mobile-web-app-title" content="بصمة إنجاز">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="logo-180.png">
@@ -154,7 +155,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 <header class="top">
   <div class="in">
     <img src="logo-180.png" alt="">
-    <div class="ttl"><h1>تذكير البصمة</h1><div class="d" id="today"></div></div>
+    <div class="ttl"><h1>بصمة إنجاز</h1><div class="d" id="today"></div></div>
     <button class="rf" id="refresh" type="button" aria-label="تحديث الصفحة">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 21v-5h-5"/></svg>
     </button>
@@ -347,8 +348,8 @@ function note(html) { $('note').innerHTML = html; $('note').hidden = !html; }
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const pushOK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
-const INSTALL = '<b>خطوة وحدة قبل أول استخدام</b>من سفاري اضغط زر المشاركة ← «إضافة إلى الشاشة الرئيسية»، ثم افتح «البصمة» من الشاشة الرئيسية.';
-const DENIED = '<b>الإشعارات مقفلة</b>الإعدادات ← الإشعارات ← البصمة، وفعّل السماح.';
+const INSTALL = '<b>خطوة وحدة قبل أول استخدام</b>من سفاري اضغط زر المشاركة ← «إضافة إلى الشاشة الرئيسية»، ثم افتح «بصمة إنجاز» من الشاشة الرئيسية.';
+const DENIED = '<b>الإشعارات مقفلة</b>الإعدادات ← الإشعارات ← بصمة إنجاز، وفعّل السماح.';
 let reg = null;
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { scope: './' }).then(r => reg = r).catch(() => {});
 function b64ToBytes(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
@@ -550,5 +551,6 @@ applySettings(); render(); pullCloud();
 setInterval(() => { if (!$('v-day').hidden && !editing) render(); }, 30000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && !editing) { pullCloud(); render(); if (!$('v-rep').hidden) renderReport(); } });
 </script>
+<script src="../brand/brand.js" data-app="basma" defer></script>
 </body>
 </html>

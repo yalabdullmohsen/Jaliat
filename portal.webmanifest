@@ -1,0 +1,16 @@
+{
+  "name": "بوابة إنجاز",
+  "short_name": "بوابة إنجاز",
+  "description": "بوابة المنسقين والخطباء — منظومة إنجاز",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "portal.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6F5F0",
+  "theme_color": "#0F5440",
+  "icons": [
+    { "src": "brand/bawaba-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "brand/bawaba-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

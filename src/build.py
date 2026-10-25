@@ -156,6 +156,9 @@ if os.path.exists(_cfg_p):
     for k, old in DEF.items():
         new = CFG.get(k) or old
         if new != old: s = s.replace(old, new)
+# --- منظومة إنجاز: الهوية الموحّدة وسطر الحقوق (brand/brand.js) ---
+if "brand/brand.js" not in s:
+    _i = s.rfind("</body>"); s = s[:_i] + '<script src="brand/brand.js" data-app="injaz" defer></script>\n' + s[_i:]
 open(os.path.join(D, "index.html"), "w", encoding="utf8").write(s)
 print("ok", len(s))
 

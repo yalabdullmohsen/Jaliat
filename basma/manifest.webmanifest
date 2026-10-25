@@ -1,6 +1,6 @@
 {
-  "name": "تذكير البصمة",
-  "short_name": "البصمة",
+  "name": "بصمة إنجاز",
+  "short_name": "بصمة إنجاز",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./",
