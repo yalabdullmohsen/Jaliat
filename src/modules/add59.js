@@ -34,3 +34,42 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
   if (D.sdday) return sdLoad(D.sdday); if (D.sdach) return sdAch(D.sdach); if (D.sdsave !== undefined) return sdSave(t); });
 document.addEventListener("change", ev => { if (ev.target.id === "sd-d" && ev.target.value) sdLoad(ev.target.value); });
 NEWF.splice(1, 0, ["v75-staff", "nav:staffday", "نشاط الموظفين اليومي", "ما عمله كل موظف في اليوم: من أي ساعة إلى أي ساعة، وكم تعديل وعلى ماذا، مع زر «سجّل إنجازاً له» في سجل الإنجاز.", true, "2026-10-22"]);
+
+/* ===== ترتيب الرئيسية وتنظيفها (عام لكل الموظفين) ===== */
+function homeTidy(){
+  const V = document.getElementById("view"); if (!V) return; const H = V.querySelector(":scope > .home"); if (!H || H.dataset.tidy) return; H.dataset.tidy = "1";
+  const q = s => V.querySelector(s), mk = (c, t = "div") => { const e = document.createElement(t); e.className = c; return e; };
+  const hx = q(":scope > .hx"), mw = q(":scope > .mw"), nf = q(":scope > .nf-card");
+  const prio = H.querySelector(":scope > .prio"), ls = H.querySelector(":scope > .ls"), kp = H.querySelector(":scope > .kpis"), grid = H.querySelector(":scope > .home-grid");
+  const week = [...H.children].find(e => e.classList.contains("panel") && !e.classList.contains("prio"));
+  // 1) تنبيهات الإعداد في شريط واحد نحيف
+  const setups = [...V.querySelectorAll(":scope > .check")]; let bar = null;
+  if (setups.length) { bar = mk("ht-setup"); setups.forEach(s => bar.appendChild(s)); }
+  // 2) كل الأرقام في شبكة واحدة، بلا تكرار ولا أصفار
+  let st = null;
+  if (kp || ls) { st = mk("ht-stats"); const seen = new Set();
+    [...(kp ? kp.children : []), ...(ls ? ls.children : [])].forEach(b => { const n = (b.querySelector("b")?.textContent || "").trim(), k = (b.dataset.go || "") + "|" + n;
+      if (n !== "0" && seen.has(k)) return; seen.add(k); if (n === "0") return; b.classList.add("ht-s"); st.appendChild(b); });
+    kp?.remove(); ls?.remove(); }
+  // 3) الأولويات: أهم 5 والباقي بزر
+  htCut(prio, ".prio-i", 5, "prio", "عرض الكل");
+  // 4) لوحتي: تصغير الخانات الفارغة وإزالة الحلقة المكررة مع الترحيب
+  if (mw) { if (hx?.querySelector(".hx-r")) mw.querySelector(".mw-p")?.remove(); mw.querySelectorAll(".mw-c").forEach(c => { if ((c.querySelector(".mw-h .num")?.textContent || "").trim() === "0") c.classList.add("ht-empty"); }); }
+  // 5) ما الجديد: أحدث 4 والباقي بزر
+  htCut(nf, ".nf-i", 4, "nf", "عرض كل الجديد");
+  // 6) إخفاء اللوحات الفارغة في الأعمدة
+  grid?.querySelectorAll(".panel").forEach(p => { const c = p.querySelector(":scope > .panel-h .chip"); const body = p.querySelector(":scope > .list, :scope > .panel-b"); if (c && c.textContent.trim() === "0" && body && body.children.length === 1 && body.firstElementChild.classList.contains("empty")) p.classList.add("ht-hide"); });
+  // 7) الترتيب: ترحيب ← إعداد ← أرقام ← (أولويات | لوحتي) ← الأسبوع ← الجديد ← التفاصيل
+  const duo = mk("ht-duo"); [prio, mw].filter(Boolean).forEach(e => duo.appendChild(e));
+  H.prepend(...[hx, bar, st, duo.children.length ? duo : null, week, nf].filter(Boolean));
+  if (grid) H.appendChild(grid);
+  H.classList.add("ht");
+}
+const _afterRender60 = afterRender;
+afterRender = function(v){ _afterRender60(v); if (v === "home") try { homeTidy(); } catch (e) { console.warn("homeTidy", e); } };
+const HT_OPEN = { prio: false, nf: false };
+function htCut(box, sel, n, key, lbl){ if (!box) return; const it = [...box.querySelectorAll(sel)]; if (it.length <= n) return; it.forEach((e, i) => e.classList.toggle("ht-x", i >= n));
+  const b = document.createElement("button"); b.type = "button"; b.className = "btn btn-ghost ht-more"; b.dataset.httog = key; b.dataset.lbl = `${lbl} (${it.length})`; box.appendChild(b); htSet(box, b, HT_OPEN[key]); }
+function htSet(p, b, open){ p.classList.toggle("ht-cut", !open); b.textContent = open ? "عرض أقل" : b.dataset.lbl; }
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-httog]"); if (!t) return; const k = t.dataset.httog; HT_OPEN[k] = !HT_OPEN[k]; htSet(t.parentElement, t, HT_OPEN[k]); });
+NEWF.splice(1, 0, ["v76-tidy", "nav:home", "رئيسية أنظف وأوضح", "الأرقام في شبكة واحدة بلا تكرار، وأهم 5 أولويات أولاً، و«ما الجديد» مختصر، وتنبيهات الإعداد في شريط واحد، واختفاء اللوحات الفارغة.", true, "2026-10-25"]);
