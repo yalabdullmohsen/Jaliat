@@ -392,7 +392,7 @@ function dayLate(k, late) {
   let entry = 0, taw = 0;
   if (d.in != null && d.in > late) entry = Math.max(0, d.in - late - permsOf(k).reduce((a, p) => a + overlap(p.from, p.to, late, d.in), 0));
   if (d.in != null) {
-    const s = d.in + 120, e = d.in + 180;
+    const tt = targets(d), s = tt.taw - 1, e = tt.tawEnd;
     if (d.taw != null && d.taw > e) taw = d.taw - s;
     else if (d.taw == null && !(isToday && nowMin() < e)) taw = Math.max(0, (d.out ?? Math.min(nowMin(), CLOSE)) - s);
     if (isToday && d.taw == null && nowMin() < e) taw = 0;
@@ -405,7 +405,7 @@ const PERM_MAX = 4, PERM_MIN = 720;
 const overlap = (a1, a2, b1, b2) => Math.max(0, Math.min(a2, b2) - Math.max(a1, b1));
 const permsOf = k => (log[k] && log[k].perms) || [];
 // الاستئذان اللي يقع أي جزء منه في نافذة التواجد يعفي منها (قرار مجلس الخدمة المدنية 6/2024)
-const tawExempt = k => { const d = log[k]; if (!d || d.in == null) return false; return permsOf(k).some(p => overlap(p.from, p.to, d.in + 120, d.in + 180) > 0 || (p.from <= d.in + 180 && p.to >= d.in + 120)); };
+const tawExempt = k => { const d = log[k]; if (!d || d.in == null) return false; const t = targets(d); if (t.noTaw) return true; return permsOf(k).some(p => overlap(p.from, p.to, t.taw - 1, t.tawEnd) > 0); };
 function monthPerms(prefix) { let n = 0, m = 0; for (const k of Object.keys(log)) if (k.startsWith(prefix)) for (const p of permsOf(k)) { n++; m += p.to - p.from; } return { n, m }; }
 const hm = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
 // شرائح الحرمان من المرتب بحسب مجموع تأخير الشهر — المادتان 18 و19
@@ -469,10 +469,26 @@ function fail(e) {
 }
 
 // الأوقات المطلوبة لليوم حسب وقت الدخول
+// بداية الدوام المعتمدة (مطابقة لكشف النظم المتكاملة):
+// الصباحي: قبل 7:00 تُحسب 7:00، وفي فترة السماح 9:01–9:30 (وما بعدها) تُحسب 9:00
+function dutyStart(e, type) {
+  if (type === 'start') return Math.min(Math.max(e, 540), 570);
+  if (type === 'end') return Math.min(Math.max(e, 420), 450);
+  return Math.min(Math.max(e, 420), 540);
+}
 function targets(d) {
   if (!d || d.in == null) return null;
-  // قرار مجلس الخدمة المدنية 6/2024: إثبات التواجد خلال الستين دقيقة التالية لانقضاء ساعتين من بداية الدوام
-  return { taw: d.in + 120, tawEnd: d.in + 180, out: exitMinutes(d.in, settings.g, settings.type) };
+  const perms = d.perms || [];
+  // إذن خاص في الحضور (استئذان ينتهي عند الدخول): لا نافذة تواجد، والدوام يُحسب من بداية الاستئذان
+  const entryPerm = perms.find(p => p.from <= d.in && p.to >= d.in - 10);
+  const startIn = entryPerm ? Math.max(entryPerm.from, 420) : d.in;
+  const base = dutyStart(startIn, settings.type);
+  let out = exitMinutes(startIn, settings.g, settings.type);
+  // إذن خاص في الانصراف (استئذان يمتد لنهاية الدوام): الانصراف المتوقع = بداية الاستئذان
+  const exitPerm = perms.find(p => p.to >= out - 1 && p.from < out);
+  if (exitPerm) out = exitPerm.from;
+  // قرار مجلس الخدمة المدنية 6/2024: نافذة التواجد من الدقيقة التالية لانقضاء ساعتين حتى نهاية الساعة الثالثة
+  return { base, taw: base + 121, tawEnd: base + 180, out, noTaw: !!entryPerm };
 }
 
 // يضبط التذكيرات الباقية لليوم حسب البصمات المسجّلة
@@ -655,7 +671,7 @@ function renderReport() {
     const d = log[k], dt = new Date(k + 'T12:00:00'), isToday = k === todayK, t = targets(d);
     const cell = kind => {
       const v = d[kind];
-      if (v != null) return `<td class="${(kind === 'in' && v > late) || (kind === 'taw' && d.in != null && v > d.in + 180) ? 'late' : ''}">${fmtShort(v)}</td>`;
+      if (v != null) return `<td class="${(kind === 'in' && v > late) || (kind === 'taw' && d.in != null && !tawExempt(k) && v > targets(d).tawEnd) ? 'late' : ''}">${fmtShort(v)}</td>`;
       if (kind === 'taw' && tawExempt(k)) return '<td class="wait">استئذان</td>';
       const waiting = isToday && (!t || n < (kind === 'taw' ? t.taw : t.out) + 60);
       if (!waiting) miss++;
