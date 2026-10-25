@@ -440,3 +440,10 @@ body:not([data-view="odsave"]) #odx-bar{display:none!important}
 .lrn-i{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;padding:6px 10px;border-radius:8px;background:var(--surface-2,rgba(0,0,0,.03))}
 .iz-f .att-sheet{background:#1D6F42;color:#fff}.iz-f .att-word{background:#2B579A;color:#fff}.iz-f .att-text{background:var(--muted);color:#fff}
 #ocr-top svg{width:20px;height:20px}
+/* sidebar never wider than itself: no horizontal scrollbar, nothing cut */
+#side.side{overflow-x:hidden!important}
+#side .nav,#side .nav .ng,#side .nav .ng-b{min-width:0;max-width:100%;box-sizing:border-box}
+#side .nav button,#side .nav-q,#side .nav-q input{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box}
+#side .nav-q{margin-inline:0!important}
+#side .nav button>span:not(.nf-b):not(.nb):not(.ng-n){min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.35;flex:1 1 auto}
+#side .nav .nf-b{font-size:10px!important;padding:1px 6px!important;flex:none}
