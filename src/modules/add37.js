@@ -11,8 +11,11 @@ const _loadWq37 = loadWq;
 loadWq = async function(){ await Promise.all([_loadWq37(), wqnLoad()]); };
 
 /* coordinators most likely concerned: the matched community first, then everyone */
-function wqCoords(w){ const c = wqComm(w), all = S.coords.filter(x => x.phone && waNum(x.phone).length >= 10);
-  const first = all.filter(x => c && (x.comm === c || (x.lang && c.includes(x.lang)))); return [...first, ...all.filter(x => !first.includes(x))]; }
+function wqCoords(w){ const all = S.coords.filter(x => x.phone && waNum(x.phone).length >= 10 && x.status !== "سابق"), { M, N } = wqCommAll(w);
+  const exp = c => { const g = S.comms.find(x => x.name === c); return g?.pending ? (g.split || []) : [c]; };
+  const pick = new Set(N.length ? N : M.flatMap(exp)), first = all.filter(x => pick.has(x.comm)).sort((a, b) => (a.role === "منسق" ? 0 : 1) - (b.role === "منسق" ? 0 : 1));
+  const L = [...first, ...all.filter(x => !first.includes(x))]; L.sure = new Set(first.filter(x => x.role === "منسق").map(x => x.comm)).size === 1; L.hit = first.length; return L; }
+const wnIdx = () => { const v = $("#wn-c")?.value; return v === "" || v == null ? -1 : +v; };
 const WQ_OC = { "موافقة":["✓ تمت الموافقة", "ok"], "اعتذار":["✕ لم تتم الموافقة", "bad"], "ملاحظات":["! ملاحظات تحتاج استكمال", "warn"] };
 function wqMsg(w, oc, c, why){
   const doc = docBy[w.no] || (w.refs || []).map(r => docBy[r]).find(Boolean);
@@ -31,12 +34,12 @@ function wqFlow(w){ const oc = wqOutcome(w), n = S.wqn.get(w.id), inSys = docBy[
 function wqNotifyBox(w){ const oc = wqOutcome(w) || "ملاحظات", L = wqCoords(w), n = S.wqn.get(w.id); S.wqF = { id:w.id, oc, ci:0 };
   return `<div class="rq-sec wn" id="wn"><b>📲 إبلاغ المنسق${n ? " (أُبلغ سابقاً، يمكن الإعادة)" : ""}</b>
     <div class="seg" id="wn-oc">${Object.keys(WQ_OC).map(k => `<button type="button" data-wnoc="${k}" class="${k === oc ? "on" : ""}">${WQ_OC[k][0]}</button>`).join("")}</div>
-    ${fld("wn-c", "المنسق", `<select class="f" id="wn-c">${L.map((c, i) => `<option value="${i}">${esc(c.name)}، ${esc(c.comm || c.lang || "")}${c.role && c.role !== "منسق" ? " (" + esc(c.role) + ")" : ""}</option>`).join("")}</select>`)}
+    ${fld("wn-c", "المنسق", `<select class="f" id="wn-c">${L.sure ? "" : `<option value="" selected>— اختر المنسق (لم يتضح من الكتاب) —</option>`}${L.map((c, i) => `<option value="${i}"${L.sure && !i ? " selected" : ""}>${i < L.hit ? "★ " : ""}${esc(c.name)}، ${esc(c.comm || c.lang || "")}${c.role && c.role !== "منسق" ? " (" + esc(c.role) + ")" : ""}</option>`).join("")}</select>`)}
     <div id="wn-why-w" ${oc === "موافقة" ? "hidden" : ""}>${fld("wn-why", "السبب / الملاحظات (اختياري)", `<textarea class="f" id="wn-why" rows="2"></textarea>`)}</div>
-    ${fld("wn-t", "نص الرسالة", `<textarea class="f" id="wn-t" rows="9">${esc(wqMsg(w, oc, L[0]))}</textarea>`)}
+    ${fld("wn-t", "نص الرسالة", `<textarea class="f" id="wn-t" rows="9">${esc(wqMsg(w, oc, L.sure ? L[0] : null))}</textarea>`)}
     <button type="button" class="btn btn-ok" data-wnsend>📲 إبلاغ المنسق بالواتساب</button></div>`; }
-function wnRefresh(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[+($("#wn-c")?.value || 0)]; $("#wn-t").value = wqMsg(w, S.wqF.oc, c, $("#wn-why")?.value.trim()); const ww = $("#wn-why-w"); if (ww) ww.hidden = S.wqF.oc === "موافقة"; }
-async function wnSend(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[+($("#wn-c")?.value || 0)]; if (!c) return toast("اختر المنسق");
+function wnRefresh(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[wnIdx()]; $("#wn-t").value = wqMsg(w, S.wqF.oc, c, $("#wn-why")?.value.trim()); const ww = $("#wn-why-w"); if (ww) ww.hidden = S.wqF.oc === "موافقة"; }
+async function wnSend(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[wnIdx()]; if (!c) return toast("اختر المنسق أولاً");
   waGo(c.phone, $("#wn-t").value, null, c.name);
   const { data, error } = await sb.from("wq_notify").insert({ wq_id:w.id, outcome:S.wqF.oc, coord:c.name, phone:waNum(c.phone), comm:c.comm || null }).select().single(); if (error) return writeFail(error);
   S.wqn.set(w.id, data); toast(`أُبلغ ${c.name} ✓`); wqForm(w.id); }

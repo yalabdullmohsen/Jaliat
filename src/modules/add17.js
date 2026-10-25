@@ -9,7 +9,18 @@ function liveWq(){ if (wqCh) sb.removeChannel(wqCh); wqCh = sb.channel("wq").on(
   .on("postgres_changes", { event:"*", schema:"public", table:"permits" }, p => { S.permits = p.eventType === "DELETE" ? S.permits.filter(x => x.id !== p.old?.id) : [p.new, ...S.permits.filter(x => x.id !== p.new.id)]; if (S.view === "permits" && $("#drawer").hidden) render(); })
   .on("postgres_changes", { event:"*", schema:"public", table:"permit_grants" }, p => { if (p.new?.id) S.grants = [p.new, ...S.grants.filter(x => x.id !== p.new.id)]; if (["permits", "tasks", "home"].includes(S.view) && $("#drawer").hidden) render(); }).subscribe(); }
 const wqDate = w => { const m = (w.doc_date || "").match(/(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : (w.created || "").replace(/\//g, "-").slice(0, 10); };
-const wqComm = w => { const t = norm(w.subj + " " + w.body); return commNames.find(c => norm(c).split(/[\s–-]+/).filter(x => x.length > 4).some(x => t.includes(x.replace(/^ال/, "")))) || ""; };
+/* v79: match a Watheqa letter to its community by the community/language name only (spelling-tolerant), never by a coordinator's first name */
+const wqSkel = s => norm(s).replace(/^(وال|بال|لل|ال)/, "").replace(/[ايوهء]/g, "");
+const WQ_GEN = new Set(["هند", "جل", "لغ", "نطق", "سلم", "متعدد", "لغت", "جمع", "جمعت", "خير", "خرت", "مركز", "مجمع", "مجمعت"]);
+function wqCommAll(w){ const txt = norm((w.subj || "") + " " + (w.body || "")), words = new Set(txt.split(/[^\u0621-\u064Aa-z]+/i).filter(x => x.length > 2).map(wqSkel));
+  const keys = c => { const cc = S.comms.find(x => x.name === c) || {}; return [String(c).split(" - ")[0], cc.lang, cc.group].filter(Boolean).flatMap(s => norm(s).split(/[\s–-]+/)).filter(x => x.length > 3).map(wqSkel).filter(k => k.length >= 3 && !WQ_GEN.has(k)); };
+  const M = commNames.filter(c => { const k = keys(c); return k.length && k.some(x => words.has(x)); });
+  const named = c => S.coords.some(co => co.comm === c && co.name && norm(co.name).length > 6 && txt.includes(norm(co.name)));
+  const N = commNames.filter(named);
+  return { M, N }; }
+const wqComm = w => { const { M, N } = wqCommAll(w); if (N.length === 1) return N[0];
+  const real = M.filter(c => !S.comms.find(x => x.name === c)?.pending), pend = M.filter(c => S.comms.find(x => x.name === c)?.pending);
+  if (real.length === 1 && !pend.length) return real[0]; if (pend.length === 1) return pend[0]; return real[0] || pend[0] || ""; };
 
 /* ---------- Watheqa page ---------- */
 /* ---------- Watheqa page (v39): clear, community letters first, request ↔ reply in one card ---------- */
