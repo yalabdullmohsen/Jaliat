@@ -68,8 +68,9 @@ button{font:inherit;cursor:pointer}
 .go svg{width:30px;height:30px;flex:none}
 .alt{display:flex;justify-content:center}
 .link{background:none;border:0;color:var(--primary);font-weight:600;font-size:.92rem;padding:6px}
-.pick{display:flex;gap:8px;align-items:center;justify-content:center}
-.pick input{font:600 1rem var(--f);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
+.pick{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:14px;font-weight:600;color:var(--muted)}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin:12px 0 0}
+.pick input{min-width:120px;text-align:center;font:600 1.05rem var(--f);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
 .btn{border:1px solid transparent;border-radius:10px;padding:9px 16px;font-weight:600;background:var(--primary);color:var(--primary-ink)}
 
 /* البصمة القادمة */
@@ -133,11 +134,13 @@ details[open] summary::after{transform:rotate(135deg)}
       </svg>
       بصمت دخول
     </button>
-    <div class="alt"><button class="link" id="showPick" type="button">بصمت بوقت ثاني؟</button></div>
+    <p class="hint" id="hint">اضغط الزر بعد ما تبصم دخول، والباقي علينا.</p>
     <div class="pick" id="pick" hidden>
-      <input type="time" id="entryTime" aria-label="وقت بصمة الدخول">
+      <span>وقت الدخول</span>
+      <input type="time" id="entryTime" dir="ltr" aria-label="وقت بصمة الدخول">
       <button class="btn" id="goAt" type="button">اعتمد</button>
     </div>
+    <div class="alt" id="backWrap" hidden><button class="link" id="back" type="button">رجوع</button></div>
   </section>
 
   <!-- بعد الدخول -->
@@ -184,7 +187,6 @@ details[open] summary::after{transform:rotate(135deg)}
           <button type="button" data-v="180">3:00</button>
         </div>
       </div>
-      <p class="rule" id="rule"></p>
       <button class="link" id="test" type="button" style="align-self:flex-start;padding-inline:0">جرّب إشعار الحين</button>
     </div>
   </details>
@@ -270,7 +272,7 @@ async function punch(entry, quiet) {
     if (atToday(p.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(p.out - 10).toISOString(), title: 'الخروج بعد 10 دقائق', body: fmt(p.out) });
     if (atToday(p.out) > now) items.push({ kind: 'out', due_at: atToday(p.out).toISOString(), title: 'بصمة الخروج', body: fmt(p.out) });
     await call({ action: 'schedule', sub, items });
-    store.set('plan', p); $('pick').hidden = true; note('');
+    store.set('plan', p); $('pick').hidden = true; $('backWrap').hidden = true; $('hint').hidden = false; $('go').hidden = false; note('');
     render();
     if (!quiet) toast('تم ✓ بنذكّرك في وقتها');
   } catch (e) { fail(e); }
@@ -292,7 +294,6 @@ function render() {
 
 function applySettings() {
   document.querySelectorAll('.seg').forEach(s => s.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(String(settings[s.dataset.k]) === b.dataset.v))));
-  $('rule').textContent = RULES[settings.type](settings.g);
 }
 document.querySelectorAll('.seg').forEach(s => s.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
@@ -303,7 +304,6 @@ document.querySelectorAll('.seg').forEach(s => s.addEventListener('click', e => 
 }));
 
 $('go').addEventListener('click', () => punch(nowMin()));
-$('showPick').addEventListener('click', () => { const d = new Date(); $('entryTime').value = `${pad(d.getHours())}:${pad(d.getMinutes())}`; $('pick').hidden = false; $('entryTime').focus(); });
 $('goAt').addEventListener('click', () => {
   const v = $('entryTime').value; if (!v) return toast('اختر وقت الدخول');
   const [h, m] = v.split(':').map(Number); punch(h * 60 + m);
@@ -311,8 +311,9 @@ $('goAt').addEventListener('click', () => {
 $('redo').addEventListener('click', () => {
   const p = store.get('plan', null);
   $('entryTime').value = p ? `${pad(Math.floor(p.entry / 60))}:${pad(p.entry % 60)}` : '';
-  $('start').hidden = false; $('day').hidden = true; $('pick').hidden = false; $('entryTime').focus();
+  $('start').hidden = false; $('day').hidden = true; $('pick').hidden = false; $('backWrap').hidden = false; $('hint').hidden = true; $('go').hidden = true;
 });
+$('back').addEventListener('click', () => { $('pick').hidden = true; $('backWrap').hidden = true; $('hint').hidden = false; $('go').hidden = false; render(); });
 $('cancel').addEventListener('click', async () => {
   try {
     if (pushOK) { const r = reg || await navigator.serviceWorker.ready, s = await r.pushManager.getSubscription(); if (s) await call({ action: 'cancel', endpoint: s.endpoint }); }
