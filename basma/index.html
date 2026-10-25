@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>بصمة إنجاز</title>
 <meta name="author" content="يوسف عبد المحسن المطيري">
-<meta name="theme-color" content="#1E3A31" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#12291F" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -22,7 +22,7 @@
   --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#F2F1EC; --ink:#1F2A25; --muted:#6C7872; --line:#E6E3DB;
   --primary:#2F6B57; --primary-ink:#FFFFFF; --primary-soft:#E9F1ED;
   --gold:#957631; --gold-soft:#F5EFE0; --bad:#B0564A; --bads:#F7E9E6;
-  --side:#1E3A31; --side-ink:#F2F6F4; --side-muted:#B9CCC3;
+  --side:#1E3A31; --side-ink:#F2F6F4; --side-muted:#B9CCC3; --top-band:#12291F;
   --shadow:0 1px 2px rgba(31,42,37,.04),0 6px 20px rgba(31,42,37,.05);
   --f:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
   color-scheme:light;
@@ -31,17 +31,17 @@
   --bg:#111614; --surface:#181E1B; --surface-2:#1E2522; --ink:#E2E8E5; --muted:#97A39D; --line:#28302C;
   --primary:#74B398; --primary-ink:#0D1512; --primary-soft:#1E2C26;
   --gold:#D3B46C; --gold-soft:#2A2517; --bad:#E39488; --bads:#2E1D1A;
-  --side:#0F1513; --side-ink:#E2E8E5; --side-muted:#97A39D;
+  --side:#0F1513; --side-ink:#E2E8E5; --side-muted:#97A39D; --top-band:#0A0F0D;
   --shadow:0 1px 2px rgba(0,0,0,.3);
   color-scheme:dark;
 }}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
-html{background:var(--side)}
+html{background:var(--top-band)}
 body{min-height:100vh}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--side);z-index:30}
-.top{position:sticky;top:0;z-index:20}
+body::before{content:"";position:fixed;inset:0 0 auto;height:calc(env(safe-area-inset-top,0px) + 6px);background:var(--top-band);z-index:30;pointer-events:none}
+.top{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--top-band) 0,var(--side) calc(env(safe-area-inset-top,0px) + 8px))}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom,0px)}
 button{font:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 40%,transparent);outline-offset:2px}
