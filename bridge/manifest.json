@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "جسر إنجاز (Copilot وواتساب)",
   "short_name": "Jaliyat Copilot",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "يعرض Microsoft 365 Copilot وواتساب ويب داخل نظام «إنجاز». يتحدّث إعداداته تلقائياً من النظام.",
   "permissions": [
     "declarativeNetRequest"
@@ -32,6 +32,7 @@
   "content_scripts": [
     {
       "matches": [
+        "https://injazkwt.com/*",
         "https://yalabdullmohsen.github.io/Jaliat/*"
       ],
       "js": [

@@ -3,7 +3,8 @@
 // without reinstalling this bridge. No remote code is ever executed — only CSS selectors and numbers are accepted.
 (function () {
   if (window.top === window) return;
-  const ORIGIN = "https://yalabdullmohsen.github.io";
+  const ORIGINS = ["https://injazkwt.com", "https://yalabdullmohsen.github.io"];
+  const ORIGIN = (location.ancestorOrigins && [...location.ancestorOrigins].find(o => ORIGINS.includes(o))) || ORIGINS.find(o => document.referrer.startsWith(o)) || ORIGINS[0];
   const CFG = {
     editor: ["#m365-chat-editor-target-element", '[role="textbox"][contenteditable="true"]', 'textarea[placeholder]'],
     send: ['button[aria-label="Send"]', 'button[aria-label="إرسال"]', 'button[data-testid="sendButton"]', 'button[type="submit"]'],
@@ -51,7 +52,7 @@
   let started = false;
   async function start() { if (started) return; started = true; const ed = await waitFor(() => q1("editor"), 30000); post({ type: ed ? "jaliyat-copilot-ready" : "jaliyat-copilot-error", v: "2.0" }); }
   window.addEventListener("message", e => {
-    if (e.origin !== ORIGIN) return;
+    if (!ORIGINS.includes(e.origin)) return;
     const d = e.data || {};
     if (d.type === "jaliyat-config") { setCfg(d.cfg); start(); }
     if (d.type === "jaliyat-ask" && typeof d.text === "string") ask(d.text, d.file);
