@@ -9,21 +9,18 @@
 <link rel="icon" type="image/png" href="../../brand/bawaba-64.png">
 <link rel="apple-touch-icon" href="../../brand/bawaba-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --bg:#F3F4F6; --surface:#FFFFFF; --surface-2:#F3F4F6; --ink:#0B0B0F; --muted:#6B7280; --line:#E5E7EB;
-  --accent:#2563EB; --accent-ink:#FFFFFF; --accent-fg:var(--accent); --gold:#B45309; --gold-soft:#FEF3C7;
-  --ok:#16A34A; --oks:#DCFCE7; --warn:#B45309; --warns:#FEF3C7; --bad:#DC2626; --bads:#FEE2E2;
-  --side:#0B0B0F; --side-ink:#FFFFFF; --side-muted:#9CA3AF;
-  --shadow:0 1px 2px rgba(11,11,15,.04);
-  --f:"Noto Sans Arabic","Segoe UI",Tahoma,sans-serif; color-scheme:light;
+  --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#F2F1EC; --ink:#1F2A25; --muted:#6C7872; --line:#E6E3DB;
+  --accent:#2F6B57; --ok:#2F7D57; --oks:#E6F2EC; --gold:#957631; --gold-soft:#F5EFE0; --bad:#B0564A; --bads:#F7E9E6; --warn:#946E1F; --warns:#F7F0E1;
+  --side:#1E3A31; --side-ink:#F2F6F4; --side-muted:#B9CCC3;
+  --shadow:0 1px 2px rgba(31,42,37,.04),0 6px 20px rgba(31,42,37,.05); --f:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif; color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#0B0B0F; --surface:#14151A; --surface-2:#1B1C22; --ink:#F3F4F6; --muted:#9CA3AF; --line:#26272E;
-  --gold:#FBBF24; --gold-soft:#2A2410; --ok:#4ADE80; --oks:#11261A; --warn:#FBBF24; --warns:#2A2410; --bad:#F87171; --bads:#2D1517;
-  --side:#000000; --side-ink:#F3F4F6; --side-muted:#9CA3AF; --shadow:none; color-scheme:dark;
-  --accent-fg:color-mix(in srgb,var(--accent) 55%,#ffffff);
+  --bg:#111614; --surface:#181E1B; --surface-2:#1E2522; --ink:#E2E8E5; --muted:#97A39D; --line:#28302C;
+  --ok:#7CBF9E; --oks:#1B2A23; --gold:#D3B46C; --gold-soft:#2A2517; --bad:#E39488; --bads:#2E1D1A; --warn:#D9B76A; --warns:#2B2618;
+  --side:#0F1513; --side-ink:#E2E8E5; --side-muted:#97A39D; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
 }}
 *{box-sizing:border-box} [hidden]{display:none!important} html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.65 var(--f);-webkit-font-smoothing:antialiased}
@@ -118,7 +115,7 @@ async function submit(e) {
 (async () => {
   try {
     INFO = await call('portal_info', {});
-    const o = INFO.org; document.documentElement.style.setProperty('--accent', o.color || '#2563EB');
+    const o = INFO.org; document.documentElement.style.setProperty('--accent', o.color || '#2F6B57');
     $('oName').textContent = o.name; $('oSub').textContent = (KINDS[o.kind] || '') + ' · بوابة العملاء'; $('dot').textContent = o.name.trim()[0] || 'إ';
     if (o.logo) $('dot').outerHTML = `<img src="${o.logo}" alt="" style="width:44px;height:44px;border-radius:12px;object-fit:cover;flex:none">`;
     document.title = o.name + ' — بوابة العملاء'; render();

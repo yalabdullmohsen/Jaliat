@@ -15,24 +15,24 @@
 <link rel="apple-touch-icon" href="logo-180.png">
 <link rel="icon" type="image/png" href="logo-64.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
 /* هوية إنجاز «عاجي ملكي». ثلاث تبويبات: اليوم (البصمات الثلاث) — التقرير (شهري) — الإعدادات. */
 :root{
-  --bg:#EDEAFB; --surface:#FFFFFF; --surface-2:#F4F2FD; --ink:#1D1B3A; --muted:#6B6890; --line:#E4E0F7;
-  --primary:#6D5BF0; --primary-ink:#FFFFFF; --primary-soft:#ECE9FE;
-  --gold:#9A6A0A; --gold-soft:#FFF1B8; --bad:#D9453F; --bads:#FFE4DC;
-  --side:#1D1B3A; --side-ink:#FFFFFF; --side-muted:#B8B5DD; --top-band:#15142E;
-  --shadow:0 1px 2px rgba(29,27,58,.04),0 8px 24px rgba(109,91,240,.08);
-  --f:"Cairo","Segoe UI",Tahoma,sans-serif;
+  --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#F2F1EC; --ink:#1F2A25; --muted:#6C7872; --line:#E6E3DB;
+  --primary:#2F6B57; --primary-ink:#FFFFFF; --primary-soft:#E9F1ED;
+  --gold:#957631; --gold-soft:#F5EFE0; --bad:#B0564A; --bads:#F7E9E6;
+  --side:#1E3A31; --side-ink:#F2F6F4; --side-muted:#B9CCC3; --top-band:#12291F;
+  --shadow:0 1px 2px rgba(31,42,37,.04),0 6px 20px rgba(31,42,37,.05);
+  --f:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#14132A; --surface:#1E1D3A; --surface-2:#262548; --ink:#EEEDFB; --muted:#A3A1CC; --line:#33315A;
-  --primary:#A99CFF; --primary-ink:#14132A; --primary-soft:#2B2860;
-  --gold:#F5C451; --gold-soft:#3A3216; --bad:#FF8A80; --bads:#3A1F25;
-  --side:#0E0D20; --side-ink:#EEEDFB; --side-muted:#A3A1CC; --top-band:#0A0A18;
-  --shadow:none;
+  --bg:#111614; --surface:#181E1B; --surface-2:#1E2522; --ink:#E2E8E5; --muted:#97A39D; --line:#28302C;
+  --primary:#74B398; --primary-ink:#0D1512; --primary-soft:#1E2C26;
+  --gold:#D3B46C; --gold-soft:#2A2517; --bad:#E39488; --bads:#2E1D1A;
+  --side:#0F1513; --side-ink:#E2E8E5; --side-muted:#97A39D; --top-band:#0A0F0D;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
   color-scheme:dark;
 }}
 *{box-sizing:border-box}
@@ -218,7 +218,6 @@ button{font:inherit;cursor:pointer;color:inherit}
   opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:5}
 #toast.on{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-.card{border-radius:26px}.btn{border-radius:999px}
 .p .man{display:block;padding:2px 0 0;font-size:.8rem;color:var(--primary)}
 </style>
 </head>

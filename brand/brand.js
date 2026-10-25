@@ -17,16 +17,12 @@
     biz: '<rect x="15" y="20" width="18" height="13" rx="2.5"/><path d="M20.5 20v-2.2a1.6 1.6 0 0 1 1.6-1.6h3.8a1.6 1.6 0 0 1 1.6 1.6V20"/><path d="M15 26h18"/>',
     basma: '<path d="M18 33c1.5-3 2-6 2-9a4 4 0 0 1 8 0c0 3.5-.6 7-2 10"/><path d="M24 24c0 4-1 7.5-2.6 10.5"/><path d="M15 29.5c.6-1.5 1-3.4 1-5.5a8 8 0 0 1 16 0c0 2-.2 4-.6 6"/><path d="M17 17.5a10.5 10.5 0 0 1 14 0"/>',
   };
-  var THEME = {
-    injaz: ['#1B5A43', '#E2BC55'], biz: ['#0B0B0F', '#2563EB'],
-    bawaba: ['#0F4C4A', '#C9A24B'], basma: ['#6D5BF0', '#FFE27A']
-  };
   var NAMES = { injaz: 'إنجاز', biz: 'إنجاز أعمال', bawaba: 'بوابة إنجاز', basma: 'بصمة إنجاز' };
   function mark(k, size) {
     return '<svg class="ij-mark" width="' + size + '" height="' + size + '" viewBox="0 0 48 48" aria-hidden="true">' +
-      '<rect width="48" height="48" rx="11" fill="' + THEME[k][0] + '"/>' +
+      '<rect width="48" height="48" rx="11" fill="#1B5A43"/>' +
       '<circle cx="24" cy="24" r="14" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="3.4"/>' +
-      '<circle cx="24" cy="24" r="14" fill="none" stroke="' + THEME[k][1] + '" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="70 100" transform="rotate(-90 24 24)"/>' +
+      '<circle cx="24" cy="24" r="14" fill="none" stroke="#E2BC55" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="70 100" transform="rotate(-90 24 24)"/>' +
       '<g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + GLYPH[k] + '</g></svg>';
   }
   window.InjazBrand = { owner: OWNER, copy: COPY, mark: mark, names: NAMES };
