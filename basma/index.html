@@ -65,6 +65,23 @@ button{font:inherit;cursor:pointer;color:inherit}
 .wrap{max-width:480px;margin:0 auto;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .view{display:flex;flex-direction:column;gap:14px}
+/* أجهزة أكبر: تابلت وكمبيوتر */
+@media (min-width:700px){
+  .top .in,.tabs{max-width:640px}
+  .wrap{max-width:640px}
+}
+@media (min-width:960px){
+  .top .in,.tabs{max-width:1040px}
+  .wrap{max-width:1040px}
+  #v-day:not([hidden]){display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
+  #v-day > *{grid-column:1}
+  #v-day > #permCard{grid-column:2;grid-row:1 / span 6}
+  #v-rep:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
+  #v-rep > *{grid-column:1}
+  #v-rep > .card:last-child{grid-column:2;grid-row:1 / span 8}
+  #v-set:not([hidden]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  .tick{font-size:4.4rem}
+}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
 .note{background:var(--gold-soft);border:0;box-shadow:none;font-size:.92rem}
 .note b{display:block;margin-bottom:2px}
