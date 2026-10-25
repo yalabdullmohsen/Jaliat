@@ -177,6 +177,8 @@ const COLORS = ['#2F6B57', '#1F5F8B', '#6B4BB0', '#9B3D4A', '#B8601F', '#3D5A6B'
 const ROLE = { owner: 'المالك', admin: 'مدير', member: 'موظف' };
 const label = k => (ORG?.labels?.[k]) || MODS[k];
 const isAdmin = () => ME && (ME.role === 'owner' || ME.role === 'admin');
+const can = k => isAdmin() || !!ME?.perms?.[k];
+const roleName = p => p.role !== 'member' ? ROLE[p.role] : ((ORG?.design?.roles || []).find(r => r.id === p.prole)?.name || ROLE.member);
 const pad = n => String(n).padStart(2, '0');
 const fmtT = d => { d = new Date(d); let h = d.getHours(); const ap = h < 12 ? 'ص' : 'م'; h = h % 12 || 12; return `${h}:${pad(d.getMinutes())} ${ap}`; };
 const fmtD = d => { const x = new Date(d); return isNaN(x) ? '' : new Intl.DateTimeFormat('ar-KW-u-nu-latn', { weekday: 'short', day: 'numeric', month: 'short' }).format(x); };
@@ -280,7 +282,7 @@ const VIEWS = {
       ${tiles.length ? `<div class="stats">${tiles.map(([k, n, l]) => `<div class="st" data-go="${k}"><b>${n}</b><span>${esc(l)}</span></div>`).join('')}</div>` : ''}
       ${m.tasks ? `<section class="card"><div class="h"><h2>مهامي</h2><button class="link" data-go="tasks">الكل</button></div>
         <div class="list">${mine.slice(0, 5).map(taskRow).join('') || '<p class="empty">ما عندك مهام مفتوحة.</p>'}</div></section>` : ''}
-      ${m.news ? `<section class="card"><div class="h"><h2>${esc(label('news'))}</h2>${isAdmin() ? '<button class="link" data-go="news">إدارة</button>' : ''}</div>
+      ${m.news ? `<section class="card"><div class="h"><h2>${esc(label('news'))}</h2>${can('news') ? '<button class="link" data-go="news">إدارة</button>' : ''}</div>
         <div class="list">${news.slice(0, 3).map(n => `<div class="row"><div class="tx"><b>${esc(n.title)}</b><div class="sub">${esc(n.body || '')}</div><div class="sub">${fmtD(n.created_at)}</div></div></div>`).join('') || '<p class="empty">ما فيه تعاميم.</p>'}</div></section>` : ''}
       ${isAdmin() && PEOPLE.length < 2 ? `<section class="card"><h2 style="margin:0 0 6px">ابدأ بإضافة فريقك</h2><p class="muted" style="margin:0 0 10px">أرسل لموظفيك رمز الانضمام، يدخلون من «انضم لجهة».</p><div class="copyrow"><span class="code">${esc(ORG.join_code)}</span><button class="btn sm" data-copy="${esc(ORG.join_code)}">نسخ الرمز</button></div></section>` : ''}`;
   },
@@ -312,7 +314,7 @@ const VIEWS = {
         return `<section class="card"><div class="h"><h2 style="font-size:1rem">${esc(r.name)}</h2><span class="muted sm">${esc(r.kind || '')}</span></div>
           <div class="list">${items.map(b => `<div class="row" data-bk="${b.id}" style="cursor:pointer"><div class="tx"><b>${fmtT(b.starts)} – ${fmtT(b.ends)} · ${esc(b.title)}</b><div class="sub">${esc(b.client_name || who(b.created_by))}${b.phone ? ' · ' + esc(b.phone) : ''}</div></div>${pill(b.status)}</div>`).join('') || '<p class="empty" style="padding:8px">متاح طول اليوم.</p>'}</div></section>`; }).join('')
         : `<section class="card"><p class="empty">${isAdmin() ? 'أضف أول قاعة أو مورد يُحجز (قاعة، سيارة، جهاز).' : 'ما فيه موارد للحجز بعد. اطلب من مدير النظام إضافتها.'}</p></section>`}
-      ${isAdmin() ? `<button class="btn ghost" id="mngR">إدارة القاعات والموارد</button>` : ''}`;
+      ${can('bookings') ? `<button class="btn ghost" id="mngR">إدارة القاعات والموارد</button>` : ''}`;
     const setDay = d => { VIEW_F.day = d; go('bookings'); };
     $('dPick').onchange = e => setDay(e.target.value);
     $('dPrev').onclick = () => { const d = new Date(day + 'T12:00:00'); d.setDate(d.getDate() - 1); setDay(ymd(d)); };
@@ -338,7 +340,7 @@ const VIEWS = {
   async more(el) {
     const m = ORG.modules;
     const items = [m.clients && ['clients', label('clients'), 'سجل العملاء وبيانات التواصل'], m.news && ['news', label('news'), 'إعلانات للفريق وللبوابة'],
-      ['team', 'الفريق والأقسام', 'الموظفون وصلاحياتهم ورمز الانضمام'], ['settings', isAdmin() ? 'الإعدادات وتصميم النظام' : 'حسابي', isAdmin() ? 'الاسم واللون والمزايا ورابط البوابة' : 'كلمة المرور والخروج']].filter(Boolean);
+      ['team', 'الفريق والأقسام', 'الموظفون وصلاحياتهم ورمز الانضمام'], ['settings', isAdmin() ? 'الإعدادات' : 'حسابي', isAdmin() ? 'الاسم واللون والدوام ورابط البوابة' : 'كلمة المرور والخروج']].filter(Boolean);
     el.innerHTML = `<h2 style="margin:0">المزيد</h2><section class="card"><div class="list">${items.map(([k, l, s]) => `<div class="row" data-go="${k}" style="cursor:pointer"><div class="tx"><b>${esc(l)}</b><div class="sub">${s}</div></div><span class="muted">‹</span></div>`).join('')}</div></section>
       <p class="muted sm" style="text-align:center">بصمة الحضور لموظفيك: <a class="link" href="../basma/" target="_blank" rel="noopener">بصمة إنجاز</a></p>`;
   },
@@ -347,11 +349,11 @@ const VIEWS = {
     const rows = await list('clients'); let q = '';
     const draw = () => {
       const items = rows.filter(c => !q || (c.name + ' ' + (c.phone || '')).includes(q));
-      el.innerHTML = `<div class="h"><h2>${esc(label('clients'))}</h2><button class="btn sm" id="addC">+ عميل</button></div>
+      el.innerHTML = `<div class="h"><h2>${esc(label('clients'))}</h2>${can('clients') ? '<button class="btn sm" id="addC">+ عميل</button>' : ''}</div>
         <input id="cq" placeholder="ابحث بالاسم أو الهاتف" value="${esc(q)}" style="padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)">
         <section class="card"><div class="list">${items.map(c => `<div class="row" data-cl="${c.id}" style="cursor:pointer"><div class="tx"><b>${esc(c.name)}</b><div class="sub" dir="auto">${esc([c.phone, c.email].filter(Boolean).join(' · '))}</div></div></div>`).join('') || '<p class="empty">ما فيه عملاء بعد.</p>'}</div></section>`;
       $('cq').oninput = e => { q = e.target.value.trim(); const p = e.target.selectionStart; draw(); $('cq').focus(); $('cq').setSelectionRange(p, p); };
-      $('addC').onclick = () => clientForm();
+      if ($('addC')) $('addC').onclick = () => clientForm();
       el.querySelectorAll('[data-cl]').forEach(x => x.onclick = () => clientForm(rows.find(c => c.id === x.dataset.cl)));
     };
     draw();
@@ -359,8 +361,8 @@ const VIEWS = {
 
   async news(el) {
     const rows = await list('news');
-    el.innerHTML = `<div class="h"><h2>${esc(label('news'))}</h2>${isAdmin() ? '<button class="btn sm" id="addN">+ تعميم</button>' : ''}</div>
-      <section class="card"><div class="list">${rows.map(n => `<div class="row"><div class="tx"><b>${esc(n.title)}</b><div class="sub">${esc(n.body || '')}</div><div class="sub">${fmtD(n.created_at)} · ${esc(who(n.created_by))}</div></div>${isAdmin() ? `<button class="link" data-del="${n.id}">حذف</button>` : ''}</div>`).join('') || '<p class="empty">ما فيه تعاميم.</p>'}</div></section>`;
+    el.innerHTML = `<div class="h"><h2>${esc(label('news'))}</h2>${can('news') ? '<button class="btn sm" id="addN">+ تعميم</button>' : ''}</div>
+      <section class="card"><div class="list">${rows.map(n => `<div class="row"><div class="tx"><b>${esc(n.title)}</b><div class="sub">${esc(n.body || '')}</div><div class="sub">${fmtD(n.created_at)} · ${esc(who(n.created_by))}</div></div>${can('news') ? `<button class="link" data-del="${n.id}">حذف</button>` : ''}</div>`).join('') || '<p class="empty">ما فيه تعاميم.</p>'}</div></section>`;
     if ($('addN')) $('addN').onclick = () => dialog('تعميم جديد', `<form class="form" id="nf"><label class="f"><span>العنوان</span><input name="title" required></label><label class="f"><span>التفاصيل</span><textarea name="body"></textarea></label><p class="muted sm" style="margin:0">يظهر لفريقك، وفي بوابة العملاء.</p><button class="btn">نشر</button></form>`,
       b => b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('news', formData(e.target)); $('dlg').close(); toast('نُشر ✓'); go('news'); } catch (er) { toast(er.message); } });
     el.querySelectorAll('[data-del]').forEach(x => x.onclick = async () => { try { await call('remove', { table: 'news', id: x.dataset.del }); toast('حُذف'); go('news'); } catch (er) { toast(er.message); } });
@@ -368,11 +370,11 @@ const VIEWS = {
 
   async team(el) {
     el.innerHTML = `<div class="h"><h2>الفريق والأقسام</h2></div>
-      ${isAdmin() ? `<section class="card"><h2 style="margin:0 0 4px;font-size:1rem">أضف موظفين</h2><p class="muted sm" style="margin:0 0 10px">أرسل لهم الرابط والرمز. يدخلون من «انضم لجهة» ويسجلون بأنفسهم.</p>
+      ${can('team') ? `<section class="card"><h2 style="margin:0 0 4px;font-size:1rem">أضف موظفين</h2><p class="muted sm" style="margin:0 0 10px">أرسل لهم الرابط والرمز. يدخلون من «انضم لجهة» ويسجلون بأنفسهم.</p>
         <div class="copyrow"><span class="code">${esc(ORG.join_code)}</span><button class="btn sm" data-copy="${esc(location.origin + location.pathname)}\nرمز الجهة: ${esc(ORG.join_code)}">نسخ الدعوة</button><button class="link" id="newCode">رمز جديد</button></div></section>` : ''}
-      <section class="card"><div class="h"><h2 style="font-size:1rem">الأقسام</h2>${isAdmin() ? '<button class="btn sm ghost" id="addD">+ قسم</button>' : ''}</div>
-        <div class="list">${DEPTS.map(d => `<div class="row"><div class="tx"><b>${esc(d.name)}</b><div class="sub">${PEOPLE.filter(p => p.dept_id === d.id).length} موظف</div></div>${isAdmin() ? `<button class="link" data-dd="${d.id}">حذف</button>` : ''}</div>`).join('') || '<p class="empty">ما فيه أقسام بعد.</p>'}</div></section>
-      <section class="card"><h2 style="margin:0 0 4px;font-size:1rem">الموظفون (${PEOPLE.length})</h2><div class="list">${PEOPLE.map(p => `<div class="row"${isAdmin() ? ` data-pp="${p.id}" style="cursor:pointer"` : ''}><div class="tx"><b>${esc(p.name)}${p.active ? '' : ' <span class="pill p-cancelled">موقوف</span>'}</b><div class="sub">${esc([ROLE[p.role], p.title, deptName(p.dept_id)].filter(Boolean).join(' · '))}</div></div></div>`).join('')}</div></section>`;
+      <section class="card"><div class="h"><h2 style="font-size:1rem">الأقسام</h2>${can('team') ? '<button class="btn sm ghost" id="addD">+ قسم</button>' : ''}</div>
+        <div class="list">${DEPTS.map(d => `<div class="row"><div class="tx"><b>${esc(d.name)}</b><div class="sub">${PEOPLE.filter(p => p.dept_id === d.id).length} موظف</div></div>${can('team') ? `<button class="link" data-dd="${d.id}">حذف</button>` : ''}</div>`).join('') || '<p class="empty">ما فيه أقسام بعد.</p>'}</div></section>
+      <section class="card"><h2 style="margin:0 0 4px;font-size:1rem">الموظفون (${PEOPLE.length})</h2><div class="list">${PEOPLE.map(p => `<div class="row"${can('team') && (isAdmin() || p.role === 'member') ? ` data-pp="${p.id}" style="cursor:pointer"` : ''}><div class="tx"><b>${esc(p.name)}${p.active ? '' : ' <span class="pill p-cancelled">موقوف</span>'}</b><div class="sub">${esc([roleName(p), p.title, deptName(p.dept_id)].filter(Boolean).join(' · '))}</div></div></div>`).join('')}</div></section>`;
     if ($('newCode')) $('newCode').onclick = async () => { try { ORG = (await call('org_update', { new_code: true })).org; toast('صار عندك رمز جديد، والقديم توقف'); go('team'); } catch (e) { toast(e.message); } };
     if ($('addD')) $('addD').onclick = () => dialog('قسم جديد', `<form class="form"><label class="f"><span>اسم القسم</span><input name="name" required></label><button class="btn">إضافة</button></form>`,
       b => b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('depts', formData(e.target)); $('dlg').close(); await boot(); go('team'); } catch (er) { toast(er.message); } });
@@ -382,14 +384,12 @@ const VIEWS = {
 
   async settings(el) {
     const portal = location.origin + location.pathname.replace(/[^/]*$/, '') + 'portal/?o=' + ORG.slug;
-    el.innerHTML = `<h2 style="margin:0">${isAdmin() ? 'الإعدادات وتصميم النظام' : 'حسابي'}</h2>
+    el.innerHTML = `<h2 style="margin:0">${isAdmin() ? 'الإعدادات' : 'حسابي'}</h2>
       ${isAdmin() ? `<form class="card form" id="orgF">
         <h2 style="margin:0;font-size:1rem">هوية الجهة</h2>
         <label class="f"><span>اسم الجهة</span><input name="name" value="${esc(ORG.name)}" required></label>
         <div class="f"><span>نوع الجهة</span><div class="kinds">${Object.entries(KINDS).map(([k, v]) => `<label><input type="radio" name="kind" value="${k}"${ORG.kind === k ? ' checked' : ''}><span>${v}</span></label>`).join('')}</div></div>
         <div class="f"><span>لون النظام</span><div class="sw" id="sw">${COLORS.map(c => `<button type="button" data-c="${c}" style="background:${c}" aria-label="${c}" aria-pressed="${c === ORG.color}"></button>`).join('')}</div></div>
-        <h2 style="margin:6px 0 0;font-size:1rem">صمّم نظامك</h2><p class="muted sm" style="margin:-6px 0 0">فعّل المزايا اللي تحتاجها جهتك، وسمّها بالأسماء اللي تستخدمونها.</p>
-        <div>${Object.entries(MODS).map(([k, v]) => `<div class="tog"><input type="checkbox" name="m_${k}" id="m_${k}"${ORG.modules[k] ? ' checked' : ''} aria-label="${v}"><input name="l_${k}" value="${esc(label(k))}" style="flex:1;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)" aria-label="اسم ${v}"></div>`).join('')}</div>
         <div class="g2"><label class="f"><span>بداية الدوام</span><input type="time" name="ws" value="${esc(ORG.work?.start || '07:30')}" dir="ltr"></label><label class="f"><span>نهاية الدوام</span><input type="time" name="we" value="${esc(ORG.work?.end || '14:30')}" dir="ltr"></label></div>
         <button class="btn">حفظ</button></form>
       <section class="card"><h2 style="margin:0 0 4px;font-size:1rem">بوابة العملاء</h2><p class="muted sm" style="margin:0 0 10px">رابط جهتك للعملاء: يرسلون طلباتهم ويحجزون ويتابعون بدون حساب.</p>
@@ -403,8 +403,7 @@ const VIEWS = {
     if ($('sw')) $('sw').onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; color = b.dataset.c; document.documentElement.style.setProperty('--accent', color); $('sw').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); };
     if ($('orgF')) $('orgF').onsubmit = async e => {
       e.preventDefault(); const d = formData(e.target);
-      const modules = {}, labels = {}; for (const k of Object.keys(MODS)) { modules[k] = !!d['m_' + k]; if (d['l_' + k] && d['l_' + k] !== MODS[k]) labels[k] = d['l_' + k]; }
-      try { ORG = (await call('org_update', { name: d.name, kind: d.kind, color, modules, labels, work: { start: d.ws, end: d.we } })).org; applyOrg(); renderNav(); toast('انحفظ ✓'); } catch (er) { toast(er.message); }
+      try { ORG = (await call('org_update', { name: d.name, kind: d.kind, color, work: { start: d.ws, end: d.we } })).org; applyOrg(); renderNav(); toast('انحفظ ✓'); } catch (er) { toast(er.message); }
     };
     $('pwF').onsubmit = async e => { e.preventDefault(); try { await call('password', formData(e.target)); e.target.reset(); toast('تغيّرت كلمة المرور ✓'); } catch (er) { toast(er.message); } };
     $('out').onclick = () => logout();
@@ -417,7 +416,7 @@ function taskRow(t) {
   return `<div class="row" data-task="${t.id}" style="cursor:pointer"><div class="tx"><b>${esc(t.title)}</b><div class="sub">${esc([t.assignee ? who(t.assignee) : 'بدون تكليف', deptName(t.dept_id), t.due ? 'موعدها ' + fmtD(t.due) : ''].filter(Boolean).join(' · '))}</div></div>${pill(t.status)}</div>`;
 }
 function taskForm(t) {
-  const people = PEOPLE.filter(p => p.active).map(p => [p.id, p.name]);
+  const people = PEOPLE.filter(p => p.active && (can('assign') || p.id === ME.id || p.id === t?.assignee)).map(p => [p.id, p.name]);
   dialog(t ? 'مهمة' : 'مهمة جديدة', `<form class="form">
     <label class="f"><span>المهمة</span><input name="title" value="${esc(t?.title)}" required></label>
     <label class="f"><span>التفاصيل</span><textarea name="details">${esc(t?.details)}</textarea></label>
@@ -425,7 +424,7 @@ function taskForm(t) {
     <label class="f"><span>القسم</span><select name="dept_id">${opt(DEPTS.map(d => [d.id, d.name]), t?.dept_id ?? ME.dept_id, 'بدون')}</select></label></div>
     <div class="g2"><label class="f"><span>الموعد</span><input type="date" name="due" value="${esc(t?.due)}"></label>
     <label class="f"><span>الحالة</span><select name="status">${opt(Object.entries({ new: ST.new, doing: ST.doing, done: ST.done }), t?.status || 'new')}</select></label></div>
-    <button class="btn">${t ? 'حفظ' : 'إضافة'}</button>${t && (isAdmin() || t.created_by === ME.id) ? '<button type="button" class="btn bad" id="delT">حذف المهمة</button>' : ''}</form>`,
+    <button class="btn">${t ? 'حفظ' : 'إضافة'}</button>${t && (can('tasks_del') || t.created_by === ME.id) ? '<button type="button" class="btn bad" id="delT">حذف المهمة</button>' : ''}</form>`,
     b => {
       b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('tasks', { ...formData(e.target), id: t?.id }); $('dlg').close(); toast('انحفظ ✓'); go('tasks'); } catch (er) { toast(er.message); } };
       if (b.querySelector('#delT')) b.querySelector('#delT').onclick = async () => { try { await call('remove', { table: 'tasks', id: t.id }); $('dlg').close(); go('tasks'); } catch (er) { toast(er.message); } };
@@ -460,13 +459,13 @@ function resourcesDlg(res) {
 function requestDlg(r) {
   dialog('طلب رقم ' + r.code, `<div class="form"><div><b>${esc(r.subject)}</b><p class="muted" style="margin:4px 0;white-space:pre-wrap">${esc(r.details || '')}</p><p class="sub muted" style="margin:0">${esc(r.client_name)} · <span dir="ltr">${esc(r.phone)}</span> · ${fmtD(r.created_at)}</p></div>
     <form class="form"><label class="f"><span>الحالة</span><select name="status">${opt(Object.entries({ new: ST.new, review: ST.review, done: ST.done, rejected: ST.rejected }), r.status)}</select></label>
-    <label class="f"><span>الرد للعميل (يشوفه في البوابة)</span><textarea name="reply">${esc(r.reply)}</textarea></label><button class="btn">حفظ</button></form></div>`,
+    <label class="f"><span>الرد للعميل (يشوفه في البوابة)</span><textarea name="reply">${esc(r.reply)}</textarea></label>${can('requests') ? '<button class="btn">حفظ</button>' : '<p class="muted sm" style="margin:0">الرد على الطلبات لمن عنده الصلاحية.</p>'}</form></div>`,
     b => b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('requests', { ...formData(e.target), id: r.id }); $('dlg').close(); toast('انحفظ ✓'); go('requests'); } catch (er) { toast(er.message); } });
 }
 function clientForm(c) {
   dialog(c ? 'عميل' : 'عميل جديد', `<form class="form"><label class="f"><span>الاسم</span><input name="name" value="${esc(c?.name)}" required></label>
     <div class="g2"><label class="f"><span>الهاتف</span><input name="phone" dir="ltr" value="${esc(c?.phone)}"></label><label class="f"><span>البريد</span><input name="email" type="email" dir="ltr" value="${esc(c?.email)}"></label></div>
-    <label class="f"><span>ملاحظات</span><textarea name="notes">${esc(c?.notes)}</textarea></label><button class="btn">حفظ</button>${c ? '<button type="button" class="btn bad" id="delC">حذف</button>' : ''}</form>`,
+    <label class="f"><span>ملاحظات</span><textarea name="notes">${esc(c?.notes)}</textarea></label>${can('clients') ? `<button class="btn">حفظ</button>${c ? '<button type="button" class="btn bad" id="delC">حذف</button>' : ''}` : ''}</form>`,
     b => {
       b.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await save('clients', { ...formData(e.target), id: c?.id }); $('dlg').close(); toast('انحفظ ✓'); go('clients'); } catch (er) { toast(er.message); } };
       if (b.querySelector('#delC')) b.querySelector('#delC').onclick = async () => { try { await call('remove', { table: 'clients', id: c.id }); $('dlg').close(); go('clients'); } catch (er) { toast(er.message); } };
@@ -474,14 +473,15 @@ function clientForm(c) {
 }
 function memberDlg(p) {
   dialog(p.name, `<form class="form"><p class="muted sm" style="margin:0" dir="ltr">${esc(p.email)}</p>
-    ${p.role !== 'owner' ? `<label class="f"><span>الصلاحية</span><select name="role">${opt([['member', 'موظف'], ['admin', 'مدير']], p.role)}</select></label>` : ''}
+    ${p.role !== 'owner' && isAdmin() ? `<label class="f"><span>نوع الحساب</span><select name="role">${opt([['member', 'موظف'], ['admin', 'مدير (كل الصلاحيات)']], p.role)}</select></label>` : ''}
+    ${p.role === 'member' ? `<label class="f"><span>الدور والصلاحيات</span><select name="prole">${opt((ORG.design?.roles || []).map(r => [r.id, r.name]), p.prole || '', 'موظف (الصلاحيات الافتراضية)')}</select></label>${isAdmin() ? '<button type="button" class="link" data-go="design" onclick="$(\'dlg\').close()" style="justify-self:start">صمّم الأدوار وصلاحياتها</button>' : ''}` : ''}
     <label class="f"><span>المسمى الوظيفي</span><input name="title" value="${esc(p.title)}"></label>
     <label class="f"><span>القسم</span><select name="dept_id">${opt(DEPTS.map(d => [d.id, d.name]), p.dept_id, 'بدون')}</select></label>
     ${p.role !== 'owner' && p.id !== ME.id ? `<label class="tog" style="border:0"><span>الحساب فعّال</span><input type="checkbox" name="active"${p.active ? ' checked' : ''}></label>` : ''}
     <button class="btn">حفظ</button></form>`,
     b => b.querySelector('form').onsubmit = async e => {
       e.preventDefault(); const d = formData(e.target); const body = { id: p.id, title: d.title, dept_id: d.dept_id || null };
-      if (d.role) body.role = d.role; if (p.role !== 'owner' && p.id !== ME.id) body.active = !!d.active;
+      if (d.role) body.role = d.role; if ('prole' in d) body.prole = d.prole || null; if (p.role !== 'owner' && p.id !== ME.id) body.active = !!d.active;
       try { await call('member_update', body); $('dlg').close(); await boot(); go('team'); } catch (er) { toast(er.message); }
     });
 }
@@ -498,6 +498,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 })();
 </script>
 <script src="modules.js"></script>
+<script src="design.js"></script>
 <script src="../brand/brand.js" data-app="biz" defer></script>
 </body>
 </html>

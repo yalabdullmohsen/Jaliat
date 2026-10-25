@@ -2,9 +2,22 @@
    يُحمَّل بعد السكربت الرئيسي ويضيف عليه بدون تعديل منطقه الأساسي. */
 (() => {
   const CAT = window.BIZ_CATALOG || [], SECT = window.BIZ_SECTORS || {};
-  const CM = Object.fromEntries(CAT.map(c => [c.key, c]));
-  const extras = () => (ORG && Array.isArray(ORG.extra) ? ORG.extra.filter(k => CM[k]) : []);
-  const mlabel = k => (ORG?.labels?.[k]) || CM[k]?.label || k;
+  const CAT_M = Object.fromEntries(CAT.map(c => [c.key, c]));
+  let CM = { ...CAT_M };
+  // تعريف كل نوع = الكتالوج + تصميم الجهة (أو نوع خاص صممته الجهة)
+  const rebuild = () => {
+    CM = { ...CAT_M };
+    for (const [k, d] of Object.entries(ORG?.design?.types || {})) {
+      const b = CAT_M[k] || { group: 'خاص بالجهة', icon: 'file', fields: [], status: ['جديد'] };
+      CM[k] = { ...b, ...d, key: k, group: d.group || b.group, icon: d.icon || b.icon, fields: d.fields?.length ? d.fields : b.fields, status: d.status?.length ? d.status : b.status, custom: !CAT_M[k] };
+    }
+  };
+  const lvlOk = (p, l, r) => l === 'all' || l == null || (l === 'own' && r && r.created_by === ME.id) || (l === 'roles' && (p.roles || []).includes(ME.prole || 'member'));
+  const canR = (k, act, r) => isAdmin() || !!ME?.perms?.records || lvlOk(CM[k]?.perm || {}, (CM[k]?.perm || {})[act], r);
+  const extras = () => (ORG && Array.isArray(ORG.extra) ? ORG.extra.filter(k => CM[k] && canR(k, 'view')) : []);
+  const mlabel = k => ORG?.design?.types?.[k]?.label || (ORG?.labels?.[k]) || CM[k]?.label || k;
+  const coreOk = k => isAdmin() || (ORG?.design?.core?.[k]?.perm?.view || 'all') === 'all';
+  const ordered = keys => { const o = ORG?.design?.order || []; const ix = k => { const i = o.indexOf(k); return i < 0 ? 999 : i; }; return [...keys].sort((a, b) => ix(a) - ix(b)); };
   const GI = {
     gavel: '<path d="M14 4l6 6M12 6l6 6M5 19l7-7M9 9l6 6"/><path d="M3 21h8"/>', bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
     users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c2 .7 3.2 2.5 3.5 5.4"/>',
@@ -48,19 +61,25 @@
 
   /* ---------- التنقل ---------- */
   const desk = matchMedia('(min-width:1000px)');
+  const coreIcon = k => GI[ORG?.design?.core?.[k]?.icon] || IC[k];
   renderNav = function () {
+    rebuild();
     const m = ORG.modules || {};
-    let items = [['home', 'الرئيسية', IC.home]].concat(['tasks', 'bookings', 'requests'].filter(k => m[k]).map(k => [k, label(k), IC[k]]));
-    if (desk.matches) items = items.concat(extras().map(k => ['m-' + k, mlabel(k), GI[CM[k].icon] || GI.file]));
+    let keys = ['tasks', 'bookings', 'requests'].filter(k => m[k] && coreOk(k));
+    if (desk.matches) keys = keys.concat(extras().map(k => 'm-' + k));
+    keys = ordered(keys);
+    if (!desk.matches) keys = keys.slice(0, 3);
+    const items = [['home', 'الرئيسية', IC.home]].concat(keys.map(k => k.startsWith('m-') ? [k, mlabel(k.slice(2)), GI[CM[k.slice(2)].icon] || GI.file] : [k, label(k), coreIcon(k)]));
     items.push(['more', 'المزيد', IC.more]);
-    const inMore = ['clients', 'team', 'settings', 'news', 'import'].includes(VIEW) || (!desk.matches && VIEW.startsWith('m-'));
+    const inMore = !items.some(([k]) => k === VIEW);
     $('nav').innerHTML = items.map(([k, l, ic]) => `<button type="button" data-go="${k}"${VIEW === k || (k === 'more' && inMore) ? ' aria-current="page"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ic}</svg><span>${esc(l)}</span></button>`).join('');
+    const lg = $('orgLogo'); if (lg) lg.src = ORG?.design?.logo || 'logo-180.png';
   };
   desk.addEventListener?.('change', () => ME && renderNav());
   const _go = go;
   go = async function (v) {
     if (typeof v === 'string' && v.startsWith('m-')) {
-      const k = v.slice(2); if (!CM[k]) return _go('home');
+      rebuild(); const k = v.slice(2); if (!CM[k]) return _go('home');
       VIEW = v; if (location.hash.slice(1) !== v) history.replaceState(null, '', '#' + v); renderNav();
       const el = $('view'); el.innerHTML = '<p class="empty">جارٍ التحميل…</p>';
       try { await modView(el, k); } catch (e) { el.innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
@@ -70,65 +89,76 @@
   };
 
   /* ---------- شاشة نوع العمل ---------- */
+  const shown = c => { const l = c.fields.filter(f => f.list); return l.length ? l.slice(0, 4) : c.fields.slice(0, 3); };
+  const fv = (f, v) => f.t === 'yesno' ? (v === true || v === 'نعم' ? 'نعم' : v === false || v === 'لا' ? 'لا' : '') : fmtVal(f, v);
   async function modView(el, k) {
     const c = CM[k]; const rows = (await call('rec_list', { module: k })).rows;
     let q = '', f = 'all';
     const draw = () => {
       const items = rows.filter(r => (f === 'all' || r.status === f) && (!q || JSON.stringify(r.data).includes(q)));
       const counts = Object.fromEntries(c.status.map(s => [s, rows.filter(r => r.status === s).length]));
-      const [f1, f2, f3] = c.fields;
-      el.innerHTML = `<div class="h"><h2>${esc(mlabel(k))}</h2><button class="btn sm" id="addR">+ إضافة</button></div>
-        <div class="seg" id="sf"><button type="button" data-f="all" aria-pressed="${f === 'all'}">الكل (${rows.length})</button>${c.status.map(s => `<button type="button" data-f="${esc(s)}" aria-pressed="${f === s}">${esc(s)} (${counts[s]})</button>`).join('')}</div>
+      const [f1, ...fr] = shown(c);
+      el.innerHTML = `<div class="h"><h2>${esc(mlabel(k))}</h2>${canR(k, 'add') ? '<button class="btn sm" id="addR">+ إضافة</button>' : ''}</div>
+        <div class="seg" id="sf"><button type="button" data-f="all" aria-pressed="${f === 'all'}">الكل (${rows.length})</button>${c.status.map(s => `<button type="button" data-f="${esc(s)}" aria-pressed="${f === s}">${esc(s)} (${counts[s] || 0})</button>`).join('')}</div>
         <input id="rq" placeholder="ابحث" value="${esc(q)}" style="padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)">
-        <section class="card"><div class="list">${items.map(r => `<div class="row" data-rid="${r.id}" style="cursor:pointer"><div class="tx"><b>${esc(fmtVal(f1, r.data[f1.k]) || '—')}</b><div class="sub">${esc([f2, f3].filter(Boolean).map(x => fmtVal(x, r.data[x.k])).filter(Boolean).join(' · '))}</div></div><span class="pill p-${toneOf(c, r.status)}">${esc(r.status || '')}</span></div>`).join('') || `<p class="empty">ما فيه ${esc(mlabel(k))} بعد. أضف أول واحد، أو ارفع ملف من الإعدادات ونرتبه لك.</p>`}</div></section>`;
+        <section class="card"><div class="list">${items.map(r => `<div class="row" data-rid="${r.id}" style="cursor:pointer"><div class="tx"><b>${esc((f1 && fv(f1, r.data[f1.k])) || r.data._from || '—')}</b><div class="sub">${esc([r.source === 'portal' ? 'من البوابة' + (r.data._from ? ': ' + r.data._from : '') : '', ...fr.map(x => fv(x, r.data[x.k]))].filter(Boolean).join(' · '))}</div></div><span class="pill p-${toneOf(c, r.status)}">${esc(r.status || '')}</span></div>`).join('') || `<p class="empty">ما فيه ${esc(mlabel(k))} بعد.${canR(k, 'add') ? ' أضف أول واحد، أو ارفع ملف ونرتبه لك.' : ''}</p>`}</div></section>`;
       $('sf').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { f = b.dataset.f; draw(); } };
       $('rq').oninput = e => { q = e.target.value.trim(); const p = e.target.selectionStart; draw(); $('rq').focus(); $('rq').setSelectionRange(p, p); };
-      $('addR').onclick = () => recForm(k);
+      if ($('addR')) $('addR').onclick = () => recForm(k);
       el.querySelectorAll('[data-rid]').forEach(x => x.onclick = () => recForm(k, rows.find(r => r.id === x.dataset.rid)));
     };
     draw();
   }
   function recForm(k, r) {
-    const c = CM[k];
+    const c = CM[k], ro = r ? !canR(k, 'edit', r) : !canR(k, 'add');
+    const dis = ro ? ' disabled' : '';
     const inp = fd => {
-      const v = r?.data?.[fd.k] ?? '';
-      if (fd.t === 'textarea') return `<textarea name="${fd.k}">${esc(v)}</textarea>`;
-      if (fd.t === 'select') return `<select name="${fd.k}">${opt(fd.o.map(x => [x, x]), v, '—')}</select>`;
-      return `<input name="${fd.k}" type="${fd.t === 'number' ? 'number' : fd.t === 'date' ? 'date' : 'text'}"${fd.t === 'number' ? ' step="any" dir="ltr"' : ''} value="${esc(v)}">`;
+      const v = r?.data?.[fd.k] ?? '', rq = fd.req ? ' required' : '';
+      if (fd.t === 'textarea') return `<textarea name="${fd.k}"${rq}${dis}>${esc(v)}</textarea>`;
+      if (fd.t === 'select') return `<select name="${fd.k}"${rq}${dis}>${opt((fd.o || []).map(x => [x, x]), v, '—')}</select>`;
+      if (fd.t === 'yesno') return `<select name="${fd.k}"${rq}${dis}>${opt([['نعم', 'نعم'], ['لا', 'لا']], v === true ? 'نعم' : v === false ? 'لا' : v, '—')}</select>`;
+      const ty = { number: 'number', date: 'date', phone: 'tel', email: 'email' }[fd.t] || 'text';
+      return `<input name="${fd.k}" type="${ty}"${['number', 'phone', 'email'].includes(fd.t) ? ' dir="ltr"' : ''}${fd.t === 'number' ? ' step="any"' : ''} value="${esc(v)}"${rq}${dis}>`;
     };
-    dialog(r ? mlabel(k) : 'إضافة — ' + mlabel(k), `<form class="form">${c.fields.map(fd => `<label class="f"><span>${esc(fd.l)}</span>${inp(fd)}</label>`).join('')}
-      <label class="f"><span>الحالة</span><select name="__st">${opt(c.status.map(s => [s, s]), r?.status || c.status[0])}</select></label>
-      <button class="btn">${r ? 'حفظ' : 'إضافة'}</button>${r ? '<button type="button" class="btn bad" id="delR">حذف</button>' : ''}</form>`,
+    const portal = r?.source === 'portal' ? `<div class="aibox">من بوابة العملاء: <b>${esc(r.data._from || '')}</b> <span dir="ltr">${esc(r.data._phone || '')}</span>${r.data._code ? ` · رقم الطلب <b dir="ltr">${esc(r.data._code)}</b>` : ''}</div>` : '';
+    dialog(r ? mlabel(k) : 'إضافة — ' + mlabel(k), `<form class="form">${portal}${c.fields.map(fd => `<label class="f"><span>${esc(fd.l)}${fd.req ? ' *' : ''}</span>${inp(fd)}</label>`).join('')}
+      <label class="f"><span>الحالة</span><select name="__st"${dis}>${opt(c.status.map(s => [s, s]), r?.status || c.status[0])}</select></label>
+      ${r?.source === 'portal' ? `<label class="f"><span>الرد على العميل (يشوفه في «تابع طلبك»)</span><textarea name="__reply"${dis}>${esc(r.data._reply || '')}</textarea></label>` : ''}
+      ${ro ? '<p class="muted sm" style="margin:0">عرض فقط، ما عندك صلاحية تعديل.</p>' : `<button class="btn">${r ? 'حفظ' : 'إضافة'}</button>${r ? '<button type="button" class="btn bad" id="delR">حذف</button>' : ''}`}</form>`,
       b => {
         b.querySelector('form').onsubmit = async e => {
-          e.preventDefault(); const d = formData(e.target), data = {};
+          e.preventDefault(); if (ro) return; const d = formData(e.target), data = {};
           for (const fd of c.fields) if (d[fd.k] !== '' && d[fd.k] != null) data[fd.k] = fd.t === 'number' ? Number(d[fd.k]) : d[fd.k];
+          if ('__reply' in d) data._reply = d.__reply;
           try { await call('rec_save', { module: k, row: { id: r?.id, data, status: d.__st } }); $('dlg').close(); toast('انحفظ ✓'); go('m-' + k); } catch (er) { toast(er.message); }
         };
-        if (b.querySelector('#delR')) b.querySelector('#delR').onclick = async () => { try { await call('rec_remove', { id: r.id }); $('dlg').close(); go('m-' + k); } catch (er) { toast(er.message); } };
+        if (b.querySelector('#delR')) b.querySelector('#delR').onclick = async () => { if (!confirmDel()) return; try { await call('rec_remove', { id: r.id }); $('dlg').close(); go('m-' + k); } catch (er) { toast(er.message); } };
       });
   }
+  const confirmDel = () => { const b = $('delR'); if (b.dataset.sure) return true; b.dataset.sure = 1; b.textContent = 'اضغط مرة ثانية للتأكيد'; return false; };
 
   /* ---------- المزيد + الرئيسية ---------- */
+  const canImport = () => isAdmin() || !!ME?.perms?.import;
   const _more = VIEWS.more;
   VIEWS.more = async el => {
     await _more(el);
-    const ex = extras(); let counts = {};
+    const ex = ordered(extras().map(k => 'm-' + k)).map(k => k.slice(2)); let counts = {};
     try { counts = (await call('rec_counts')).counts; } catch {}
     const sec = document.createElement('section'); sec.className = 'card';
-    sec.innerHTML = `<div class="h" style="margin-bottom:4px"><h2 style="font-size:1rem">أعمال الجهة</h2>${isAdmin() ? '<button class="link" data-go="settings">+ أنواع أكثر</button>' : ''}</div>
-      <div>${ex.map(k => `<div class="mrow" data-go="m-${k}"><span class="ic">${icon(k)}</span><div class="tx"><b>${esc(mlabel(k))}</b><div class="sub">${esc(CM[k].group)}</div></div><span class="cnt">${counts[k] || 0}</span></div>`).join('') || '<p class="empty">ما فعّلت أنواع عمل إضافية بعد.</p>'}</div>`;
+    sec.innerHTML = `<div class="h" style="margin-bottom:4px"><h2 style="font-size:1rem">أعمال الجهة</h2>${isAdmin() ? '<button class="link" data-go="design">+ صمّم وأضف</button>' : ''}</div>
+      <div>${ex.map(k => `<div class="mrow" data-go="m-${k}"><span class="ic">${icon(k)}</span><div class="tx"><b>${esc(mlabel(k))}</b><div class="sub">${esc(CM[k].group || '')}</div></div><span class="cnt">${counts[k] || 0}</span></div>`).join('') || '<p class="empty">ما فيه أنواع عمل إضافية بعد.</p>'}</div>`;
     el.insertBefore(sec, el.children[1] || null);
-    if (isAdmin()) { const imp = document.createElement('section'); imp.className = 'card'; imp.innerHTML = importCardHTML(); el.insertBefore(imp, sec.nextSibling); wireImport(imp); }
+    if (isAdmin()) { const d = document.createElement('section'); d.className = 'card'; d.innerHTML = `<div class="mrow" data-go="design" style="border:0"><span class="ic">${GI.layers}</span><div class="tx"><b>تصميم النظام</b><div class="sub">المزايا والحقول والترتيب والأدوار والصلاحيات والشعار</div></div><span class="muted">‹</span></div>`; el.insertBefore(d, el.children[1]); }
+    if (canImport()) { const imp = document.createElement('section'); imp.className = 'card'; imp.innerHTML = importCardHTML(); el.insertBefore(imp, sec.nextSibling); wireImport(imp); }
   };
   const _home = VIEWS.home;
   VIEWS.home = async el => {
     await _home(el);
-    const ex = extras(); let counts = {};
+    const ex = ordered(extras().map(k => 'm-' + k)).map(k => k.slice(2)).filter(k => CM[k].home !== false); let counts = {};
     try { counts = (await call('rec_counts')).counts; } catch {}
     if (ex.length) {
       const g = document.createElement('section'); g.className = 'card';
-      g.innerHTML = `<div class="h" style="margin-bottom:4px"><h2 style="font-size:1rem">أعمال الجهة</h2></div>${ex.slice(0, 8).map(k => `<div class="mrow" data-go="m-${k}"><span class="ic">${icon(k)}</span><div class="tx"><b>${esc(mlabel(k))}</b></div><span class="cnt">${counts[k] || 0}</span></div>`).join('')}`;
+      g.innerHTML = `<div class="h" style="margin-bottom:4px"><h2 style="font-size:1rem">أعمال الجهة</h2></div>${ex.slice(0, 10).map(k => `<div class="mrow" data-go="m-${k}"><span class="ic">${icon(k)}</span><div class="tx"><b>${esc(mlabel(k))}</b></div><span class="cnt">${counts[k] || 0}</span></div>`).join('')}`;
       const stats = el.querySelector('.stats'); el.insertBefore(g, stats ? stats.nextSibling : el.children[1]);
     }
     const total = Object.values(counts).reduce((a, b) => a + b, 0);
@@ -139,29 +169,18 @@
     }
   };
 
-  /* ---------- الإعدادات: القطاع + الكتالوج ---------- */
+  /* ---------- الإعدادات: رابط تصميم النظام ---------- */
   const _settings = VIEWS.settings;
   VIEWS.settings = async el => {
     await _settings(el);
     if (!isAdmin()) return;
-    const ex = new Set(extras());
-    const groups = [...new Set(CAT.map(c => c.group))];
-    const sec = document.createElement('form'); sec.className = 'card form'; sec.id = 'catF';
-    sec.innerHTML = `<h2 style="margin:0;font-size:1rem">أنواع العمل في جهتك</h2>
-      <p class="muted sm" style="margin:-6px 0 0">اختر القطاع ونفعّل لك الأنواع المناسبة، أو اختر بنفسك.</p>
-      <label class="f"><span>قطاع الجهة</span><select name="sector" id="secSel">${opt(Object.keys(SECT).map(s => [s, s]), ORG.sector || 'عام')}</select></label>
-      ${groups.map(g => `<div class="grp">${esc(g)}</div><div class="xg">${CAT.filter(c => c.group === g).map(c => `<label><input type="checkbox" name="x_${c.key}"${ex.has(c.key) ? ' checked' : ''}>${icon(c.key)}<span>${esc(c.label)}</span></label>`).join('')}</div>`).join('')}
-      <button class="btn">حفظ أنواع العمل</button>`;
-    const orgF = $('orgF'); orgF.parentNode.insertBefore(sec, orgF.nextSibling);
-    const imp = document.createElement('section'); imp.className = 'card'; imp.innerHTML = importCardHTML(); sec.parentNode.insertBefore(imp, sec.nextSibling); wireImport(imp);
-    $('secSel').onchange = e => { const want = new Set(SECT[e.target.value] || []); if (!want.size) return; sec.querySelectorAll('[name^="x_"]').forEach(i => { if (want.has(i.name.slice(2))) i.checked = true; }); toast('فعّلت أنواع العمل المناسبة للقطاع، راجعها واحفظ'); };
-    sec.onsubmit = async e => {
-      e.preventDefault(); const d = formData(sec);
-      const extra = CAT.map(c => c.key).filter(k => d['x_' + k]);
-      try { ORG = (await call('org_update', { sector: d.sector, extra })).org; renderNav(); toast('انحفظ ✓'); } catch (er) { toast(er.message); }
-    };
+    const sec = document.createElement('section'); sec.className = 'card';
+    sec.innerHTML = `<div class="hero-imp"><div class="tx"><h2 style="margin:0 0 4px;font-size:1.05rem">تصميم النظام</h2><p class="muted sm" style="margin:0">فعّل المزايا ورتبها، صمّم أنواع عمل بحقولها، وحدد أدوار الموظفين وصلاحياتهم (مثل إسناد المهام).</p></div><button class="btn" data-go="design">افتح التصميم</button></div>`;
+    const orgF = $('orgF'); orgF.parentNode.insertBefore(sec, orgF);
+    const imp = document.createElement('section'); imp.className = 'card'; imp.innerHTML = importCardHTML(); orgF.parentNode.insertBefore(imp, orgF.nextSibling); wireImport(imp);
   };
   VIEWS.import = async el => { el.innerHTML = `<h2 style="margin:0">ارفع ملف عملك</h2><section class="card">${importCardHTML(true)}</section>`; wireImport(el); };
+  window.BIZX = { get CM() { return CM; }, CAT_M, GI, rebuild, icon: k => icon(k), mlabel };
 
   /* ---------- استيراد الملف ---------- */
   function importCardHTML(big) {
@@ -219,7 +238,7 @@
     { key: 'news', label: label('news'), fields: [{ k: 'title', a: ['التعميم', 'الإعلان', 'العنوان', 'announcement'] }, { k: 'body', a: ['النص', 'المحتوى', 'body'] }] },
   ];
   const norm = s => String(s || '').toLowerCase().replace(/[ًٌٍَُِّْـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
-  const defs = () => CORE.concat(CAT.map(c => ({ key: c.key, label: c.label, rec: true, fields: c.fields.map(f => ({ k: f.k, a: f.a || [f.l], t: f.t })) })));
+  const defs = () => CORE.concat(Object.values(CM).map(c => ({ key: c.key, label: c.label, rec: true, fields: c.fields.map(f => ({ k: f.k, a: f.a || [f.l], t: f.t })) })));
   function mapHeaders(hdr, def) {
     const used = new Set(), map = {};
     for (const f of def.fields) {

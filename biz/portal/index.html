@@ -71,7 +71,8 @@ let INFO, TAB = 'req';
 function lab(k, d) { return INFO.org.labels?.[k] || d; }
 function render() {
   const m = INFO.org.modules || {};
-  const tabs = [m.requests && ['req', 'طلب جديد'], m.bookings && INFO.resources.length && ['book', 'حجز موعد'], m.requests && ['track', 'تابع طلبك']].filter(Boolean);
+  const forms = INFO.forms || [];
+  const tabs = [m.requests && ['req', 'طلب جديد'], m.bookings && INFO.resources.length && ['book', 'حجز موعد'], ...forms.map(f => ['f:' + f.key, f.label]), (m.requests || forms.length) && ['track', 'تابع طلبك']].filter(Boolean);
   if (!tabs.find(t => t[0] === TAB)) TAB = tabs[0]?.[0];
   const F = (l, h) => `<label class="f"><span>${l}</span>${h}</label>`;
   const who = `<div class="g2">${F('الاسم', '<input name="name" autocomplete="name" required>')}${F('رقم الهاتف', '<input name="phone" inputmode="tel" dir="ltr" autocomplete="tel" required>')}</div>`;
@@ -85,9 +86,15 @@ function render() {
       <div class="g2">${F('اليوم', `<input type="date" name="day" value="${d}" required>`)}<div class="g2">${F('من', '<input type="time" name="from" value="09:00" required>')}${F('إلى', '<input type="time" name="to" value="10:00" required>')}</div></div>
       <p class="err" id="er" hidden></p><button class="btn">طلب الحجز</button><p class="muted sm" style="margin:0">الحجز يصير مؤكدًا بعد موافقة الجهة.</p></form>`;
   }
+  if (TAB && TAB.startsWith('f:')) {
+    const fm = forms.find(f => 'f:' + f.key === TAB);
+    const inp = x => { const rq = x.req ? ' required' : ''; if (x.t === 'textarea') return `<textarea name="d_${x.k}"${rq}></textarea>`; if (x.t === 'select') return `<select name="d_${x.k}"${rq}><option value="">—</option>${(x.o || []).map(o => `<option>${esc(o)}</option>`).join('')}</select>`; if (x.t === 'yesno') return `<select name="d_${x.k}"${rq}><option value="">—</option><option>نعم</option><option>لا</option></select>`; const ty = { number: 'number', date: 'date', phone: 'tel', email: 'email' }[x.t] || 'text'; return `<input name="d_${x.k}" type="${ty}"${['number', 'phone', 'email'].includes(x.t) ? ' dir="ltr"' : ''}${rq}>`; };
+    body = `<form class="card form" id="fm"><h2>${esc(fm.label)}</h2>${who}${fm.fields.map(x => F(esc(x.l) + (x.req ? ' *' : ''), inp(x))).join('')}<p class="err" id="er" hidden></p><button class="btn">إرسال</button><p class="muted sm" style="margin:0">بعد الإرسال يطلع لك رقم، تتابع فيه من «تابع طلبك».</p></form>`;
+  }
   if (TAB === 'track') body = `<form class="card form" id="fm"><h2>تابع طلبك</h2><div class="g2">${F('رقم الطلب', '<input name="code" dir="ltr" autocapitalize="characters" required>')}${F('رقم الهاتف', '<input name="phone" inputmode="tel" dir="ltr" required>')}</div><p class="err" id="er" hidden></p><button class="btn">عرض الحالة</button><div id="res"></div></form>`;
   const news = (INFO.news || []).length ? `<section class="card news"><h2 style="margin-bottom:6px">${esc(lab('news', 'آخر الأخبار'))}</h2>${INFO.news.map(n => `<div class="it"><b>${esc(n.title)}</b><div class="muted sm">${esc(n.body || '')}</div></div>`).join('')}</section>` : '';
-  $('main').innerHTML = (tabs.length > 1 ? `<div class="seg" id="tabs">${tabs.map(([k, l]) => `<button type="button" data-t="${k}" aria-pressed="${k === TAB}">${l}</button>`).join('')}</div>` : '') + (body || '<p class="empty">ما فيه خدمات متاحة حاليًا.</p>') + news;
+  const wel = INFO.org.welcome ? `<section class="card" style="white-space:pre-wrap">${esc(INFO.org.welcome)}</section>` : '';
+  $('main').innerHTML = wel + (tabs.length > 1 ? `<div class="seg" id="tabs">${tabs.map(([k, l]) => `<button type="button" data-t="${k}" aria-pressed="${k === TAB}">${l}</button>`).join('')}</div>` : '') + (body || '<p class="empty">ما فيه خدمات متاحة حاليًا.</p>') + news;
   if ($('tabs')) $('tabs').onclick = e => { const b = e.target.closest('[data-t]'); if (b) { TAB = b.dataset.t; render(); } };
   if ($('fm')) $('fm').onsubmit = submit;
 }
@@ -97,8 +104,11 @@ async function submit(e) {
     if (TAB === 'req') { const r = await call('portal_submit', d); f.outerHTML = `<section class="card done"><span class="muted">وصل طلبك ✓ رقم الطلب</span><span class="big">${esc(r.code)}</span><span class="muted sm">احفظ الرقم، وتابع الرد من «تابع طلبك» برقم الطلب وهاتفك.</span></section>`; }
     if (TAB === 'book') { await call('portal_submit', { kind: 'booking', name: d.name, phone: d.phone, subject: d.subject, resource_id: d.resource_id, starts: new Date(`${d.day}T${d.from}:00`).toISOString(), ends: new Date(`${d.day}T${d.to}:00`).toISOString() });
       f.outerHTML = `<section class="card done"><span class="big" style="font-size:1.3rem;letter-spacing:0">وصل طلب الحجز ✓</span><span class="muted sm">بيتواصلون معك على رقمك بعد الموافقة.</span></section>`; }
+    if (TAB.startsWith('f:')) { const data = {}; for (const [k, v] of Object.entries(d)) if (k.startsWith('d_') && v !== '') data[k.slice(2)] = v;
+      const r = await call('portal_submit', { kind: 'form', module: TAB.slice(2), name: d.name, phone: d.phone, data });
+      f.outerHTML = `<section class="card done"><span class="muted">وصل ✓ رقم الطلب</span><span class="big">${esc(r.code)}</span><span class="muted sm">احفظ الرقم، وتابع من «تابع طلبك» برقم الطلب وهاتفك.</span></section>`; }
     if (TAB === 'track') { const r = (await call('portal_track', d)).request;
-      $('res').innerHTML = `<div class="card" style="box-shadow:none;background:var(--surface-2);border:0"><b>${esc(r.subject)}</b> <span class="pill p-${r.status}">${ST[r.status]}</span>${r.reply ? `<p style="margin:8px 0 0;white-space:pre-wrap">${esc(r.reply)}</p>` : '<p class="muted sm" style="margin:6px 0 0">ما وصل رد بعد.</p>'}</div>`; }
+      $('res').innerHTML = `<div class="card" style="box-shadow:none;background:var(--surface-2);border:0"><b>${esc(r.subject)}</b> <span class="pill p-${r.status || 'review'}">${esc(r.status_text || ST[r.status])}</span>${r.reply ? `<p style="margin:8px 0 0;white-space:pre-wrap">${esc(r.reply)}</p>` : '<p class="muted sm" style="margin:6px 0 0">ما وصل رد بعد.</p>'}</div>`; }
   } catch (err) { $('er').textContent = err.message; $('er').hidden = false; }
   finally { if (btn.isConnected) btn.disabled = false; }
 }
@@ -107,6 +117,7 @@ async function submit(e) {
     INFO = await call('portal_info', {});
     const o = INFO.org; document.documentElement.style.setProperty('--accent', o.color || '#2F6B57');
     $('oName').textContent = o.name; $('oSub').textContent = (KINDS[o.kind] || '') + ' · بوابة العملاء'; $('dot').textContent = o.name.trim()[0] || 'إ';
+    if (o.logo) $('dot').outerHTML = `<img src="${o.logo}" alt="" style="width:44px;height:44px;border-radius:12px;object-fit:cover;flex:none">`;
     document.title = o.name + ' — بوابة العملاء'; render();
   } catch (e) { $('main').innerHTML = `<p class="empty">${esc(SLUG ? e.message : 'افتح الرابط اللي أرسلته لك الجهة.')}</p>`; }
 })();
