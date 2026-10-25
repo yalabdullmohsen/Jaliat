@@ -347,6 +347,10 @@ button{font:inherit;cursor:pointer;color:inherit}
     <div class="card set">
       <h3 class="sh">الإشعارات</h3>
       <button class="btn" id="test" type="button">أرسل إشعار تجربة</button>
+      <button class="btn ghost" id="calBtn" type="button">تنبيهات التقويم (صوت من اختيارك)</button>
+      <details class="help"><summary>كيف أغيّر الصوت؟</summary>
+        <ol><li>اضغط الزر وافتح الملف، ثم «إضافة الكل» في التقويم.</li><li>الإعدادات ← الأصوات والاهتزازات ← <b>تنبيهات التقويم</b> ← اختر النغمة.</li></ol>
+      </details>
       <details class="help"><summary>طريقة التثبيت وحل مشاكل الإشعارات</summary>
         <b>آيفون</b>
         <ol><li>افتح injazkwt.com/basma من سفاري.</li><li>زر المشاركة ⬆︎ ← «إضافة إلى الشاشة الرئيسية».</li><li>افتح «بصمة إنجاز» من الشاشة الرئيسية، واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
@@ -543,7 +547,7 @@ function targets(d) {
 }
 
 // يضبط التذكيرات الباقية لليوم حسب البصمات المسجّلة
-async function syncReminders() {
+function reminderItems() {
   const d = log[dayKey(new Date())], t = targets(d), now = Date.now(), items = [];
   if (t) {
     const ex = tawExempt(dayKey(new Date()));
@@ -555,9 +559,31 @@ async function syncReminders() {
       if (atToday(t.out) > now) items.push({ kind: 'out', due_at: atToday(t.out).toISOString(), title: 'بصمة الخروج', body: fmt(t.out) });
     }
   }
+  return items;
+}
+async function syncReminders() {
+  const items = reminderItems();
   const sub = await getSub();
   await call({ action: 'schedule', sub, items });
 }
+// تنبيهات التقويم: صوتها يختاره المستخدم من إعدادات الجوال (الإعدادات ← الأصوات ← تنبيهات التقويم)
+function calIcs() {
+  const items = reminderItems(), z = x => new Date(x).toISOString().replace(/[-:]|\.\d{3}/g, '');
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Injaz Basma//AR', 'CALSCALE:GREGORIAN'];
+  items.forEach((it, i) => L.push('BEGIN:VEVENT', `UID:basma-${Date.now()}-${i}@injazkwt.com`, `DTSTAMP:${z(Date.now())}`,
+    `DTSTART:${z(it.due_at)}`, `DTEND:${z(new Date(it.due_at).getTime() + 5 * 60000)}`, `SUMMARY:${it.title}`, `DESCRIPTION:${it.body || ''}`,
+    'BEGIN:VALARM', 'ACTION:AUDIO', 'TRIGGER:PT0S', 'END:VALARM', 'END:VEVENT'));
+  L.push('END:VCALENDAR');
+  return { n: items.length, txt: L.join('\r\n') };
+}
+$('calBtn').addEventListener('click', () => {
+  const r = calIcs();
+  if (!r.n) return toast('ما فيه تذكيرات باقية اليوم. سجّل بصمة الدخول أول');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([r.txt], { type: 'text/calendar' }));
+  a.download = 'basma.ics'; document.body.appendChild(a); a.click(); a.remove();
+  toast(`جهزت ${r.n} تنبيهات، اضغط «إضافة الكل» في التقويم`);
+});
 
 const NAMES = { in: 'الدخول', taw: 'التواجد', out: 'الخروج' };
 // ---- مكان الدوام: البصمة داخل 200 متر من الموقع المحفوظ ----
