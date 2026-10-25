@@ -186,9 +186,10 @@ function renderAuth() {
   document.querySelectorAll('#authTabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.a === AUTH)));
   const F = (l, h) => `<label class="f"><span>${l}</span>${h}</label>`;
   const em = F('البريد الإلكتروني', '<input name="email" type="email" dir="ltr" autocomplete="email" required>');
-  const pw = (n = 'current-password') => F('كلمة المرور', `<input name="password" type="password" dir="ltr" autocomplete="${n}" minlength="8" placeholder="8 أحرف على الأقل" required>`);
+  const emLogin = F('البريد أو اسم المستخدم', '<input name="email" type="text" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" required>');
+  const pw = (n = 'current-password') => F('كلمة المرور', `<input name="password" type="password" dir="ltr" autocomplete="${n}"${n === 'new-password' ? ' minlength="8" placeholder="8 أحرف على الأقل"' : ''} required>`);
   let h = '';
-  if (AUTH === 'login') h = `<h2 style="margin:0">دخول</h2>${em}${pw()}<p class="err" id="aErr" hidden></p><button class="btn" type="submit">دخول</button>`;
+  if (AUTH === 'login') h = `<h2 style="margin:0">دخول</h2>${emLogin}${pw()}<p class="err" id="aErr" hidden></p><button class="btn" type="submit">دخول</button>`;
   if (AUTH === 'signup') h = `<h2 style="margin:0">سجّل جهتك</h2><p class="muted sm" style="margin:-6px 0 0">تصير أنت مدير النظام، وتضيف موظفيك برمز الانضمام.</p>
     ${F('اسم الجهة', '<input name="org_name" required placeholder="مثال: إدارة الخدمات العامة">')}
     <div class="f"><span>نوع الجهة</span><div class="kinds">${Object.entries(KINDS).map(([k, v], i) => `<label><input type="radio" name="kind" value="${k}"${i === 3 ? ' checked' : ''}><span>${v}</span></label>`).join('')}</div></div>
