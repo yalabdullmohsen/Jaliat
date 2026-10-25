@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>بصمة إنجاز</title>
 <meta name="author" content="يوسف عبد المحسن المطيري">
-<meta name="theme-color" content="#12291F" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#181E1B" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="بصمة إنجاز">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
@@ -38,29 +38,29 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
-html{background:var(--top-band)}
+html{background:var(--surface)}
 body{min-height:100vh}
-body::before{content:"";position:fixed;inset:0 0 auto;height:calc(env(safe-area-inset-top,0px) + 6px);background:var(--top-band);z-index:30;pointer-events:none}
-.top{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--top-band) 0,var(--side) calc(env(safe-area-inset-top,0px) + 8px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:30;pointer-events:none}
+.top{position:sticky;top:0;z-index:20}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom,0px)}
 button{font:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 40%,transparent);outline-offset:2px}
 
-.top{background:var(--side);color:var(--side-ink);padding-top:env(safe-area-inset-top,0px)}
+.top{background:var(--surface);color:var(--ink);padding-top:env(safe-area-inset-top,0px);border-bottom:1px solid var(--line);box-shadow:0 4px 14px -10px rgba(31,42,37,.25)}
 .top .in{max-width:480px;margin:0 auto;display:flex;align-items:center;gap:12px;padding-block:14px 12px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .top img{width:40px;height:40px;border-radius:10px;box-shadow:0 0 0 1px rgba(211,180,108,.45)}
 .top .ttl{flex:1;min-width:0}
-.top h1{margin:0;font-size:1.2rem;font-weight:700;line-height:1.3}
-.top .d{font-size:.85rem;color:var(--side-muted)}
-.rf{width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:var(--side-ink);display:grid;place-items:center;flex:none}
+.top h1{margin:0;font-size:1.2rem;font-weight:700;line-height:1.3;color:var(--primary)}
+.top .d{font-size:.85rem;color:var(--muted)}
+.rf{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--primary);display:grid;place-items:center;flex:none}
 .rf svg{width:20px;height:20px}
 .rf.spin svg{animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(-360deg)}}
 .tabs{max-width:480px;margin:0 auto;display:flex;gap:4px;padding-block:0 12px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.tabs button{flex:1;border:0;background:rgba(255,255,255,.07);color:var(--side-muted);border-radius:10px;padding:9px 4px;font-weight:600;font-size:.92rem}
-.tabs button[aria-selected="true"]{background:var(--side-ink);color:var(--side)}
+.tabs button{flex:1;border:0;background:var(--surface-2);color:var(--muted);border-radius:10px;padding:9px 4px;font-weight:600;font-size:.92rem}
+.tabs button[aria-selected="true"]{background:var(--primary);color:var(--primary-ink)}
 
 .wrap{max-width:480px;margin:0 auto;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
