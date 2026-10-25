@@ -430,3 +430,4 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .home.ht .ht-hide{display:none!important}
 @media (max-width:1100px){.ht-duo{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:700px){.ht-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ht-stats .ht-s{padding:10px 12px!important}.ht-stats .ht-s b{font-size:20px}.ht-setup .check{grid-template-columns:1fr}.ht-setup .check .br-acts{grid-column:1;grid-row:auto}}
+body:not([data-view="odsave"]) #odx-bar{display:none!important}

@@ -73,3 +73,7 @@ function htCut(box, sel, n, key, lbl){ if (!box) return; const it = [...box.quer
 function htSet(p, b, open){ p.classList.toggle("ht-cut", !open); b.textContent = open ? "عرض أقل" : b.dataset.lbl; }
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-httog]"); if (!t) return; const k = t.dataset.httog; HT_OPEN[k] = !HT_OPEN[k]; htSet(t.parentElement, t, HT_OPEN[k]); });
 NEWF.splice(1, 0, ["v76-tidy", "nav:home", "رئيسية أنظف وأوضح", "الأرقام في شبكة واحدة بلا تكرار، وأهم 5 أولويات أولاً، و«ما الجديد» مختصر، وتنبيهات الإعداد في شريط واحد، واختفاء اللوحات الفارغة.", true, "2026-10-25"]);
+/* زر OneDrive العائم يظهر في صفحة «الحفظ في OneDrive» فقط */
+const _afterRender61 = afterRender;
+afterRender = function(v){ _afterRender61(v); document.body.dataset.view = v; };
+NEWF.splice(1, 0, ["v77-odx-quiet", "nav:odsave", "زر OneDrive في صفحته فقط", "زر «احفظ نسخة اليوم في OneDrive» العائم لم يعد يظهر في كل الصفحات؛ تجده في صفحة «الحفظ في OneDrive» فقط، والحفظ اليومي التلقائي مستمر كما هو.", true, "2026-10-25"]);
