@@ -92,6 +92,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .tbar i{display:block;height:100%;width:0;border-radius:99px;transition:width 1s linear}
 .next.taw .tbar i{background:var(--gold)} .next.out .tbar i{background:var(--bad)}
 .next.taw .tick{color:var(--gold)} .next.out .tick{color:var(--bad)}
+.next.end .nhead .lbl{color:var(--primary);font-weight:700;font-size:1rem}
+.next.end .cd{background:var(--primary-soft);color:var(--primary);margin-top:10px}
 .next.end .big{color:var(--primary);font-size:1.5rem}
 
 /* البصمات الثلاث */
@@ -113,10 +115,17 @@ button{font:inherit;cursor:pointer;color:inherit}
 @media (prefers-color-scheme:dark){.p-taw .act,.p-out .act{color:#141414}}
 .p .done{border:0;background:none;padding:6px 4px;text-align:left;flex:none}
 .p .done b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums;line-height:1.2}
-.p .done span{font-size:.78rem;color:var(--primary);font-weight:600}
-.p.is-done{background:var(--surface-2);box-shadow:none}
+.p .done span{display:inline-flex;align-items:center;gap:4px;font-size:.78rem;color:var(--muted);font-weight:600}
+.p.is-done{background:var(--surface-2);box-shadow:none;border-color:transparent}
+.p.is-done .nm::after{content:"";display:inline-block;width:7px;height:12px;margin-inline-start:8px;border:solid var(--primary);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translateY(-2px)}
+.p.is-locked{opacity:.55}
+.p .act.soft{background:transparent !important;border:1.5px solid currentColor}
+.p-in .act.soft{color:var(--primary)} .p-taw .act.soft{color:var(--gold)} .p-out .act.soft{color:var(--bad)}
+.p .act:disabled{cursor:not-allowed}
 .perm{display:flex;flex-direction:column;gap:10px}
-.perm .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.perm .ph{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.quota{font-size:.82rem;font-weight:700;font-variant-numeric:tabular-nums;padding:3px 10px;border-radius:99px;background:var(--primary-soft);color:var(--primary);white-space:nowrap}
+.quota.over{background:var(--bads);color:var(--bad)}
 .perm .sub{font-size:.82rem;color:var(--muted)}
 .perm .pi{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--surface-2);border-radius:10px;font-weight:600;font-variant-numeric:tabular-nums}
 .perm .permAdd .row{display:flex;gap:8px}
@@ -155,7 +164,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .tbl .miss,.tbl .late{color:var(--bad)}
 .tbl .wait{color:var(--muted)}
 .late-card{display:flex;flex-direction:column;gap:8px;padding:14px}
-.lc-h{display:flex;justify-content:space-between;align-items:baseline;font-weight:600}
+.lc-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 10px;font-weight:600}
+.lc-h b{white-space:nowrap}
 .lc-h b{font-variant-numeric:tabular-nums}
 .bar{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--primary);border-radius:99px}
@@ -165,14 +175,16 @@ button{font:inherit;cursor:pointer;color:inherit}
 .legend{font-size:.8rem;color:var(--muted);margin:10px 0 0}
 
 /* الإعدادات */
-.set{display:flex;flex-direction:column;gap:16px}
+.set{display:flex;flex-direction:column;gap:14px}
+.sh{margin:0;font-size:1.02rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.set > small{color:var(--muted);font-size:.84rem;line-height:1.7}
 .f{display:flex;flex-direction:column;gap:6px}
 .f > span{font-size:.9rem;font-weight:600}
 .f > small{color:var(--muted);font-size:.8rem}
 .seg{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:3px}
 .seg button{flex:1;border:0;background:none;border-radius:8px;padding:9px 4px;font-size:.88rem;font-weight:600;color:var(--muted)}
 .code{display:flex;align-items:center;gap:8px}
-.code b{flex:1;font-size:1.25rem;letter-spacing:.08em;direction:ltr;text-align:center;background:var(--surface-2);border-radius:10px;padding:10px;font-variant-numeric:tabular-nums}
+.code b{flex:1;min-width:0;font-size:1.1rem;letter-spacing:.05em;white-space:nowrap;direction:ltr;text-align:center;background:var(--surface-2);border-radius:10px;padding:10px 6px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
 .restore{display:flex;gap:8px}
 .restore input{flex:1;min-width:0;direction:ltr;text-align:center;text-transform:uppercase;letter-spacing:.06em;font:600 1rem var(--f);padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
 .sync{font-size:.8rem;color:var(--muted)}
@@ -232,14 +244,14 @@ button{font:inherit;cursor:pointer;color:inherit}
       </div>
     </div>
     <div class="card perm" id="permCard">
-      <div class="ph"><b>الاستئذان</b><span class="sub" id="permQuota"></span></div>
+      <div class="ph"><b>الاستئذان</b><span class="quota" id="permQuota"></span></div>
       <div id="permList"></div>
       <div class="permAdd" id="permAdd" hidden>
         <div class="row"><label>من <input type="time" id="pFrom" dir="ltr" min="06:30" max="16:59"></label><label>إلى <input type="time" id="pTo" dir="ltr" min="06:30" max="16:59"></label></div>
         <div class="links"><button class="btn" id="pSave" type="button">حفظ الاستئذان</button><button class="link" id="pCancel" type="button">رجوع</button></div>
       </div>
       <button class="btn ghost" id="pNew" type="button">+ استئذان اليوم</button>
-      <small class="sub">الاستئذان المعتمد: 4 مرات و12 ساعة بالشهر. إذا وقع في نافذة التواجد تُعفى منها.</small>
+      <small class="sub">إذا وقع الاستئذان في نافذة التواجد تُعفى منها.</small>
     </div>
   </section>
 
@@ -274,50 +286,58 @@ button{font:inherit;cursor:pointer;color:inherit}
   </section>
 
   <!-- الإعدادات -->
-  <section id="v-set" class="card set" hidden>
-    <div class="f"><span>نوع الدوام</span>
-      <div class="seg" data-k="type">
-        <button type="button" data-v="reg">صباحي</button>
-        <button type="button" data-v="start">تخفيف بداية</button>
-        <button type="button" data-v="end">تخفيف نهاية</button>
+  <section id="v-set" class="view" hidden>
+    <div class="card set">
+      <h3 class="sh">الدوام</h3>
+      <div class="f"><span>نوع الدوام</span>
+        <div class="seg" data-k="type">
+          <button type="button" data-v="reg">صباحي</button>
+          <button type="button" data-v="start">تخفيف بداية</button>
+          <button type="button" data-v="end">تخفيف نهاية</button>
+        </div>
+        <small id="rule"></small>
       </div>
-      <small id="rule"></small>
-    </div>
-    <div class="f"><span>الموظف</span>
-      <div class="seg" data-k="g">
-        <button type="button" data-v="m">رجل</button>
-        <button type="button" data-v="f">امرأة</button>
-      </div>
-    </div>
-    <div class="f"><span>رمزك الخاص</span>
-      <small>بياناتك محفوظة بهذا الرمز بدون حساب. إذا غيّرت جوالك أو حذفت التطبيق، اكتبه تحت وترجع بياناتك.</small>
-      <div class="code"><b id="myCode"></b><button class="btn ghost" id="copyCode" type="button">نسخ</button></div>
-      <span class="sync" id="syncState"></span>
-    </div>
-    <div class="f"><span>عندك رمز من قبل؟</span>
-      <div class="restore">
-        <input id="rCode" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الرمز">
-        <button class="btn" id="rGo" type="button">استرجاع</button>
+      <div class="f"><span>الموظف</span>
+        <div class="seg" data-k="g">
+          <button type="button" data-v="m">رجل</button>
+          <button type="button" data-v="f">امرأة</button>
+        </div>
       </div>
     </div>
-    <div class="f"><span>مكان الدوام</span>
+
+    <div class="card set">
+      <h3 class="sh">مكان الدوام</h3>
       <small id="geoTx">ما حددت مكان الدوام. إذا حددته، ما تقدر تسجل البصمة إلا وأنت فيه.</small>
       <button class="btn ghost" id="geoSet" type="button">أنا الحين في الدوام — احفظ هذا المكان</button>
       <div class="seg" data-k="geoOn" id="geoSeg" hidden>
-        <button type="button" data-v="1">البصمة في مكان الدوام فقط</button>
+        <button type="button" data-v="1">في مكان الدوام فقط</button>
         <button type="button" data-v="0">من أي مكان</button>
       </div>
     </div>
-    <details class="help"><summary>طريقة التثبيت والإشعارات</summary>
-      <b>آيفون</b>
-      <ol><li>افتح injazkwt.com/basma من <b>سفاري</b>.</li><li>زر المشاركة ⬆︎ ← «إضافة إلى الشاشة الرئيسية».</li><li>افتح «بصمة إنجاز» من الشاشة الرئيسية، واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
-      <b>أندرويد</b>
-      <ol><li>افتح الرابط من <b>كروم</b>، واضغط ⋮ ← «تثبيت التطبيق».</li><li>افتحه واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
-      <b>ما وصلك الإشعار؟</b>
-      <ol><li>افتحه من أيقونة الشاشة الرئيسية، مو من المتصفح.</li><li>الإعدادات ← الإشعارات ← بصمة إنجاز ← فعّل السماح.</li><li>اطفِ عدم الإزعاج أو أضف التطبيق للمسموح.</li></ol>
-    </details>
-    <div class="f"><span>الإشعارات</span>
-      <button class="btn ghost" id="test" type="button">أرسل إشعار تجربة</button>
+
+    <div class="card set">
+      <h3 class="sh">رمزك الخاص <span class="sync" id="syncState"></span></h3>
+      <small>بياناتك محفوظة بهذا الرمز بدون حساب. احفظه عندك، وإذا غيّرت جوالك اكتبه تحت وترجع بياناتك.</small>
+      <div class="code"><b id="myCode"></b><button class="btn ghost" id="copyCode" type="button">نسخ</button></div>
+      <div class="f"><span>عندك رمز من قبل؟</span>
+        <div class="restore">
+          <input id="rCode" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الرمز">
+          <button class="btn" id="rGo" type="button">استرجاع</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card set">
+      <h3 class="sh">الإشعارات</h3>
+      <button class="btn" id="test" type="button">أرسل إشعار تجربة</button>
+      <details class="help"><summary>طريقة التثبيت وحل مشاكل الإشعارات</summary>
+        <b>آيفون</b>
+        <ol><li>افتح injazkwt.com/basma من سفاري.</li><li>زر المشاركة ⬆︎ ← «إضافة إلى الشاشة الرئيسية».</li><li>افتح «بصمة إنجاز» من الشاشة الرئيسية، واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
+        <b>أندرويد</b>
+        <ol><li>افتح الرابط من كروم، واضغط ⋮ ← «تثبيت التطبيق».</li><li>افتحه واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
+        <b>ما وصلك الإشعار؟</b>
+        <ol><li>افتحه من أيقونة الشاشة الرئيسية، مو من المتصفح.</li><li>الإعدادات ← الإشعارات ← بصمة إنجاز ← فعّل السماح.</li><li>اطفِ عدم الإزعاج أو أضف التطبيق للمسموح.</li></ol>
+      </details>
     </div>
   </section>
 </main>
@@ -588,7 +608,7 @@ function render() {
     TICK = null;
     if (d.taw == null && n < t.tawEnd && !tawExempt(dayKey(new Date()))) { TICK = n < t.taw ? { to: atToday(t.taw), from: atToday(d.in), lbl: 'باقي على فتح التواجد' } : { to: atToday(t.tawEnd), from: atToday(t.taw), lbl: 'باقي على إغلاق التواجد' }; box.classList.add('taw'); $('nLbl').textContent = `بصمة التواجد (تنقفل ${fmt(t.tawEnd)})`; $('nTime').textContent = fmt(t.taw); $('nCd').textContent = n < t.taw ? left(atToday(t.taw) - ms) : `مفتوحة الحين، باقي ${left(atToday(t.tawEnd) - ms).replace('بعد ', '')}`; $('nCd').hidden = false; }
     else if (d.out == null) { if (n < t.out) TICK = { to: atToday(t.out), from: atToday(d.taw ?? d.in), lbl: 'باقي على الخروج' }; box.classList.add('out'); $('nLbl').textContent = 'بصمة الخروج'; $('nTime').textContent = fmt(t.out); $('nCd').textContent = n < t.out ? left(atToday(t.out) - ms) : 'حان وقتها'; $('nCd').hidden = false; }
-    else { box.classList.add('end'); $('nLbl').textContent = 'خلصت بصمات اليوم'; $('nTime').textContent = 'الله يعطيك العافية'; $('nCd').hidden = true; }
+    else { box.classList.add('end'); $('nLbl').textContent = 'خلصت بصمات اليوم ✓'; $('nTime').textContent = 'الله يعطيك العافية'; $('nCd').textContent = `مدة دوامك اليوم ${hm(Math.max(0, d.out - d.in))} ساعة`; $('nCd').hidden = false; }
   }
   $('lead').hidden = !!t;
   const nextKind = d.in == null ? 'in' : (d.taw == null && !tawExempt(dayKey(new Date()))) ? 'taw' : d.out == null ? 'out' : null;
@@ -597,11 +617,13 @@ function render() {
     const v = d[kind], done = v != null;
     const open = inWindow(n);
     const due = !open ? 'البصمة تفتح 6:30 ص – 4:59 م' : kind === 'taw' && tawExempt(dayKey(new Date())) ? 'معفى اليوم بسبب الاستئذان' : kind === 'taw' && t ? `من ${fmt(t.taw)} إلى ${fmt(t.tawEnd)}` : kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
-    return `<div class="p p-${kind}${done ? ' is-done' : ''}${kind === nextKind ? ' is-next' : ''}">
+    const locked = kind !== 'in' && d.in == null;
+    const solid = kind === nextKind;
+    return `<div class="p p-${kind}${done ? ' is-done' : ''}${solid ? ' is-next' : ''}${locked ? ' is-locked' : ''}">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[kind]}</svg></span>
-      <div class="tx"><div class="nm">${NAMES[kind]}</div><div class="sub">${done ? 'تم ✓' : due}</div></div>
-      ${done ? `<button class="done" data-edit="${kind}" type="button" aria-label="تعديل ${NAMES[kind]}"><b>${fmt(v)}</b><span>تعديل</span></button>`
-             : `<button class="act" data-rec="${kind}" type="button"${open ? '' : ' disabled'}>بصمت</button>`}
+      <div class="tx"><div class="nm">${NAMES[kind]}</div><div class="sub">${done ? 'تم التسجيل' : due}</div></div>
+      ${done ? `<button class="done" data-edit="${kind}" type="button" aria-label="تعديل ${NAMES[kind]}"><b>${fmt(v)}</b><span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>تعديل</span></button>`
+             : `<button class="act${solid ? '' : ' soft'}" data-rec="${kind}" type="button"${open && !locked ? '' : ' disabled'}>بصمت</button>`}
     </div>`;
   }).join('');
 }
@@ -627,8 +649,8 @@ setInterval(tick, 1000);
 function renderPerms() {
   setTimeout(tick, 0);
   const k = dayKey(new Date()), q = monthPerms(k.slice(0, 8));
-  $('permQuota').textContent = `هذا الشهر: ${q.n} من ${PERM_MAX} · ${hm(q.m)} من 12:00 ساعة`;
-  $('permQuota').style.color = q.n > PERM_MAX || q.m > PERM_MIN ? 'var(--bad)' : '';
+  $('permQuota').textContent = `${q.n}/${PERM_MAX} مرات · ${hm(q.m)}/12:00`;
+  $('permQuota').classList.toggle('over', q.n > PERM_MAX || q.m > PERM_MIN);
   $('permList').innerHTML = permsOf(k).map((p, i) => `<div class="pi"><span>${fmt(p.from)} – ${fmt(p.to)} <span class="sub">(${hm(p.to - p.from)})</span></span><button class="link mute" data-pdel="${i}" type="button">حذف</button></div>`).join('');
 }
 $('pNew').addEventListener('click', () => { const n = Math.max(OPEN, Math.min(nowMin(), CLOSE - 60)); $('pFrom').value = `${pad(Math.floor(n / 60))}:${pad(n % 60)}`; $('pTo').value = `${pad(Math.floor((n + 60) / 60))}:${pad((n + 60) % 60)}`; $('permAdd').hidden = false; $('pNew').hidden = true; });
@@ -690,7 +712,7 @@ function renderReport() {
       if (kind === 'taw' && tawExempt(k)) return '<td class="wait">استئذان</td>';
       const waiting = isToday && (!t || n < (kind === 'taw' ? t.taw : t.out) + 60);
       if (!waiting) miss++;
-      return waiting ? '<td class="wait">·</td>' : '<td class="miss">—</td>';
+      return waiting ? '<td class="wait">لاحقًا</td>' : '<td class="miss">—</td>';
     };
     if (d.in != null) { sum += d.in; cnt++; }
     return `<tr><td>${new Intl.DateTimeFormat('ar-KW-u-nu-latn', { weekday: 'long' }).format(dt)}<small>${dt.getDate()}/${mo + 1}</small></td>${cell('in')}${cell('taw')}${cell('out')}</tr>`;
@@ -706,7 +728,7 @@ function renderReport() {
   $('lateCard').classList.toggle('warn', lateMin >= LATE_CAP * .7 && lateMin <= LATE_CAP * 2);
   $('lateCard').classList.toggle('over', lateMin > LATE_CAP);
   const pq = monthPerms(prefix);
-  $('permRep').textContent = `${pq.n} من ${PERM_MAX} مرات · ${hm(pq.m)} من 12:00 ساعة`;
+  $('permRep').textContent = `${pq.n}/${PERM_MAX} مرات · ${hm(pq.m)}/12:00 ساعة`;
   $('permRepBox').classList.toggle('over', pq.n > PERM_MAX || pq.m > PERM_MIN);
   const bd = band(lateMin);
   $('lateNote').textContent = lateMin > LATE_CAP ? `تجاوزت حد ربع اليوم بـ${lateMin - LATE_CAP} دقيقة: ${bd.t}.` : `باقي ${LATE_CAP - lateMin} دقيقة قبل حد ربع اليوم. التأخير يبدأ ${settings.type === 'end' ? '7:31' : '9:31'} ص، وعدم إثبات التواجد في نافذته يدخل في التأخير.`;
