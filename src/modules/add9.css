@@ -431,3 +431,12 @@ tbody td{border-bottom:1px solid var(--line-2)}
 @media (max-width:1100px){.ht-duo{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:700px){.ht-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ht-stats .ht-s{padding:10px 12px!important}.ht-stats .ht-s b{font-size:20px}.ht-setup .check{grid-template-columns:1fr}.ht-setup .check .br-acts{grid-column:1;grid-row:auto}}
 body:not([data-view="odsave"]) #odx-bar{display:none!important}
+/* ===== إرفاق: ما تعلّمه Copilot ===== */
+.lrn{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;background:var(--surface)}
+.lrn summary{cursor:pointer;font-weight:700;display:flex;align-items:center;gap:8px}
+.lrn>.s{display:block;margin:8px 0;color:var(--muted);font-size:12.5px}
+.lrn-add{display:flex;gap:8px}.lrn-add .f{flex:1;min-width:0}
+.lrn-l{display:grid;gap:6px;margin-top:8px;max-height:220px;overflow:auto}
+.lrn-i{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;padding:6px 10px;border-radius:8px;background:var(--surface-2,rgba(0,0,0,.03))}
+.iz-f .att-sheet{background:#1D6F42;color:#fff}.iz-f .att-word{background:#2B579A;color:#fff}.iz-f .att-text{background:var(--muted);color:#fff}
+#ocr-top svg{width:20px;height:20px}
