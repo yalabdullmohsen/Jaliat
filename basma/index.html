@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>بصمة إنجاز</title>
 <meta name="author" content="يوسف عبد المحسن المطيري">
-<meta name="theme-color" content="#1E3A31">
+<meta name="theme-color" content="#1E3A31" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -38,6 +38,10 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
+html{background:var(--side)}
+body{min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--side);z-index:30}
+.top{position:sticky;top:0;z-index:20}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom,0px)}
 button{font:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 40%,transparent);outline-offset:2px}
@@ -77,8 +81,13 @@ button{font:inherit;cursor:pointer;color:inherit}
 .next .cd{display:inline-block;font-size:.88rem;font-weight:600;padding:3px 12px;border-radius:999px}
 .next.taw .big{color:var(--gold)} .next.taw .cd{background:var(--gold-soft);color:var(--gold)}
 .next.out .big{color:var(--bad)} .next.out .cd{background:var(--bads);color:var(--bad)}
-.tick{font:700 clamp(3rem,15vw,4rem)/1.05 var(--f);font-variant-numeric:tabular-nums;direction:ltr;letter-spacing:.04em;margin:6px 0 8px}
-.tick small{font-size:.95rem;font-weight:600;color:var(--muted);letter-spacing:0;direction:rtl;display:block;margin-top:2px}
+.tick{font:700 clamp(3rem,15vw,4rem)/1.05 var(--f);margin-top:10px;font-variant-numeric:tabular-nums;direction:ltr;letter-spacing:.04em;margin:6px 0 8px}
+.sgs{display:flex;justify-content:center;align-items:flex-start;gap:2px;direction:ltr}
+.sg{display:flex;flex-direction:column;align-items:center}
+.sg b{font:inherit;line-height:1}
+.sg i{font-style:normal;font-size:.78rem;font-weight:600;color:var(--muted);letter-spacing:0;margin-top:4px}
+.sep{line-height:1;opacity:.45;padding:0 2px}
+.tick small{margin-top:12px !important;font-size:.95rem;font-weight:600;color:var(--muted);letter-spacing:0;direction:rtl;display:block;margin-top:2px}
 .tbar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:0 auto 10px;max-width:260px}
 .tbar i{display:block;height:100%;width:0;border-radius:99px;transition:width 1s linear}
 .next.taw .tbar i{background:var(--gold)} .next.out .tbar i{background:var(--bad)}
@@ -444,7 +453,12 @@ const pushOK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notif
 const INSTALL = '<b>خطوة وحدة قبل أول استخدام</b>من سفاري اضغط زر المشاركة ← «إضافة إلى الشاشة الرئيسية»، ثم افتح «بصمة إنجاز» من الشاشة الرئيسية.';
 const DENIED = '<b>الإشعارات مقفلة</b>الإعدادات ← الإشعارات ← بصمة إنجاز، وفعّل السماح.';
 let reg = null;
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { scope: './' }).then(r => reg = r).catch(() => {});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js', { scope: './' }).then(r => { reg = r; r.update().catch(() => {}); }).catch(() => {});
+  // نسخة جديدة نزلت: نحدّث الصفحة مرة وحدة تلقائيًا
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloaded || !navigator.serviceWorker.controller) return; reloaded = true; location.reload(); });
+}
 function b64ToBytes(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
 async function getSub() {
   if (!pushOK) throw new Error(isIOS && !standalone ? 'install' : 'unsupported');
@@ -605,7 +619,8 @@ function tick() {
   if (left <= 0) { TICK = null; render(); return; }
   const s = Math.floor(left / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
   el.hidden = false; $('nBar').parentElement.hidden = false; $('nCd').hidden = true;
-  el.innerHTML = `${h ? h + ':' : ''}${pad(m)}:${pad(sec)}<small>${TICK.lbl}</small>`;
+  const seg = (v, l) => `<span class="sg"><b>${v}</b><i>${l}</i></span>`;
+  el.innerHTML = `<div class="sgs">${h ? seg(h, 'ساعة') + '<span class="sep">:</span>' : ''}${seg(pad(m), 'دقيقة')}<span class="sep">:</span>${seg(pad(sec), 'ثانية')}</div><small>${TICK.lbl}</small>`;
   const span = TICK.to - TICK.from; $('nBar').style.width = span > 0 ? Math.min(100, Math.max(0, (1 - left / span) * 100)).toFixed(1) + '%' : '0%';
 }
 setInterval(tick, 1000);
