@@ -266,9 +266,9 @@ async function punch(entry, quiet) {
   $('go').disabled = $('goAt').disabled = true;
   try {
     const sub = await getSub(), now = Date.now(), items = [];
-    if (atToday(p.taw) > now) items.push({ kind: 'taw', due_at: atToday(p.taw).toISOString(), title: 'بصمة التواجد', body: `حان وقت بصمة التواجد ${fmt(p.taw)}` });
-    if (atToday(p.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(p.out - 10).toISOString(), title: 'باقي 10 دقائق على الخروج', body: `بصمة الخروج ${fmt(p.out)}` });
-    if (atToday(p.out) > now) items.push({ kind: 'out', due_at: atToday(p.out).toISOString(), title: 'بصمة الخروج', body: `حان وقت بصمة الخروج ${fmt(p.out)}` });
+    if (atToday(p.taw) > now) items.push({ kind: 'taw', due_at: atToday(p.taw).toISOString(), title: 'بصمة التواجد', body: fmt(p.taw) });
+    if (atToday(p.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(p.out - 10).toISOString(), title: 'الخروج بعد 10 دقائق', body: fmt(p.out) });
+    if (atToday(p.out) > now) items.push({ kind: 'out', due_at: atToday(p.out).toISOString(), title: 'بصمة الخروج', body: fmt(p.out) });
     await call({ action: 'schedule', sub, items });
     store.set('plan', p); $('pick').hidden = true; note('');
     render();
