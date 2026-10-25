@@ -53,7 +53,7 @@ function parseActs(raw){
   for (const m of text.matchAll(/\b(\d{1,2})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{4})\b/g)) { const y = +m[3], mo = +m[2], d = +m[1]; if (y > 1990 && y < 2100 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) dates.push(`${y}-${pad(mo)}-${pad(d)}`); }
   for (const m of text.matchAll(/\b(\d{4})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{1,2})\b/g)) { const y = +m[1], mo = +m[2], d = +m[3]; if (y > 1990 && y < 2100 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) dates.push(`${y}-${pad(mo)}-${pad(d)}`); }
   dates.sort(); if (!docBy[base.doc] && dates.length) { base.start = dates[0]; if (dates.length > 1) base.end = dates[dates.length - 1]; }
-  base.type = /دور(ه|ات)\b|دوره|دورات/.test(n) ? "دورة علمية" : /محاضر/.test(n) ? "محاضرة دينية" : "درس ديني";
+  base.type = /دور(ه|ات)\b|دوره|دورات/.test(n) ? "دورة علمية" : /محاضر(ه|ة|ات)/.test(n) && !/(^|\s)(درس|دروس)/.test(n.replace(/محاضر(ه|ة|ات)/g, "")) ? "محاضرة دينية" : /محاضر(ه|ة|ات)/.test(n) ? "محاضرة دينية" : "درس ديني";
   let comm = ""; let cl = 0; for (const c of commNames) { const ck = nkey(c).replace(/^ال/, ""); const parts = norm(c).split(/[–\-\s]+/).map(x => nkey(x).replace(/^ال/, "")).filter(x => x.length >= 4);
     if (ck.length >= 4 && nkey(text).includes(ck) && ck.length > cl) { comm = c; cl = ck.length; } else if (!comm && parts.length && parts.every(p => nkey(text).includes(p))) comm = c; }
   if (!comm && docBy[base.doc]?.comm) comm = docBy[base.doc].comm; if (comm) base.comm = comm;

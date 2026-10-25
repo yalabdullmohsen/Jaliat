@@ -88,7 +88,7 @@ const attPrompt = (note, extra) => ATT_PROMPT
 async function attGo(){
   const files = INTAKE.files.slice(); if (!files.length) return;
   const note = $("#iz-note")?.value.trim() || ""; const b = $("#iz-go"); b.disabled = true; b.textContent = "جارٍ القراءة…";
-  const rid = crypto.randomUUID(); const paths = [], canvases = []; let pdf = null, extra = "";
+  const rid = uuid4(); const paths = [], canvases = []; let pdf = null, extra = "";
   try {
     await lrnLoad();
     for (const f of files) { const k = attKind(f), ext = (f.name.match(/\.[a-z0-9]+$/i)?.[0] || "").toLowerCase();

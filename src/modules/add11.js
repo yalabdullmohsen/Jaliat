@@ -153,7 +153,7 @@ async function intakeGo(){
   const note = $("#iz-note")?.value.trim() || "";
   const b = $("#iz-go"); b.disabled = true; b.textContent = "جارٍ الرفع…";
   /* 1) keep originals in the request's record */
-  const rid = crypto.randomUUID(); const paths = [];
+  const rid = uuid4(); const paths = [];
   const canvases = []; let pdf = null;
   try {
     for (const f of files) {

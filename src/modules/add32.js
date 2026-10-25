@@ -14,7 +14,7 @@ async function intakePaste(){ const text = $("#iz-text").value.trim(), note = $(
   const b = $("#iz-go"); b.disabled = true; b.textContent = "جارٍ الإدخال…";
   const acts = parseActs(text).acts.map(a => tolAct(a));
   const coordM = text.match(/(?:المنسق|منسق الجالية|مقدم الطلب|الموقع|الاسم)[:\s\-–—]*([؀-ۿ]+(?:\s+[؀-ۿ]+){1,3})/), phoneM = digits(text).match(/\b(?:\+?965)?\s*([569]\d{7})\b/);
-  const rid = crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+  const rid = crypto.randomUUID ? uuid4() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
   const data = { date:TODAY, notes:note, acts, comm:acts[0]?.comm || "", coord:coordM?.[1] || "", phone:phoneM?.[1] || "", text:text.slice(0, 20000), src:"paste" };
   const { error } = await sb.from("requests").insert({ id:rid, data, status:"جديد", files:[] });
   if (error) { b.disabled = false; b.textContent = "تحليل وإدخال تلقائي"; return writeFail(error); }

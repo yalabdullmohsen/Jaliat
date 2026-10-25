@@ -1,3 +1,4 @@
+function uuid4(){ try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (_) {} const b = crypto.getRandomValues(new Uint8Array(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128; const h = [...b].map(x => x.toString(16).padStart(2, "0")).join(""); return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`; }
 "use strict";
 /* ================= v9: smart layer ================= */
 const LS = {
@@ -221,7 +222,7 @@ function docSmart(){
   if (!S.form || S.form.kind !== "act" || S.form.id) return;
   const d = docBy[$("#f-doc").value.trim()]; if (!d) return;
   if (!$("#f-comm").value && d.comm && commNames.includes(d.comm)) $("#f-comm").value = d.comm;
-  const s = norm(d.subj || ""); const ty = /دور/.test(s) ? "دورة علمية" : /محاضر/.test(s) ? "محاضرة دينية" : /درس|دروس/.test(s) ? "درس ديني" : "";
+  const s = norm(d.subj || ""); const ty = /دور/.test(s) ? "دورة علمية" : /محاضر(ه|ة|ات)/.test(s) ? "محاضرة دينية" : /درس|دروس/.test(s) ? "درس ديني" : "";
   if (ty && ty !== S.form.type) fillAct({ type:ty });
 }
 function saveDraft(){ if (S.form?.kind === "act" && !S.form.id && S.canWrite) { try { LS.set("draft", { at:Date.now(), v:{ ...readAct(), type:S.form.type } }); } catch(e) {} } }
