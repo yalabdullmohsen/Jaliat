@@ -1,0 +1,51 @@
+/* منظومة إنجاز — الواجهة الموحّدة «عاجي ملكي» بطابع الماك بوك
+   ملف مشترك: بوابة إنجاز · التحقق من التصريح · صفحة الخطبة · بصمة إنجاز  (إنجاز نفسه يبنيها من src/modules/add62.css و add63.css)
+   © 2026 يوسف عبد المحسن المطيري */
+
+/* ---------- الألوان: نفس «عاجي ملكي» لكل الصفحات، بكل أسماء المتغيرات المستعملة فيها ---------- */
+:root{
+  --bg:#FAF7F0; --card:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4EFE4; --line:#EAE2D2; --ink:#1C1A15; --mu:#6F6756; --muted:#6F6756;
+  --g:#0E4D3A; --g2:#0A3C2D; --gs:#E6EFE9; --primary:#0E4D3A; --primary-ink:#FFFFFF; --primary-soft:#E6EFE9;
+  --gold:#B8924A; --gold-soft:#F6EEDC; --bad:#B4503F; --bads:#F8E6E1; --w:#9A6B17; --ws:#F8EDD7;
+  --mac-r:12px; --mac-rs:8px; --mac-hair:0 0 0 .5px rgba(40,30,10,.10);
+  --sh:0 0 0 .5px rgba(40,30,10,.08),0 1px 2px rgba(40,30,10,.04),0 10px 28px -14px rgba(40,30,10,.18);
+  --mac-focus:0 0 0 3.5px rgba(14,77,58,.25);
+  --f-ui:-apple-system,BlinkMacSystemFont,"SF Arabic","SF Pro Text","IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  accent-color:#0E4D3A }
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0F1412; --card:#161C19; --surface:#161C19; --surface-2:#1C2420; --line:#26302B; --ink:#ECE6D8; --mu:#ADA592; --muted:#ADA592;
+  --g:#3FA27D; --g2:#5BB892; --gs:#173026; --primary:#3FA27D; --primary-ink:#06120D; --primary-soft:#173026;
+  --gold:#D4AF63; --gold-soft:#2A2416; --bad:#E58D80; --bads:#2C1B18; --w:#DDB66B; --ws:#2A2416;
+  --mac-hair:0 0 0 .5px rgba(255,255,255,.08);
+  --sh:0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.4),0 12px 30px -14px rgba(0,0,0,.6);
+  --mac-focus:0 0 0 3.5px rgba(63,162,125,.30); accent-color:#3FA27D }}
+
+body{font-family:var(--f-ui)!important;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::selection{background:rgba(184,146,74,.30)}
+
+/* ---------- البطاقات: زوايا وظلال الماك بدل الحدود ---------- */
+.card,.stat,.rep,.set,.late-card{border-radius:var(--mac-r)!important;border-color:transparent!important;box-shadow:var(--sh)!important;background:var(--card)}
+
+/* ---------- الأزرار ---------- */
+.btn,button.go,a.go,.go{border-radius:var(--mac-rs)!important;font-weight:600;transition:box-shadow .15s,transform .12s,background .15s}
+.btn:active,.go:active{transform:translateY(1px)}
+.btn.p,.btn.primary,.go{background:linear-gradient(180deg,color-mix(in srgb,var(--g) 88%,#fff),var(--g))!important;color:#fff!important;border:0!important;box-shadow:0 0 0 .5px color-mix(in srgb,var(--g) 80%,#000),0 1px 2px rgba(0,0,0,.15)!important}
+.btn.ghost,.btn.s{background:var(--card)!important;border-color:transparent!important;box-shadow:var(--mac-hair),0 1px 1px rgba(40,30,10,.05)!important}
+
+/* ---------- الحقول وحلقة التركيز ---------- */
+input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{border-radius:7px!important;border-color:transparent!important;box-shadow:var(--mac-hair),inset 0 1px 1px rgba(40,30,10,.04)!important;background-color:var(--card);color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:0!important;box-shadow:0 0 0 .5px var(--g),var(--mac-focus)!important}
+:focus-visible{outline:0;box-shadow:var(--mac-focus)!important}
+
+/* ---------- أزرار التبديل ---------- */
+.seg{border-radius:9px!important;padding:2px!important;background:color-mix(in srgb,var(--ink) 6%,var(--card))!important;border:0!important}
+.seg button,.seg a{border-radius:7px!important}
+.seg .on,.seg button.on,.seg [aria-selected="true"]{background:var(--card)!important;color:var(--ink)!important;box-shadow:0 0 0 .5px rgba(40,30,10,.10),0 1px 2px rgba(40,30,10,.12)!important}
+
+/* ---------- الشريط العلوي الزجاجي ---------- */
+.top,header.top{background:color-mix(in srgb,var(--bg) 78%,transparent)!important;-webkit-backdrop-filter:saturate(1.8) blur(20px);backdrop-filter:saturate(1.8) blur(20px);border-bottom:.5px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+
+/* ---------- أشرطة التمرير الرفيعة ---------- */
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 22%,transparent);border-radius:10px;border:3px solid transparent;background-clip:content-box}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
