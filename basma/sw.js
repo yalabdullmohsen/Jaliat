@@ -1,5 +1,5 @@
-const C = 'basma-v4';
-const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-180.png', 'favicon.png'];
+const C = 'basma-v5';
+const FILES = ['./', 'index.html', 'manifest.webmanifest', 'logo-192.png', 'logo-180.png', 'logo-64.png'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -26,8 +26,8 @@ self.addEventListener('push', e => {
   e.waitUntil(self.registration.showNotification(d.title || 'تذكير البصمة', {
     body: d.body || '',
     tag: d.tag || 'basma',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
+    icon: 'logo-192.png',
+    badge: 'logo-192.png',
     requireInteraction: true,
     renotify: true,
   }));
