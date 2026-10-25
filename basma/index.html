@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
-/* هوية إنجاز «عاجي ملكي»: عاجي + أخضر ملكي + ذهبي. عمود واحد: شريط علوي، زر/البصمة القادمة، القائمة، الإعدادات مطوية. */
+/* هوية إنجاز «عاجي ملكي». ثلاث تبويبات: اليوم (البصمات الثلاث) — التقرير (شهري) — الإعدادات. */
 :root{
   --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#F2F1EC; --ink:#1F2A25; --muted:#6C7872; --line:#E6E3DB;
   --primary:#2F6B57; --primary-ink:#FFFFFF; --primary-soft:#E9F1ED;
@@ -38,158 +38,203 @@
 [hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom,0px)}
-button{font:inherit;cursor:pointer}
+button{font:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 40%,transparent);outline-offset:2px}
 
 .top{background:var(--side);color:var(--side-ink);padding-top:env(safe-area-inset-top,0px)}
-.top .in{max-width:480px;margin:0 auto;display:flex;align-items:center;gap:12px;padding-block:16px 18px;
+.top .in{max-width:480px;margin:0 auto;display:flex;align-items:center;gap:12px;padding-block:14px 12px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .top img{width:40px;height:40px;border-radius:10px;box-shadow:0 0 0 1px rgba(211,180,108,.45)}
 .top .ttl{flex:1;min-width:0}
-.rf{width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:var(--side-ink);display:grid;place-items:center;flex:none}
-.rf svg{width:20px;height:20px}
-.rf:active{background:rgba(255,255,255,.16)}
-.rf.spin svg{animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(-360deg)}}
 .top h1{margin:0;font-size:1.2rem;font-weight:700;line-height:1.3}
 .top .d{font-size:.85rem;color:var(--side-muted)}
-
-.wrap{max-width:480px;margin:0 auto;padding-block:18px 32px;display:flex;flex-direction:column;gap:14px;
+.rf{width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:var(--side-ink);display:grid;place-items:center;flex:none}
+.rf svg{width:20px;height:20px}
+.rf.spin svg{animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(-360deg)}}
+.tabs{max-width:480px;margin:0 auto;display:flex;gap:4px;padding-block:0 12px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.tabs button{flex:1;border:0;background:rgba(255,255,255,.07);color:var(--side-muted);border-radius:10px;padding:9px 4px;font-weight:600;font-size:.92rem}
+.tabs button[aria-selected="true"]{background:var(--side-ink);color:var(--side)}
+
+.wrap{max-width:480px;margin:0 auto;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.view{display:flex;flex-direction:column;gap:14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
 .note{background:var(--gold-soft);border:0;box-shadow:none;font-size:.92rem}
-.note b{display:block;margin-bottom:4px}
+.note b{display:block;margin-bottom:2px}
+.lead{margin:0;color:var(--muted);font-size:.92rem;text-align:center}
 
-/* الزر الرئيسي */
-.go{width:100%;border:0;border-radius:14px;background:var(--primary);color:var(--primary-ink);
-  padding:22px 16px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:1.25rem;font-weight:700;
-  box-shadow:0 8px 22px -10px color-mix(in srgb,var(--primary) 70%,transparent);transition:transform .1s,opacity .1s}
-.go:active{transform:scale(.98)} .go:disabled{opacity:.6}
-.go svg{width:30px;height:30px;flex:none}
-.alt{display:flex;justify-content:center}
-.link{background:none;border:0;color:var(--primary);font-weight:600;font-size:.92rem;padding:6px}
-.pick{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:14px;font-weight:600;color:var(--muted)}
-.hint{text-align:center;color:var(--muted);font-size:.9rem;margin:12px 0 0}
-.pick input{min-width:120px;text-align:center;font:600 1.05rem var(--f);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
-.btn{border:1px solid transparent;border-radius:10px;padding:9px 16px;font-weight:600;background:var(--primary);color:var(--primary-ink)}
-
-/* البصمة القادمة */
-.next{text-align:center;padding:20px 16px}
+/* البصمة الجاية */
+.next{text-align:center;padding:18px 16px}
 .next .lbl{font-size:.9rem;color:var(--muted)}
-.next .big{font-size:2.6rem;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;margin:2px 0}
+.next .big{font-size:2.4rem;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;margin:2px 0}
 .next .cd{display:inline-block;font-size:.88rem;font-weight:600;padding:3px 12px;border-radius:999px}
 .next.taw .big{color:var(--gold)} .next.taw .cd{background:var(--gold-soft);color:var(--gold)}
 .next.out .big{color:var(--bad)} .next.out .cd{background:var(--bads);color:var(--bad)}
-.next.end .big{color:var(--primary);font-size:1.6rem}
+.next.end .big{color:var(--primary);font-size:1.5rem}
 
-.rows{display:flex;flex-direction:column}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px;border-top:1px solid var(--line)}
-.row:first-child{border-top:0}
-.row .k{display:flex;align-items:center;gap:10px;font-weight:600}
-.dot{width:10px;height:10px;border-radius:50%;flex:none}
-.r-in .dot{background:var(--primary)} .r-taw .dot{background:var(--gold)} .r-out .dot{background:var(--bad)}
-.row .v{font-weight:700;font-variant-numeric:tabular-nums}
-.row.done .v{color:var(--muted);font-weight:500}
-.row.done .k::after{content:"✓";color:var(--primary);font-size:.85rem}
-.tools{display:flex;justify-content:space-between;gap:8px;margin-top:8px;flex-wrap:wrap}
-.tools .link.mute{color:var(--muted)}
+/* البصمات الثلاث */
+.punches{display:flex;flex-direction:column;gap:10px}
+.p{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px 14px;box-shadow:var(--shadow)}
+.p .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none}
+.p .ic svg{width:24px;height:24px}
+.p-in .ic{background:var(--primary-soft);color:var(--primary)}
+.p-taw .ic{background:var(--gold-soft);color:var(--gold)}
+.p-out .ic{background:var(--bads);color:var(--bad)}
+.p .tx{flex:1;min-width:0}
+.p .nm{font-weight:700;font-size:1.05rem;line-height:1.3}
+.p .sub{font-size:.85rem;color:var(--muted)}
+.p .act{border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.95rem;flex:none}
+.p-in .act{background:var(--primary);color:var(--primary-ink)}
+.p-taw .act{background:var(--gold);color:#fff}
+.p-out .act{background:var(--bad);color:#fff}
+@media (prefers-color-scheme:dark){.p-taw .act,.p-out .act{color:#141414}}
+.p .done{border:0;background:none;padding:6px 4px;text-align:left;flex:none}
+.p .done b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums;line-height:1.2}
+.p .done span{font-size:.78rem;color:var(--primary);font-weight:600}
+.p.is-done{background:var(--surface-2);box-shadow:none}
+.p.is-next{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary),var(--shadow)}
 
-details.card{padding:0}
-summary{list-style:none;padding:14px 16px;font-weight:600;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"";width:8px;height:8px;border-inline-start:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s}
-details[open] summary::after{transform:rotate(135deg)}
-.set{padding:0 16px 16px;display:flex;flex-direction:column;gap:14px}
+/* محرّر الوقت */
+.edit{display:flex;flex-direction:column;gap:12px}
+.edit h3{margin:0;font-size:1rem}
+.edit .row{display:flex;gap:8px;align-items:center}
+.edit input{flex:1;min-width:0;text-align:center;font:600 1.15rem var(--f);padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
+.btn{border:0;border-radius:10px;padding:11px 18px;font-weight:700;background:var(--primary);color:var(--primary-ink)}
+.btn.ghost{background:var(--surface-2);color:var(--ink)}
+.link{background:none;border:0;color:var(--primary);font-weight:600;font-size:.92rem;padding:6px}
+.link.mute{color:var(--muted)}
+.links{display:flex;justify-content:center;gap:16px}
+
+/* التقرير */
+.mnav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mnav h2{margin:0;font-size:1.1rem}
+.mnav button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.mnav button:disabled{opacity:.35}
+.mnav svg{width:18px;height:18px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center}
+.st b{display:block;font-size:1.3rem;line-height:1.3;font-variant-numeric:tabular-nums}
+.st span{font-size:.78rem;color:var(--muted)}
+.st.warn b{color:var(--bad)}
+.tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tbl th{font-size:.78rem;color:var(--muted);font-weight:600;text-align:center;padding:0 4px 8px}
+.tbl th:first-child{text-align:right}
+.tbl td{text-align:center;padding:10px 4px;border-top:1px solid var(--line);font-size:.92rem;font-weight:600}
+.tbl td:first-child{text-align:right;font-weight:500}
+.tbl td small{display:block;color:var(--muted);font-size:.75rem;font-weight:400;line-height:1.2}
+.tbl .miss,.tbl .late{color:var(--bad)}
+.tbl .wait{color:var(--muted)}
+.legend{font-size:.8rem;color:var(--muted);margin:10px 0 0}
+
+/* الإعدادات */
+.set{display:flex;flex-direction:column;gap:16px}
 .f{display:flex;flex-direction:column;gap:6px}
-.f > span{font-size:.88rem;font-weight:600;color:var(--muted)}
+.f > span{font-size:.9rem;font-weight:600}
+.f > small{color:var(--muted);font-size:.8rem}
 .seg{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:3px}
-.seg button{flex:1;border:0;background:none;border-radius:8px;padding:8px 4px;font-size:.88rem;font-weight:600;color:var(--muted)}
+.seg button{flex:1;border:0;background:none;border-radius:8px;padding:9px 4px;font-size:.88rem;font-weight:600;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.rule{font-size:.82rem;color:var(--muted);margin:0}
 
 #toast{position:fixed;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));margin:0 auto;width:max-content;max-width:calc(100% - 32px);
   background:var(--side);color:var(--side-ink);padding:10px 16px;border-radius:12px;font-weight:600;font-size:.92rem;text-align:center;
-  opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none}
+  opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:5}
 #toast.on{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header class="top"><div class="in">
-  <img src="logo-180.png" alt="">
-  <div class="ttl"><h1>تذكير البصمة</h1><div class="d" id="today"></div></div>
-  <button class="rf" id="refresh" type="button" aria-label="تحديث الصفحة" title="تحديث">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 21v-5h-5"/></svg>
-  </button>
-</div></header>
+<header class="top">
+  <div class="in">
+    <img src="logo-180.png" alt="">
+    <div class="ttl"><h1>تذكير البصمة</h1><div class="d" id="today"></div></div>
+    <button class="rf" id="refresh" type="button" aria-label="تحديث الصفحة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 21v-5h-5"/></svg>
+    </button>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="day" aria-selected="true">اليوم</button>
+    <button role="tab" data-tab="rep" aria-selected="false">التقرير</button>
+    <button role="tab" data-tab="set" aria-selected="false">الإعدادات</button>
+  </nav>
+</header>
 
 <main class="wrap">
   <div class="card note" id="note" hidden></div>
 
-  <!-- قبل الدخول -->
-  <section id="start">
-    <button class="go" id="go" type="button">
-      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true">
-        <path d="M14 36c2-4 3-8 3-12a7 7 0 0 1 14 0c0 5-1 10-3 14"/><path d="M24 24c0 6-1.5 11-4 16"/><path d="M9 30c1-2 1.5-4 1.5-6a13.5 13.5 0 0 1 27 0c0 3-.3 6-1 9"/><path d="M12 13a17 17 0 0 1 24 0"/>
-      </svg>
-      بصمت دخول
-    </button>
-    <p class="hint" id="hint">اضغط الزر بعد ما تبصم دخول، والباقي علينا.</p>
-    <div class="pick" id="pick" hidden>
-      <span>وقت الدخول</span>
-      <input type="time" id="entryTime" dir="ltr" aria-label="وقت بصمة الدخول">
-      <button class="btn" id="goAt" type="button">اعتمد</button>
-    </div>
-    <div class="alt" id="backWrap" hidden><button class="link" id="back" type="button">رجوع</button></div>
-  </section>
-
-  <!-- بعد الدخول -->
-  <section id="day" hidden>
-    <div class="card next" id="next">
+  <!-- اليوم -->
+  <section id="v-day" class="view">
+    <div class="card next" id="next" hidden>
       <div class="lbl" id="nLbl"></div>
       <div class="big" id="nTime"></div>
       <span class="cd" id="nCd"></span>
     </div>
-    <div class="card" style="margin-top:14px">
-      <div class="rows">
-        <div class="row r-in done"><span class="k"><i class="dot"></i>الدخول</span><span class="v" id="tIn"></span></div>
-        <div class="row r-taw" id="rTaw"><span class="k"><i class="dot"></i>التواجد</span><span class="v" id="tTaw"></span></div>
-        <div class="row r-out" id="rOut"><span class="k"><i class="dot"></i>الخروج</span><span class="v" id="tOut"></span></div>
+    <p class="lead" id="lead">بعد كل بصمة اضغط زرها، ونذكّرك بالبصمة اللي بعدها.</p>
+    <div class="punches" id="punches"></div>
+    <div class="card edit" id="editor" hidden>
+      <h3 id="eTitle"></h3>
+      <div class="row">
+        <input type="time" id="eTime" dir="ltr" aria-label="الوقت">
+        <button class="btn" id="eSave" type="button">حفظ</button>
       </div>
-      <div class="tools">
-        <button class="link" id="redo" type="button">تعديل وقت الدخول</button>
-        <button class="link mute" id="cancel" type="button">إلغاء التذكيرات</button>
+      <div class="links">
+        <button class="link mute" id="eDel" type="button">حذف البصمة</button>
+        <button class="link" id="eBack" type="button">رجوع</button>
       </div>
     </div>
   </section>
 
-  <details class="card">
-    <summary>الإعدادات</summary>
-    <div class="set">
-      <div class="f"><span>نوع الدوام</span>
-        <div class="seg" data-k="type">
-          <button type="button" data-v="reg">صباحي</button>
-          <button type="button" data-v="start">تخفيف بداية</button>
-          <button type="button" data-v="end">تخفيف نهاية</button>
-        </div>
-      </div>
-      <div class="f"><span>الموظف</span>
-        <div class="seg" data-k="g">
-          <button type="button" data-v="m">رجل</button>
-          <button type="button" data-v="f">امرأة</button>
-        </div>
-      </div>
-      <div class="f"><span>التواجد بعد الدخول بـ</span>
-        <div class="seg" data-k="taw">
-          <button type="button" data-v="90">1:30</button>
-          <button type="button" data-v="120">2:00</button>
-          <button type="button" data-v="150">2:30</button>
-          <button type="button" data-v="180">3:00</button>
-        </div>
-      </div>
-      <button class="link" id="test" type="button" style="align-self:flex-start;padding-inline:0">جرّب إشعار الحين</button>
+  <!-- التقرير -->
+  <section id="v-rep" class="view" hidden>
+    <div class="mnav">
+      <button id="mPrev" type="button" aria-label="الشهر السابق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <h2 id="mTitle"></h2>
+      <button id="mNext" type="button" aria-label="الشهر التالي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
     </div>
-  </details>
+    <div class="stats">
+      <div class="st"><b id="sDays">0</b><span>أيام الدوام</span></div>
+      <div class="st"><b id="sAvg">—</b><span>متوسط الدخول</span></div>
+      <div class="st" id="sMissBox"><b id="sMiss">0</b><span>بصمات ناقصة</span></div>
+    </div>
+    <div class="card" style="padding:12px 14px">
+      <table class="tbl" id="tbl">
+        <thead><tr><th>اليوم</th><th>دخول</th><th>تواجد</th><th>خروج</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="lead" id="rEmpty" hidden>ما فيه بصمات مسجّلة في هذا الشهر.</p>
+      <p class="legend" id="legend">الأحمر: دخول متأخر، أو بصمة ما انسجلت.</p>
+    </div>
+  </section>
+
+  <!-- الإعدادات -->
+  <section id="v-set" class="card set" hidden>
+    <div class="f"><span>نوع الدوام</span>
+      <div class="seg" data-k="type">
+        <button type="button" data-v="reg">صباحي</button>
+        <button type="button" data-v="start">تخفيف بداية</button>
+        <button type="button" data-v="end">تخفيف نهاية</button>
+      </div>
+      <small id="rule"></small>
+    </div>
+    <div class="f"><span>الموظف</span>
+      <div class="seg" data-k="g">
+        <button type="button" data-v="m">رجل</button>
+        <button type="button" data-v="f">امرأة</button>
+      </div>
+    </div>
+    <div class="f"><span>ذكّرني بالتواجد بعد الدخول بـ</span>
+      <div class="seg" data-k="taw">
+        <button type="button" data-v="90">1:30</button>
+        <button type="button" data-v="120">2:00</button>
+        <button type="button" data-v="150">2:30</button>
+        <button type="button" data-v="180">3:00</button>
+      </div>
+    </div>
+    <div class="f"><span>الإشعارات</span>
+      <button class="btn ghost" id="test" type="button">أرسل إشعار تجربة</button>
+    </div>
+  </section>
 </main>
 <div id="toast" role="status" aria-live="polite"></div>
 
@@ -202,8 +247,15 @@ const store = {
   set(k, v) { try { localStorage.setItem('basma.' + k, JSON.stringify(v)); } catch {} },
 };
 const settings = Object.assign({ type: 'reg', g: 'm', taw: 120 }, store.get('settings', {}));
+const pad = n => String(n).padStart(2, '0');
+const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-// قواعد الدوام الصباحي (القرار الوزاري 2023/273) — الدقائق من منتصف الليل
+// سجلّ البصمات: { "2026-10-25": { in: 437, taw: 594, out: 827 } } بالدقائق من منتصف الليل
+const log = store.get('log', {});
+(() => { const old = store.get('plan', null); if (old && old.day && !log[old.day]) { log[old.day] = { in: old.entry }; store.set('log', log); } })();
+const saveLog = () => store.set('log', log);
+
+// قواعد الدوام الصباحي (القرار الوزاري 2023/273)
 function exitMinutes(e, g, type) {
   const full = g === 'f' ? 375 : 390, red = g === 'f' ? 285 : 300;
   if (type === 'start') { e = Math.min(Math.max(e, 540), 570); return e + red; }
@@ -212,15 +264,15 @@ function exitMinutes(e, g, type) {
   if (e <= 540) return e + full;
   return g === 'f' ? 945 : 960;
 }
+const lateAfter = t => t === 'start' ? 570 : t === 'end' ? 450 : 540;
 const RULES = {
-  reg: g => `دخول 7:00–9:00، والخروج بعد ${g === 'f' ? '6:15' : '6:30'} ساعة. بعد 9:00 الخروج ${g === 'f' ? '3:45' : '4:00'} م.`,
-  start: g => `دخول 9:00–9:30، والخروج بعد ${g === 'f' ? '4:45' : '5:00'} ساعات.`,
-  end: g => `دخول 7:00–7:30، والخروج بعد ${g === 'f' ? '4:45' : '5:00'} ساعات.`,
+  reg: g => `الدخول من 7:00 إلى 9:00، والخروج بعد ${g === 'f' ? '6 ساعات وربع' : '6 ساعات ونص'}.`,
+  start: g => `الدخول من 9:00 إلى 9:30، والخروج بعد ${g === 'f' ? '4 ساعات و45 دقيقة' : '5 ساعات'}.`,
+  end: g => `الدخول من 7:00 إلى 7:30، والخروج بعد ${g === 'f' ? '4 ساعات و45 دقيقة' : '5 ساعات'}.`,
 };
 
-const pad = n => String(n).padStart(2, '0');
-const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 function fmt(m) { m = ((m % 1440) + 1440) % 1440; let h = Math.floor(m / 60); const mi = m % 60, ap = h < 12 ? 'ص' : 'م'; h = h % 12 || 12; return `${h}:${pad(mi)} ${ap}`; }
+const fmtShort = m => fmt(m).replace(/ [صم]$/, '');
 function atToday(m) { const d = new Date(); d.setHours(0, 0, 0, 0); d.setMinutes(m); return d; }
 const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
 const hrs = h => h === 1 ? 'ساعة' : h === 2 ? 'ساعتين' : h <= 10 ? `${h} ساعات` : `${h} ساعة`;
@@ -228,19 +280,18 @@ const mins = r => r === 1 ? 'دقيقة' : r === 2 ? 'دقيقتين' : r <= 10 
 function left(ms) { const m = Math.max(1, Math.ceil(ms / 60000)), h = Math.floor(m / 60), r = m % 60; return 'بعد ' + (h ? hrs(h) + (r ? ' و' + mins(r) : '') : mins(r)); }
 
 let toastT;
-function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 3200); }
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 3000); }
 function note(html) { $('note').innerHTML = html; $('note').hidden = !html; }
 
+// ---- الإشعارات ----
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const pushOK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 const INSTALL = '<b>خطوة وحدة قبل أول استخدام</b>من سفاري اضغط زر المشاركة ← «إضافة إلى الشاشة الرئيسية»، ثم افتح «البصمة» من الشاشة الرئيسية.';
 const DENIED = '<b>الإشعارات مقفلة</b>الإعدادات ← الإشعارات ← البصمة، وفعّل السماح.';
-
 let reg = null;
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { scope: './' }).then(r => reg = r).catch(() => {});
 function b64ToBytes(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
-
 async function getSub() {
   if (!pushOK) throw new Error(isIOS && !standalone ? 'install' : 'unsupported');
   if (Notification.permission === 'denied') throw new Error('denied');
@@ -257,84 +308,167 @@ async function call(body) {
 }
 function fail(e) {
   const m = e && e.message;
-  if (m === 'install') { note(INSTALL); toast('أضفه للشاشة الرئيسية أول'); }
-  else if (m === 'denied') { note(DENIED); toast('لازم تسمح بالإشعارات'); }
-  else if (m === 'unsupported') toast('هذا المتصفح ما يدعم الإشعارات');
-  else toast('ما انحفظ، تأكد من الإنترنت وجرّب مرة ثانية');
+  if (m === 'install') { note(INSTALL); toast('انحفظت البصمة. للتذكير أضفه للشاشة الرئيسية'); }
+  else if (m === 'denied') { note(DENIED); toast('انحفظت البصمة. للتذكير اسمح بالإشعارات'); }
+  else if (m === 'unsupported') toast('انحفظت البصمة. هذا المتصفح ما يدعم الإشعارات');
+  else toast('انحفظت البصمة، لكن التذكير ما انضبط. تأكد من الإنترنت');
 }
 
-async function punch(entry, quiet) {
-  const p = { day: dayKey(new Date()), entry, taw: entry + Number(settings.taw), out: exitMinutes(entry, settings.g, settings.type) };
-  $('go').disabled = $('goAt').disabled = true;
+// الأوقات المطلوبة لليوم حسب وقت الدخول
+function targets(d) {
+  if (!d || d.in == null) return null;
+  return { taw: d.in + Number(settings.taw), out: exitMinutes(d.in, settings.g, settings.type) };
+}
+
+// يضبط التذكيرات الباقية لليوم حسب البصمات المسجّلة
+async function syncReminders() {
+  const d = log[dayKey(new Date())], t = targets(d), now = Date.now(), items = [];
+  if (t) {
+    if (d.taw == null && atToday(t.taw) > now) items.push({ kind: 'taw', due_at: atToday(t.taw).toISOString(), title: 'بصمة التواجد', body: fmt(t.taw) });
+    if (d.out == null) {
+      if (atToday(t.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(t.out - 10).toISOString(), title: 'الخروج بعد 10 دقائق', body: fmt(t.out) });
+      if (atToday(t.out) > now) items.push({ kind: 'out', due_at: atToday(t.out).toISOString(), title: 'بصمة الخروج', body: fmt(t.out) });
+    }
+  }
+  const sub = await getSub();
+  await call({ action: 'schedule', sub, items });
+}
+
+const NAMES = { in: 'الدخول', taw: 'التواجد', out: 'الخروج' };
+async function record(kind, m) {
+  const k = dayKey(new Date());
+  log[k] = log[k] || {};
+  log[k][kind] = m; saveLog(); render();
   try {
-    const sub = await getSub(), now = Date.now(), items = [];
-    if (atToday(p.taw) > now) items.push({ kind: 'taw', due_at: atToday(p.taw).toISOString(), title: 'بصمة التواجد', body: fmt(p.taw) });
-    if (atToday(p.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(p.out - 10).toISOString(), title: 'الخروج بعد 10 دقائق', body: fmt(p.out) });
-    if (atToday(p.out) > now) items.push({ kind: 'out', due_at: atToday(p.out).toISOString(), title: 'بصمة الخروج', body: fmt(p.out) });
-    await call({ action: 'schedule', sub, items });
-    store.set('plan', p); $('pick').hidden = true; $('backWrap').hidden = true; $('hint').hidden = false; $('go').hidden = false; note('');
-    render();
-    if (!quiet) toast('تم ✓ بنذكّرك في وقتها');
+    await syncReminders(); note('');
+    if (kind === 'in') toast(`تم ✓ بنذكّرك بالتواجد ${fmt(targets(log[k]).taw)}`);
+    else if (kind === 'taw') toast('تم ✓ بنذكّرك بالخروج');
+    else toast('تم ✓ الله يعطيك العافية');
   } catch (e) { fail(e); }
-  finally { $('go').disabled = $('goAt').disabled = false; }
 }
 
+// ---- واجهة اليوم ----
+const ICONS = {
+  in: '<path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/>',
+  taw: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+};
+let editing = null;
 function render() {
-  const p = store.get('plan', null), has = p && p.day === dayKey(new Date());
-  $('start').hidden = !!has; $('day').hidden = !has;
-  if (!has) return;
-  const n = nowMin(), ms = Date.now();
-  $('tIn').textContent = fmt(p.entry); $('tTaw').textContent = fmt(p.taw); $('tOut').textContent = fmt(p.out);
-  $('rTaw').classList.toggle('done', n >= p.taw); $('rOut').classList.toggle('done', n >= p.out);
-  const box = $('next'); box.className = 'card next';
-  if (n < p.taw) { box.classList.add('taw'); $('nLbl').textContent = 'بصمة التواجد'; $('nTime').textContent = fmt(p.taw); $('nCd').textContent = left(atToday(p.taw) - ms); $('nCd').hidden = false; }
-  else if (n < p.out) { box.classList.add('out'); $('nLbl').textContent = 'بصمة الخروج'; $('nTime').textContent = fmt(p.out); $('nCd').textContent = left(atToday(p.out) - ms); $('nCd').hidden = false; }
-  else { box.classList.add('end'); $('nLbl').textContent = 'انتهى دوام اليوم'; $('nTime').textContent = 'الله يعطيك العافية'; $('nCd').hidden = true; }
+  const d = log[dayKey(new Date())] || {}, t = targets(d), n = nowMin(), ms = Date.now();
+  const box = $('next');
+  if (!t) box.hidden = true;
+  else {
+    box.hidden = false; box.className = 'card next';
+    if (d.taw == null && n < t.taw + 60) { box.classList.add('taw'); $('nLbl').textContent = 'بصمة التواجد'; $('nTime').textContent = fmt(t.taw); $('nCd').textContent = n < t.taw ? left(atToday(t.taw) - ms) : 'حان وقتها'; $('nCd').hidden = false; }
+    else if (d.out == null) { box.classList.add('out'); $('nLbl').textContent = 'بصمة الخروج'; $('nTime').textContent = fmt(t.out); $('nCd').textContent = n < t.out ? left(atToday(t.out) - ms) : 'حان وقتها'; $('nCd').hidden = false; }
+    else { box.classList.add('end'); $('nLbl').textContent = 'خلصت بصمات اليوم'; $('nTime').textContent = 'الله يعطيك العافية'; $('nCd').hidden = true; }
+  }
+  $('lead').hidden = !!t;
+  const nextKind = d.in == null ? 'in' : d.taw == null ? 'taw' : d.out == null ? 'out' : null;
+  $('punches').innerHTML = ['in', 'taw', 'out'].map(kind => {
+    const v = d[kind], done = v != null;
+    const due = kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
+    return `<div class="p p-${kind}${done ? ' is-done' : ''}${kind === nextKind ? ' is-next' : ''}">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[kind]}</svg></span>
+      <div class="tx"><div class="nm">${NAMES[kind]}</div><div class="sub">${done ? 'تم ✓' : due}</div></div>
+      ${done ? `<button class="done" data-edit="${kind}" type="button" aria-label="تعديل ${NAMES[kind]}"><b>${fmt(v)}</b><span>تعديل</span></button>`
+             : `<button class="act" data-rec="${kind}" type="button">بصمت</button>`}
+    </div>`;
+  }).join('');
 }
+$('punches').addEventListener('click', e => {
+  const r = e.target.closest('[data-rec]'), ed = e.target.closest('[data-edit]');
+  if (r) record(r.dataset.rec, nowMin());
+  else if (ed) openEditor(ed.dataset.edit);
+});
+function openEditor(kind) {
+  editing = kind;
+  const v = (log[dayKey(new Date())] || {})[kind];
+  $('eTitle').textContent = `تعديل وقت ${NAMES[kind]}`;
+  $('eTime').value = `${pad(Math.floor(v / 60))}:${pad(v % 60)}`;
+  $('editor').hidden = false; $('punches').hidden = true;
+}
+function closeEditor() { editing = null; $('editor').hidden = true; $('punches').hidden = false; }
+$('eBack').addEventListener('click', closeEditor);
+$('eSave').addEventListener('click', () => {
+  const v = $('eTime').value; if (!v) return toast('اختر الوقت');
+  const [h, m] = v.split(':').map(Number); const kind = editing; closeEditor(); record(kind, h * 60 + m);
+});
+$('eDel').addEventListener('click', async () => {
+  const k = dayKey(new Date()), kind = editing; closeEditor();
+  if (log[k]) { delete log[k][kind]; if (!Object.keys(log[k]).length) delete log[k]; saveLog(); }
+  render(); toast(`حذفت بصمة ${NAMES[kind]}`);
+  try { await syncReminders(); } catch {}
+});
 
+// ---- التقرير ----
+let mOff = 0;
+function renderReport() {
+  const base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + mOff);
+  const y = base.getFullYear(), mo = base.getMonth();
+  $('mTitle').textContent = new Intl.DateTimeFormat('ar-KW-u-nu-latn', { month: 'long', year: 'numeric' }).format(base);
+  $('mNext').disabled = mOff >= 0;
+  const prefix = `${y}-${pad(mo + 1)}-`, todayK = dayKey(new Date()), n = nowMin();
+  const days = Object.keys(log).filter(k => k.startsWith(prefix)).sort().reverse();
+  const late = lateAfter(settings.type);
+  let sum = 0, cnt = 0, miss = 0;
+  $('rows').innerHTML = days.map(k => {
+    const d = log[k], dt = new Date(k + 'T12:00:00'), isToday = k === todayK, t = targets(d);
+    const cell = kind => {
+      const v = d[kind];
+      if (v != null) return `<td class="${kind === 'in' && v > late ? 'late' : ''}">${fmtShort(v)}</td>`;
+      const waiting = isToday && (!t || n < (kind === 'taw' ? t.taw : t.out) + 60);
+      if (!waiting) miss++;
+      return waiting ? '<td class="wait">·</td>' : '<td class="miss">—</td>';
+    };
+    if (d.in != null) { sum += d.in; cnt++; }
+    return `<tr><td>${new Intl.DateTimeFormat('ar-KW-u-nu-latn', { weekday: 'long' }).format(dt)}<small>${dt.getDate()}/${mo + 1}</small></td>${cell('in')}${cell('taw')}${cell('out')}</tr>`;
+  }).join('');
+  $('sDays').textContent = days.length;
+  $('sAvg').textContent = cnt ? fmtShort(Math.round(sum / cnt)) : '—';
+  $('sMiss').textContent = miss; $('sMissBox').classList.toggle('warn', miss > 0);
+  $('rEmpty').hidden = days.length > 0; $('legend').hidden = !days.length; $('tbl').hidden = !days.length;
+}
+$('mPrev').addEventListener('click', () => { mOff--; renderReport(); });
+$('mNext').addEventListener('click', () => { if (mOff < 0) { mOff++; renderReport(); } });
+
+// ---- التبويبات ----
+function showTab(tab) {
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  $('v-day').hidden = tab !== 'day'; $('v-rep').hidden = tab !== 'rep'; $('v-set').hidden = tab !== 'set';
+  if (tab === 'rep') renderReport();
+  if (tab === 'day') render();
+}
+document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+
+// ---- الإعدادات ----
 function applySettings() {
   document.querySelectorAll('.seg').forEach(s => s.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(String(settings[s.dataset.k]) === b.dataset.v))));
+  $('rule').textContent = RULES[settings.type](settings.g);
 }
-document.querySelectorAll('.seg').forEach(s => s.addEventListener('click', e => {
+document.querySelectorAll('.seg').forEach(s => s.addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
   settings[s.dataset.k] = s.dataset.k === 'taw' ? Number(b.dataset.v) : b.dataset.v;
-  store.set('settings', settings); applySettings();
-  const p = store.get('plan', null);
-  if (p && p.day === dayKey(new Date())) punch(p.entry, true).then(() => toast('حدّثت الأوقات'));
+  store.set('settings', settings); applySettings(); render();
+  if (log[dayKey(new Date())]?.in != null) { try { await syncReminders(); toast('حدّثت أوقات اليوم'); } catch {} }
+  else toast('انحفظ');
 }));
-
-$('go').addEventListener('click', () => punch(nowMin()));
-$('goAt').addEventListener('click', () => {
-  const v = $('entryTime').value; if (!v) return toast('اختر وقت الدخول');
-  const [h, m] = v.split(':').map(Number); punch(h * 60 + m);
-});
-$('redo').addEventListener('click', () => {
-  const p = store.get('plan', null);
-  $('entryTime').value = p ? `${pad(Math.floor(p.entry / 60))}:${pad(p.entry % 60)}` : '';
-  $('start').hidden = false; $('day').hidden = true; $('pick').hidden = false; $('backWrap').hidden = false; $('hint').hidden = true; $('go').hidden = true;
-});
-$('back').addEventListener('click', () => { $('pick').hidden = true; $('backWrap').hidden = true; $('hint').hidden = false; $('go').hidden = false; render(); });
-$('cancel').addEventListener('click', async () => {
-  try {
-    if (pushOK) { const r = reg || await navigator.serviceWorker.ready, s = await r.pushManager.getSubscription(); if (s) await call({ action: 'cancel', endpoint: s.endpoint }); }
-    store.set('plan', null); render(); toast('ألغيت تذكيرات اليوم');
-  } catch { toast('ما قدرت ألغي، جرّب مرة ثانية'); }
-});
 $('test').addEventListener('click', async () => {
   try { const sub = await getSub(); await call({ action: 'test', sub }); toast('أُرسل إشعار تجربة'); } catch (e) { fail(e); }
 });
-
 $('refresh').addEventListener('click', async () => {
   $('refresh').classList.add('spin');
   try { if (reg) await reg.update(); } catch {}
   location.reload();
 });
+
 $('today').textContent = new Intl.DateTimeFormat('ar-KW-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 if (isIOS && !standalone) note(INSTALL);
 else if (pushOK && Notification.permission === 'denied') note(DENIED);
 applySettings(); render();
-setInterval(render, 30000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+setInterval(() => { if (!$('v-day').hidden && !editing) render(); }, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !editing) { render(); if (!$('v-rep').hidden) renderReport(); } });
 </script>
 </body>
 </html>
