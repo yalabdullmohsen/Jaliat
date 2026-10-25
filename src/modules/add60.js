@@ -6,7 +6,7 @@ const ATT_LBL = { img:"صورة", pdf:"PDF", sheet:"إكسل", word:"وورد", 
 
 /* أيقونة مشبك الإرفاق + زر أعلى الشاشة */
 function attIcon(){ const sp = document.querySelector("svg symbol")?.parentElement; if (sp && !document.getElementById("i-clip")) sp.insertAdjacentHTML("beforeend", `<symbol id="i-clip" viewBox="0 0 24 24"><path d="M20.5 11.5l-8.2 8.2a5.3 5.3 0 0 1-7.5-7.5l8.6-8.6a3.5 3.5 0 0 1 5 5l-8.6 8.6a1.8 1.8 0 0 1-2.5-2.5l7.9-7.9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>`);
-  const b = document.getElementById("ocr-top"); if (!b || b.dataset.att) return; b.dataset.att = "1"; b.title = "إرفاق ملف أو صورة، يقرؤه Copilot ويضعه في مكانه"; b.setAttribute("aria-label", "إرفاق");
+  const b = document.getElementById("ocr-top"); if (!b) return; b.title = "إرفاق ملف أو صورة، يقرؤه Copilot ويضعه في مكانه"; b.setAttribute("aria-label", "إرفاق");
   b.innerHTML = `<svg><use href="#i-clip"/></svg><span>إرفاق</span>`; }
 attIcon();
 const _boot960 = boot9; boot9 = function(){ _boot960(); attIcon(); };
