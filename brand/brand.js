@@ -34,6 +34,12 @@
     '.ij-fam span.on{opacity:1}' +
     '.ij-fam .ij-mark{border-radius:6px;flex:none}' +
     '.ij-copy{margin:0;opacity:.6}.ij-nw{white-space:nowrap}' +
+    '.ij-new{position:fixed;z-index:60;inset-inline:max(12px,env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));margin:0 auto;max-width:520px;' +
+    'display:flex;align-items:center;gap:12px;background:#1E3A31;color:#F2F6F4;border-radius:16px;padding:12px 12px 12px 14px;box-shadow:0 14px 36px -12px rgba(0,0,0,.45);font-size:13.5px;line-height:1.55}' +
+    '.ij-new .ij-mark{border-radius:10px;flex:none;box-shadow:0 0 0 1px rgba(226,188,85,.5)}' +
+    '.ij-new-t{flex:1;min-width:0}.ij-new-t b{display:block;font-size:14.5px;color:#E2BC55}.ij-new-t span{opacity:.85}' +
+    '.ij-new-go{flex:none;background:#E2BC55;color:#1E3A31;font-weight:700;text-decoration:none;border-radius:10px;padding:8px 14px}' +
+    '.ij-new-x{flex:none;background:none;border:0;color:#F2F6F4;opacity:.7;font-size:22px;line-height:1;cursor:pointer;padding:4px 6px}' +
     '.ij-copy-inline{display:block;margin-top:10px;font-size:11.5px;line-height:1.5;opacity:.6;text-align:center}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -49,8 +55,25 @@
   }
   function inlineCopy() { var s = document.createElement('small'); s.className = 'ij-copy-inline'; s.innerHTML = COPY_HTML; return s; }
 
+  // «جديد» في إنجاز: بطاقة تعرّف الموظف ببصمة إنجاز، تختفي نهائيًا بعد ما يضغطها
+  function newCard() {
+    var K = 'ij-new-basma';
+    try { if (localStorage.getItem(K)) return; } catch (e) { return; }
+    var appEl = document.getElementById('app');
+    if (!appEl || appEl.hidden || document.querySelector('.ij-new')) return;
+    var c = document.createElement('div');
+    c.className = 'ij-new'; c.setAttribute('role', 'status');
+    c.innerHTML = mark('basma', 40) + '<div class="ij-new-t"><b>جديد: بصمة إنجاز</b><span>يذكّرك ببصمة التواجد والخروج في وقتها، مع تقرير شهري ورصيد التأخير.</span></div>' +
+      '<a class="ij-new-go" href="basma/" target="_blank" rel="noopener">افتح</a><button type="button" class="ij-new-x" aria-label="إخفاء">×</button>';
+    function done() { try { localStorage.setItem(K, '1'); } catch (e) {} c.remove(); }
+    c.querySelector('.ij-new-go').addEventListener('click', done);
+    c.querySelector('.ij-new-x').addEventListener('click', done);
+    document.body.appendChild(c);
+  }
+
   function place() {
     if (app === 'injaz') {
+      newCard();
       // نظام الموظفين: سطر الحقوق في بطاقة الدخول وأسفل القائمة الجانبية
       var card = document.querySelector('#login .login-card');
       if (card && !card.querySelector('.ij-copy-inline')) card.appendChild(inlineCopy());
@@ -66,5 +89,5 @@
   // الصفحات اللي تعيد رسم محتواها: نعيد وضع السطر إذا انشال
   var busy = false;
   new MutationObserver(function () { if (busy) return; busy = true; requestAnimationFrame(function () { place(); busy = false; }); })
-    .observe(document.body, { childList: true, subtree: true });
+    .observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
 })();

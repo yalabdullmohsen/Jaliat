@@ -86,6 +86,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .p .tx{flex:1;min-width:0}
 .p .nm{font-weight:700;font-size:1.05rem;line-height:1.3}
 .p .sub{font-size:.85rem;color:var(--muted)}
+.p .act:disabled{opacity:.4}
 .p .act{border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.95rem;flex:none}
 .p-in .act{background:var(--primary);color:var(--primary-ink)}
 .p-taw .act{background:var(--gold);color:#fff}
@@ -127,6 +128,13 @@ button{font:inherit;cursor:pointer;color:inherit}
 .tbl td small{display:block;color:var(--muted);font-size:.75rem;font-weight:400;line-height:1.2}
 .tbl .miss,.tbl .late{color:var(--bad)}
 .tbl .wait{color:var(--muted)}
+.late-card{display:flex;flex-direction:column;gap:8px;padding:14px}
+.lc-h{display:flex;justify-content:space-between;align-items:baseline;font-weight:600}
+.lc-h b{font-variant-numeric:tabular-nums}
+.bar{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--primary);border-radius:99px}
+.late-card.warn .bar i{background:var(--gold)} .late-card.over .bar i{background:var(--bad)} .late-card.over .lc-h b{color:var(--bad)}
+.late-card small{color:var(--muted);font-size:.8rem}
 .legend{font-size:.8rem;color:var(--muted);margin:10px 0 0}
 
 /* الإعدادات */
@@ -144,6 +152,11 @@ button{font:inherit;cursor:pointer;color:inherit}
 .sync.ok{color:var(--primary)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
+.help{background:var(--surface-2);border-radius:12px;padding:0 14px}
+.help summary{cursor:pointer;font-weight:700;padding:12px 0;list-style:none}
+.help summary::-webkit-details-marker{display:none}
+.help > b{display:block;margin-top:4px;font-size:.9rem}
+.help ol{margin:4px 0 12px;padding-inline-start:20px;font-size:.88rem;line-height:1.8}
 #toast{position:fixed;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));margin:0 auto;width:max-content;max-width:calc(100% - 32px);
   background:var(--side);color:var(--side-ink);padding:10px 16px;border-radius:12px;font-weight:600;font-size:.92rem;text-align:center;
   opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:5}
@@ -182,7 +195,7 @@ button{font:inherit;cursor:pointer;color:inherit}
     <div class="card edit" id="editor" hidden>
       <h3 id="eTitle"></h3>
       <div class="row">
-        <input type="time" id="eTime" dir="ltr" aria-label="الوقت">
+        <input type="time" id="eTime" dir="ltr" min="06:30" max="16:59" aria-label="الوقت">
         <button class="btn" id="eSave" type="button">حفظ</button>
       </div>
       <div class="links">
@@ -204,6 +217,12 @@ button{font:inherit;cursor:pointer;color:inherit}
       <div class="st"><b id="sAvg">—</b><span>متوسط الدخول</span></div>
       <div class="st" id="sMissBox"><b id="sMiss">0</b><span>بصمات ناقصة</span></div>
     </div>
+    <div class="card late-card" id="lateCard">
+      <div class="lc-h"><span>رصيد دقائق التأخير</span><b id="lateTx">0 من 105</b></div>
+      <div class="bar"><i id="lateBar"></i></div>
+      <small id="lateNote">المسموح 105 دقيقة بالشهر، وتنحسب من 9:31 ص.</small>
+    </div>
+    <button class="btn ghost" id="xls" type="button">تنزيل التقرير ملف إكسل</button>
     <div class="card" style="padding:12px 14px">
       <table class="tbl" id="tbl">
         <thead><tr><th>اليوم</th><th>دخول</th><th>تواجد</th><th>خروج</th></tr></thead>
@@ -249,6 +268,14 @@ button{font:inherit;cursor:pointer;color:inherit}
         <button class="btn" id="rGo" type="button">استرجاع</button>
       </div>
     </div>
+    <details class="help"><summary>طريقة التثبيت والإشعارات</summary>
+      <b>آيفون</b>
+      <ol><li>افتح injazkwt.com/basma من <b>سفاري</b>.</li><li>زر المشاركة ⬆︎ ← «إضافة إلى الشاشة الرئيسية».</li><li>افتح «بصمة إنجاز» من الشاشة الرئيسية، واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
+      <b>أندرويد</b>
+      <ol><li>افتح الرابط من <b>كروم</b>، واضغط ⋮ ← «تثبيت التطبيق».</li><li>افتحه واضغط «أرسل إشعار تجربة» واختر «سماح».</li></ol>
+      <b>ما وصلك الإشعار؟</b>
+      <ol><li>افتحه من أيقونة الشاشة الرئيسية، مو من المتصفح.</li><li>الإعدادات ← الإشعارات ← بصمة إنجاز ← فعّل السماح.</li><li>اطفِ عدم الإزعاج أو أضف التطبيق للمسموح.</li></ol>
+    </details>
     <div class="f"><span>الإشعارات</span>
       <button class="btn ghost" id="test" type="button">أرسل إشعار تجربة</button>
     </div>
@@ -325,7 +352,12 @@ function exitMinutes(e, g, type) {
   if (e <= 540) return e + full;
   return g === 'f' ? 945 : 960;
 }
-const lateAfter = t => t === 'start' ? 570 : t === 'end' ? 450 : 540;
+// دقائق التأخير تُحسب من 9:31 (الصباحي وتخفيف البداية) أو 7:31 (تخفيف النهاية)، بحد 105 دقيقة بالشهر
+const lateAfter = t => t === 'end' ? 450 : 570;
+const LATE_CAP = 105;
+// البصمة تفتح من 6:30 ص إلى 4:59 م (الدخول قبل 7:00 يُحسب 7:00)
+const OPEN = 390, CLOSE = 1019;
+const inWindow = m => m >= OPEN && m <= CLOSE;
 const RULES = {
   reg: g => `الدخول من 7:00 إلى 9:00، والخروج بعد ${g === 'f' ? '6 ساعات وربع' : '6 ساعات ونص'}.`,
   start: g => `الدخول من 9:00 إلى 9:30، والخروج بعد ${g === 'f' ? '4 ساعات و45 دقيقة' : '5 ساعات'}.`,
@@ -386,6 +418,7 @@ async function syncReminders() {
   const d = log[dayKey(new Date())], t = targets(d), now = Date.now(), items = [];
   if (t) {
     if (d.taw == null && atToday(t.taw) > now) items.push({ kind: 'taw', due_at: atToday(t.taw).toISOString(), title: 'بصمة التواجد', body: fmt(t.taw) });
+    if (d.taw == null && atToday(t.taw + 15) > now) items.push({ kind: 'taw-2', due_at: atToday(t.taw + 15).toISOString(), title: 'نسيت بصمة التواجد؟', body: `موعدها كان ${fmt(t.taw)}` });
     if (d.out == null) {
       if (atToday(t.out - 10) > now) items.push({ kind: 'out-pre', due_at: atToday(t.out - 10).toISOString(), title: 'الخروج بعد 10 دقائق', body: fmt(t.out) });
       if (atToday(t.out) > now) items.push({ kind: 'out', due_at: atToday(t.out).toISOString(), title: 'بصمة الخروج', body: fmt(t.out) });
@@ -397,6 +430,8 @@ async function syncReminders() {
 
 const NAMES = { in: 'الدخول', taw: 'التواجد', out: 'الخروج' };
 async function record(kind, m) {
+  if (!inWindow(m)) return toast('البصمة تفتح من 6:30 ص إلى 4:59 م');
+  if (kind === 'in' && m < 420) m = 420;
   const k = dayKey(new Date());
   log[k] = log[k] || {};
   log[k][kind] = m; saveLog(); markDirty(k); pushCloud(); render();
@@ -429,12 +464,13 @@ function render() {
   const nextKind = d.in == null ? 'in' : d.taw == null ? 'taw' : d.out == null ? 'out' : null;
   $('punches').innerHTML = ['in', 'taw', 'out'].map(kind => {
     const v = d[kind], done = v != null;
-    const due = kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
+    const open = inWindow(n);
+    const due = !open ? 'البصمة تفتح 6:30 ص – 4:59 م' : kind === 'in' ? 'اضغط بعد ما تبصم' : t ? `موعدها ${fmt(kind === 'taw' ? t.taw : t.out)}` : 'بعد بصمة الدخول';
     return `<div class="p p-${kind}${done ? ' is-done' : ''}${kind === nextKind ? ' is-next' : ''}">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[kind]}</svg></span>
       <div class="tx"><div class="nm">${NAMES[kind]}</div><div class="sub">${done ? 'تم ✓' : due}</div></div>
       ${done ? `<button class="done" data-edit="${kind}" type="button" aria-label="تعديل ${NAMES[kind]}"><b>${fmt(v)}</b><span>تعديل</span></button>`
-             : `<button class="act" data-rec="${kind}" type="button">بصمت</button>`}
+             : `<button class="act" data-rec="${kind}" type="button"${open ? '' : ' disabled'}>بصمت</button>`}
     </div>`;
   }).join('');
 }
@@ -489,8 +525,33 @@ function renderReport() {
   $('sDays').textContent = days.length;
   $('sAvg').textContent = cnt ? fmtShort(Math.round(sum / cnt)) : '—';
   $('sMiss').textContent = miss; $('sMissBox').classList.toggle('warn', miss > 0);
+  let lateMin = 0;
+  for (const k of days) { const v = log[k].in; if (v != null && v > late) lateMin += Math.min(v - late, LATE_CAP); }
+  const pct = Math.min(100, Math.round(lateMin / LATE_CAP * 100));
+  $('lateTx').textContent = `${lateMin} من ${LATE_CAP} دقيقة`;
+  $('lateBar').style.width = pct + '%';
+  $('lateCard').classList.toggle('warn', lateMin >= LATE_CAP * .7 && lateMin <= LATE_CAP);
+  $('lateCard').classList.toggle('over', lateMin > LATE_CAP);
+  $('lateNote').textContent = lateMin > LATE_CAP ? `تجاوزت المسموح بـ${lateMin - LATE_CAP} دقيقة` : `باقي لك ${LATE_CAP - lateMin} دقيقة هذا الشهر. التأخير ينحسب من ${settings.type === 'end' ? '7:31' : '9:31'} ص.`;
   $('rEmpty').hidden = days.length > 0; $('legend').hidden = !days.length; $('tbl').hidden = !days.length;
 }
+$('xls').addEventListener('click', async () => {
+  try {
+    if (!window.XLSX) await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+    const base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + mOff);
+    const prefix = `${base.getFullYear()}-${pad(base.getMonth() + 1)}-`, late = lateAfter(settings.type);
+    const rows = Object.keys(log).filter(k => k.startsWith(prefix)).sort().map(k => {
+      const d = log[k], dt = new Date(k + 'T12:00:00');
+      return { 'التاريخ': `${dt.getDate()}/${dt.getMonth() + 1}/${dt.getFullYear()}`, 'اليوم': new Intl.DateTimeFormat('ar-KW', { weekday: 'long' }).format(dt),
+        'الدخول': d.in != null ? fmt(d.in) : '', 'التواجد': d.taw != null ? fmt(d.taw) : '', 'الخروج': d.out != null ? fmt(d.out) : '',
+        'دقائق التأخير': d.in != null && d.in > late ? Math.min(d.in - late, LATE_CAP) : 0 };
+    });
+    if (!rows.length) return toast('ما فيه بصمات في هذا الشهر');
+    const ws = XLSX.utils.json_to_sheet(rows); ws['!cols'] = [{ wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 13 }];
+    const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] }; XLSX.utils.book_append_sheet(wb, ws, 'البصمات');
+    XLSX.writeFile(wb, `بصمة-إنجاز-${prefix.slice(0, 7)}.xlsx`);
+  } catch { toast('ما قدرت أجهز الملف، تأكد من الإنترنت'); }
+});
 $('mPrev').addEventListener('click', () => { mOff--; renderReport(); });
 $('mNext').addEventListener('click', () => { if (mOff < 0) { mOff++; renderReport(); } });
 

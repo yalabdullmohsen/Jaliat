@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>منظومة إنجاز</title>
+<meta name="description" content="منظومة إنجاز: إنجاز للموظفين، بوابة إنجاز للمنسقين والخطباء، بصمة إنجاز لتذكير البصمات.">
+<meta name="author" content="يوسف عبد المحسن المطيري">
+<meta name="theme-color" content="#1E3A31">
+<link rel="icon" type="image/png" href="../favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#F2F1EC; --ink:#1F2A25; --muted:#6C7872; --line:#E6E3DB;
+  --primary:#2F6B57; --gold:#957631; --side:#1E3A31; --side-ink:#F2F6F4; --side-muted:#B9CCC3; --ring:#E2BC55;
+  --f:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#111614; --surface:#181E1B; --surface-2:#1E2522; --ink:#E2E8E5; --muted:#97A39D; --line:#28302C;
+  --primary:#74B398; --gold:#D3B46C; --side:#0F1513; --side-ink:#E2E8E5; --side-muted:#97A39D; color-scheme:dark;
+}}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.7 var(--f);-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
+.in{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hero{background:var(--side);color:var(--side-ink);padding-top:env(safe-area-inset-top,0px)}
+.hero .in{padding-block:40px 36px;display:flex;flex-direction:column;gap:14px}
+.marks{display:flex;gap:10px}
+.marks img{width:52px;height:52px;border-radius:14px;box-shadow:0 0 0 1px rgba(226,188,85,.45)}
+.hero h1{margin:0;font-size:2.1rem;line-height:1.25;text-wrap:balance}
+.hero p{margin:0;color:var(--side-muted);max-width:56ch}
+main .in{padding-block:24px 8px;display:flex;flex-direction:column;gap:20px}
+h2{margin:0;font-size:1.15rem}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.st{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center}
+.st b{display:block;font-size:1.7rem;line-height:1.2;color:var(--primary);font-variant-numeric:tabular-nums}
+.st span{font-size:.82rem;color:var(--muted)}
+@media (max-width:420px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.apps{display:grid;gap:12px}
+.app{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.app img{width:56px;height:56px;border-radius:14px;flex:none}
+.app .tx{min-width:0;flex:1}
+.app h3{margin:0;font-size:1.1rem}
+.app .who{font-size:.85rem;color:var(--gold);font-weight:600}
+.app p{margin:6px 0 10px;color:var(--muted);font-size:.93rem}
+.app ul{margin:0 0 10px;padding-inline-start:18px;font-size:.9rem}
+.app a{display:inline-block;font-weight:700;color:var(--primary);text-decoration:none;direction:ltr}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+<header class="hero"><div class="in">
+  <div class="marks"><img src="../icon-v2-192.png" alt="إنجاز"><img src="../brand/bawaba-192.png" alt="بوابة إنجاز"><img src="../basma/logo-192.png" alt="بصمة إنجاز"></div>
+  <h1>منظومة إنجاز</h1>
+  <p>ثلاثة أنظمة مستقلة بهوية واحدة، تخدم الموظفين والمنسقين والخطباء في قسم الجاليات ورعاية المهتدين وطلبة البعوث، بوزارة الشؤون الإسلامية.</p>
+</div></header>
+
+<main><div class="in">
+  <section>
+    <h2 style="margin-bottom:10px">بالأرقام</h2>
+    <div class="stats">
+      <div class="st"><b id="n-acts">—</b><span>نشاط مسجّل</span></div>
+      <div class="st"><b id="n-comms">—</b><span>جالية لها بوابة</span></div>
+      <div class="st"><b id="n-khatibs">—</b><span>خطبة جمعة بغير العربية</span></div>
+      <div class="st"><b id="n-letters">—</b><span>كتاب من وثيقة</span></div>
+      <div class="st"><b id="n-portal">—</b><span>حساب منسق</span></div>
+      <div class="st"><b id="n-basma">—</b><span>مستخدم للبصمة</span></div>
+    </div>
+    <p class="note" style="margin-top:8px">الأرقام تتحدّث تلقائيًا من النظام.</p>
+  </section>
+
+  <section class="apps">
+    <h2>الأنظمة الثلاثة</h2>
+    <div class="app"><img src="../icon-v2-192.png" alt=""><div class="tx">
+      <h3>إنجاز</h3><span class="who">لموظفي القسم</span>
+      <p>نظام العمل اليومي: الأنشطة والمهام والكتب والتقارير في مكان واحد.</p>
+      <ul><li>أنشطة الجاليات والدروس والتقويم</li><li>ربط مع وثيقة وإرسال الكتب منها</li><li>تصاريح الدروس بالباركود</li><li>المهام والتقارير الشهرية والنسخ الاحتياطي</li></ul>
+      <a href="../">injazkwt.com</a></div></div>
+    <div class="app"><img src="../brand/bawaba-192.png" alt=""><div class="tx">
+      <h3>بوابة إنجاز</h3><span class="who">للمنسقين والخطباء</span>
+      <p>بوابة خاصة لكل جالية: طلبات الأنشطة ومتابعتها، والتعاميم، وتسجيل الخطب والدروس.</p>
+      <ul><li>طلب نشاط جديد ومتابعة رحلة الطلب</li><li>تسجيل خطبة الجمعة في وقتها</li><li>المراسلات مع القسم وشهادات الشكر</li></ul>
+      <a href="../bawaba/">injazkwt.com/bawaba</a></div></div>
+    <div class="app"><img src="../basma/logo-192.png" alt=""><div class="tx">
+      <h3>بصمة إنجاز</h3><span class="who">لكل موظف</span>
+      <p>تذكير ببصمات الدخول والتواجد والخروج حسب جدول الدوام، مع تقرير شهري.</p>
+      <ul><li>إشعار بالتواجد والخروج في وقتها</li><li>رصيد دقائق التأخير الشهري</li><li>بيانات كل موظف برمز خاص بدون حساب</li></ul>
+      <a href="../basma/">injazkwt.com/basma</a></div></div>
+  </section>
+</div></main>
+<script src="../brand/brand.js" data-app="suite" defer></script>
+<script>
+(async () => {
+  try {
+    const r = await fetch('https://nybuospfwbbtejvjivhd.supabase.co/rest/v1/rpc/injaz_public_stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: 'sb_publishable_iQTApPnB_mBr_CE-zU8PGw_HesLP_GZ' },
+      body: '{}'
+    });
+    const d = await r.json();
+    const set = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.textContent = Number(v).toLocaleString('en'); };
+    set('n-acts', d.acts); set('n-comms', d.comms); set('n-khatibs', d.khatibs); set('n-letters', d.letters); set('n-portal', d.portal_accounts); set('n-basma', d.basma_users);
+  } catch {}
+})();
+</script>
+</body>
+</html>
