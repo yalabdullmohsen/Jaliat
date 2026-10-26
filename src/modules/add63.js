@@ -138,7 +138,7 @@ grantSave = async function(){ const e = $("#p-date2")?.value, d = $("#p-date")?.
 /* permit → PDF file sent on WhatsApp (no link): the PDF is prepared when the permit opens, one tap shares it */
 const PPDF = new Map();
 async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const el = $("#permit-paper"); if (!el) return null;
-  const job = (async () => { await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  const job = (async () => { await loadScript("https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     const cv = await html2canvas(el, { scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false }); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
     const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/jpeg", .92), "JPEG", (W - w) / 2, m, w, h);
     const p = S.permits.find(x => x.id === id); return new File([pdf.output("blob")], `تصريح-${p?.no || id}.pdf`, { type:"application/pdf" }); })();
