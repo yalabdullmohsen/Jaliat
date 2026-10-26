@@ -145,7 +145,7 @@ async function permitView(id){
   S.form = { kind:"permitv", id };
   openDrawer(`التصريح ${p.no}`, `<div class="check ${c === "ok" ? "ok" : "warn"}"><b>${st}</b><span>حتى ${fmt(p.until)} · رمز التحقق ${p.code.slice(0, 4)}-${p.code.slice(4)}</span></div>
     <div class="permit-wrap"><div class="permit print-area" id="permit-paper">
-      <div class="pm-h"><div class="pm-org"><span>دولة الكويت</span><b>وزارة الأوقاف والشؤون الإسلامية</b><span>إدارة العلاقات الخارجية</span><span>قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
+      <div class="pm-h"><div class="pm-org"><span>دولة الكويت</span><b>وزارة الشؤون الإسلامية</b><span>إدارة العلاقات الخارجية</span><span>قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
         <div class="pm-meta"><span><b>رقم التصريح:</b> ${esc(p.no)}</span><span><b>تاريخ الإصدار:</b> ${fmt(p.issued_at.slice(0, 10))}</span><span><b>الموافق:</b> ${esc(H.format(new Date(p.issued_at)))}</span></div></div>
       <h2 class="pm-title">تصريح إلقاء درس</h2><p class="pm-sub">يُبرَز لإمام المسجد عند إقامة الدرس</p>
       <p class="pm-lead">تُصرِّح إدارة العلاقات الخارجية (قسم الجاليات ورعاية المهتدين وطلبة البعوث) لفضيلة الشيخ / <strong>${esc(d.sheikh)}</strong> بإلقاء درس في <strong>${esc(d.mosque)}</strong>، وفق البيانات الموضحة أدناه.</p>

@@ -62,7 +62,7 @@ function vRewards(){
 }
 function srSheetHTML(sheet, y, m, sum, cnt){
   return `<div class="toolbar"><button class="btn btn-primary" data-srprint>${icon("i-doc")} طباعة الكشف</button><button class="btn btn-ghost" data-srxls>${icon("i-down")} تصدير إكسل</button><span class="count">${sheet.length} خطيب · ${cnt} خطبة</span></div>
-  <div class="panel sr-sheet" id="sr-sheet"><div class="sr-h"><div><b>وزارة الأوقاف والشؤون الإسلامية</b><span>إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
+  <div class="panel sr-sheet" id="sr-sheet"><div class="sr-h"><div><b>وزارة الشؤون الإسلامية</b><span>إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
     <h2>كشف مكافآت خطباء الجاليات عن شهر ${MONTHS[m]} ${y}</h2><span class="s">قيمة الخطبة الواحدة: ${SR.rate ? kd(SR.rate) + " د.ك" : "غير محددة"}</span></div>
     <div class="table-wrap"><table class="stbl sr-tbl"><thead><tr><th>م</th><th>اسم الخطيب</th><th>الرقم المدني</th><th>الهاتف</th><th>المسجد</th><th class="c">عدد الخطب</th><th>تواريخ الخطب</th><th class="c">المبلغ (د.ك)</th></tr></thead><tbody>
     ${sheet.map((p, i) => `<tr><td class="n">${i + 1}</td><td class="nm">${esc(p.name || "—")}</td><td class="num">${esc(p.pid || "")}</td><td class="num">${esc(p.ph || "")}</td><td class="s2">${esc([...p.mos].filter(Boolean).join("، "))}</td><td class="c num"><b>${p.n}</b></td><td class="s2 num">${p.fr.sort().map(f => fmt(f).slice(0, 5)).join("، ")}</td><td class="c num"><b>${SR.rate ? kd(p.sum) : "—"}</b></td></tr>`).join("") || `<tr><td colspan="8" class="empty">لا توجد خطب مسجلة لهذا الشهر، سجّلها من تبويب «تسجيل الخطب»</td></tr>`}
@@ -123,7 +123,7 @@ function srXls(){
   const rows = sheet.map((p, i) => ({ "م":i + 1, "اسم الخطيب":p.name, "الرقم المدني":p.pid, "الهاتف":p.ph, "المسجد":[...p.mos].join("، "), "عدد الخطب":p.n, "تواريخ الخطب":p.fr.sort().map(fmt).join("، "), "المبلغ (د.ك)":SR.rate ? +p.sum.toFixed(3) : "" }));
   rows.push({ "م":"", "اسم الخطيب":"الإجمالي", "عدد الخطب":sheet.reduce((s, p) => s + p.n, 0), "المبلغ (د.ك)":SR.rate ? +sheet.reduce((s, p) => s + p.sum, 0).toFixed(3) : "" });
   const wb = XLSX.utils.book_new(); wb.Workbook = { Views:[{ RTL:true }] };
-  const ws = XLSX.utils.aoa_to_sheet([["وزارة الأوقاف والشؤون الإسلامية، إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث"], [`كشف مكافآت خطباء الجاليات عن شهر ${MONTHS[m]} ${y}`], [`قيمة الخطبة: ${SR.rate ? kd(SR.rate) + " د.ك" : "غير محددة"}`], []]);
+  const ws = XLSX.utils.aoa_to_sheet([["وزارة الشؤون الإسلامية، إدارة العلاقات الخارجية، قسم الجاليات ورعاية المهتدين وطلبة البعوث"], [`كشف مكافآت خطباء الجاليات عن شهر ${MONTHS[m]} ${y}`], [`قيمة الخطبة: ${SR.rate ? kd(SR.rate) + " د.ك" : "غير محددة"}`], []]);
   XLSX.utils.sheet_add_json(ws, rows, { origin:"A5" }); ws["!cols"] = [6, 28, 16, 12, 30, 10, 36, 14].map(w => ({ wch:w }));
   XLSX.utils.book_append_sheet(wb, ws, "الكشف");
   const data = XLSX.write(wb, { type:"array", bookType:"xlsx" }); const url = URL.createObjectURL(new Blob([data], { type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));

@@ -117,3 +117,39 @@ wqForm = function(id){ _wqForm85(id); const w = wqById(id); const b = $(".drawer
   b.insertAdjacentHTML("beforeend", `<div class="rq-sec"><b>التصاريح لهذه الموافقة</b>${L.map(e => { const p = S.permits.find(x => x.act_id === e.id && !x.revoked); return `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")} · ${esc(daysText(e) || "")} ${esc(e.time || "")}</span></span>${p ? `<span class="chip ok">صدر ${esc(p.no || "")}</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</div>`; }).join("")}</div>`); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-pact],[data-gact]"); if (!t) return; const id = t.dataset.pact || t.dataset.gact; closeDrawer();
   setTimeout(() => t.dataset.pact ? permitForm({ act_id:id }) : grantForm({ act_id:id }), 60); });
+
+/* lesson date: «من» and «إلى» — the end date decides the permit validity (the duration list fills it) */
+function pRangeAdd(){ const d = $("#p-date"); if (!d || $("#p-date2")) return; const f = d.closest(".fld"); const lab = f?.querySelector("label"); if (lab) lab.textContent = "تاريخ الدرس: من";
+  f.insertAdjacentHTML("afterend", fld("p-date2", "إلى", `<input class="f" type="date" id="p-date2">`)); pRangeSync(); }
+function pRangeSync(){ const d = $("#p-date")?.value, sel = $("#p-dur"), e = $("#p-date2"); if (!d || !e) return; const k = DUR.find(x => x[0] === sel?.value) || DUR[DUR.length - 1]; e.value = addDays(d, k[2] - 1); }
+document.addEventListener("change", ev => { if (ev.target.id === "p-dur" || ev.target.id === "p-date") pRangeSync(); });
+const _permitForm86 = permitForm; permitForm = function(p, g){ _permitForm86(p, g); if (S.form?.kind === "permit") { pRangeAdd(); const u = g?.preset?.until || p?.until; if (u && $("#p-date2")) $("#p-date2").value = u; } };
+const _grantForm86 = grantForm; grantForm = function(p){ _grantForm86(p); pRangeAdd(); };
+const _pDurDoc86 = pDurDoc; pDurDoc = function(doc){ _pDurDoc86(doc); pRangeSync(); };
+const _permitIssue86 = permitIssue;
+permitIssue = async function(){ const e = $("#p-date2")?.value, d = $("#p-date")?.value; if (e && d) { if (e < d) return toast("تاريخ «إلى» قبل تاريخ «من»");
+    const n = Math.round((dOf(e) - dOf(d)) / 864e5) + 1, k = "rng" + e; if (!DUR.find(x => x[0] === k)) DUR.push([k, n === 1 ? "يوم الدرس فقط" : `من ${fmt(d)} إلى ${fmt(e)}`, n]);
+    const sel = $("#p-dur"); if (sel && !sel.querySelector(`[value="${k}"]`)) sel.insertAdjacentHTML("beforeend", `<option value="${k}">${n === 1 ? "يوم الدرس فقط" : "حتى " + fmt(e)}</option>`); if (sel) sel.value = k; if ($("#p-rep")?.value === "once" && n > 1) $("#p-rep").value = "weekly"; }
+  return _permitIssue86(); };
+const _grantSave86 = grantSave;
+grantSave = async function(){ const e = $("#p-date2")?.value, d = $("#p-date")?.value; if (e && d) { if (e < d) return toast("تاريخ «إلى» قبل تاريخ «من»");
+    const n = Math.round((dOf(e) - dOf(d)) / 864e5) + 1, k = "rng" + e; if (!DUR.find(x => x[0] === k)) DUR.push([k, `حتى ${fmt(e)}`, n]); const sel = $("#p-dur"); if (sel && !sel.querySelector(`[value="${k}"]`)) sel.insertAdjacentHTML("beforeend", `<option value="${k}">حتى ${fmt(e)}</option>`); if (sel) sel.value = k; }
+  return _grantSave86(); };
+/* permit → PDF file sent on WhatsApp (no link): the PDF is prepared when the permit opens, one tap shares it */
+const PPDF = new Map();
+async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const el = $("#permit-paper"); if (!el) return null;
+  const job = (async () => { await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    const cv = await html2canvas(el, { scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false }); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
+    const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/jpeg", .92), "JPEG", (W - w) / 2, m, w, h);
+    const p = S.permits.find(x => x.id === id); return new File([pdf.output("blob")], `تصريح-${p?.no || id}.pdf`, { type:"application/pdf" }); })();
+  PPDF.set(id, job); job.catch(() => PPDF.delete(id)); return job; }
+const _permitView87 = permitView;
+permitView = async function(id){ await _permitView87(id); const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
+document.addEventListener("click", async ev => { const b = ev.target.closest("[data-pwa]"); if (!b) return; ev.preventDefault(); ev.stopImmediatePropagation();
+  const id = b.dataset.pwa, p = S.permits.find(x => x.id === id); if (!p) return; const old = b.innerHTML; b.disabled = true; b.textContent = "يجهّز PDF…";
+  try { const f = await permitPdf(id); if (!f) throw new Error("no pdf"); const txt = `تصريح إلقاء درس رقم ${p.no}\nالشيخ: ${p.data?.sheikh || ""}\nالمسجد: ${p.data?.mosque || ""}${p.data?.time ? "\nالموعد: " + p.data.time : ""}`;
+    if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:f.name, text:txt }); } catch (_) {} }
+    else { const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast("نزل ملف PDF، أرفقه في واتساب القسم"); if (S.view !== "whatsapp" && typeof go === "function" && TITLES.whatsapp) setTimeout(() => go("whatsapp"), 600); } }
+  catch (e) { toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }
+  finally { b.disabled = false; b.innerHTML = old; } }, true);

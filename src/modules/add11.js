@@ -344,7 +344,7 @@ async function copyRich(html, text){
 /* =============== 4) WhatsApp =============== */
 const waNum = p => { let d = digits(p).replace(/\D/g, ""); if (d.length === 8) d = "965" + d; return d; };
 function waOpen(phone, text){ const n = waNum(phone); if (n.length < 10) return toast("لا يوجد رقم هاتف صحيح"); window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`, "_blank", "noopener"); }
-const SIGN = "\n\nقسم الجاليات ورعاية المهتدين وطلبة البعوث\nوزارة الأوقاف والشؤون الإسلامية";
+const SIGN = "\n\nقسم الجاليات ورعاية المهتدين وطلبة البعوث\nوزارة الشؤون الإسلامية";
 function waAct(e, c){
   return `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل/ ${c?.name || ""} حفظه الله\n\nنود إفادتكم بتفاصيل ${e.type} للجالية ${e.comm}:\n• المسجد: ${e.mosName || "—"}${e.area ? "، " + e.area : ""}\n• اليوم: ${daysText(e)}\n• الوقت: ${e.time || "—"}\n• المحاضر: ${e.lect || "—"}\n• المدة: من ${fmt(e.start)} إلى ${fmt(e.end)}${e.doc ? `\n• رقم الموافقة: ${e.doc}` : ""}\n\nنرجو التأكيد والالتزام بالموعد، وجزاكم الله خيراً.${SIGN}`;
 }
@@ -376,7 +376,7 @@ function vWeekly(){
     ${sel("wk-c", commNames, S.f.wkc, "كل الجاليات")}${sel("wk-g", GOVS, S.f.wkg, "كل المحافظات")}
     <span class="count">${tot} موعد</span><button class="btn" type="button" data-wktxt>${icon("i-wa")} نسخ للواتساب</button><button class="btn btn-primary" type="button" data-wkprint>${icon("i-down")} طباعة / PDF</button></div>
   <div class="panel print-area" id="wk-sheet"><div class="panel-b">
-    <div class="sr-h"><div><b>وزارة الأوقاف والشؤون الإسلامية</b><span>${DEPT}</span></div><div style="text-align:end"><h2>الجدول الأسبوعي للأنشطة${S.f.wkc ? "، " + esc(S.f.wkc) : ""}${S.f.wkg ? "، محافظة " + esc(S.f.wkg) : ""}</h2><span>من السبت ${fmt(isoOf(s))} إلى الجمعة ${fmt(isoOf(e))} م</span></div></div>
+    <div class="sr-h"><div><b>وزارة الشؤون الإسلامية</b><span>${DEPT}</span></div><div style="text-align:end"><h2>الجدول الأسبوعي للأنشطة${S.f.wkc ? "، " + esc(S.f.wkc) : ""}${S.f.wkg ? "، محافظة " + esc(S.f.wkg) : ""}</h2><span>من السبت ${fmt(isoOf(s))} إلى الجمعة ${fmt(isoOf(e))} م</span></div></div>
     ${W.map(x => `<div class="wk-day"><div class="wk-dh"><b>${DAYS[x.d.getDay()]}</b><span class="num">${fmt(x.iso)}</span><span class="chip">${x.L.length}</span></div>
       ${x.L.length ? `<div class="table-wrap"><table class="tbl sr-tbl"><thead><tr><th>#</th><th>الوقت</th><th>الجالية</th><th>المسجد</th><th>المنطقة</th><th>المحاضر</th><th>النوع</th></tr></thead><tbody>${x.L.map(a => `<tr data-open="act:${a.id}"><td class="num">${a.n}</td><td>${esc(a.time || "")}</td><td>${esc(a.comm || "")}</td><td>${esc(a.mosName)}</td><td>${esc(a.area)}</td><td>${esc(a.lect || "")}</td><td>${esc(a.type)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty s">لا توجد أنشطة</div>`}</div>`).join("")}
   </div></div>`;
@@ -479,7 +479,7 @@ function reportHTML(ym){
   const MN = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"][m - 1];
   const amt = serm.reduce((s, r) => s + (+r.amount || 0), 0);
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>تقرير ${MN} ${y}</title><style>body{font-family:'Simplified Arabic',Arial;direction:rtl}h1,h2{color:#1d4d3a}h2{font-size:15pt;border-bottom:2px solid #c9a227;padding-bottom:3px;margin-top:18px}</style></head><body dir="rtl">
-<p style="text-align:center;margin:0">وزارة الأوقاف والشؤون الإسلامية<br>${DEPT}</p>
+<p style="text-align:center;margin:0">وزارة الشؤون الإسلامية<br>${DEPT}</p>
 <h1 style="text-align:center;font-size:20pt">التقرير الشهري لأنشطة الجاليات، ${MN} ${y} م</h1>
 <h2>ملخص الشهر</h2>${tbl(["الأنشطة الجارية", "أنشطة جديدة", "موافقات جديدة", "طلبات واردة", "خطب الجمعة المسجلة"], [[act.length, nw.length, docs.length, reqs.length, serm.filter(r => r.who !== "none").length]])}
 <h2>الأنشطة حسب الجالية</h2>${tbl(["الجالية", "الأنشطة الجارية", "الجديدة هذا الشهر"], Object.entries(byC).sort((a, b) => b[1].a - a[1].a).map(([c, o]) => [c, o.a, o.n]))}
