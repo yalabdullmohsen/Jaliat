@@ -1,0 +1,4 @@
+.p-soon{opacity:.55;cursor:not-allowed;position:relative}
+.p-soon::after{content:"قريباً";font-size:10px;font-weight:700;margin-inline-start:6px;padding:1px 6px;border-radius:8px;background:var(--gold-soft,#f3e7c4);color:var(--gold,#8a6d1f)}
+.p-pause{margin-bottom:14px}
+.p-pause .btn{width:auto;justify-self:start;align-self:flex-start}
