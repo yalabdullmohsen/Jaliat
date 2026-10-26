@@ -139,7 +139,7 @@ grantSave = async function(){ const e = $("#p-date2")?.value, d = $("#p-date")?.
 const PPDF = new Map();
 async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const el = $("#permit-paper"); if (!el) return null;
   const job = (async () => { await loadScript("https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
-    const cv = await html2canvas(el, { scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false }); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
+    const cv = await html2canvas(el, { scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false, onclone:d => { const st = d.createElement("style"); st.textContent = "#permit-paper,#permit-paper *{letter-spacing:0!important;word-spacing:normal!important;font-feature-settings:normal!important;text-rendering:auto!important}"; d.head.appendChild(st); } }); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
     const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/jpeg", .92), "JPEG", (W - w) / 2, m, w, h);
     const p = S.permits.find(x => x.id === id); return new File([pdf.output("blob")], `تصريح-${p?.no || id}.pdf`, { type:"application/pdf" }); })();
   PPDF.set(id, job); job.catch(() => PPDF.delete(id)); return job; }
