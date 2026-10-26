@@ -153,3 +153,14 @@ document.addEventListener("click", async ev => { const b = ev.target.closest("[d
       toast("نزل ملف PDF، أرفقه في واتساب القسم"); if (S.view !== "whatsapp" && typeof go === "function" && TITLES.whatsapp) setTimeout(() => go("whatsapp"), 600); } }
   catch (e) { toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }
   finally { b.disabled = false; b.innerHTML = old; } }, true);
+/* the head can always issue the permit himself, wherever «تفويض» appears */
+const _grantsPanel88 = grantsPanel;
+grantsPanel = function(){ let h = _grantsPanel88(); if (!S.admin) return h;
+  for (const g of S.grants.filter(gOpen).filter(g => g.grantee !== S.me?.id)) h = h.replace(`<button type="button" class="btn btn-ghost bad-t" data-pgrevoke="${g.id}">`, `<button type="button" class="btn btn-primary" data-pgself="${g.id}">إصدار بنفسي</button><button type="button" class="btn btn-ghost bad-t" data-pgrevoke="${g.id}">`);
+  return h; };
+const _wqForm88 = wqForm;
+wqForm = function(id){ _wqForm88(id); const b = $(".drawer-f [data-pgfrom]"); if (!b || !S.admin || $(".drawer-f [data-pwqissue]")) return;
+  b.insertAdjacentHTML("beforebegin", `<button class="btn btn-primary" type="button" data-pwqissue="${esc(id)}">إصدار تصريح</button>`); };
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-pgself],[data-pwqissue]"); if (!t) return;
+  if (t.dataset.pgself) { const g = S.grants.find(x => x.id === t.dataset.pgself); if (!g) return; closeDrawer(); setTimeout(() => { permitForm({ ...(g.preset || {}) }); if (S.form) S.form.grant = g.id; const u = g.preset?.until; if (u && $("#p-date2")) $("#p-date2").value = u; }, 60); return; }
+  const w = wqById(t.dataset.pwqissue); if (!w) return; closeDrawer(); setTimeout(() => { permitForm({}); const i = $("#p-act"); if (i) { i.value = w.no; pFind(w.no); } }, 60); });
