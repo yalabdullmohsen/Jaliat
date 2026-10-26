@@ -20,7 +20,7 @@ permitIssue = async function(){ const p = $("#p-pray")?.value; if (!p) return _p
   if (!v("p-sheikh") || !v("p-mosque") || !v("p-date")) return toast("أكمل اسم الشيخ والمسجد والتاريخ"); if (!days.length) return toast("اختر يوم الدرس");
   if (p === "بعد صلاة الجمعة" && !days.every(x => x === 5)) return toast("«بعد صلاة الجمعة» يكون يوم الجمعة فقط");
   const dur = DUR.find(x => x[0] === v("p-dur")) || DUR.find(x => x[0] === "180"); const until = addDays(v("p-date"), dur[2] - 1);
-  const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), prayer:p, days, time:`${pdText(days)}، ${p}`, dur:dur[1], head:v("p-head") };
+  const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), prayer:p, days, time:`${pdText(days)}، ${p}`, dur:dur[1], head:v("p-head"), note:v("p-note") };
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
   S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id); };
 /* AI reading fills the days and the validity from the letter */

@@ -17,7 +17,7 @@ permitIssue = async function(){ const p = $("#p-pray")?.value; if (!p) return _p
   const v = id => $("#" + id)?.value.trim() || "";
   if (!v("p-sheikh") || !v("p-mosque") || !v("p-date")) return toast("أكمل اسم الشيخ والمسجد والتاريخ");
   const dur = DUR.find(x => x[0] === v("p-dur")) || DUR[0]; const until = addDays(v("p-date"), dur[2] - 1);
-  const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), time:p, prayer:p, dur:dur[1], head:v("p-head") };
+  const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), time:p, prayer:p, dur:dur[1], head:v("p-head"), note:v("p-note") };
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
   S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id); };
 /* the AI reading fills the prayer period too */

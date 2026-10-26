@@ -125,6 +125,7 @@ function permitForm(preset, grant){
     <div class="g2">${fld("p-topic", "عنوان الدرس (اختياري)", `<input class="f" id="p-topic" value="${esc(d.topic)}">`)}${fld("p-lang", "اللغة (اختياري)", `<input class="f" id="p-lang" value="${esc(d.lang)}">`)}</div>
     <div class="g3">${fld("p-date", "تاريخ الدرس", `<input class="f" type="date" id="p-date" value="${esc(d.date)}">`)}${fld("p-from", "من", `<input class="f" type="time" id="p-from" value="${esc(d.t_from)}">`)}${fld("p-to", "إلى", `<input class="f" type="time" id="p-to" value="${esc(d.t_to)}">`)}</div>
     <div class="g2">${fld("p-dur", "مدة التصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("p-head", "المعتمِد", `<input class="f" id="p-head" value="${esc(d.head)}"${lock}>`)}</div>
+    ${fld("p-note", "ملاحظات (اختياري)", `<input class="f" id="p-note" value="${esc(d.note || grant?.note || "")}" placeholder="مثال: ثاني جمعة من كل شهر، أو كل ثلاثاء بعد المغرب">`)}
     <span class="hint">يُولَّد رقم التصريح ورمز التحقق تلقائياً. الباركود يفتح صفحة تحقق رسمية تبيّن للإمام صلاحية التصريح الآن.</span>`,
     `<button class="btn btn-primary" data-pissue>إصدار التصريح</button><button class="btn btn-ghost" data-close>إلغاء</button>`);
 }
@@ -132,7 +133,7 @@ async function permitIssue(){
   const v = id => $("#" + id)?.value.trim() || "";
   if (!v("p-sheikh") || !v("p-mosque") || !v("p-date")) return toast("أكمل اسم الشيخ والمسجد والتاريخ");
   const dur = DUR.find(x => x[0] === v("p-dur")) || DUR[0]; const until = addDays(v("p-date"), dur[2] - 1);
-  const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), time:`من ${t12(v("p-from"))} إلى ${t12(v("p-to"))}`, dur:dur[1], head:v("p-head") };
+  const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:v("p-from"), t_to:v("p-to"), time:`من ${t12(v("p-from"))} إلى ${t12(v("p-to"))}`, dur:dur[1], head:v("p-head"), note:v("p-note") };
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
   S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id);
 }
@@ -148,7 +149,7 @@ async function permitView(id){
         <div class="pm-meta"><span><b>رقم التصريح:</b> ${esc(p.no)}</span><span><b>تاريخ الإصدار:</b> ${fmt(p.issued_at.slice(0, 10))}</span><span><b>الموافق:</b> ${esc(H.format(new Date(p.issued_at)))}</span></div></div>
       <h2 class="pm-title">تصريح إلقاء درس</h2><p class="pm-sub">يُبرَز لإمام المسجد عند إقامة الدرس</p>
       <p class="pm-lead">تُصرِّح إدارة العلاقات الخارجية (قسم الجاليات ورعاية المهتدين وطلبة البعوث) لفضيلة الشيخ / <strong>${esc(d.sheikh)}</strong> بإلقاء درس في <strong>${esc(d.mosque)}</strong>، وفق البيانات الموضحة أدناه.</p>
-      <table class="pm-t"><tr><th>اسم الشيخ</th><td>${esc(d.sheikh)}</td></tr><tr><th>المسجد</th><td>${esc(d.mosque)}</td></tr>${d.topic ? `<tr><th>عنوان الدرس</th><td>${esc(d.topic)}</td></tr>` : ""}${d.lang ? `<tr><th>لغة الدرس</th><td>${esc(d.lang)}</td></tr>` : ""}<tr><th>التاريخ</th><td>${DAYS[dOf(d.date).getDay()]} ${fmt(d.date)}، ${esc(H.format(dOf(d.date)))}</td></tr><tr><th>الوقت</th><td>${esc(d.time || "")}</td></tr></table>
+      <table class="pm-t"><tr><th>اسم الشيخ</th><td>${esc(d.sheikh)}</td></tr><tr><th>المسجد</th><td>${esc(d.mosque)}</td></tr>${d.topic ? `<tr><th>عنوان الدرس</th><td>${esc(d.topic)}</td></tr>` : ""}${d.lang ? `<tr><th>لغة الدرس</th><td>${esc(d.lang)}</td></tr>` : ""}<tr><th>التاريخ</th><td>${DAYS[dOf(d.date).getDay()]} ${fmt(d.date)}، ${esc(H.format(dOf(d.date)))}</td></tr><tr><th>الوقت</th><td>${esc(d.time || "")}</td></tr>${d.note ? `<tr><th>ملاحظات</th><td>${esc(d.note)}</td></tr>` : ""}</table>
       <div class="pm-valid"><div><span>مدة التصريح</span><b>${esc(d.dur || "")}</b></div><div><span>ينتهي العمل به</span><b>${fmt(p.until)}، 11:59 م</b></div></div>
       <p class="pm-note">يُعدّ هذا التصريح رسمياً ونافذاً خلال مدته فقط ويُلغى تلقائياً بانتهائها. على إمام المسجد مسح الباركود للتحقق الفوري من صحته وصلاحيته عبر نظام «إنجاز».</p>
       <div class="pm-bottom"><div class="pm-appr"><span>اعتماد رئيس قسم الجاليات ورعاية المهتدين وطلبة البعوث</span><b>${esc(d.head || "")}</b>

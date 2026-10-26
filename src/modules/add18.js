@@ -22,7 +22,7 @@ function grantForm(preset){
     ${fld("p-mosque", "المسجد والمنطقة", `<input class="f" id="p-mosque" value="${esc(d.mosque)}" list="p-mos"><datalist id="p-mos">${S.mosques.map(m => `<option value="${esc("مسجد " + m.name + (m.area ? "، " + m.area : ""))}">`).join("")}</datalist>`)}
     <div class="g2">${fld("p-topic", "عنوان الدرس (اختياري)", `<input class="f" id="p-topic" value="${esc(d.topic)}">`)}${fld("p-lang", "اللغة (اختياري)", `<input class="f" id="p-lang" value="${esc(d.lang)}">`)}</div>
     <div class="g3">${fld("p-date", "تاريخ الدرس", `<input class="f" type="date" id="p-date" value="${esc(d.date)}">`)}${fld("p-from", "من", `<input class="f" type="time" id="p-from" value="${esc(d.t_from)}">`)}${fld("p-to", "إلى", `<input class="f" type="time" id="p-to" value="${esc(d.t_to)}">`)}</div>
-    <div class="g2">${fld("p-dur", "أقصى مدة للتصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("g-note", "توجيه للموظف (اختياري)", `<input class="f" id="g-note" placeholder="مثال: بناءً على كتاب وثيقة 2608-2957">`)}</div>`,
+    <div class="g2">${fld("p-dur", "أقصى مدة للتصريح", `<select class="f" id="p-dur">${DUR.map(([k, l]) => `<option value="${k}"${k === d.dur ? " selected" : ""}>${l}</option>`).join("")}</select>`)}${fld("g-note", "ملاحظات (اختياري)", `<input class="f" id="g-note" placeholder="مثال: ثاني جمعة من كل شهر، أو كل ثلاثاء بعد المغرب">`)}</div>`,
     `<button class="btn btn-primary" data-pgsave>تفويض وإرسال المهمة</button><button class="btn btn-ghost" data-close>إلغاء</button>`);
 }
 async function grantSave(){
