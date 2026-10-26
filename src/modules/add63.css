@@ -83,3 +83,4 @@ html{accent-color:var(--primary)}
 .p-auto{padding:12px;border-radius:12px;background:color-mix(in srgb,var(--gold-soft) 70%,var(--surface));margin-bottom:6px}
 .p-auto .hint{display:block;margin-top:4px}
 .pn-i{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:.5px solid color-mix(in srgb,var(--ink) 10%,transparent)}.pn-t{display:grid;flex:1 1 220px;min-width:0}.pn-b{display:flex;gap:6px}
+.p-pick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-2px 0 8px}.p-pick .chip{cursor:pointer}

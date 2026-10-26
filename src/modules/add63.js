@@ -54,7 +54,7 @@ grantSave = async function(){ const v = id => $("#" + id)?.value.trim() || "", d
 const pActLabel = e => `#${e.n} · ${e.lect || "—"} · ${e.mosName || ""}${e.area ? "، " + e.area : ""} · ${daysText(e) || ""} ${e.time || ""}${e.doc ? " · موافقة " + e.doc : ""}`;
 function pNextDate(days){ const t = dOf(TODAY); if (!days?.length) return TODAY; for (let i = 0; i < 8; i++) { const d = new Date(t); d.setDate(t.getDate() + i); if (days.includes(d.getDay())) return addDays(TODAY, i); } return TODAY; }
 function pActBox(){ const L = S.E.filter(e => !["ملغى", "مكتمل"].includes(e.status)).sort((a, b) => (b.n || 0) - (a.n || 0));
-  return `<div class="p-auto">${fld("p-act", "✨ اختر النشاط وتتعبّأ البيانات تلقائياً", `<input class="f" id="p-act" list="p-acts" placeholder="اكتب اسم الشيخ أو المسجد أو رقم النشاط أو رقم الموافقة…"><datalist id="p-acts">${L.slice(0, 600).map(e => `<option value="${esc(pActLabel(e))}">`).join("")}</datalist>`)}<span class="hint">بعد التعبئة راجع البيانات وعدّل اللي تبيه، ثم ${S.form?.kind === "permit" ? "«إصدار التصريح»" : "«تفويض وإرسال المهمة»"}.</span></div>`; }
+  return `<div class="p-auto">${fld("p-act", "✨ اكتب رقم الكتاب أو اختر النشاط، وتتعبّأ البيانات تلقائياً", `<input class="f" id="p-act" list="p-acts" placeholder="اكتب رقم الكتاب (مثل 2610-6416) أو اسم الشيخ أو المسجد…"><datalist id="p-acts">${L.slice(0, 600).map(e => `<option value="${esc(pActLabel(e))}">`).join("")}</datalist>`)}<span class="hint">بعد التعبئة راجع البيانات وعدّل اللي تبيه، ثم ${S.form?.kind === "permit" ? "«إصدار التصريح»" : "«تفويض وإرسال المهمة»"}.</span></div>`; }
 function pFill(e){ if (!e) return; const set = (id, v) => { const x = $("#" + id); if (x && v != null && !x.readOnly) x.value = v; };
   const doc = docBy[e.doc], comm = S.comms.find(c => c.name === e.comm);
   set("p-sheikh", (e.lect || "").split(" / ")[0]); set("p-mosque", e.mosName ? e.mosName + (e.area ? "، " + e.area : "") : (e.mosRaw || ""));
@@ -62,11 +62,35 @@ function pFill(e){ if (!e) return; const set = (id, v) => { const x = $("#" + id
   const days = e.daily ? [...PD_ALL] : (e.days || []); document.querySelectorAll("#pd-days .pd-d").forEach(b => b.classList.toggle("on", days.includes(+b.dataset.pdd)));
   const pr = prayerOf(e.time); const s = $("#p-pray"); if (s) { s.value = pr || "none"; pTimeSync(); }
   set("p-rep", "weekly"); set("p-date", pNextDate(days));
-  const left = doc?.end ? Math.round((dOf(doc.end) - dOf(TODAY)) / 864e5) : 180; const dk = [...DUR].reverse().find(x => x[2] <= Math.max(1, left)) || DUR[0]; set("p-dur", dk[0]);
+  const start = doc?.start && doc.start > TODAY ? doc.start : null; if (start) { const t = dOf(start); let d0 = start; for (let i = 0; i < 8 && days.length; i++) { const x = new Date(t); x.setDate(t.getDate() + i); if (days.includes(x.getDay())) { d0 = addDays(start, i); break; } } set("p-date", d0); }
+  pDurDoc(doc);
   const note = [e.doc ? `موافقة ${e.doc}${doc?.end ? " سارية حتى " + fmt(doc.end) : ""}` : "", e.notes && !/⚠/.test(e.notes) ? e.notes : ""].filter(Boolean).join(" · ");
   set($("#g-note") ? "g-note" : "p-note", note);
   if (S.form) S.form.act = e.id; toast("تعبّأت البيانات من النشاط، راجعها"); }
-document.addEventListener("change", ev => { if (ev.target.id !== "p-act") return; const n = +(ev.target.value.match(/^#(\d+)/) || [])[1]; pFill(S.E.find(e => e.n === n)); });
+function pDurDoc(doc){ const sel = $("#p-dur"); if (!sel) return; const from = $("#p-date")?.value || TODAY;
+  if (doc?.end && doc.end >= from) { const n = Math.round((dOf(doc.end) - dOf(from)) / 864e5) + 1, k = "doc" + doc.end; if (!DUR.find(x => x[0] === k)) DUR.push([k, `حتى نهاية الموافقة ${fmt(doc.end)}`, n]);
+    if (!sel.querySelector(`[value="${k}"]`)) sel.insertAdjacentHTML("beforeend", `<option value="${k}">حتى نهاية الموافقة ${fmt(doc.end)}</option>`); sel.value = k; }
+  else sel.value = "180"; }
+const pNo = s => { const m = String(s || "").match(/(\d{4})\s*[-ـ–]+\s*(\d{4})/); if (!m) return ""; return +m[1] < +m[2] && m[2].startsWith("26") ? `${m[2]}-${m[1]}` : `${m[1]}-${m[2]}`; };
+function pPick(L, title){ $("#p-act-pick")?.remove(); $("#p-act")?.closest(".fld")?.insertAdjacentHTML("afterend", `<div id="p-act-pick" class="p-pick"><span class="s">${esc(title)}</span>${L.map(x => `<button type="button" class="chip t1" data-pfill="${esc(x.k)}">${esc(x.l)}</button>`).join("")}</div>`); }
+const PPLAN = new Map();
+function pFillPlan(a, w){ if (!a) return; const m = mosBy[a.mosque]; const fake = { id:"", n:0, lect:a.lect, mosName:m ? "مسجد " + m.name : "", area:m?.area || "", mosRaw:a.mosRaw, days:a.days || [], daily:a.daily, time:a.time, type:a.type, title:a.title, comm:a.comm, doc:docBy[w.no] ? w.no : "", notes:"" };
+  pFill(fake); if (S.form) S.form.act = ""; const nt = $("#g-note") ? "g-note" : "p-note"; const x = $("#" + nt); if (x && !x.value) x.value = `كتاب ${w.no}`; }
+function pFind(v){ const val = String(v || "").trim(); if (!val) return;
+  const byLabel = S.E.find(e => pActLabel(e) === val); if (byLabel) { $("#p-act-pick")?.remove(); return pFill(byLabel); }
+  const n = val.match(/^#?(\d{1,4})$/); if (n) { const e = S.E.find(x => x.n === +n[1]); if (e) { $("#p-act-pick")?.remove(); return pFill(e); } }
+  const no = pNo(val); if (!no) return;
+  const w = S.wq.find(x => x.no === no), rel = new Set([no, w && wqParent(w)?.no, ...(w ? wqKids(w).map(k => k.no) : [])].filter(Boolean));
+  const L = S.E.filter(e => rel.has(e.doc) && !["ملغى", "مكتمل"].includes(e.status));
+  if (L.length === 1) { $("#p-act-pick")?.remove(); return pFill(L[0]); }
+  if (L.length > 1) return pPick(L.map(e => ({ k:"a:" + e.id, l:`${e.lect || "—"} · ${e.mosName || ""} · ${daysText(e) || ""} ${e.time || ""}` })), `الكتاب ${no} فيه ${L.length} أنشطة، اختر:`);
+  const src = w ? [wqParent(w), w].filter(Boolean) : []; for (const x of src) { let P = null; try { P = wqPlan(x); } catch (_) {} if (P?.acts?.length) { PPLAN.set(x.no, { w:x, acts:P.acts });
+      if (P.acts.length === 1) { $("#p-act-pick")?.remove(); return pFillPlan(P.acts[0], x); }
+      return pPick(P.acts.map((a, i) => ({ k:`w:${x.no}:${i}`, l:`${a.lect || "—"} · ${mosBy[a.mosque]?.name || a.mosRaw || ""} · ${daysText(a) || ""} ${a.time || ""}` })), `من الكتاب ${x.no}، اختر:`); } }
+  toast(w ? "لقيت الكتاب بس ما فيه جدول واضح، عبّي البيانات يدوياً" : "رقم الكتاب غير موجود في إنجاز"); }
+document.addEventListener("input", ev => { if (ev.target.id !== "p-act") return; clearTimeout(pFind._t); const v = ev.target.value; pFind._t = setTimeout(() => pFind(v), 350); });
+document.addEventListener("click", ev => { const b = ev.target.closest("[data-pfill]"); if (!b) return; const k = b.dataset.pfill;
+  if (k.startsWith("a:")) pFill(S.E.find(e => e.id === k.slice(2))); else { const [, no, i] = k.split(":"); const P = PPLAN.get(no); if (P) pFillPlan(P.acts[+i], P.w); } $("#p-act-pick")?.remove(); });
 const _permitForm84 = permitForm;
 permitForm = function(preset, grant){ _permitForm84(preset, grant); if (S.form?.kind !== "permit" || grant || $("#p-act")) return;
   const at = $("#p-sheikh")?.closest(".fld"); at?.insertAdjacentHTML("beforebegin", pActBox());
