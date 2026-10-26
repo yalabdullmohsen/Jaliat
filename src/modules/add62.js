@@ -44,3 +44,12 @@ vWatheqa = function(){ let h = _vWatheqa82();
     h = h.replace(new RegExp(`(data-wq="${w.id}"[\\s\\S]*?<span class="wq-t"><b>[\\s\\S]*?</b>)`), `$1<span class="wq-r">↰ على كتابنا ${esc(p.no || "")} · ${fmt(wqDate(p))}</span>`); }
   return h; };
 NEWF.splice(1, 0, ["v82-wqparent", "nav:watheqa", "كتاب الموافقة مع كتابه الأصلي", "كل موافقة من وثيقة تظهر مع كتابنا الأصلي (فيه الأوقات والمساجد والمحاضرين)، وتُقرأ الأنشطة منه إذا كان كتاب الموافقة بدون جدول. وإذا كانت الموافقة مكتوبة في الإجراءات فقط («لا مانع») يظهر: لا يوجد كتاب موافقة.", true, "2026-10-26"]);
+/* approval documents in «الوثائق»: show the original letter and the approval letter of each other */
+const _listForm82 = listForm;
+listForm = function(kind, key){ const r = _listForm82.apply(this, arguments); if (kind !== "doc") return r;
+  setTimeout(() => { const d = docBy[key], b = $(".drawer-b"); if (!d || !b || b.querySelector(".doc-ln")) return;
+    const w = wqByNo(key), p = d.orig || (w && wqParent(w)?.no), kids = d.appr ? String(d.appr).split("،") : (w ? wqKids(w).map(k => k.no) : []);
+    if (!p && !kids.length) return;
+    const btn = no => { const x = wqByNo(no); return x ? `<button type="button" class="chip t1" data-wq="${esc(x.id)}">${esc(no)}</button>` : `<span class="chip">${esc(no)}</span>`; };
+    b.insertAdjacentHTML("afterbegin", `<div class="check ok doc-ln">${p ? `<b>كتاب موافقة على كتابنا الأصلي ${btn(p)}</b><span>الأوقات والمساجد والمحاضرون من الكتاب الأصلي.</span>` : `<b>كتاب الموافقة: ${kids.map(btn).join(" ")}</b><span>هذا كتابنا الأصلي، والموافقة وصلت عليه.</span>`}</div>`); }, 0);
+  return r; };
