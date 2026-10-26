@@ -50,3 +50,46 @@ grantSave = async function(){ const v = id => $("#" + id)?.value.trim() || "", d
   const { data:t, error:e2 } = await sb.from("tasks").insert({ title:`إصدار تصريح درس، ${preset.sheikh}`, details:`${preset.mosque}\nتاريخ الدرس: ${fmt(preset.date)}${when ? "\nالموعد: " + when : ""}${g.note ? "\nملاحظات: " + g.note : ""}\nصلاحيتك على هذا التصريح فقط.`, assignee:g.grantee, due:preset.date, prio:"عالية", link:`#pgrant:${g.id}` }).select().single();
   if (!e2 && t) { await sb.from("permit_grants").update({ task_id:t.id }).eq("id", g.id); g.task_id = t.id; S.tasks = [t, ...S.tasks]; }
   S.grants = [g, ...S.grants.filter(x => x.id !== g.id)]; closeDrawer(); render(); toast(`فُوِّض ${pname(g.grantee)} بإصدار التصريح ووصله إشعار`); };
+/* auto-fill: pick the activity (or its approval) and every field is filled — the head only reviews and issues/sends */
+const pActLabel = e => `#${e.n} · ${e.lect || "—"} · ${e.mosName || ""}${e.area ? "، " + e.area : ""} · ${daysText(e) || ""} ${e.time || ""}${e.doc ? " · موافقة " + e.doc : ""}`;
+function pNextDate(days){ const t = dOf(TODAY); if (!days?.length) return TODAY; for (let i = 0; i < 8; i++) { const d = new Date(t); d.setDate(t.getDate() + i); if (days.includes(d.getDay())) return addDays(TODAY, i); } return TODAY; }
+function pActBox(){ const L = S.E.filter(e => !["ملغى", "مكتمل"].includes(e.status)).sort((a, b) => (b.n || 0) - (a.n || 0));
+  return `<div class="p-auto">${fld("p-act", "✨ اختر النشاط وتتعبّأ البيانات تلقائياً", `<input class="f" id="p-act" list="p-acts" placeholder="اكتب اسم الشيخ أو المسجد أو رقم النشاط أو رقم الموافقة…"><datalist id="p-acts">${L.slice(0, 600).map(e => `<option value="${esc(pActLabel(e))}">`).join("")}</datalist>`)}<span class="hint">بعد التعبئة راجع البيانات وعدّل اللي تبيه، ثم ${S.form?.kind === "permit" ? "«إصدار التصريح»" : "«تفويض وإرسال المهمة»"}.</span></div>`; }
+function pFill(e){ if (!e) return; const set = (id, v) => { const x = $("#" + id); if (x && v != null && !x.readOnly) x.value = v; };
+  const doc = docBy[e.doc], comm = S.comms.find(c => c.name === e.comm);
+  set("p-sheikh", (e.lect || "").split(" / ")[0]); set("p-mosque", e.mosName ? e.mosName + (e.area ? "، " + e.area : "") : (e.mosRaw || ""));
+  set("p-lang", e.lang || (comm?.lang && !/متعدد/.test(comm.lang) ? comm.lang : "")); set("p-topic", e.title && e.title !== e.type ? e.title : (e.type || ""));
+  const days = e.daily ? [...PD_ALL] : (e.days || []); document.querySelectorAll("#pd-days .pd-d").forEach(b => b.classList.toggle("on", days.includes(+b.dataset.pdd)));
+  const pr = prayerOf(e.time); const s = $("#p-pray"); if (s) { s.value = pr || "none"; pTimeSync(); }
+  set("p-rep", "weekly"); set("p-date", pNextDate(days));
+  const left = doc?.end ? Math.round((dOf(doc.end) - dOf(TODAY)) / 864e5) : 180; const dk = [...DUR].reverse().find(x => x[2] <= Math.max(1, left)) || DUR[0]; set("p-dur", dk[0]);
+  const note = [e.doc ? `موافقة ${e.doc}${doc?.end ? " سارية حتى " + fmt(doc.end) : ""}` : "", e.notes && !/⚠/.test(e.notes) ? e.notes : ""].filter(Boolean).join(" · ");
+  set($("#g-note") ? "g-note" : "p-note", note);
+  if (S.form) S.form.act = e.id; toast("تعبّأت البيانات من النشاط، راجعها"); }
+document.addEventListener("change", ev => { if (ev.target.id !== "p-act") return; const n = +(ev.target.value.match(/^#(\d+)/) || [])[1]; pFill(S.E.find(e => e.n === n)); });
+const _permitForm84 = permitForm;
+permitForm = function(preset, grant){ _permitForm84(preset, grant); if (S.form?.kind !== "permit" || grant || $("#p-act")) return;
+  const at = $("#p-sheikh")?.closest(".fld"); at?.insertAdjacentHTML("beforebegin", pActBox());
+  const e = preset?.act_id ? S.E.find(x => x.id === preset.act_id) : null; if (e) { $("#p-act").value = pActLabel(e); pFill(e); } };
+const _grantForm84 = grantForm;
+grantForm = function(preset){ _grantForm84(preset); if ($("#p-act")) return; const at = $("#p-sheikh")?.closest(".fld"); at?.insertAdjacentHTML("beforebegin", pActBox());
+  const e = preset?.act_id ? S.E.find(x => x.id === preset.act_id) : null; if (e) { $("#p-act").value = pActLabel(e); pFill(e); } };
+NEWF.splice(1, 0, ["v85-pauto", "nav:permits", "تعبئة التصريح تلقائياً", "في «إصدار تصريح» و«تفويض موظف»: اختر النشاط (بالشيخ أو المسجد أو رقم الموافقة) فتتعبّأ كل البيانات: الشيخ، المسجد، اللغة، الأيام، الوقت، أقرب موعد، مدة الموافقة، والملاحظات. أنت فقط تراجع وترسل.", true, "2026-10-26"]);
+
+/* approvals → permits: the head sees every approved activity without a permit, and issues it himself or delegates it in one tap (all data prefilled) */
+function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean));
+  return S.E.filter(e => e.doc && docBy[e.doc] && (docBy[e.doc].date || docBy[e.doc].start || "") >= since && (!docBy[e.doc].end || docBy[e.doc].end >= TODAY) && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id))
+    .map(e => ({ e, delegated:gr.has(e.id) })).sort((a, b) => (docBy[b.e.doc].date || "").localeCompare(docBy[a.e.doc].date || "")); }
+const pNeedBtns = e => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button><button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button>`;
+const _vPermits85 = vPermits;
+vPermits = function(){ const h = _vPermits85(); if (!S.admin) return h; const L = permitNeeds(); if (!L.length) return h;
+  return `<div class="panel pn-need"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="chip gold">${L.length}</span><span class="s">البيانات تتعبّأ تلقائياً، راجع وأصدر أو فوّض</span></div><div class="list">${L.slice(0, 30).map(({ e, delegated }) => `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")}${e.area ? "، " + esc(e.area) : ""} · ${esc(daysText(e) || "")} ${esc(e.time || "")} · موافقة ${esc(e.doc)}</span></span>${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</div>`).join("")}</div></div>` + h; };
+const _prio85 = priorities;
+priorities = function(){ const P = _prio85(); if (S.admin) { const n = permitNeeds().filter(x => !x.delegated).length; if (n) P.push({ w:86, k:"gold", t:`${n} موافقة وصلت وتحتاج تصريح`, s:"أصدره بنفسك أو فوّض موظفاً، البيانات جاهزة", act:{ go:"permits", l:"إصدار / تفويض" } }); } return P.sort((a, b) => b.w - a.w); };
+const _wqForm85 = wqForm;
+wqForm = function(id){ _wqForm85(id); const w = wqById(id); const b = $(".drawer-b"); if (!w || !b || !S.admin) return;
+  const nos = new Set([w.no, wqParent(w)?.no, ...wqKids(w).map(k => k.no)].filter(Boolean)); const L = S.E.filter(e => nos.has(e.doc) && !["ملغى", "مكتمل"].includes(e.status));
+  if (!L.length || !(w.approval || w.act_ok || wqKids(w).some(k => wqRes(k) === "ok"))) return;
+  b.insertAdjacentHTML("beforeend", `<div class="rq-sec"><b>التصاريح لهذه الموافقة</b>${L.map(e => { const p = S.permits.find(x => x.act_id === e.id && !x.revoked); return `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")} · ${esc(daysText(e) || "")} ${esc(e.time || "")}</span></span>${p ? `<span class="chip ok">صدر ${esc(p.no || "")}</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</div>`; }).join("")}</div>`); };
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-pact],[data-gact]"); if (!t) return; const id = t.dataset.pact || t.dataset.gact; closeDrawer();
+  setTimeout(() => t.dataset.pact ? permitForm({ act_id:id }) : grantForm({ act_id:id }), 60); });
