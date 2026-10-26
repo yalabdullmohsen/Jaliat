@@ -76,3 +76,7 @@ html{accent-color:var(--primary)}
 .wqp summary .lnk{margin-inline-start:auto}
 .wqp-m{display:grid;gap:2px;margin:8px 0 6px}.wqp .q-body{max-height:340px;overflow:auto;font-size:13px}
 .wqk .check{margin-top:6px}
+
+/* v83: permit schedule block */
+.p-sched{display:grid;gap:10px;margin:4px 0 6px;padding:12px;border-radius:12px;background:var(--surface-2)}
+.p-sched .pd-days{display:flex;flex-wrap:wrap;gap:6px}
