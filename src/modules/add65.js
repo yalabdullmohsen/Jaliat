@@ -82,3 +82,31 @@ if (typeof GUIDES === "object" && GUIDES.permits && typeof TOURS === "object") {
   new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 || n.nodeType === 3) pend.add(n);
     if (q || !pend.size) return; q = true; requestAnimationFrame(() => { const L = [...pend]; pend.clear(); q = false; for (const n of L) if (document.contains(n)) fix(n); }); }).observe(document.body, { childList:true, subtree:true });
   document.addEventListener("DOMContentLoaded", () => fix(document.body)); setTimeout(() => fix(document.body), 1500); })();
+
+/* v90 — تعديل التصريح على الصورة نفسها: اضغط أي معلومة في التصريح وعدّلها، تنحفظ تلقائياً وتتحدث البيانات والقائمة */
+const _pvInline90 = permitView;
+permitView = async function(id){ await _pvInline90(id); const p = S.permits.find(x => x.id === id); const paper = $("#permit-paper"); if (!p || !paper || !S.admin || p.revoked) return;
+  paper.classList.add("editing");
+  paper.querySelectorAll("[data-pf]").forEach(n => { try { n.contentEditable = "plaintext-only"; if (n.contentEditable !== "plaintext-only") n.contentEditable = "true"; } catch (_) { n.contentEditable = "true"; } n.setAttribute("spellcheck", "false"); });
+  if (!$(".pf-st")) paper.closest(".permit-wrap")?.insertAdjacentHTML("beforebegin", `<div class="pf-st" id="pf-st"><span>✎ اضغط على أي معلومة في التصريح لتعدّلها، وتنحفظ تلقائياً.</span></div>`); };
+const pfSt = (t, bad) => { const e = $("#pf-st"); if (!e) return; e.className = "pf-st" + (bad ? " bad" : ""); e.innerHTML = `<b>${t}</b>`; };
+async function pfSave(id, patch, until){ const p = S.permits.find(x => x.id === id); if (!p) return; const upd = { data:{ ...(p.data || {}), ...patch } }; if (until) upd.until = until;
+  pfSt("جاري الحفظ…"); const { data:row, error } = await sb.from("permits").update(upd).eq("id", id).select().single();
+  if (error) { pfSt("تعذّر الحفظ", true); return writeFail(error); }
+  S.permits = S.permits.map(x => x.id === id ? row : x); PPDF.delete(id); pfSt("تم الحفظ ✓"); render(); setTimeout(() => permitPdf(id).catch(() => {}), 500); return row; }
+const PFT = {};
+document.addEventListener("input", ev => { const n = ev.target.closest?.("#permit-paper [data-pf]"); if (!n || S.form?.kind !== "permitv") return; const k = n.dataset.pf, id = S.form.id, v = n.textContent.replace(/\s+/g, " ").trim();
+  document.querySelectorAll(`#permit-paper [data-pf="${k}"]`).forEach(x => { if (x !== n) x.textContent = v; });
+  pfSt("…"); clearTimeout(PFT[k]); PFT[k] = setTimeout(() => pfCommit(n, id), 800); });
+async function pfCommit(n, id){ const k = n.dataset.pf, v = n.textContent.replace(/\s+/g, " ").trim(), p = S.permits.find(x => x.id === id); if (!p || !document.contains(n)) return;
+  if (v === (p.data?.[k] || "")) return pfSt("تم الحفظ ✓"); if ((k === "sheikh" || k === "mosque") && !v) { pfSt("الاسم ما يصير فاضي", true); return; } await pfSave(id, { [k]:v }); }
+document.addEventListener("focusout", ev => { const n = ev.target.closest?.("#permit-paper [data-pf]"); if (!n || S.form?.kind !== "permitv") return; clearTimeout(PFT[n.dataset.pf]); pfCommit(n, S.form.id); });
+document.addEventListener("keydown", ev => { const n = ev.target.closest?.("#permit-paper [data-pf]"); if (n && ev.key === "Enter") { ev.preventDefault(); n.blur(); } });
+document.addEventListener("paste", ev => { const n = ev.target.closest?.("#permit-paper [data-pf]"); if (!n) return; ev.preventDefault(); const t = (ev.clipboardData || window.clipboardData).getData("text").replace(/\s+/g, " "); document.execCommand("insertText", false, t); });
+document.addEventListener("click", ev => { const c = ev.target.closest?.("#permit-paper.editing [data-pd]"); if (!c || c.querySelector("input") || S.form?.kind !== "permitv") return; const id = S.form.id, p = S.permits.find(x => x.id === id); if (!p) return;
+  const k = c.dataset.pd, cur = k === "date" ? p.data?.date : p.until; const i = document.createElement("input"); i.type = "date"; i.value = cur || ""; c.textContent = ""; c.appendChild(i); i.focus(); try { i.showPicker?.(); } catch (_) {}
+  let done = false; const fin = async save => { if (done) return; done = true; const v = i.value;
+    if (save && v && v !== cur) { if (k === "date") { const until = p.until && p.until < v ? v : null; await pfSave(id, { date:v }, until); } else { if (v < (p.data?.date || "")) { toast("تاريخ الانتهاء قبل تاريخ الدرس"); } else await pfSave(id, {}, v); } }
+    permitView(id); };
+  i.addEventListener("change", () => fin(true)); i.addEventListener("blur", () => setTimeout(() => fin(false), 150)); });
+NEWF.splice(1, 0, ["v90-pinline", "nav:permits", "تعديل التصريح على الصورة نفسها", "افتح أي تصريح صادر واضغط على المعلومة اللي تبي تغيّرها (الشيخ، المسجد، الموضوع، الوقت، الملاحظات، التاريخ…) وعدّل مباشرة على التصريح. تنحفظ تلقائياً وتتحدث القائمة وملف PDF.", true, "2026-10-27"]);

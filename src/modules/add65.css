@@ -12,3 +12,11 @@
   .pn-c .s{grid-column:2}.pn-act{justify-content:stretch;margin-top:6px}.pn-act .pn-b{width:100%}.pn-act .pn-b .btn{flex:1}}
 @media (max-width:700px){.pn-need .panel-h{flex-wrap:wrap;row-gap:4px}.pn-need .panel-h h3{flex:1 1 auto;white-space:normal}.pn-need .panel-h .s{flex-basis:100%;order:3}}
 .pn-c bdi.num{justify-self:start}
+/* v90: تعديل التصريح بالضغط على المعلومة نفسها */
+#permit-paper.editing [data-pf],#permit-paper.editing [data-pd]{cursor:text;border-radius:6px;outline:1px dashed color-mix(in srgb,var(--gold) 55%,transparent);outline-offset:2px;transition:background .15s}
+#permit-paper.editing [data-pd]{cursor:pointer}
+#permit-paper.editing [data-pf]:hover,#permit-paper.editing [data-pd]:hover{background:color-mix(in srgb,var(--gold-soft) 70%,transparent)}
+#permit-paper.editing [data-pf]:focus{outline:2px solid var(--primary);background:color-mix(in srgb,var(--gold-soft) 55%,transparent)}
+#permit-paper [data-pd] input{font:inherit;padding:2px 6px;border:1px solid var(--primary);border-radius:6px;background:#fff;color:inherit}
+.pf-st{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:8px 12px;border-radius:10px;background:var(--surface-2);font-size:13px;color:var(--muted)}.pf-st b{color:var(--primary);font-weight:600}.pf-st.bad b{color:var(--bad,#b3261e)}
+@media print{#permit-paper [data-pf],#permit-paper [data-pd]{outline:none!important;background:none!important}}
