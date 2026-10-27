@@ -159,16 +159,18 @@ async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const el = 
   const job = (async () => { await loadScript("https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     const cv = await html2canvas(el, { scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false, onclone:d => { const pp = d.getElementById("permit-paper"); if (pp) { pp.classList.remove("editing"); pp.querySelectorAll("[contenteditable]").forEach(x => x.removeAttribute("contenteditable")); } const st = d.createElement("style"); st.textContent = "#permit-paper,#permit-paper *{letter-spacing:0!important;word-spacing:normal!important;font-feature-settings:normal!important;text-rendering:auto!important}"; d.head.appendChild(st); } }); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
     const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/jpeg", .92), "JPEG", (W - w) / 2, m, w, h);
-    const p = S.permits.find(x => x.id === id), d = p?.data || {}, clean = t => String(t || "").replace(/[\\/:*?"<>|\u200e\u200f\u2066-\u2069]/g, " ").replace(/[A-Za-z0-9\-_.]+/g, " ").replace(/\s+/g, " ").trim(), mos = clean(String(d.mosque || "").split("،")[0]), shk = clean(d.sheikh),
-      ttl = ["تصريح إلقاء درس", shk && "الشيخ " + shk.replace(/^الشيخ\s+/, ""), mos].filter(Boolean).join(" - ").slice(0, 80), u16 = "\xFE\xFF" + [...ttl].map(c => { const k = c.charCodeAt(0); return String.fromCharCode(k >> 8, k & 255); }).join("");
-    pdf.setProperties({ title:u16 }); return new File([pdf.output("blob")], `${ttl}.pdf`, { type:"application/pdf" }); })();
+    const p = S.permits.find(x => x.id === id), d = p?.data || {}, clean = t => String(t || "").replace(/[\\/:*?"<>|\u200e\u200f\u2066-\u2069]/g, " ").replace(/\s+/g, " ").trim(), mos = clean(String(d.mosque || "").split("،")[0]), shk = clean(d.sheikh),
+      ttl = ["تصريح إلقاء درس", shk && "الشيخ " + shk.replace(/^الشيخ\s+/, ""), mos].filter(Boolean).join(" - ").slice(0, 120), u16 = "\xFE\xFF" + [...ttl].map(c => { const k = c.charCodeAt(0); return String.fromCharCode(k >> 8, k & 255); }).join("");
+    /* اسم الملف لاتيني فقط: الآيفون/واتساب يكسرون ترميز الأسماء العربية (Ø§Ù…) عند المشاركة من المتصفح، والعنوان العربي في داخل الملف وفي الرسالة */
+    const fname = `Tasreeh-${String(p?.no || id).replace(/^JL-/, "").replace(/[^A-Za-z0-9-]/g, "")}.pdf`;
+    pdf.setProperties({ title:u16 }); return new File([pdf.output("blob")], fname, { type:"application/pdf" }); })();
   PPDF.set(id, job); job.catch(() => PPDF.delete(id)); return job; }
 const _permitView87 = permitView;
 permitView = async function(id){ await _permitView87(id); const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
 document.addEventListener("click", async ev => { const b = ev.target.closest("[data-pwa]"); if (!b) return; ev.preventDefault(); ev.stopImmediatePropagation();
   const id = b.dataset.pwa, p = S.permits.find(x => x.id === id); if (!p) return; const old = b.innerHTML; b.disabled = true; b.textContent = "يجهّز PDF…";
   try { const f = await permitPdf(id); if (!f) throw new Error("no pdf"); const txt = `تصريح إلقاء درس رقم \u2066${p.no}\u2069\nالشيخ: ${p.data?.sheikh || ""}\nالمسجد: ${p.data?.mosque || ""}${p.data?.time ? "\nالموعد: " + p.data.time : ""}`;
-    if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:f.name.replace(/\.pdf$/, ""), text:txt }); } catch (_) {} }
+    if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:"تصريح إلقاء درس", text:txt }); } catch (_) {} }
     else { const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
       toast("نزل ملف PDF، أرفقه في واتساب القسم"); if (S.view !== "whatsapp" && typeof go === "function" && TITLES.whatsapp) setTimeout(() => go("whatsapp"), 600); } }
   catch (e) { toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }

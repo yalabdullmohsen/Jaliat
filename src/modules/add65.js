@@ -72,12 +72,13 @@ if (typeof GUIDES === "object" && GUIDES.permits && typeof TOURS === "object") {
 
 /* v89 — أرقام الكتب والتصاريح (2610-6707 / JL-…) تُعرض دائماً بالاتجاه الصحيح في كل الشاشات بدل ما تنعكس وسط العربي */
 (function(){ const RE = /\d{4}\s*[-‐-―ـ]\s*\d{4}|JL-\d{4,8}-\d{3,4}/g, SKIP = "bdi,script,style,textarea,input,select,option,[contenteditable],.ij-nw";
-  function fix(root){ if (!root) return; const base = root.nodeType === 3 ? root.parentNode : root; if (!base || base.nodeType !== 1) return; const nodes = [];
-    const w = document.createTreeWalker(base, NodeFilter.SHOW_TEXT, { acceptNode: n => { const p = n.parentElement; if (!p || p.closest(SKIP)) return NodeFilter.FILTER_REJECT; RE.lastIndex = 0; return RE.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } });
+  function fix(root){ if (!root) return; const base = root.nodeType === 3 ? root.parentNode : root; if (!base || base.nodeType !== 1) return; const nodes = [], doc = base.ownerDocument || document;
+    const w = doc.createTreeWalker(base, NodeFilter.SHOW_TEXT, { acceptNode: n => { const p = n.parentElement; if (!p || p.closest(SKIP)) return NodeFilter.FILTER_REJECT; RE.lastIndex = 0; return RE.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } });
     while (w.nextNode()) nodes.push(w.currentNode);
     for (const n of nodes) { const t = n.nodeValue, f = document.createDocumentFragment(); let last = 0, m; RE.lastIndex = 0;
       while ((m = RE.exec(t))) { if (m.index > last) f.appendChild(document.createTextNode(t.slice(last, m.index))); const b = document.createElement("bdi"); b.setAttribute("dir", "ltr"); b.textContent = m[0]; f.appendChild(b); last = m.index + m[0].length; }
       if (last < t.length) f.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(f, n); } }
+  window.pFixNums = fix;
   let q = false; const pend = new Set();
   new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 || n.nodeType === 3) pend.add(n);
     if (q || !pend.size) return; q = true; requestAnimationFrame(() => { const L = [...pend]; pend.clear(); q = false; for (const n of L) if (document.contains(n)) fix(n); }); }).observe(document.body, { childList:true, subtree:true });
@@ -86,7 +87,7 @@ if (typeof GUIDES === "object" && GUIDES.permits && typeof TOURS === "object") {
 /* v90 — تعديل التصريح على الصورة نفسها: اضغط أي معلومة في التصريح وعدّلها، تنحفظ تلقائياً وتتحدث البيانات والقائمة */
 const _pvInline90 = permitView;
 permitView = async function(id){ await _pvInline90(id); const p = S.permits.find(x => x.id === id); const paper = $("#permit-paper"); if (!p || !paper || !S.admin || p.revoked) return;
-  paper.classList.add("editing");
+  window.pFixNums?.(paper); paper.classList.add("editing");
   paper.querySelectorAll("[data-pf]").forEach(n => { try { n.contentEditable = "plaintext-only"; if (n.contentEditable !== "plaintext-only") n.contentEditable = "true"; } catch (_) { n.contentEditable = "true"; } n.setAttribute("spellcheck", "false"); });
   if (!$(".pf-st")) paper.closest(".permit-wrap")?.insertAdjacentHTML("beforebegin", `<div class="pf-st" id="pf-st"><span>✎ اضغط على أي معلومة في التصريح لتعدّلها، وتنحفظ تلقائياً.</span></div>`); };
 const pfSt = (t, bad) => { const e = $("#pf-st"); if (!e) return; e.className = "pf-st" + (bad ? " bad" : ""); e.innerHTML = `<b>${t}</b>`; };
