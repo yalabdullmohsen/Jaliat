@@ -27,8 +27,11 @@ permitIssue = async function(){ const v = id => $("#" + id)?.value.trim() || "",
     time_mode:mode, prayer, days, rep, ...(rep in PNTH ? { nth:PNTH[rep] } : {}), ...(rep === "once" ? { once:true } : {}), time, dur:rep === "once" ? "يوم الدرس فقط" : dur[1], head:v("p-head"), note:v("p-note") };
   if (S.form?.edit) { if (!S.admin) return toast("تعديل التصريح لرئيس القسم أو مدير النظام"); const eid = S.form.edit; const { data:er, error:ee } = await sb.from("permits").update({ data, until }).eq("id", eid).select().single(); if (ee) return writeFail(ee);
     S.permits = S.permits.map(x => x.id === eid ? er : x); closeDrawer(); toast(`تعدّل التصريح ${er.no}، نفس الرقم والباركود`); render(); return permitView(er.id); }
+  { const act = S.form?.act || "", live = x => !x.revoked && (!x.until || x.until >= TODAY), nk = t => String(t || "").replace(/\s+/g, " ").trim();
+    const dup = S.permits.find(x => live(x) && ((act && x.act_id === act) || (nk(x.data?.sheikh) === nk(data.sheikh) && nk(String(x.data?.mosque || "").split("،")[0]) === nk(String(data.mosque || "").split("،")[0]) && x.data?.date === data.date && nk(x.data?.time) === nk(data.time))));
+    if (dup) { if (!window.PBULK) { toast(`يوجد تصريح ساري لنفس النشاط (${dup.no})، ما يتكرر`); render(); } return null; } }
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
-  S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } if (window.PBULK) { window.PBULK.push(row); return row; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id); };
+  S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } if (window.PBULK) { window.PBULK.push(row); return row; } closeDrawer(); toast(`صدر التصريح ${row.no}`); render(); permitView(row.id); };
 NEWF.splice(1, 0, ["v84-pflex", "nav:permits", "إصدار التصريح والتفويض بمرونة", "في «إصدار تصريح» و«تفويض موظف»: الوقت صار اختياري: بعد صلاة معيّنة، أو بالساعة، أو بدون وقت. والتكرار: كل أسبوع، أو ثاني جمعة من كل شهر، أو بداية كل شهر، أو مرة واحدة. ومع خانة ملاحظات تظهر على التصريح.", true, "2026-10-26"]);
 /* the delegation form (head of section) gets the same flexible schedule; the employee's permit inherits it */
 const _grantForm83 = grantForm;
