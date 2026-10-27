@@ -231,4 +231,10 @@ if ("serviceWorker" in navigator) {
   const up = () => navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {});
   document.addEventListener("visibilitychange", () => { if (!document.hidden) up(); });
   window.addEventListener("focus", up); setInterval(up, 5 * 60 * 1000); setTimeout(up, 3000);
+  /* فحص مباشر لرقم الإصدار كل دقيقة (يتجاوز كاش المتصفح) وإعادة تحميل تلقائية بدون ضغط تحديث */
+  let curV = null, seen = false; const ver = () => fetch("/sw.js?v=" + Date.now(), { cache:"no-store" }).then(r => r.text()).then(t => (t.match(/jaliyat-v(\d+)/) || [])[1]).catch(() => null);
+  const chk = async () => { if (seen) return; const v = await ver(); if (!v) return; if (curV === null) { curV = v; return; } if (v === curV) return; seen = true; up();
+    const go = async () => { try { for (const k of await caches.keys()) await caches.delete(k); } catch (_) {} apply(); };
+    if ($("#drawer")?.hidden !== false) setTimeout(go, 800); else { toast("وصل تحديث جديد، يُطبَّق عند إغلاق النافذة"); const t = setInterval(() => { if ($("#drawer").hidden) { clearInterval(t); go(); } }, 1500); } };
+  chk(); setInterval(chk, 60 * 1000); document.addEventListener("visibilitychange", () => { if (!document.hidden) chk(); }); window.addEventListener("focus", chk);
 }
