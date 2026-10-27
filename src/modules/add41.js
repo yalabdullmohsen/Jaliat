@@ -9,7 +9,7 @@ const _boot9s49 = boot9; boot9 = function(){ _boot9s49(); loadSmart().then(() =>
 /* ---------- (1) an approval from Watheqa registers itself: approval + its activities, one tap ---------- */
 function wqPlan(w){ const P = (() => { try { return parseActs(w.body || ""); } catch (_) { return { acts:[] }; } })();
   const comm = (typeof wqComm === "function" && wqComm(w)) || "";
-  const start = wqDate(w) || TODAY, end = addMonths(start, 6);
+  const start = wqApDate(w) || TODAY, end = addMonths(start, 6);
   const acts = (P.acts || []).map(a => { try { return tolAct(a, { comm }); } catch (_) { return null; } }).filter(a => a && (a.mosque || a.mosRaw));
   return { no:w.no, comm, start, end, acts }; }
 function wqApprove(id){ const w = S.wq.find(x => x.id === id); if (!w) return; const P = wqPlan(w); S.form = { kind:"wqap", id, plan:P };
@@ -22,7 +22,7 @@ function wqApprove(id){ const w = S.wq.find(x => x.id === id); if (!w) return; c
 async function wqApproveGo(){ const F = S.form; if (F?.kind !== "wqap") return; const w = S.wq.find(x => x.id === F.id); const comm = $("#ap-comm").value; if (!comm) return toast("اختر الجالية");
   let s = $("#ap-s").value || TODAY, e = $("#ap-e").value || addMonths(s, 6); if (e > addMonths(s, 6)) e = addMonths(s, 6);
   const pick = [...document.querySelectorAll("[data-api]")].filter(x => x.checked).map(x => F.plan.acts[+x.dataset.api]);
-  try { if (!docBy[w.no]) await T.ref("docs", [...S.docs, { no:w.no, date:wqDate(w) || s, subj:w.subj || "موافقة", comm, start:s, end:e, notes:"من نظام وثيقة، " + (wqFrom(w) || "") }]);
+  try { if (!docBy[w.no]) await T.ref("docs", [...S.docs, { no:w.no, date:wqApDate(w) || s, subj:w.subj || "موافقة", comm, start:s, end:e, notes:"من نظام وثيقة، " + (wqFrom(w) || "") }]);
     let n = Math.max(0, ...[...S.acts.values()].map(a => a.n || 0));
     for (const a of pick) { n++; const { mosRaw, ...x } = a; await T.put("acts", null, { ...x, comm, doc:w.no, start:"", end:"", status:"مجدول", n, notes:[x.notes, mosRaw && !x.mosque ? "المسجد كما ورد: " + mosRaw : ""].filter(Boolean).join(" · ") }); }
     closeDrawer(); toast(`سُجّلت الموافقة ${w.no}${pick.length ? ` و${pick.length} نشاط` : ""} ✓`); setTimeout(() => wqForm(w.id), 400); } catch (er) { writeFail(er); } }

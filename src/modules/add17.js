@@ -9,6 +9,8 @@ function liveWq(){ if (wqCh) sb.removeChannel(wqCh); wqCh = sb.channel("wq").on(
   .on("postgres_changes", { event:"*", schema:"public", table:"permits" }, p => { S.permits = p.eventType === "DELETE" ? S.permits.filter(x => x.id !== p.old?.id) : [p.new, ...S.permits.filter(x => x.id !== p.new.id)]; if (S.view === "permits" && $("#drawer").hidden) render(); })
   .on("postgres_changes", { event:"*", schema:"public", table:"permit_grants" }, p => { if (p.new?.id) S.grants = [p.new, ...S.grants.filter(x => x.id !== p.new.id)]; if (["permits", "tasks", "home"].includes(S.view) && $("#drawer").hidden) render(); }).subscribe(); }
 const wqDate = w => { const m = (w.doc_date || "").match(/(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : (w.created || "").replace(/\//g, "-").slice(0, 10); };
+/* تاريخ الموافقة = تاريخ صدورها من الجهة (كتاب الرد «لا مانع»)، لا تاريخ إرسال طلبنا */
+const wqApDate = w => { if (w.approval) return wqDate(w); const r = S.wq.filter(x => x.approval && (x.refs || []).includes(w.no)).sort((a, b) => wqDate(a).localeCompare(wqDate(b)))[0]; return r ? wqDate(r) : wqDate(w); };
 /* v79: match a Watheqa letter to its community by the community/language name only (spelling-tolerant), never by a coordinator's first name */
 const wqSkel = s => norm(s).replace(/^(وال|بال|لل|ال)/, "").replace(/[ايوهء]/g, "");
 const WQ_GEN = new Set(["هند", "جل", "لغ", "نطق", "سلم", "متعدد", "لغت", "جمع", "جمعت", "خير", "خرت", "مركز", "مجمع", "مجمعت"]);
@@ -98,7 +100,7 @@ function wqForm(id){
 async function wqAdd(id){
   const w = S.wq.find(x => x.id === id); if (!w) return; const no = w.no; if (!no) return toast("لا يوجد رقم للكتاب");
   if (docBy[no]) return toast("الوثيقة مسجلة مسبقاً");
-  const start = wqDate(w) || TODAY, end = addMonths(start, 6);
+  const start = wqApDate(w) || TODAY, end = addMonths(start, 6);
   try { await T.ref("docs", [...S.docs, { no, date:start, subj:w.subj || "موافقة", comm:wqComm(w), start, end, notes:"من نظام وثيقة، " + (w.signer || "") }]); toast(`سُجّلت الموافقة ${no}، من ${fmt(start)} إلى ${fmt(end)}`); closeDrawer(); setTimeout(() => listForm("doc", no), 700); } catch (e) { writeFail(e); }
 }
 

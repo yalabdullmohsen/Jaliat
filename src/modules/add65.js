@@ -24,6 +24,8 @@ function pWqItems(w){ const par = wqParent(w), nos = new Set([w.no, par?.no, ...
   return out.filter(it => !S.permits.some(p => !p.revoked && p.data?.sheikh === (it.a.lect || "").split(" / ")[0] && String(p.data?.note || "").includes("كتاب " + it.w.no))); }
 const _wqForm88b = wqForm;
 wqForm = function(id){ _wqForm88b(id); const w = wqById(id); const f = $(".drawer-f"); if (!w || !S.admin || !f || f.querySelector("[data-pwball]")) return;
+  { const par = wqParent(w), nos = new Set([w.no, par?.no, ...wqKids(w).map(k => k.no)].filter(Boolean)), L = S.E.filter(e => nos.has(e.doc) && !["ملغى", "مكتمل"].includes(e.status));
+    if (L.length > 1 && !f.querySelector(".pw-st")) f.insertAdjacentHTML("afterbegin", `<div class="rq-sec pw-st"><b>حالة التصاريح لكل نشاط</b>${L.map(e => { const p = S.permits.find(x => x.act_id === e.id && !x.revoked); return `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")} · ${esc(daysText(e) || "")} ${esc(e.time || "")}</span></span>${p ? `<button type="button" class="chip ok" data-permit="${esc(p.id)}">صدر ${esc(p.no || "")}</button>` : `<span class="chip warn">يحتاج تصريح</span>`}</div>`; }).join("")}</div>`); }
   const n = pWqItems(w).length; if (n < 2) return;
   const at = f.querySelector("[data-pwqissue]") || f.querySelector("[data-close]"); at?.insertAdjacentHTML("beforebegin", `<button class="btn btn-primary" type="button" data-pwball="${esc(id)}">إصدار كل التصاريح (${n})</button>`); };
 async function pBulk(wid){ const w = wqById(wid); if (!w) return; const items = pWqItems(w); if (!items.length) return toast("كل أنشطة هذا الكتاب صدرت لها تصاريح");
