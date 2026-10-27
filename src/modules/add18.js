@@ -38,9 +38,9 @@ async function grantSave(){
 function grantUse(id){ const g = S.grants.find(x => x.id === id); if (!g) return toast("التفويض غير موجود"); if (g.permit_id) { toast("صدر هذا التصريح مسبقاً"); return permitView(g.permit_id); } if (!gOpen(g)) return toast("انتهى هذا التفويض أو سُحب"); if (g.grantee !== S.me?.id && !S.admin) return toast("هذا التفويض لموظف آخر"); permitForm({}, g.grantee === S.me?.id ? g : null); }
 
 const _openLink18 = openLink;
-openLink = function(h){ const s = String(h || "").replace(/^#/, ""); if (s.startsWith("pgrant:")) { if (S.view !== "permits") go("permits"); return grantUse(s.slice(7)); } return _openLink18(h); };
+openLink = function(h){ const s = String(h || "").replace(/^#/, ""); if (s.startsWith("pgrant:")) return grantUse(s.slice(7)); return _openLink18(h); };
 const _prio18 = priorities;
-priorities = function(){ const P = _prio18(); const n = myGrants().length; if (n) P.push({ w:92, k:"gold", t:`${n} تصريح فوّضك رئيس القسم بإصداره`, s:"صلاحيتك على هذه التصاريح فقط", act:{ go:"permits", l:"إصدار" } }); return P.sort((a, b) => b.w - a.w); };
+priorities = function(){ const P = _prio18(); const n = myGrants().length; if (n) P.push({ w:92, k:"gold", t:`${n} تصريح فوّضك رئيس القسم بإصداره`, s:"صلاحيتك على هذه التصاريح فقط", act:{ open:"pgrant:" + myGrants()[0].id, l:"إصدار التصريح الآن" } }); return P.sort((a, b) => b.w - a.w); };
 const _palAll18 = palAll;
 palAll = function(){ const A = _palAll18(); if (S.admin) A.unshift({ g:"إجراءات", t:"تفويض موظف بإصدار تصريح", s:"", ic:"i-badge", run:() => grantForm(), txt:"تفويض صلاحية تصريح موظف" }); for (const g of myGrants()) A.unshift({ g:"إجراءات", t:`إصدار تصريح مفوَّض: ${g.preset?.sheikh || ""}`, s:g.preset?.mosque || "", ic:"i-badge", run:() => { go("permits"); grantUse(g.id); }, txt:"تصريح تفويض " + (g.preset?.sheikh || "") }); return A; };
 // add «تفويض» next to «تصريح» in the activity drawer, and in the Watheqa letter drawer
