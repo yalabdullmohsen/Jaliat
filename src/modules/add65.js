@@ -46,3 +46,25 @@ document.addEventListener("click", async ev => { const a = ev.target.closest("[d
   files.forEach((f, i) => setTimeout(() => { const l = document.createElement("a"); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); }, i * 400));
   toast("نزلت ملفات PDF، أرفقها في واتساب القسم"); }, true);
 NEWF.splice(1, 0, ["v88-pbulk", "nav:watheqa", "تصريح لكل نشاط بضغطة وحدة", "في كتاب الموافقة اللي فيه أكثر من مسجد أو شيخ أو موعد: اضغط «إصدار كل التصاريح» فيصدر تصريح مستقل لكل نشاط، وكل واحد بملف PDF خاص، ثم «إرسال الكل». يشتغل على الكتب السابقة والجديدة.", true, "2026-10-27"]);
+
+/* v89 — جولة إصدار التصاريح: تفتح تلقائياً مرة واحدة لرئيس القسم وتمشي معه على الشاشة خطوة بخطوة، وزرها يبقى في صفحة التصاريح */
+if (typeof GUIDES === "object" && GUIDES.permits && typeof TOURS === "object") {
+  GUIDES.permits.s.push(
+    { sel:"[data-permit]", t:"افتح أي تصريح صادر", x:"من القائمة افتح التصريح: <b>طباعة / PDF</b>، <b>إرسال PDF واتساب</b>، <b>تعديل التصريح</b> (يبقى نفس الرقم والباركود)، أو <b>إلغاء التصريح</b>.", none:"افتح أي تصريح صادر: طباعة، إرسال PDF واتساب، تعديل التصريح، أو إلغاؤه." },
+    { go:"watheqa", sel:".wq-i", t:"كتاب فيه أكثر من مسجد أو شيخ", x:"افتح كتاب الموافقة من وثيقة، وتحت بتلقى <b>«إصدار تصريح»</b> (تتعبّى بياناته من الكتاب)، وإذا الكتاب فيه أكثر من مسجد أو شيخ أو موعد يطلع <b>«إصدار كل التصاريح»</b>: تصريح مستقل لكل واحد بضغطة وحدة، وبعدها <b>«إرسال الكل PDF»</b>.", none:"في كتاب الموافقة: «إصدار تصريح» يعبّي من الكتاب، و«إصدار كل التصاريح» لكتب فيها أكثر من مسجد أو شيخ." });
+  TOURS["g-permits"].steps = [TOURS["g-permits"].steps[0], ...GUIDES.permits.s.map(s => ({ go:s.go || "permits", ...s }))];
+  TOURS["permits-new"] = { title:"جولة: إصدار التصاريح", steps:[
+    { go:"permits", t:"أهلاً، نمشي معك على إصدار التصريح", x:"بنمرّ على الشاشة خطوة خطوة: كيف تصدر تصريحاً، وكيف تصدر لكتاب فيه أكثر من مسجد، وكيف تعدّل وترسل. اضغط «التالي»." },
+    { go:"watheqa", sel:".wq-i", t:"١. ابدأ من كتاب الموافقة", x:"افتح أي كتاب موافقة من وثيقة. تحت بتلقى <b>«إصدار تصريح»</b>: تتعبّى كل البيانات من الكتاب نفسه (الشيخ، المسجد، المحافظة، الأيام، الوقت، المدة)، وتراجعها وتضغط «إصدار التصريح».", none:"افتح أي كتاب موافقة من وثيقة، وتحت بتلقى «إصدار تصريح»: تتعبّى بياناته من الكتاب نفسه." },
+    { go:"watheqa", sel:".wq-i", t:"٢. كتاب فيه أكثر من مسجد أو شيخ", x:"إذا الكتاب فيه أكثر من مسجد أو شيخ أو موعد يطلع زر <b>«إصدار كل التصاريح»</b>: يصدر تصريح مستقل لكل واحد بضغطة وحدة، ولكل تصريح ملف PDF خاص، وبعدها <b>«إرسال الكل PDF»</b>.", none:"في الكتاب اللي فيه أكثر من نشاط يطلع زر «إصدار كل التصاريح»: تصريح مستقل لكل مسجد أو شيخ بضغطة وحدة." },
+    { go:"permits", sel:"[data-pnew]", t:"٣. أو أصدر تصريح يدوي", x:"من هنا تفتح نموذج تصريح فاضي: اكتب رقم الكتاب في الخانة العلوية فتتعبّى البيانات، أو عبّيها بنفسك." },
+    { go:"permits", sel:"[data-permit]", t:"٤. افتح التصريح الصادر", x:"من التصريح تقدر: <b>طباعة / PDF</b>، <b>إرسال PDF واتساب</b>، <b>تعديل التصريح</b> (يبقى نفس الرقم والباركود)، أو <b>إلغاء التصريح</b>.", none:"بعد ما يصدر أول تصريح يظهر هنا، وتفتحه لإرساله أو تعديله." },
+    { go:"permits", sel:"[data-passets]", t:"٥. التوقيع والختم", x:"ارفع صورة التوقيع والختم مرة وحدة وتظهر على كل التصاريح." },
+    { go:"permits", t:"خلصنا ✓", x:"تقدر ترجع للجولة أي وقت من زر «جولة التصاريح» أعلى هذي الصفحة، أو من زر «دليل الصفحة» فوق." } ] };
+  const _tourEnd89 = tourEnd; tourEnd = function(d){ if (TR.k === "permits-new") { try { localStorage.setItem("tour-permits-new", "1"); } catch (_) {} } _tourEnd89(d); };
+  const _afterRender89 = afterRender;
+  afterRender = function(v){ _afterRender89(v); if (v !== "permits" || !S.admin) return;
+    const tb = $(".toolbar"); if (tb && !$("#pn-tour")) tb.insertAdjacentHTML("beforebegin", `<div class="check ok" id="pn-tour" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="flex:1;min-width:200px"><b>جولة التصاريح</b><br><span class="s">نمشي معك على الشاشة: كيف تصدر وتعدّل وترسل، وكيف تصدر لكتاب فيه أكثر من مسجد.</span></span><button class="btn btn-primary" type="button" data-tour="permits-new">ابدأ الجولة</button></div>`);
+    let seen = false; try { seen = !!localStorage.getItem("tour-permits-new"); } catch (_) { seen = true; }
+    if (!seen && !TR.k && !window.__pnAuto && S.me?.username !== "yousef") { window.__pnAuto = true; setTimeout(() => { if (!TR.k && S.view === "permits") tourStart("permits-new"); }, 1200); } };
+}
