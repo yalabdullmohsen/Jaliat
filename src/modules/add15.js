@@ -48,7 +48,7 @@ function priorities(){
   const unseen = (S.tasks || []).filter(t => t.assignee === me && !t.seen_at && TK_OPEN.includes(t.status));
   if (unseen.length) P.push({ w:90, k:"gold", t:`${unseen.length} مهمة جديدة لم تفتحها`, s:"رئيس القسم يرى أنك لم تطّلع عليها بعد", act:{ go:"tasks", l:"فتح" } });
   const newReq = (S.reqs || []).filter(r => !r.data?.ack && r.status !== "مرفوض");
-  if (newReq.length) P.push({ w:85, k:"gold", t:`${newReq.length} طلب وارد بلا تأكيد استلام للمنسق`, s:"أكّد الاستلام برقم الطلب عبر واتساب", act:{ go:"inbox", l:"الطلبات" } });
+  if (newReq.length) P.push({ w:85, k:"gold", t:`${newReq.length} طلب منسق بلا تأكيد استلام للمنسق`, s:"أكّد الاستلام برقم الطلب عبر واتساب", act:{ go:"inbox", l:"الطلبات" } });
   const exp = S.docs.filter(d => d.end && d.end >= TODAY && d.end <= addDays(TODAY, 10) && S.E.some(e => e.doc === d.no && e.live) && !(S.tasks || []).some(t => t.link === `#doc:${d.no}` && TK_OPEN.includes(t.status)));
   if (exp.length) P.push({ w:80, k:"warn", t:`${exp.length} موافقة تنتهي خلال 10 أيام بلا مهمة تجديد`, s:exp.slice(0, 3).map(d => `${d.no} (${fmt(d.end)})`).join("، "), act:S.admin ? { tkfrom:`doc|${exp[0].no}`, l:"إسناد تجديد" } : { open:`doc:${exp[0].no}`, l:"فتح" } });
   const tent = (S.bks || []).filter(b => b.status === "مبدئي" && b.day >= TODAY && b.day <= addDays(TODAY, 3));

@@ -21,7 +21,7 @@ vInbox = function(){ let h = _vInbox53();
   return h; };
 const _prio53 = priorities;
 priorities = function(){ const P = _prio53(); const L = S.reqs.filter(r => OPEN_ST(r.status) && r.created_at && rqAge(r) > 5);
-  if (L.length && S.canWrite) P.push({ w:91, k:"bad", t:`${L.length} طلب وارد تجاوز 5 أيام دون إنجاز`, s:L.slice(0, 2).map(r => (r.data?.comm || r.data?.org || "طلب") + " منذ " + rqAge(r) + " يوم").join(" · "), act:{ go:"inbox", l:"الطلبات" } });
+  if (L.length && S.canWrite) P.push({ w:91, k:"bad", t:`${L.length} طلب منسق تجاوز 5 أيام دون إنجاز`, s:L.slice(0, 2).map(r => (r.data?.comm || r.data?.org || "طلب") + " منذ " + rqAge(r) + " يوم").join(" · "), act:{ go:"inbox", l:"الطلبات" } });
   return P.sort((a, b) => b.w - a.w); };
 
 /* ---------- analytics of coordinators' monthly reports ---------- */

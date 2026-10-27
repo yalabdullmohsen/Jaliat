@@ -1,5 +1,5 @@
 /* ================= v10: intake inbox, Copilot vision, letters, WhatsApp, weekly sheet, attendance, alerts, voice, reports, backups ================= */
-Object.assign(TITLES, { inbox:"الطلبات الواردة", weekly:"الجدول الأسبوعي", backups:"النسخ الاحتياطية" });
+Object.assign(TITLES, { inbox:"طلبات المنسقين", weekly:"الجدول الأسبوعي", backups:"النسخ الاحتياطية" });
 S.reqs = []; S.att = [];
 const RQ_ST = ["جديد", "قيد المراجعة", "بانتظار الموافقة", "معتمد", "مرفوض"];
 const RQ_C = { "جديد":"gold", "قيد المراجعة":"t1", "بانتظار الموافقة":"warn", "معتمد":"ok", "مرفوض":"bad" };
@@ -16,7 +16,7 @@ function live11(){
   if (x11Channel) sb.removeChannel(x11Channel);
   const up = (L, p) => p.eventType === "DELETE" ? L.filter(x => x.id !== p.old?.id) : [p.new, ...L.filter(x => x.id !== p.new.id)];
   x11Channel = sb.channel("x11")
-    .on("postgres_changes", { event:"*", schema:"public", table:"requests" }, p => { S.reqs = up(S.reqs, p); if (p.eventType === "INSERT" && p.new.created_by !== S.me?.id) { toast(`طلب وارد جديد: ${p.new.data?.org || p.new.data?.comm || ""}`); devNotify("طلب وارد جديد", p.new.data?.org || p.new.data?.comm || "افتح الطلبات الواردة"); } bellRefresh(); if (["inbox", "home"].includes(S.view) && $("#drawer").hidden) render(); })
+    .on("postgres_changes", { event:"*", schema:"public", table:"requests" }, p => { S.reqs = up(S.reqs, p); if (p.eventType === "INSERT" && p.new.created_by !== S.me?.id) { toast(`طلب وارد جديد: ${p.new.data?.org || p.new.data?.comm || ""}`); devNotify("طلب وارد جديد", p.new.data?.org || p.new.data?.comm || "افتح طلبات المنسقين"); } bellRefresh(); if (["inbox", "home"].includes(S.view) && $("#drawer").hidden) render(); })
     .subscribe();
 }
 
@@ -80,7 +80,7 @@ const _sysMd11 = sysMarkdown;
 sysMarkdown = function(){
   let out = _sysMd11();
   const T2 = (head, rows) => `| ${head.join(" | ")} |\n|${head.map(() => "---").join("|")}|\n` + rows.map(r => `| ${r.map(x => String(x ?? "").replace(/\|/g, "/").replace(/\s+/g, " ").trim() || "—").join(" | ")} |`).join("\n");
-  if (S.reqs.length) out += `\n\n## الطلبات الواردة (${S.reqs.length})\n` + T2(["التاريخ", "الجهة", "الجالية", "المنسق", "الحالة", "عدد الأنشطة", "الأنشطة", "ملاحظات"], S.reqs.slice(0, 200).map(r => [fmt(r.data?.date || r.created_at?.slice(0, 10)), r.data?.org, r.data?.comm, r.data?.coord, r.status, (r.data?.acts || []).length, (r.data?.acts || []).map(actLine).join(" / "), r.data?.notes]));
+  if (S.reqs.length) out += `\n\n## طلبات المنسقين (${S.reqs.length})\n` + T2(["التاريخ", "الجهة", "الجالية", "المنسق", "الحالة", "عدد الأنشطة", "الأنشطة", "ملاحظات"], S.reqs.slice(0, 200).map(r => [fmt(r.data?.date || r.created_at?.slice(0, 10)), r.data?.org, r.data?.comm, r.data?.coord, r.status, (r.data?.acts || []).length, (r.data?.acts || []).map(actLine).join(" / "), r.data?.notes]));
   if (false) { const from = addMonths(TODAY, -3); out += `\n\n## سجل الحضور والمهتدين (آخر 3 أشهر)\n` + T2(["التاريخ", "النشاط", "الجالية", "المسجد", "الحضور", "المهتدون الجدد", "ملاحظة"], S.att.filter(x => x.day >= from).map(x => { const e = S.byId.get(x.act_id); return [fmt(x.day), e ? "#" + e.n : "—", e?.comm, e?.mosName, x.cnt, x.converts, x.note]; })); }
   return out;
 };
@@ -98,8 +98,8 @@ describe = function(a){
 const _runAction11 = runAction;
 runAction = async function(a){
   if (a.op === "add_request") { const d = a.data || {}; const body = { org:d.org || "", comm:commByName(d.comm) || d.comm || "", coord:d.coord || "", phone:d.phone || "", date:d.date || TODAY, subj:d.subj || "", notes:d.notes || "", issues:d.issues || "", acts:(d.acts || []).map(x => tolAct(x, { comm:commByName(d.comm) || "" })), src:"copilot" };
-    if (INTAKE.reqId) { const cur = S.reqs.find(r => r.id === INTAKE.reqId); const { error } = await sb.from("requests").update({ data:{ ...(cur?.data || {}), ...body }, updated_at:new Date().toISOString() }).eq("id", INTAKE.reqId); if (error) throw error; const id = INTAKE.reqId; INTAKE.reqId = null; await loadReqs(); setTimeout(() => toast("سُجّل الطلب، افتحه من «الطلبات الواردة»"), 50); return `سُجّل الطلب (${body.acts.length} نشاط) في الطلبات الواردة`; }
-    const { error } = await sb.from("requests").insert({ data:body, status:"جديد" }); if (error) throw error; await loadReqs(); return "سُجّل الطلب في الطلبات الواردة"; }
+    if (INTAKE.reqId) { const cur = S.reqs.find(r => r.id === INTAKE.reqId); const { error } = await sb.from("requests").update({ data:{ ...(cur?.data || {}), ...body }, updated_at:new Date().toISOString() }).eq("id", INTAKE.reqId); if (error) throw error; const id = INTAKE.reqId; INTAKE.reqId = null; await loadReqs(); setTimeout(() => toast("سُجّل الطلب، افتحه من «طلبات المنسقين»"), 50); return `سُجّل الطلب (${body.acts.length} نشاط) في طلبات المنسقين`; }
+    const { error } = await sb.from("requests").insert({ data:body, status:"جديد" }); if (error) throw error; await loadReqs(); return "سُجّل الطلب في طلبات المنسقين"; }
   if (a.op === "log_attendance") { const e = S.E.find(x => x.n === +a.n); if (!e) throw new Error(`النشاط #${a.n} غير موجود`); await attSave(e.id, a.day || TODAY, a.cnt, a.converts, a.note); return `سُجّل حضور النشاط #${a.n}`; }
   if (a.op === "add_act" && !a.force) { const m = actMatch(tolAct(a.data)); if (m) throw new Error(`يوجد نشاط مشابه مسجل (#${m.n})، لم يُكرر`); }
   return _runAction11(a);
@@ -255,7 +255,7 @@ async function reqForm(id){
   const r = S.reqs.find(x => x.id === id); if (!r) return;
   const d = r.data || {}; S.form = { kind:"req", id }; S.rqActs = (d.acts || []).map(a => ({ ...a }));
   const coords = S.coords.filter(c => c.comm && c.comm === d.comm);
-  openDrawer("طلب وارد", `
+  openDrawer("طلب منسق", `
     ${(r.files || []).length ? `<div class="rq-files" id="rq-files">${r.files.map(() => `<span class="rq-ph"></span>`).join("")}</div>` : ""}
     <div class="g2">${fld("rq-org", "الجهة الطالبة", `<input class="f" id="rq-org" value="${esc(d.org || "")}"${dis()}>`)}${fld("rq-comm", "الجالية", sel("rq-comm", commNames, d.comm))}</div>
     <div class="g2">${fld("rq-coord", "المنسق / الموقّع", `<input class="f" id="rq-coord" value="${esc(d.coord || "")}" list="rq-cl"><datalist id="rq-cl">${coords.map(c => `<option value="${esc(c.name)}">`).join("")}</datalist>`)}${fld("rq-phone", "الهاتف", `<input class="f num" id="rq-phone" dir="ltr" value="${esc(d.phone || coords.find(c => c.name === d.coord)?.phone || "")}">`)}</div>
@@ -646,7 +646,7 @@ document.addEventListener("click", async ev => {
   if (D.atm) { S.f.atm = D.atm; return render(); }
   if (D.attxl !== undefined) return attXlsx();
   if (D.report !== undefined) return reportDownload();
-  if (D.reportcp !== undefined) return askAbout(`اكتب «التقرير الشهري لأنشطة الجاليات» لشهر ${TODAY.slice(5, 7)}/${TODAY.slice(0, 4)} بصياغة رسمية لرفعها لمدير الإدارة: مقدمة، أبرز الإنجازات بالأرقام من ملف النظام (الأنشطة الجارية والجديدة حسب الجالية والمحافظة، الموافقات، الطلبات الواردة، خطب الجمعة)، التحديات (التعارضات والموافقات المنتهية والنواقص)، والتوصيات. استخدم جداول.`);
+  if (D.reportcp !== undefined) return askAbout(`اكتب «التقرير الشهري لأنشطة الجاليات» لشهر ${TODAY.slice(5, 7)}/${TODAY.slice(0, 4)} بصياغة رسمية لرفعها لمدير الإدارة: مقدمة، أبرز الإنجازات بالأرقام من ملف النظام (الأنشطة الجارية والجديدة حسب الجالية والمحافظة، الموافقات، طلبات المنسقين، خطب الجمعة)، التحديات (التعارضات والموافقات المنتهية والنواقص)، والتوصيات. استخدم جداول.`);
   if (D.bknow !== undefined) { const { error } = await sb.rpc("backup_now"); if (error) return writeFail(error); toast("أُخذت نسخة احتياطية"); return bkLoad(); }
   if (D.bkxl) return bkXlsx(+D.bkxl);
   if (D.odnow !== undefined) return odRun(true);

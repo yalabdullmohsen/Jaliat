@@ -101,7 +101,7 @@ async function rqAck(via){
 const _reqForm14 = reqForm;
 reqForm = async function(id){
   await _reqForm14(id); const r = S.reqs.find(x => x.id === id); if (!r || S.form?.id !== id) return;
-  const ack = r.data?.ack; const h = $(".drawer-h h3"); if (h) h.textContent = `طلب وارد ${rqNo(r)}`;
+  const ack = r.data?.ack; const h = $(".drawer-h h3"); if (h) h.textContent = `طلب منسق ${rqNo(r)}`;
   $(".drawer-b")?.insertAdjacentHTML("afterbegin", ack ? `<div class="check ok"><b>✓ تم تأكيد استلام الطلب للمنسق</b><span>${fmtTime(ack.at)}، بواسطة ${esc(whoName(ack.by))}${ack.via === "wa" ? " عبر واتساب" : ""}</span></div>`
     : `<div class="check warn rq-ack"><b>لم يُؤكد استلام الطلب للمنسق بعد</b><span>أرسل له رسالة تأكيد برقم الطلب ${rqNo(r)}</span><span class="br-acts"><button type="button" class="btn btn-primary" data-rqack="wa">${icon("i-wa")} تأكيد الاستلام عبر واتساب</button><button type="button" class="btn" data-rqack="other">أُكّد بطريقة أخرى</button></span></div>`);
 };
