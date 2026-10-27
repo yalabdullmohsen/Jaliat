@@ -1,5 +1,5 @@
 /* v86 — إصدار التصاريح موقوف مؤقتاً: الصفحة مفتوحة، والإصدار والتفويض «قريباً». الأساس الآن إبلاغ المنسق بالواتساب. */
-const PERMIT_SOON = true;
+const PERMIT_SOON = false;
 const pSoonMsg = () => toast("إصدار التصاريح قريباً — موقوف مؤقتاً، استخدم «إبلاغ المنسق» بالواتساب");
 const P_SEL = "[data-pact],[data-gact],[data-pgself],[data-pwqissue],[data-pgfrom],[data-pguse]";
 const _permitFormSoon = permitForm, _grantFormSoon = grantForm;
