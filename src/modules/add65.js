@@ -12,5 +12,5 @@ document.addEventListener("click", ev => { const t = ev.target.closest("[data-pe
     $("#p-act")?.closest(".p-auto")?.remove();
     const h = $(".drawer-h h3"); if (h) h.textContent = `تعديل التصريح ${p.no}`;
     const b = $("[data-pissue]"); if (b) b.textContent = "حفظ التعديل";
-    $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<div class="check warn"><b>تعديل تصريح صادر</b><span>يبقى نفس الرقم والباركود، ويظهر للإمام عند المسح بالبيانات الجديدة.</span></div>`); }, 60); });
+    $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<span class="hint">يبقى نفس الرقم والباركود، ويظهر للإمام بالبيانات الجديدة عند المسح.</span>`); }, 60); });
 NEWF.splice(1, 0, ["v87-pedit", "nav:permits", "تعديل التصريح", "افتح أي تصريح صادر واضغط «تعديل التصريح» لتغيير الشيخ أو المسجد أو الموعد أو المدة. يبقى نفس رقم التصريح والباركود، ويتحدّث للإمام عند المسح. لرئيس القسم ومدير النظام.", true, "2026-10-27"]);
