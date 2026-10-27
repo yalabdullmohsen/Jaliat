@@ -54,3 +54,24 @@ NEWF.splice(1, 0, ["v91-rt", "nav:renew", "تذكيرات المنسقين: ثل
 /* v91 — التفويض بضغطة: أول ما يفتح الموظف النظام وعنده تفويض يطلع له نموذج التصريح معبّأ مباشرة، يراجع ويضغط إصدار */
 (() => { const seen = (id) => { try { return sessionStorage.getItem("pg-auto-" + id); } catch (_) { return "1"; } }, mark = (id) => { try { sessionStorage.setItem("pg-auto-" + id, "1"); } catch (_) {} };
   setInterval(() => { try { if (S.admin || !S.me?.id || !$("#drawer")?.hidden || document.hidden || typeof myGrants !== "function") return; const g = myGrants().find(x => !x.permit_id && !seen(x.id)); if (!g) return; mark(g.id); toast("فوّضك رئيس القسم بإصدار تصريح، البيانات جاهزة"); grantUse(g.id); } catch (_) {} }, 4000); })();
+
+/* v92 — الربط التلقائي: أي بيانات تدخل تُربط ببعضها بدون طلب (للمدير ورئيس القسم): الجالية من الموافقة أو من محاضرها، الموافقة من أنشطتها، والتصريح بنشاطه */
+const autoLinkRun = (() => { let busy = false, last = 0;
+  const one = t => String(t || "").split(" / ")[0].replace(/\s+/g, " ").trim();
+  return async function(){ if (busy || !S.admin || !S.acts || !S.permits || Date.now() - last < 20000) return; busy = true; last = Date.now(); const done = [];
+    try {
+      const A = [...S.acts].map(([id, a]) => ({ ...a, id }));
+      const commOf = new Map(); for (const a of A) if (a.comm && one(a.lect)) { const k = one(a.lect); (commOf.get(k) || commOf.set(k, new Set()).get(k)).add(a.comm); }
+      for (const a of A) { if (a.comm || !a.id) continue; let c = docBy[a.doc]?.comm; if (!c) { const s = commOf.get(one(a.lect)); if (s && s.size === 1) c = [...s][0]; } if (!c) continue;
+        const { data:r } = await sb.from("acts").select("data").eq("id", a.id).maybeSingle(); if (!r || r.data?.comm) continue; const { error } = await sb.from("acts").update({ data:{ ...r.data, comm:c } }).eq("id", a.id); if (!error) done.push("نشاط " + a.id); }
+      const byDoc = new Map(); for (const a of A) if (a.doc && a.comm) (byDoc.get(a.doc) || byDoc.set(a.doc, new Set()).get(a.doc)).add(a.comm);
+      const L = S.docs.map(d => { if (d.comm) return d; const s = byDoc.get(d.no); return s && s.size === 1 ? { ...d, comm:[...s][0] } : d; });
+      if (L.some((d, i) => d !== S.docs[i])) { await T.ref("docs", L); done.push("موافقات"); }
+      const used = new Set(S.permits.filter(p => !p.revoked && p.act_id).map(p => p.act_id)), nk = t => String(t || "").replace(/\s+/g, " ").trim();
+      for (const p of S.permits) { if (p.revoked || p.act_id) continue; const sh = nk(String(p.data?.sheikh || "").split("  -  ")[0]), mo = nk(String(p.data?.mosque || "").split("،")[0]);
+        const m = S.E.filter(e => !used.has(e.id) && !["ملغى", "مكتمل"].includes(e.status) && nk(one(e.lect)) === sh && e.mosName && (mo === nk(e.mosName) || mo === nk(e.mosName.replace(/^مسجد /, ""))));
+        if (m.length === 1) { const { error } = await sb.from("permits").update({ act_id:m[0].id }).eq("id", p.id); if (!error) { p.act_id = m[0].id; used.add(m[0].id); done.push("تصريح " + p.no); } } }
+    } catch (_) {} finally { busy = false; }
+    if (done.length) { try { toast(`ربط تلقائي: ${done.length} عنصر`); } catch (_) {} } };
+})();
+setInterval(() => { try { autoLinkRun(); } catch (_) {} }, 30000); setTimeout(() => { try { autoLinkRun(); } catch (_) {} }, 9000);
