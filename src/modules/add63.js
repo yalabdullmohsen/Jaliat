@@ -83,11 +83,17 @@ function pFind(v){ const val = String(v || "").trim(); if (!val) return;
   const w = S.wq.find(x => x.no === no), rel = new Set([no, w && wqParent(w)?.no, ...(w ? wqKids(w).map(k => k.no) : [])].filter(Boolean));
   const L = S.E.filter(e => rel.has(e.doc) && !["ملغى", "مكتمل"].includes(e.status));
   if (L.length === 1) { $("#p-act-pick")?.remove(); return pFill(L[0]); }
-  if (L.length > 1) return pPick(L.map(e => ({ k:"a:" + e.id, l:`${e.lect || "—"} · ${e.mosName || ""} · ${daysText(e) || ""} ${e.time || ""}` })), `الكتاب ${no} فيه ${L.length} أنشطة، اختر:`);
+  if (L.length > 1) { pFill(L[0]); return pPick(L.map(e => ({ k:"a:" + e.id, l:`${e.lect || "—"} · ${e.mosName || ""} · ${daysText(e) || ""} ${e.time || ""}` })), `الكتاب ${no} فيه ${L.length} أنشطة، عبّيت الأول — غيّره إذا تبي غيره:`); }
   const src = w ? [wqParent(w), w].filter(Boolean) : []; for (const x of src) { let P = null; try { P = wqPlan(x); } catch (_) {} if (P?.acts?.length) { PPLAN.set(x.no, { w:x, acts:P.acts });
       if (P.acts.length === 1) { $("#p-act-pick")?.remove(); return pFillPlan(P.acts[0], x); }
-      return pPick(P.acts.map((a, i) => ({ k:`w:${x.no}:${i}`, l:`${a.lect || "—"} · ${mosBy[a.mosque]?.name || a.mosRaw || ""} · ${daysText(a) || ""} ${a.time || ""}` })), `من الكتاب ${x.no}، اختر:`); } }
-  toast(w ? "لقيت الكتاب بس ما فيه جدول واضح، عبّي البيانات يدوياً" : "رقم الكتاب غير موجود في إنجاز"); }
+      pFillPlan(P.acts[0], x); return pPick(P.acts.map((a, i) => ({ k:`w:${x.no}:${i}`, l:`${a.lect || "—"} · ${mosBy[a.mosque]?.name || a.mosRaw || ""} · ${daysText(a) || ""} ${a.time || ""}` })), `من الكتاب ${x.no} عبّيت الأول — غيّره إذا تبي غيره:`); } }
+  if (w) return pFillLetter(w);
+  toast("رقم الكتاب غير موجود في إنجاز"); }
+function pFillLetter(w){ const t = [wqParent(w), w].filter(Boolean).map(x => x.body || "").join("\n");
+  const lect = (t.match(/(?:فضيلة\s*)?(?:الشيخ|الداعية|الدكتور)\s*\/?\s*([^\n،,.(]{4,40})/) || [])[1] || "", mos = (t.match(/(مسجد\s*\/?\s*[^\n،,.(]{3,40})/) || [])[1] || "";
+  const set = (id, v) => { const x = $("#" + id); if (x && v && !x.readOnly && !x.value) x.value = v; };
+  set("p-sheikh", lect.trim()); set("p-mosque", mos.trim()); set("p-topic", w.subj || ""); set($("#g-note") ? "g-note" : "p-note", `كتاب ${w.no}`);
+  if (S.form) S.form.act = ""; toast(lect || mos ? "تعبّأت البيانات من نص الكتاب، راجعها وكمّل الناقص" : "الكتاب ما فيه اسم شيخ ولا مسجد واضح، كمّل يدوياً"); }
 document.addEventListener("input", ev => { if (ev.target.id !== "p-act") return; clearTimeout(pFind._t); const v = ev.target.value; pFind._t = setTimeout(() => pFind(v), 350); });
 document.addEventListener("click", ev => { const b = ev.target.closest("[data-pfill]"); if (!b) return; const k = b.dataset.pfill;
   if (k.startsWith("a:")) pFill(S.E.find(e => e.id === k.slice(2))); else { const [, no, i] = k.split(":"); const P = PPLAN.get(no); if (P) pFillPlan(P.acts[+i], P.w); } $("#p-act-pick")?.remove(); });
