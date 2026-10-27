@@ -143,10 +143,10 @@ async function permitView(id){
   let qr = ""; try { const q = qrcode(0, "M"); q.addData(url); q.make(); qr = q.createDataURL(6, 2); } catch (_) {}
   const H = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn", { day:"numeric", month:"long", year:"numeric" });
   S.form = { kind:"permitv", id };
-  openDrawer(`التصريح ${p.no}`, `<div class="check ${c === "ok" ? "ok" : "warn"}"><b>${st}</b><span>حتى ${fmt(p.until)} · رمز التحقق ${p.code.slice(0, 4)}-${p.code.slice(4)}</span></div>
+  openDrawer(`التصريح \u2066${p.no}\u2069`, `<div class="check ${c === "ok" ? "ok" : "warn"}"><b>${st}</b><span>حتى ${fmt(p.until)} · رمز التحقق ${p.code.slice(0, 4)}-${p.code.slice(4)}</span></div>
     <div class="permit-wrap"><div class="permit print-area" id="permit-paper">
       <div class="pm-h"><div class="pm-org"><span>دولة الكويت</span><b>وزارة الشؤون الإسلامية</b><span>إدارة العلاقات الخارجية</span><span>قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
-        <div class="pm-meta"><span><b>رقم التصريح:</b> ${esc(p.no)}</span><span><b>تاريخ الإصدار:</b> ${fmt(p.issued_at.slice(0, 10))}</span><span><b>الموافق:</b> ${esc(H.format(new Date(p.issued_at)))}</span></div></div>
+        <div class="pm-meta"><span><b>رقم التصريح:</b> <bdi dir="ltr">${esc(p.no)}</bdi></span><span><b>تاريخ الإصدار:</b> ${fmt(p.issued_at.slice(0, 10))}</span><span><b>الموافق:</b> ${esc(H.format(new Date(p.issued_at)))}</span></div></div>
       <h2 class="pm-title">تصريح إلقاء درس</h2><p class="pm-sub">يُبرَز لإمام المسجد عند إقامة الدرس</p>
       <p class="pm-lead">تُصرِّح إدارة العلاقات الخارجية (قسم الجاليات ورعاية المهتدين وطلبة البعوث) لفضيلة الشيخ / <strong>${esc(d.sheikh)}</strong> بإلقاء درس في <strong>${esc(d.mosque)}</strong>، وفق البيانات الموضحة أدناه.</p>
       <table class="pm-t"><tr><th>اسم الشيخ</th><td>${esc(d.sheikh)}</td></tr><tr><th>المسجد</th><td>${esc(d.mosque)}</td></tr>${d.topic ? `<tr><th>عنوان الدرس</th><td>${esc(d.topic)}</td></tr>` : ""}${d.lang ? `<tr><th>لغة الدرس</th><td>${esc(d.lang)}</td></tr>` : ""}<tr><th>التاريخ</th><td>${DAYS[dOf(d.date).getDay()]} ${fmt(d.date)}، ${esc(H.format(dOf(d.date)))}</td></tr><tr><th>الوقت</th><td>${esc(d.time || "")}</td></tr>${d.note ? `<tr><th>ملاحظات</th><td>${esc(d.note)}</td></tr>` : ""}</table>
