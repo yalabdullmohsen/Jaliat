@@ -22,7 +22,7 @@ async function prRead(body){ if (PR.busy) return; PR.busy = true; prSt(`<span cl
   catch (e) { prSt("تعذّرت القراءة: " + esc(String(e?.message || e).slice(0, 160)), "bad"); }
   finally { PR.busy = false; } }
 function prMos(x){ const n = nkey(x.mosque || ""); if (!n) return ""; const a = nkey(x.area || ""), C = S.mosques.filter(m => nkey(m.name) === n), C2 = C.length ? C : S.mosques.filter(m => nkey(m.name).includes(n) || n.includes(nkey(m.name))), m = (a && C2.find(m => nkey(m.area || "").includes(a) || a.includes(nkey(m.area || "x")))) || (a && C2.length > 1 ? null : C2[0]);
-  return m ? "مسجد " + m.name + (m.area ? "، " + m.area : "") : "مسجد " + x.mosque + (x.area ? "، " + x.area : ""); }
+  return m ? pMos("مسجد " + m.name, m.area, m.gov) : "مسجد " + x.mosque + (x.area ? "، " + x.area : ""); }
 function prFill(i){ const x = PR.items[i]; if (!x) return; const set = (id, v) => { const e = $("#" + id); if (e && v && !e.readOnly) { e.value = v; e.classList.add("pr-filled"); } };
   set("p-sheikh", x.sheikh); set("p-mosque", prMos(x)); set("p-topic", x.topic || (x.prayer ? "درس ديني " + x.prayer : "")); set("p-lang", x.lang);
   const d = x.date && x.date >= TODAY ? x.date : x.start && x.start >= TODAY ? x.start : addDays(TODAY, 1); set("p-date", d);
