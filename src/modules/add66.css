@@ -1,0 +1,19 @@
+/* v91: تذكيرات المنسقين */
+.rt{display:grid;gap:12px}
+.rt-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rt-tab{display:grid;gap:2px;justify-items:start;text-align:start;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font:inherit;color:inherit}
+.rt-tab b{font-size:24px;line-height:1.1}.rt-tab span{font-weight:600}.rt-tab small{color:var(--muted);font-size:12px}
+.rt-tab.on{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,var(--surface));box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 18%,transparent)}
+.rt-info{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.rt-info p{margin:6px 0 0;color:var(--muted)}
+.rt-sum{display:flex;gap:16px;color:var(--muted);font-size:13px}.rt-sum b{color:var(--ink)}
+.rt-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.k-soon.rt-badge{background:#F6E7B8;color:#6B5313}.k-exp.rt-badge{background:#F4D4CF;color:#8A241A}.k-upd.rt-badge{background:#D6E6F5;color:#1D4E79}
+.rt-tab.k-soon.on{border-color:#C9A227}.rt-tab.k-exp.on{border-color:#B3261E}.rt-tab.k-upd.on{border-color:#2A6FA8}
+.rt-c{display:grid;gap:10px;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface)}.rt-c.sent{opacity:.75}
+.rt-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.rt-left{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--surface-2)}.rt-left.bad{background:#F4D4CF;color:#8A241A}.rt-left.warn{background:#F6E7B8;color:#6B5313}.rt-left.ok{background:#DDEBDD;color:#1E5B2E}
+.rt-ok{margin-inline-start:auto;font-size:12px;color:var(--primary);font-weight:600}
+.rt-t{display:grid}.rt-t b{font-size:17px}.rt-t span{color:var(--muted);font-size:13px}
+.rt-co{display:grid;gap:8px}.rt-p{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rt-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--gold-soft);font-weight:700;flex:none}
+.rt-pn{display:grid;flex:1 1 150px;min-width:0}.rt-pn b{font-weight:600}.rt-pn span{color:var(--muted);font-size:12.5px}
+.rt-send{min-width:170px}.rt-more{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media (max-width:700px){.rt-tabs{gap:6px}.rt-tab{padding:10px}.rt-tab b{font-size:20px}.rt-p{display:grid;grid-template-columns:34px 1fr;}.rt-p .btn{grid-column:1 / -1}.rt-send{width:100%}}
