@@ -1,6 +1,6 @@
 /* منظومة إنجاز — الهوية الموحّدة وسطر الحقوق
-   ملف واحد مشترك بين: إنجاز (الموظفين) · بوابة إنجاز (المنسقين والخطباء) · بصمة إنجاز
-   الاستخدام: <script src="…/brand/brand.js" data-app="injaz|bawaba|basma" defer></script>
+   ملف واحد مشترك بين: إنجاز (الموظفين) · بوابة إنجاز (المنسقين والخطباء)
+   الاستخدام: <script src="…/brand/brand.js" data-app="injaz|bawaba" defer></script>
    © 2026 يوسف عبد المحسن المطيري — جميع الحقوق محفوظة */
 (function () {
   var OWNER = 'يوسف عبد المحسن المطيري';
@@ -13,10 +13,9 @@
   // علامات المنظومة: نفس المربع الأخضر والحلقة الذهبية، والرمز في الوسط يختلف
   var GLYPH = {
     injaz: '<path d="M17 25l5 5 10-11" stroke-width="3.4"/>',
-    bawaba: '<path d="M16 34V24a8 8 0 0 1 16 0v10"/><path d="M13 34h22"/>',
-    basma: '<path d="M18 33c1.5-3 2-6 2-9a4 4 0 0 1 8 0c0 3.5-.6 7-2 10"/><path d="M24 24c0 4-1 7.5-2.6 10.5"/><path d="M15 29.5c.6-1.5 1-3.4 1-5.5a8 8 0 0 1 16 0c0 2-.2 4-.6 6"/><path d="M17 17.5a10.5 10.5 0 0 1 14 0"/>',
+    bawaba: '<path d="M16 34V24a8 8 0 0 1 16 0v10"/><path d="M13 34h22"/>'
   };
-  var NAMES = { injaz: 'إنجاز', bawaba: 'بوابة إنجاز', basma: 'بصمة إنجاز' };
+  var NAMES = { injaz: 'إنجاز', bawaba: 'بوابة إنجاز' };
   function mark(k, size) {
     return '<svg class="ij-mark" width="' + size + '" height="' + size + '" viewBox="0 0 48 48" aria-hidden="true">' +
       '<rect width="48" height="48" rx="11" fill="#1B5A43"/>' +
@@ -34,12 +33,6 @@
     '.ij-fam span.on{opacity:1}' +
     '.ij-fam .ij-mark{border-radius:6px;flex:none}' +
     '.ij-copy{margin:0;opacity:.6}.ij-nw{white-space:nowrap}' +
-    '.ij-new{position:fixed;z-index:60;inset-inline:max(12px,env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));margin:0 auto;max-width:520px;' +
-    'display:flex;align-items:center;gap:12px;background:#1E3A31;color:#F2F6F4;border-radius:16px;padding:12px 12px 12px 14px;box-shadow:0 14px 36px -12px rgba(0,0,0,.45);font-size:13.5px;line-height:1.55}' +
-    '.ij-new .ij-mark{border-radius:10px;flex:none;box-shadow:0 0 0 1px rgba(226,188,85,.5)}' +
-    '.ij-new-t{flex:1;min-width:0}.ij-new-t b{display:block;font-size:14.5px;color:#E2BC55}.ij-new-t span{opacity:.85}' +
-    '.ij-new-go{flex:none;background:#E2BC55;color:#1E3A31;font-weight:700;text-decoration:none;border-radius:10px;padding:8px 14px}' +
-    '.ij-new-x{flex:none;background:none;border:0;color:#F2F6F4;opacity:.7;font-size:22px;line-height:1;cursor:pointer;padding:4px 6px}' +
     '.ij-copy-inline{display:block;margin-top:10px;font-size:11.5px;line-height:1.5;opacity:.6;text-align:center}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -48,32 +41,16 @@
     f.className = 'ij-foot';
     f.setAttribute('lang', 'ar');
     f.innerHTML = '<div class="ij-fam" aria-label="منظومة إنجاز">' +
-      ['injaz', 'bawaba', 'basma'].filter(function (k) { return k !== 'injaz' || app === 'injaz'; }).map(function (k) {
+      ['injaz', 'bawaba'].filter(function (k) { return k !== 'injaz' || app === 'injaz'; }).map(function (k) {
         return '<span class="' + (k === app ? 'on' : '') + '">' + mark(k, 18) + NAMES[k] + '</span>';
       }).join('') + '</div><p class="ij-copy">' + COPY_HTML + '</p>';
     return f;
   }
   function inlineCopy() { var s = document.createElement('small'); s.className = 'ij-copy-inline'; s.innerHTML = COPY_HTML; return s; }
 
-  // «جديد» في إنجاز: بطاقة تعرّف الموظف ببصمة إنجاز، تختفي نهائيًا بعد ما يضغطها
-  function newCard() {
-    var K = 'ij-new-basma';
-    try { if (localStorage.getItem(K)) return; } catch (e) { return; }
-    var appEl = document.getElementById('app');
-    if (!appEl || appEl.hidden || document.querySelector('.ij-new')) return;
-    var c = document.createElement('div');
-    c.className = 'ij-new'; c.setAttribute('role', 'status');
-    c.innerHTML = mark('basma', 40) + '<div class="ij-new-t"><b>جديد: بصمة إنجاز</b><span>يذكّرك ببصمة التواجد والخروج في وقتها، مع تقرير شهري ورصيد التأخير.</span></div>' +
-      '<a class="ij-new-go" href="basma/" target="_blank" rel="noopener">افتح</a><button type="button" class="ij-new-x" aria-label="إخفاء">×</button>';
-    function done() { try { localStorage.setItem(K, '1'); } catch (e) {} c.remove(); }
-    c.querySelector('.ij-new-go').addEventListener('click', done);
-    c.querySelector('.ij-new-x').addEventListener('click', done);
-    document.body.appendChild(c);
-  }
 
   function place() {
     if (app === 'injaz') {
-      newCard();
       // نظام الموظفين: سطر الحقوق في بطاقة الدخول وأسفل القائمة الجانبية
       var card = document.querySelector('#login .login-card');
       if (card && !card.querySelector('.ij-copy-inline')) card.appendChild(inlineCopy());
