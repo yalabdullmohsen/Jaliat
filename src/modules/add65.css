@@ -1,0 +1,14 @@
+/* v89: قائمة «موافقات تحتاج تصريح» أعمدة واضحة */
+.pn-grid{display:grid}
+.pn-row{display:grid;grid-template-columns:minmax(150px,1.3fr) minmax(150px,1.3fr) minmax(110px,1fr) 96px 236px;gap:6px 14px;align-items:center;padding:10px 4px;border-bottom:.5px solid color-mix(in srgb,var(--ink) 10%,transparent)}
+.pn-row:last-child{border-bottom:0}
+.pn-hd{padding:8px 4px;font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid color-mix(in srgb,var(--ink) 14%,transparent)}
+.pn-c{display:grid;min-width:0;line-height:1.5}.pn-c b{font-weight:600;overflow-wrap:anywhere}.pn-c .s{overflow-wrap:anywhere}
+.pn-act{display:flex;justify-content:flex-end}.pn-act .pn-b{display:flex;gap:6px;flex-wrap:nowrap;white-space:nowrap}
+.pn-more{display:flex;justify-content:center;padding:10px 0 4px}
+@media (max-width:900px){.pn-hd{display:none}
+  .pn-row{grid-template-columns:1fr;gap:4px;padding:12px 4px}
+  .pn-c{grid-template-columns:72px 1fr;gap:2px 10px;align-items:baseline}.pn-c::before{content:attr(data-l);font-size:12px;color:var(--muted)}
+  .pn-c .s{grid-column:2}.pn-act{justify-content:stretch;margin-top:6px}.pn-act .pn-b{width:100%}.pn-act .pn-b .btn{flex:1}}
+@media (max-width:700px){.pn-need .panel-h{flex-wrap:wrap;row-gap:4px}.pn-need .panel-h h3{flex:1 1 auto;white-space:normal}.pn-need .panel-h .s{flex-basis:100%;order:3}}
+.pn-c bdi.num{justify-self:start}

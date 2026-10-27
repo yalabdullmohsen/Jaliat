@@ -116,7 +116,16 @@ function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permi
 const pNeedBtns = e => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button><button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button>`;
 const _vPermits85 = vPermits;
 vPermits = function(){ const h = _vPermits85(); if (!S.admin) return h; const L = permitNeeds(); if (!L.length) return h;
-  return `<div class="panel pn-need"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="chip gold">${L.length}</span><span class="s">البيانات تتعبّأ تلقائياً، راجع وأصدر أو فوّض</span></div><div class="list">${L.slice(0, 30).map(({ e, delegated }) => `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")}${e.area ? "، " + esc(e.area) : ""} · ${esc(daysText(e) || "")} ${esc(e.time || "")} · موافقة ${esc(e.doc)}</span></span>${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</div>`).join("")}</div></div>` + h; };
+  const all = S.f.pnall === "1", rows = all ? L : L.slice(0, 8), N = d => `<bdi dir="ltr" class="num">${esc(d)}</bdi>`;
+  return `<div class="panel pn-need"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="chip gold">${L.length}</span><span class="s">البيانات تتعبّأ تلقائياً، راجع وأصدر أو فوّض</span></div>
+    <div class="pn-grid"><div class="pn-row pn-hd"><span>الشيخ / المحاضر</span><span>المسجد</span><span>الموعد</span><span>الكتاب</span><span></span></div>${rows.map(({ e, delegated }) => `<div class="pn-row">
+      <span class="pn-c pn-who" data-l="الشيخ"><b>${esc(e.lect || "—")}</b></span>
+      <span class="pn-c" data-l="المسجد"><b>${esc(e.mosName || "—")}</b>${e.area || e.gov ? `<span class="s">${esc([e.area, e.gov].filter(Boolean).join("، "))}</span>` : ""}</span>
+      <span class="pn-c" data-l="الموعد"><b>${esc(daysText(e) || "—")}</b>${e.time ? `<span class="s">${esc(e.time)}</span>` : ""}</span>
+      <span class="pn-c" data-l="الكتاب">${N(e.doc)}</span>
+      <span class="pn-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</span></div>`).join("")}</div>
+    ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}</div>` + h; };
+document.addEventListener("click", ev => { if (!ev.target.closest("[data-pnall]")) return; S.f.pnall = S.f.pnall === "1" ? "" : "1"; render(); });
 const _prio85 = priorities;
 priorities = function(){ const P = _prio85(); if (S.admin) { const n = permitNeeds().filter(x => !x.delegated).length; if (n) P.push({ w:86, k:"gold", t:`${n} موافقة وصلت وتحتاج تصريح`, s:"أصدره بنفسك أو فوّض موظفاً، البيانات جاهزة", act:{ go:"permits", l:"إصدار / تفويض" } }); } return P.sort((a, b) => b.w - a.w); };
 const _wqForm85 = wqForm;
