@@ -988,7 +988,7 @@ function userForm(id){
     ${fld("u-name", "الاسم الظاهر", `<input class="f" id="u-name" value="${esc(u.name||"")}" placeholder="مثال: أحمد العنزي">`)}
     ${fld("u-title", "المنصب", `<input class="f" id="u-title" list="dl-titles" value="${esc(u.title||"")}" placeholder="مثال: باحث دراسات">`)}
     <datalist id="dl-titles">${TITLES_SUG.map(x => `<option value="${x}">`).join("")}</datalist>
-    ${fld("u-user", "اسم المستخدم (للدخول)", `<input class="f" id="u-user" dir="ltr" autocapitalize="none" spellcheck="false" value="${esc(u.username||"")}"${id ? " disabled" : ""} placeholder="ahmad">`, id ? "" : "بحروف إنجليزية صغيرة أو أرقام، بدون مسافات")}
+    ${fld("u-user", "اسم المستخدم (للدخول)", `<input class="f" id="u-user" dir="ltr" autocapitalize="none" spellcheck="false" value="${esc(u.username||"")}" placeholder="ahmad">`, "بحروف إنجليزية صغيرة أو أرقام، بدون مسافات. تغييره يغيّر اسم الدخول فوراً")}
     ${fld("u-pass", id ? "كلمة مرور جديدة (اتركها فارغة إن لم تتغير)" : "كلمة المرور", `<input class="f" id="u-pass" dir="ltr" autocomplete="new-password" placeholder="6 أحرف على الأقل">`, "أعطها للموظف، ويستطيع تغييرها بعد الدخول")}
     <div class="fld"><span class="lbl">الصلاحية</span><div class="seg" id="u-role">${["admin","editor","viewer"].map(r => `<button type="button" data-role="${r}" aria-pressed="${u.role === r}">${ROLE_AR[r]}</button>`).join("")}</div></div>
     ${id ? `<div class="fld"><span class="lbl">الحالة</span><div class="seg" id="u-active"><button type="button" data-act="1" aria-pressed="${!!u.active}">فعّال</button><button type="button" data-act="0" aria-pressed="${!u.active}">موقوف</button></div></div>` : ""}`,
@@ -999,7 +999,7 @@ async function saveUser(){
   const F = S.form; const name = $("#u-name").value.trim(), pass = $("#u-pass").value, title = $("#u-title").value.trim();
   const btn = document.querySelector("[data-save]"); btn.disabled = true;
   try {
-    if (F.id) await callUsers({ action:"update", id:F.id, name, title, role:F.role, active:F.active, password: pass || undefined });
+    if (F.id) await callUsers({ action:"update", id:F.id, name, title, username:$("#u-user").value.trim().toLowerCase(), role:F.role, active:F.active, password: pass || undefined });
     else await callUsers({ action:"create", username:$("#u-user").value.trim().toLowerCase(), name, title, password:pass, role:F.role });
     closeDrawer(); toast(F.id ? "حُفظ المستخدم" : "أُنشئ الحساب");
   } catch (e) { toast(e.message); btn.disabled = false; }
