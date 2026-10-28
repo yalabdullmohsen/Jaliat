@@ -27,3 +27,7 @@
 button.rn-st{cursor:pointer}.rn-st.ok{border-color:#9CC9A8;background:#EAF4EC}.rn-st.ok small{color:#1E5B2E}.rn-st.no{border-color:#E6B9B3;background:#FBEDEB}.rn-st.no small{color:#8A241A}.rn-st.mid{border-color:#E4D08A;background:#FBF4DA}.rn-st.mid small{color:#6B5313}
 .rn-ref{display:flex;margin-top:4px}
 @media (max-width:600px){.rn-path{grid-template-columns:1fr}}
+
+/* v99 — استبدال خطيب */
+.sb-box{display:grid;gap:8px}.sb-g{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.sb-m{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sb-m>span{display:flex;gap:4px;flex-wrap:wrap}.sb-m .chip{font-style:normal}
