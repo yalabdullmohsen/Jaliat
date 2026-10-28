@@ -335,16 +335,6 @@ function winBox(){const s=winState();if(s.k==="load")return'<div class="wbox" id
 function smHero(){const s=winState(),on=s.k==="open";if(!WIN)loadWin().then(()=>{const h=$("sm-hero");if(h)h.innerHTML=smHero()});
  return'<button type="button" class="sm-hero'+(on?"":" off")+'" data-tab="msg" data-sub="serm"><span class="mic"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg></span><span><b>'+(on?"سجّلوا خطبة اليوم الآن":"تسجيل خطبة الجمعة")+'</b><span>'+(!WIN?"…":on?_t("مفتوح حتى {0}",t12(s.c)):_t("يفتح الجمعة {0}، {1} إلى {2}",fd(WIN.fri),t12(s.o),t12(s.c)))+'</span></span></button>'}
 function wTick(){if(WTICK)return;WTICK=setInterval(()=>{if(!S_)return;const b=$("wbox");if(b&&!(REC&&REC.on)){const k=b.className;const tmp=document.createElement("div");tmp.innerHTML=winBox();const nb=tmp.firstChild;if(nb.className!==k){const y=scrollY;draw();scrollTo(0,y)}else b.replaceWith(nb)}const h=$("sm-hero");if(h)h.innerHTML=smHero()},20000)}
-let RL=null;
-function rlURL(t){return location.origin+location.pathname.replace(/[^/]*$/,"")+"portal.html#r="+t}
-function rlMsg(){return"السلام عليكم ورحمة الله\nهذا رابط تسجيل خطب الجمعة والدروس الدينية لجالية "+I.comm+"، يفتح مباشرة دون حساب. اختاروا خطبة أو درس ثم سجّلوا وأرسلوا:\n"+rlURL(RL)}
-function rlBox(){if(RL===null){rpc("portal_me_rec_link",{p_s:S_}).then(r=>{RL=r||"";if(tab==="msg"&&sub.msg==="serm"){const y=scrollY;draw();scrollTo(0,y)}}).catch(()=>{RL=""});return""}
-if(!RL)return"";return'<div class="card pad" style="margin-bottom:12px"><b>'+_t("رابط الخطباء والمحاضرين")+'</b><p class="note" style="margin:6px 0 10px">أرسلوه لكل خطيب أو محاضر عندكم، يفتح له تسجيل الخطبة أو الدرس مباشرة دون حساب.</p><div class="act" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn p sm" data-rlwa="1">واتساب</button><button type="button" class="btn ghost sm" data-rlcp="1">نسخ الرابط</button><button type="button" class="btn ghost sm" data-rlnew="1">رابط جديد</button></div></div>'}
-let KL=null;
-function klURL(t){return location.origin+location.pathname.replace(/[^/]*$/,"")+"sermon.html#"+t}
-function klMsg(x){return"السلام عليكم ورحمة الله\nأخي الخطيب "+x.name+"، هذا رابط تسجيل خطبة الجمعة لمسجد "+x.mosque+"، تضغط عليه بعد الخطبة وتؤكد:\n"+klURL(x.token)}
-function klBox(){if(KL===null){rpc("portal_me_khatib_links",{p_s:S_}).then(r=>{KL=r||[];if(tab==="msg"&&sub.msg==="serm"){const y=scrollY;draw();scrollTo(0,y)}}).catch(()=>{KL=[]});return'<div class="sec"><h2>روابط الخطباء</h2></div><div class="card empty">…</div>'}
-if(!KL.length)return"";return'<div class="sec"><h2>روابط الخطباء</h2></div><p class="note" style="margin:0 2px 10px">أرسلوا لكل خطيب رابطه، وهو يؤكد به خطبته يوم الجمعة بعد الصلاة أو يوم السبت.</p><div class="card list">'+KL.map((x,i)=>'<div class="row"><div class="tx"><b>'+e(x.name)+(x.who==="bak"?" ("+_t("احتياط")+")":"")+'</b><span class="sub">'+_t("مسجد {0}",e(x.mosque))+'</span></div><div class="act"><button type="button" class="btn p sm" data-kwa="'+i+'">واتساب</button><button type="button" class="btn ghost sm" data-kcp="'+i+'">نسخ</button></div></div>').join("")+'</div>'}
 let SMODE="serm";
 const DAYN=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
 function kwDow(){return +new Date(Date.now()+(typeof WOFF==="number"?WOFF:0)).toLocaleString("en-US",{weekday:"short",timeZone:"Asia/Kuwait"}).replace(/Sun/,"0").replace(/Mon/,"1").replace(/Tue/,"2").replace(/Wed/,"3").replace(/Thu/,"4").replace(/Fri/,"5").replace(/Sat/,"6")}
@@ -404,7 +394,7 @@ if(s==="ask")h+=waCard()+'<div style="height:10px"></div><form data-form="ask" c
 if(s==="rep")h+='<form data-form="rep" class="card pad"><p class="note">'+(sent?"أرسلتم تقرير هذا الشهر، ويمكنكم إرسال تقرير محدَّث.":"ملخص نشاط الجالية خلال الشهر، يساعد القسم في المتابعة والدعم.")+'</p>'+
 field("الشهر",'<select id="rp">'+[0,1,2].map(k=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-k);const v=d.toISOString().slice(0,7);return'<option value="'+v+'">'+d.toLocaleDateString(LOC(),{month:"long",year:"numeric"})+'</option>'}).join("")+'</select>')+'<div class="g2">'+field("عدد الدروس المقامة",'<input id="rl" inputmode="numeric" dir="ltr" placeholder="0">')+field("متوسط الحضور",'<input id="ra" inputmode="numeric" dir="ltr" placeholder="0">')+'</div>'+
 field("المهتدون الجدد",'<input id="rc" inputmode="numeric" dir="ltr" placeholder="0">')+field("أبرز ما تم",'<textarea id="nt2" rows="3"></textarea>',1)+field("احتياجات الجالية من القسم",'<textarea id="rn" rows="2"></textarea>',1)+errBox("er2")+'<button class="btn p" type="submit">إرسال التقرير</button></form>';
-if(s==="serm")h+=rlBox()+vSerm()+klBox();
+if(s==="serm")h+=vSerm();
 if(s==="circ"){const C=I.circulars||[];h+=C.length?'<div class="card list">'+C.map(c=>'<div class="row circ"><div class="tx"><b>'+e(c.title)+'</b><span class="sub">'+e(c.kind)+' '+_t("رقم")+' '+e(c.no)+' · '+fd(c.at)+'</span>'+(c.body?'<p>'+e(c.body).replace(/\n/g,"<br>")+'</p>':'')+'</div></div>').join("")+'</div>':'<div class="card empty">لا توجد تعاميم حالياً.</div>'}
 return h}
 
@@ -440,11 +430,6 @@ if(D.tab&&RM){D.tab="msg";D.sub="serm"}
 if(D.tab){if(D.sm&&!(REC&&(REC.on||REC.url)))SMODE=D.sm;FILES=[];tab=D.tab;if(D.sub)sub[tab]=D.sub;return draw()}
 if(D.sub){sub[tab]=D.sub;return draw()}
 if(D.day!==undefined){const a=acts[+D.i],d=+D.day;a.days=a.days||[];a.days=a.days.includes(d)?a.days.filter(x=>x!==d):[...a.days,d];t.classList.toggle("on");return}
-if(D.rlwa){open("https://wa.me/?text="+encodeURIComponent(rlMsg()),"_blank");return}
-if(D.rlcp){try{await navigator.clipboard.writeText(rlMsg());t.textContent="تم النسخ"}catch(_){prompt("انسخوا الرسالة",rlMsg())}return}
-if(D.rlnew){if(!confirm("سيتوقف الرابط القديم عن العمل. متابعة؟"))return;t.disabled=true;try{RL=await rpc("portal_me_rec_link",{p_s:S_,p_reset:true});draw()}catch(_){t.disabled=false}return}
-if(D.kwa!==undefined){open("https://wa.me/?text="+encodeURIComponent(klMsg(KL[+D.kwa])),"_blank");return}
-if(D.kcp!==undefined){try{await navigator.clipboard.writeText(klMsg(KL[+D.kcp]));t.textContent="تم النسخ"}catch(_){prompt("انسخوا الرسالة",klMsg(KL[+D.kcp]))}return}
 if(D.rc){t.disabled=true;try{await rpc("portal_me_renew_cancel",{p_s:S_,p_doc:D.no});const a=I.approvals.find(x=>x.no===D.no);if(a)a.answer=null;draw()}catch(x){t.disabled=false}return}
 if(D.ra){t.disabled=true;try{await rpc("portal_me_renew",{p_s:S_,p_doc:D.no,p_answer:D.ra});const a=I.approvals.find(x=>x.no===D.no);if(a)a.answer=D.ra;draw()}catch(x){t.disabled=false}return}
 if(D.kind){kind=D.kind;return draw()}if(t.id==="add"){acts.push({});draw();return window.scrollTo(0,document.body.scrollHeight)}if(D.rm!==undefined){acts.splice(+D.rm,1);return draw()}
