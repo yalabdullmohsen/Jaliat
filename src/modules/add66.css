@@ -17,3 +17,6 @@
 .rt-pn{display:grid;flex:1 1 150px;min-width:0}.rt-pn b{font-weight:600}.rt-pn span{color:var(--muted);font-size:12.5px}
 .rt-send{min-width:170px}.rt-more{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 @media (max-width:700px){.rt-tabs{gap:6px}.rt-tab{padding:10px}.rt-tab b{font-size:20px}.rt-p{display:grid;grid-template-columns:34px 1fr;}.rt-p .btn{grid-column:1 / -1}.rt-send{width:100%}}
+
+/* v94 — عنوان جدول خطباء الجاليات أخضر واضح (كان يضيع بسبب thead الشفاف) */
+.kt thead th,:root .kt thead th{background:#006C35!important;color:#fff!important;border:1px solid #0b5a30!important;font-size:13px!important;font-weight:700}

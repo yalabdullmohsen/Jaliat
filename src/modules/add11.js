@@ -362,9 +362,10 @@ function waPick(list, mk){
 }
 
 /* =============== 5) Weekly schedule (print / WhatsApp text) =============== */
+function weekStartSun(off){ const d = dOf(TODAY); d.setDate(d.getDate() - d.getDay() + 7 * (off || 0)); return d; }
 function weekStart(off){ const d = dOf(TODAY); d.setDate(d.getDate() - ((d.getDay() + 1) % 7) + 7 * (off || 0)); return d; }
 function weekRows(){
-  const s = weekStart(S.f.wko), out = [];
+  const s = weekStartSun(S.f.wko), out = [];
   for (let i = 0; i < 7; i++) { const d = new Date(s); d.setDate(s.getDate() + i); const iso = isoOf(d);
     const L = S.E.filter(e => e.live && e.start <= iso && e.end >= iso && e.days.includes(d.getDay()) && (!S.f.wkc || e.comm === S.f.wkc) && (!S.f.wkg || e.gov === S.f.wkg)).sort((a, b) => (a.sl?.[0] || 0) - (b.sl?.[0] || 0) || (a.comm || "").localeCompare(b.comm || "", "ar"));
     out.push({ d, iso, L }); }
@@ -376,7 +377,7 @@ function vWeekly(){
     ${sel("wk-c", commNames, S.f.wkc, "كل الجاليات")}${sel("wk-g", GOVS, S.f.wkg, "كل المحافظات")}
     <span class="count">${tot} موعد</span><button class="btn" type="button" data-wktxt>${icon("i-wa")} نسخ للواتساب</button><button class="btn btn-primary" type="button" data-wkprint>${icon("i-down")} طباعة / PDF</button></div>
   <div class="panel print-area" id="wk-sheet"><div class="panel-b">
-    <div class="sr-h"><div><b>وزارة الشؤون الإسلامية</b><span>${DEPT}</span></div><div style="text-align:end"><h2>الجدول الأسبوعي للأنشطة${S.f.wkc ? "، " + esc(S.f.wkc) : ""}${S.f.wkg ? "، محافظة " + esc(S.f.wkg) : ""}</h2><span>من السبت ${fmt(isoOf(s))} إلى الجمعة ${fmt(isoOf(e))} م</span></div></div>
+    <div class="sr-h"><div><b>وزارة الشؤون الإسلامية</b><span>${DEPT}</span></div><div style="text-align:end"><h2>الجدول الأسبوعي للأنشطة${S.f.wkc ? "، " + esc(S.f.wkc) : ""}${S.f.wkg ? "، محافظة " + esc(S.f.wkg) : ""}</h2><span>من الأحد ${fmt(isoOf(s))} إلى السبت ${fmt(isoOf(e))} م</span></div></div>
     ${W.map(x => `<div class="wk-day"><div class="wk-dh"><b>${DAYS[x.d.getDay()]}</b><span class="num">${fmt(x.iso)}</span><span class="chip">${x.L.length}</span></div>
       ${x.L.length ? `<div class="table-wrap"><table class="tbl sr-tbl"><thead><tr><th>#</th><th>الوقت</th><th>الجالية</th><th>المسجد</th><th>المنطقة</th><th>المحاضر</th><th>النوع</th></tr></thead><tbody>${x.L.map(a => `<tr data-open="act:${a.id}"><td class="num">${a.n}</td><td>${esc(a.time || "")}</td><td>${esc(a.comm || "")}</td><td>${esc(a.mosName)}</td><td>${esc(a.area)}</td><td>${esc(a.lect || "")}</td><td>${esc(a.type)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty s">لا توجد أنشطة</div>`}</div>`).join("")}
   </div></div>`;

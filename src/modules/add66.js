@@ -79,3 +79,52 @@ setInterval(() => { try { autoLinkRun(); } catch (_) {} }, 30000); setTimeout(()
 /* v93 — الكتب المرسلة تلقائياً لوثيقة: تنبيه في الأولويات ما دام فيها شيء بانتظار الحفظ */
 const _prio93 = priorities;
 priorities = function(){ const P = _prio93(); const n = (S.wqOut || []).filter(o => o.status === "pending" || o.status === "working").length; if (S.canWrite && n) P.push({ w:80, k:"gold", t:`${n} كتاب بانتظار الحفظ التلقائي في وثيقة`, s:"اتركه ليكمل أو ألغِ إرساله", act:{ go:"watheqa", l:"عرض" } }); return P.sort((a, b) => b.w - a.w); };
+
+/* v94 — صفحة المساجد: ترقيم + فلتر نوع النشاط (درس، دورة، محاضرة، خطبة، تحفيظ) */
+const MQ_TYPES = [["", "كل الأنواع"], ["درس", "درس ديني"], ["دورة", "دورة علمية"], ["محاضرة", "محاضرة"], ["خطبة", "خطبة جمعة"], ["تحفيظ", "حلقات تحفيظ"]];
+vMosques = function(){ const f = S.f, q = nkey(f.mq || ""), ty = f.mtype || ""; const cnt = {}, byT = {};
+  S.E.forEach(e => { if (!e.mosque) return; cnt[e.mosque] = (cnt[e.mosque] || 0) + 1; const t = String(e.type || "") + " " + String(e.title || ""); (byT[e.mosque] = byT[e.mosque] || []).push(t); });
+  const khM = new Set([...S.khatibs.values()].map(k => nkey(String(k.mosque || "").replace(/^مسجد\s+/, ""))));
+  const has = m => !ty ? true : ty === "خطبة" ? khM.has(nkey(m.name)) : (byT[m.id] || []).some(t => t.includes(ty));
+  const num = m => +(String(m.id).match(/\d+/) || [0])[0];
+  const rows = S.mosques.filter(m => (!f.mgov || m.gov === f.mgov) && (!q || nkey(m.name + m.area).includes(q)) && has(m)).sort((a, b) => num(a) - num(b));
+  return `<div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input id="mq" class="f" placeholder="ابحث باسم المسجد أو المنطقة…" value="${esc(f.mq || "")}" data-fk="mq"></div>
+    <select class="f" data-fk="mgov">${opts(GOVS, f.mgov, "كل المحافظات")}</select>
+    <select class="f" data-fk="mtype">${MQ_TYPES.map(([v, l]) => `<option value="${v}"${v === ty ? " selected" : ""}>${l}</option>`).join("")}</select>${S.canWrite ? `<button class="btn btn-primary" data-new="mos"><svg width="16" height="16"><use href="#i-plus"/></svg>إضافة مسجد</button>` : ""}<span class="count">${rows.length} مسجد</span></div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>م</th><th>المسجد</th><th>المنطقة</th><th>المحافظة</th><th>الأنشطة</th></tr></thead><tbody>
+  ${rows.map(m => `<tr data-open="mos:${esc(m.id)}"><td class="n">${num(m) || ""}</td><td>مسجد ${esc(m.name)}</td><td>${esc(m.area)}</td><td>${esc(m.gov || "—")}</td><td class="num">${cnt[m.id] || ""}</td></tr>`).join("")}</tbody></table></div></div>`; };
+
+/* v95 — بوابة تدقيق التصريح: التاريخ والوقت لازم يكونوا منطقيين قبل الإصدار */
+function pGate(){ const g = id => document.querySelector("#" + id)?.value || "", E = [], date = g("p-date"), act = S.form?.act ? S.byId?.get?.(S.form.act) : null, doc = act?.doc ? docBy[act.doc] : null;
+  const on = [...document.querySelectorAll("#pd-days .pd-d.on")].map(b => +b.dataset.pdd), rep = g("p-rep") || "weekly", mode = g("p-pray");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(dOf(date))) return ["تاريخ الدرس غير صحيح"];
+  const y = +date.slice(0, 4), cy = +TODAY.slice(0, 4); if (y < cy - 1 || y > cy + 1) E.push(`سنة التاريخ ${y} غير معقولة`);
+  const diff = Math.round((dOf(date) - dOf(TODAY)) / 864e5);
+  if (!doc && diff < -60) E.push(`التاريخ ${fmt(date)} قديم (قبل ${-diff} يوماً)`); if (diff > 400) E.push("التاريخ بعيد أكثر من سنة");
+  if (rep !== "once" && on.length && !on.includes(dOf(date).getDay())) E.push(`${fmt(date)} يوم ${DAYS[dOf(date).getDay()]} وليس من أيام الدرس المختارة`);
+  if (doc) { if (doc.start && date < doc.start) E.push(`التاريخ قبل بداية الموافقة ${act.doc} (${fmt(doc.start)})`); if (doc.end && date > doc.end) E.push(`التاريخ بعد نهاية الموافقة ${act.doc} (${fmt(doc.end)})`); }
+  if (mode === "clock") { const a = g("p-from"), b = g("p-to"); if (!a) E.push("وقت البداية ناقص"); else if (b && b <= a) E.push("وقت النهاية يجب أن يكون بعد البداية"); else if (a < "04:00" || (b || a) > "23:30") E.push("الوقت خارج ساعات الدروس المعتادة"); }
+  if (g("p-pray") === "بعد صلاة الجمعة" && dOf(date).getDay() !== 5) E.push("«بعد صلاة الجمعة» والتاريخ ليس يوم جمعة");
+  return E; }
+const _pIssue95 = permitIssue;
+permitIssue = async function(){ const E = pGate(); if (E.length) { if (!window.PBULK) toast("دقّق قبل الإصدار: " + E[0] + (E.length > 1 ? ` (+${E.length - 1})` : "")); return null; } return _pIssue95.apply(this, arguments); };
+
+/* v96: PDF لبيانات الطلب لإرفاقه بالكتاب الموجه لإدارة المساجد */
+async function rqPdf(id){ const r = S.reqs.find(x => x.id === id); if (!r) return; const d = r.data || {}, acts = d.acts || [];
+  const box = document.createElement("div"); box.dir = "rtl"; box.style.cssText = "position:fixed;left:-9999px;top:0;width:760px;background:#fff;color:#111;font-family:Tajawal,Cairo,Arial,sans-serif;padding:28px;line-height:1.8;font-size:14px";
+  const row = (k, v) => v ? `<tr><td style="border:1px solid #999;padding:5px 8px;background:#e8f3ec;width:150px;font-weight:700">${k}</td><td style="border:1px solid #999;padding:5px 8px">${esc(v)}</td></tr>` : "";
+  box.innerHTML = `<h2 style="text-align:center;color:#006C35;margin:0 0 4px">بيانات طلب نشاط</h2><div style="text-align:center;margin-bottom:12px">رقم الطلب ${esc(rqNo ? rqNo(r) : "")} · ${esc(fmt(d.date || (r.created_at || "").slice(0, 10)))}</div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:14px">${row("الجهة الطالبة", d.org)}${row("الجالية", d.comm)}${row("المنسق", d.coord)}${row("الهاتف", d.phone)}${row("الموضوع", d.subj)}</table>
+  ${acts.map((a, i) => `<table style="width:100%;border-collapse:collapse;margin-bottom:12px"><tr><td colspan="2" style="background:#006C35;color:#fff;padding:5px 8px;font-weight:700">النشاط ${i + 1}</td></tr>${row("النوع", a.type)}${row("عنوان الدرس", a.title)}${row("النبذة", a.summary)}${row("المسجد", a.mosRaw || a.mosque)}${row("المحافظة", a.gov)}${row("الأيام", (a.days || []).join("، "))}${row("الوقت", a.time)}${row("المحاضر", a.lect)}${row("اعتماد المحاضر", a.lectOk)}</table>`).join("")}
+  ${d.notes ? `<p><b>ملاحظات:</b> ${esc(d.notes)}</p>` : ""}`;
+  document.body.appendChild(box); toast("يجهّز PDF…");
+  try { await loadScript("https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    const cv = await html2canvas(box, { scale:2, backgroundColor:"#ffffff", logging:false }); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
+    const W = 210, H = 297, m = 8, pw = W - 2 * m, ph = cv.height * pw / cv.width, pageH = H - 2 * m; let y = 0;
+    while (y < ph) { if (y) pdf.addPage(); const sh = Math.min(pageH, ph - y), c2 = document.createElement("canvas"); c2.width = cv.width; c2.height = Math.ceil(sh * cv.width / pw); c2.getContext("2d").drawImage(cv, 0, Math.floor(y * cv.width / pw), cv.width, c2.height, 0, 0, cv.width, c2.height); pdf.addImage(c2.toDataURL("image/jpeg", .92), "JPEG", m, m, pw, sh); y += pageH; }
+    const f = new File([pdf.output("blob")], `Request-${String(r.no || id).replace(/[^A-Za-z0-9-]/g, "") || "req"}.pdf`, { type:"application/pdf" });
+    const u = URL.createObjectURL(f), a = document.createElement("a"); a.href = u; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 8000); toast("تم تنزيل PDF الطلب");
+  } catch (e) { toast("تعذر إنشاء PDF"); } finally { box.remove(); } }
+const _reqForm96 = reqForm;
+reqForm = async function(id){ await _reqForm96(id); if (S.form?.id !== id) return; const f = $(".drawer-f"); if (f && !f.querySelector("[data-rqpdf]")) f.insertAdjacentHTML("afterbegin", `<button type="button" class="btn" data-rqpdf="${id}">${icon("i-doc")} تحميل PDF للطلب</button>`); };
+document.addEventListener("click", ev => { const b = ev.target.closest("[data-rqpdf]"); if (b) { ev.preventDefault(); rqPdf(b.dataset.rqpdf); } });
