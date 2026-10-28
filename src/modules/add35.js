@@ -28,7 +28,7 @@ S.wqOut = null;
 const _letterData36 = letterData;
 letterData = function(src){ const L = _letterData36(src); if (L && !L.coord) { const c = S.comms.find(x => x.name === L.comm); L.coord = c?.coord || S.coords.find(x => x.comm === L.comm && (x.role || "منسق") === "منسق")?.name || ""; } return L; };
 const WO_ST = { pending:["بانتظار وثيقة", "warn"], working:["جارٍ الحفظ", "warn"], drafted:["حُفظت مسودة في وثيقة ✓", "ok"], failed:["تعذّر، راجعه", "bad"], cancelled:["أُلغي", ""] };
-async function woLoad(){ const { data } = await sb.from("watheqa_outbox").select("id,no,gov,to_whom,subj,status,result,created_by,created_at,done_at").order("created_at", { ascending:false }).limit(60); S.wqOut = data || []; if (S.view === "watheqa") render(); }
+async function woLoad(){ const { data } = await sb.from("watheqa_outbox").select("id,no,gov,to_whom,subj,status,result,created_by,created_at,done_at,src").order("created_at", { ascending:false }).limit(60); S.wqOut = data || []; if (S.view === "watheqa") render(); }
 function woGate(src){ const L = letterData(src); if (!L) return ["لا توجد بيانات"]; const m = [];
   if (!L.coord) m.push("اسم المنسق"); if (L.acts.some(a => !a.mosque)) m.push("مسجد غير مسجل في النظام"); if (L.acts.some(a => !a.time)) m.push("وقت النشاط"); if (L.acts.some(a => !a.daily && !(a.days || []).length)) m.push("أيام النشاط"); if (L.acts.some(a => !(a.gov || mosBy[a.mosque]?.gov))) m.push("المحافظة"); return m; }
 const _letterOpen36 = letterOpen;
