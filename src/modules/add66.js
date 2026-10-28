@@ -75,3 +75,7 @@ const autoLinkRun = (() => { let busy = false, last = 0;
     if (done.length) { try { toast(`ربط تلقائي: ${done.length} عنصر`); } catch (_) {} } };
 })();
 setInterval(() => { try { autoLinkRun(); } catch (_) {} }, 30000); setTimeout(() => { try { autoLinkRun(); } catch (_) {} }, 9000);
+
+/* v93 — الكتب المرسلة تلقائياً لوثيقة: تنبيه في الأولويات ما دام فيها شيء بانتظار الحفظ */
+const _prio93 = priorities;
+priorities = function(){ const P = _prio93(); const n = (S.wqOut || []).filter(o => o.status === "pending" || o.status === "working").length; if (S.canWrite && n) P.push({ w:80, k:"gold", t:`${n} كتاب بانتظار الحفظ التلقائي في وثيقة`, s:"اتركه ليكمل أو ألغِ إرساله", act:{ go:"watheqa", l:"عرض" } }); return P.sort((a, b) => b.w - a.w); };
