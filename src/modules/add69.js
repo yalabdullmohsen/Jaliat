@@ -13,3 +13,6 @@ reqForm = async function(id){ await _reqForm99(id); const r = S.reqs.find(x => x
   box.innerHTML = `<b>استبدال خطيب مؤقت</b><div class="sb-g"><span class="s">المسجد</span><b>${esc(a.mosque || "—")}</b><span class="s">الخطيب الأساسي</span><b>${esc(a.khatib || "—")}</b><span class="s">البديل المؤقت</span><b>${esc(a.sub || "—")}${wa ? ` · <bdi dir="ltr">${esc(a.subPhone)}</bdi>` : ""}</b><span class="s">السبب</span><b>${esc(a.reason || "—")}</b><span class="s">عدد الجمع</span><b>${F.length} جمعة${F.length ? `، من ${fmt(F[0])} إلى ${fmt(F[F.length - 1])}` : ""}</b></div>${frGroup(F)}`;
   $("#rq-subj")?.closest("label, .fl, div")?.insertAdjacentElement("beforebegin", box); };
 NEWF.splice(1, 0, ["v99-subst", "nav:inbox", "طلب استبدال خطيب مؤقت من البوابة", "المنسق يحدد المسجد والخطيب الأساسي والبديل ويختار الجمع بالتواريخ عبر عدة أشهر، ويصلك الطلب في «طلبات المنسقين» بكل جمعة مفصلة.", false, "2026-10-28"]);
+
+/* تنظيف بقايا «بصمة إنجاز» المحذوفة من المتصفح */
+try { Object.keys(localStorage).filter(k => /basma|بصمة/i.test(k)).forEach(k => localStorage.removeItem(k)); } catch (_) {}
