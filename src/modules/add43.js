@@ -55,7 +55,7 @@ function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, e
   return `<div class="sr-pf${ok === false ? " bad" : ok ? " ok" : ""}">
     <div><span>التاريخ</span><b>${kwD(st)}</b></div><div><span>بدأ التسجيل</span><b class="num">${kwT(st)}</b></div><div><span>انتهى</span><b class="num">${kwT(en)}</b></div>
     <div><span>المدة</span><b class="num">${mmss2(r.secs)}</b></div><div><span>وصل للقسم</span><b class="num">${kwT(p.sent || r.created_at)}</b></div>
-    <div><span>سجّله</span><b>${esc(p.by || "—")}</b></div>
+    <div><span>سجّله</span><b>${esc(p.by || "—")}</b></div>${p.civil ? `<div><span>الرقم المدني</span><b class="num">${esc(p.civil)}</b></div>` : ""}${p.phone ? `<div><span>الهاتف</span><b class="num"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a></b></div>` : ""}${r.mosque ? `<div><span>المسجد</span><b>${esc(r.mosque)}</b></div>` : ""}
     <p>${ok === null ? "سُجّل قبل تفعيل الضوابط الصارمة" : `${ok ? "✓" : "⚠"} تسجيل مباشر من البوابة، بلا إرفاق ملف${rule ? "، " + rule : ""}${ok === false ? " — خارج الوقت المسموح" : ""}`}</p></div>`; }
 function vSermRec(){ const f = S.f.srf || "all", L = S.srecs.filter(r => f === "all" || (f === "new" ? !r.reviewed_at : f === "flag" ? r.flags && !/لا ملاحظات/.test(r.flags) : f === "off" ? r.adherence && r.adherence !== "ملتزم" : true));
   const wk = S.srecs.some(r => r.status === "waiting_key");
