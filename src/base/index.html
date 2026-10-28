@@ -929,7 +929,7 @@ function applyRole(){
 /* ---------------- people, users & audit ---------------- */
 const whoName = id => { const p = S.profiles.find(x => x.id === id); return p ? (p.name || p.username) : "—"; };
 const whoTitle = id => S.profiles.find(x => x.id === id)?.title || "";
-const TITLES_SUG = ["رئيس القسم","مراقب","باحث دراسات","باحث","منسق جاليات","موظف إداري","مدخل بيانات"];
+const TITLES_SUG = ["مدير إدارة العلاقات الخارجية","مدير إدارة","رئيس القسم","مراقب","باحث دراسات","باحث","منسق جاليات","موظف إداري","مدخل بيانات"];
 const fmtTime = iso => { if (!iso) return ""; const d = new Date(iso); return `${fmt(isoOf(d))} ${d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true}).replace("AM","ص").replace("PM","م")}`; };
 function vUsers(){
   const rc = {admin:"gold", editor:"ok", viewer:""};
