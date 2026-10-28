@@ -277,24 +277,22 @@ acts.map(actHTML).join("")+'<button type="button" class="btn o" id="add">+ إض�
 
 
 /* استبدال خطيب مؤقت: الجمع تُحدَّد بالتواريخ، ويختار المنسق كم جمعة (حتى 30) عبر عدة أشهر */
-let SB={from:"",to:"",sel:[]};
+let SB={sel:[]};
 const FR_MAX=30,arM=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
-const nextFri=()=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+((5-d.getDay()+7)%7||7));return iso(d)};
-function frList(){const a=SB.from,b=SB.to;if(!a||!b||b<a)return[];const r=[],d=new Date(a+"T12:00:00"),z=new Date(b+"T12:00:00");d.setDate(d.getDate()+((5-d.getDay()+7)%7));while(d<=z&&r.length<60){r.push(iso(d));d.setDate(d.getDate()+7)}return r}
-function frHTML(){const L=frList();if(!SB.from||!SB.to)return'<p class="note">'+_t("حدّدوا تاريخ البداية والنهاية لتظهر الجمع")+'</p>';if(!L.length)return'<p class="note">'+_t("لا توجد جمعة في هذه الفترة")+'</p>';
- const by={};L.forEach(x=>{(by[x.slice(0,7)]=by[x.slice(0,7)]||[]).push(x)});
- return'<div style="display:flex;gap:8px;margin-bottom:8px"><button type="button" class="btn o" data-frall="1">'+_t("تحديد الكل")+'</button><button type="button" class="btn o" data-frclr="1">'+_t("إلغاء التحديد")+'</button></div>'+Object.keys(by).map(m=>'<div style="margin-bottom:10px"><b>'+_t(arM[+m.slice(5)-1])+' '+m.slice(0,4)+'</b><div class="days" style="flex-wrap:wrap">'+by[m].map(x=>'<button type="button" data-fri="'+x+'" class="'+(SB.sel.includes(x)?"on":"")+'">'+(+x.slice(8))+'</button>').join("")+'</div></div>').join("")}
+function frMonths(){const r=[],t=new Date();t.setHours(12,0,0,0);for(let i=0;i<6;i++){const y=new Date(t.getFullYear(),t.getMonth()+i,1,12),m=y.getMonth(),L=[];for(let d=new Date(y);d.getMonth()===m;d.setDate(d.getDate()+1)){if(d.getDay()===5&&d>t)L.push(iso(d))}r.push({k:y.getFullYear()+"-"+String(m+1).padStart(2,"0"),t:_t(arM[m])+" "+y.getFullYear(),L})}return r.filter(x=>x.L.length)}
+function frList(){return frMonths().flatMap(x=>x.L)}
+function frHTML(){return frMonths().map(m=>'<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>'+m.t+'</b><button type="button" class="link" data-frm="'+m.k+'">'+_t("كل جمع الشهر")+'</button></div><div class="days" style="flex-wrap:wrap">'+m.L.map(x=>'<button type="button" data-fri="'+x+'" class="'+(SB.sel.includes(x)?"on":"")+'">'+(+x.slice(8))+'</button>').join("")+'</div></div>').join("")}
 function frCount(){const n=SB.sel.length;return n?_t("{0} جمعة محددة",n)+(n>FR_MAX?" · "+_t("الحد الأقصى {0}",FR_MAX):""):_t("لم تُحدَّد أي جمعة")}
-function vSubst(){if(!SB.from){SB.from=nextFri();}
-return'<form data-form="subst" style="display:grid;gap:12px"><div class="card pad note-card"><div class="tx"><b>استبدال خطيب مؤقت</b><span>• حدّدوا الجمع بالتواريخ، ويمكن لعدة أشهر.<br>• أرفقوا السيرة الذاتية للخطيب البديل إن لم يكن معتمداً من الوزارة.</span></div></div><div class="card pad"><div class="seg">'+[["جديد","نشاط جديد"],["تجديد","تجديد موافقة"],["استبدال","استبدال خطيب"]].map(([k,t])=>'<button type="button" data-kind="'+k+'" class="'+(kind===k?"on":"")+'">'+t+'</button>').join("")+'</div>'+
+function vSubst(){
+return'<form data-form="subst" style="display:grid;gap:12px"><div class="card pad note-card"><div class="tx"><b>استبدال خطيب مؤقت</b><span>• اختاروا جمع كل شهر تحتاجون فيه البديل، ويمكن لعدة أشهر.<br>• أرفقوا السيرة الذاتية للخطيب البديل إن لم يكن معتمداً من الوزارة.</span></div></div><div class="card pad"><div class="seg">'+[["جديد","نشاط جديد"],["تجديد","تجديد موافقة"],["استبدال","استبدال خطيب"]].map(([k,t])=>'<button type="button" data-kind="'+k+'" class="'+(kind===k?"on":"")+'">'+t+'</button>').join("")+'</div>'+
 field("المسجد",'<input id="sb-m" placeholder="اسم المسجد كما هو">')+field("اسم الخطيب الأساسي (الغائب)",'<input id="sb-o">')+
 field("اسم الخطيب البديل المؤقت",'<input id="sb-n">')+field("هاتف البديل",'<input id="sb-p" type="tel" inputmode="tel" dir="ltr">',1)+field("سبب الاستبدال",'<select id="sb-r"><option>سفر</option><option>مرض</option><option>ظرف خاص</option><option>أخرى</option></select>')+'</div>'+
-'<div class="card pad"><b>'+_t("الجمع المطلوبة")+'</b><div class="g2">'+field("من تاريخ",'<input id="sb-f" type="date" value="'+SB.from+'">')+field("إلى تاريخ",'<input id="sb-t" type="date" value="'+SB.to+'">')+'</div><div id="sb-l">'+frHTML()+'</div><p class="note" id="sb-c" style="margin-top:8px"><b>'+frCount()+'</b></p></div>'+
+'<div class="card pad"><b>'+_t("الجمع المطلوبة")+'</b><p class="note" style="margin:4px 0 10px">'+_t("اضغطوا على رقم الجمعة، أو «كل جمع الشهر»")+'</p><div id="sb-l">'+frHTML()+'</div><p class="note" id="sb-c" style="margin-top:8px"><b>'+frCount()+'</b></p></div>'+
 '<div class="card pad">'+field("ملاحظات",'<textarea id="nt" rows="3" placeholder="أي تفاصيل تساعد القسم"></textarea>',1)+attBox()+errBox("er")+'<button class="btn p" type="submit">إرسال الطلب</button><p class="note">يصل الطلب لقسم الجاليات مباشرة، وتتابعون حالته من الرئيسية.</p></div></form>'}
 function frRedraw(){const l=$("sb-l"),c=$("sb-c");if(l)l.innerHTML=frHTML();if(c)c.innerHTML='<b>'+frCount()+'</b>'}
-document.addEventListener("change",x=>{const t=x.target;if(t.id==="sb-f"||t.id==="sb-t"){SB[t.id==="sb-f"?"from":"to"]=t.value;SB.sel=SB.sel.filter(d=>frList().includes(d));frRedraw()}});
 document.addEventListener("click",x=>{const t=x.target.closest("button");if(!t)return;if(t.dataset.fri){const d=t.dataset.fri;SB.sel=SB.sel.includes(d)?SB.sel.filter(y=>y!==d):[...SB.sel,d].sort();t.classList.toggle("on");const c=$("sb-c");if(c)c.innerHTML='<b>'+frCount()+'</b>'}
- else if(t.dataset.frall){SB.sel=frList().slice(0,FR_MAX);frRedraw()}else if(t.dataset.frclr){SB.sel=[];frRedraw()}});
+ else if(t.dataset.frm){const L=(frMonths().find(m=>m.k===t.dataset.frm)||{L:[]}).L,all=L.every(d=>SB.sel.includes(d));SB.sel=(all?SB.sel.filter(d=>!L.includes(d)):[...new Set([...SB.sel,...L])]).sort();const y=scrollY;frRedraw();scrollTo(0,y)}});
+
 /* أنشطتي */
 function vActs(){const L=I.acts||[];
 return'<div class="hello"><h1>أنشطة الجالية</h1><p>'+_t("{0} نشاط مسجّل لدى القسم",L.length)+'</p></div>'+(L.length?'<div class="card list">'+L.map(a=>{const d=a.end?left(a.end):null;
