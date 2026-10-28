@@ -36,7 +36,7 @@ const _vRenew49 = vRenew;
 vRenew = function(){ const h = _vRenew49(); const A = [...S.renewAns.values()].filter(r => { const d = docBy[r.doc_no]; return d && d.end >= addDays(TODAY, -30); }).sort((a, b) => b.at.localeCompare(a.at));
   if (!A.length) return h;
   const box = `<div class="panel ra-p"><div class="panel-h"><h3>ردود المنسقين على التجديد</h3><span class="chip">${A.length}</span></div><div class="list">${A.map(r => { const d = docBy[r.doc_no];
-    return `<div class="li"><span class="t"><b>${esc(r.comm || d?.comm || "")}</b> · الموافقة ${esc(r.doc_no)} تنتهي ${fmt(d?.end)}${r.note ? `<br><span class="s">${esc(r.note)}</span>` : ""}</span><span class="chip ${r.answer === "نعم" ? "ok" : "bad"}">${r.answer === "نعم" ? "نستمر" : "لا نستمر"}</span>${r.answer === "نعم" && S.canWrite ? `<button type="button" class="btn btn-primary" data-letter="renew:${esc(r.doc_no)}">تجهيز كتاب التجديد</button>` : ""}</div>`; }).join("")}</div></div>`;
+    return `<div class="li"><span class="t"><b>${esc(r.comm || d?.comm || "")}</b> · الموافقة ${esc(r.doc_no)} تنتهي ${fmt(d?.end)}${r.note ? `<br><span class="s" style="white-space:pre-line">${esc(r.note)}</span>` : ""}</span><span class="chip ${r.answer === "نعم" ? "ok" : "bad"}">${r.answer === "نعم" ? "نستمر" : "لا نستمر"}</span>${r.answer === "نعم" && S.canWrite ? `<button type="button" class="btn btn-primary" data-letter="renew:${esc(r.doc_no)}">تجهيز كتاب التجديد</button>` : ""}</div>`; }).join("")}</div></div>`;
   return box + h; };
 
 /* ---------- (5) lessons confirmed by the imam's scan ---------- */
