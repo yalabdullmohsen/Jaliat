@@ -124,6 +124,6 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
   t.disabled = true; t.textContent = "جارٍ الاعتماد…"; await wqApproveGo(); if (!docBy[w.no]) { t.disabled = false; t.textContent = "اعتماد وإبلاغ المنسق"; return; }
   const c = S.coords.find(k => k.comm === comm && k.phone && (k.role || "منسق") === "منسق") || S.coords.find(k => k.comm === comm && k.phone); if (!c) return toast("سُجّلت الموافقة، ولا يوجد رقم للمنسق");
   waGo(c.phone, wqMsg(w, "موافقة", c), null, c.name);
-  const { data } = await sb.from("wq_notify").insert({ wq_id:w.id, outcome:"موافقة", coord:c.name, phone:waNum(c.phone), comm }).select().single(); if (data) S.wqn?.set(w.id, data); }, true);
+  toast("أرسل الرسالة ثم علّم «تم الإبلاغ» من الكتاب"); }, true);
 
 NEWF.splice(1, 0, ["v62-guide", "nav:guide", "الدليل: شرح كل صفحة على الشاشة", "زر «📘 دليل الصفحة» أعلى كل صفحة يشرحها خطوة بخطوة بأسهم على الشاشة، وعلامة «؟» بجانب كل جزء، وصفحة «الدليل» فيها كل الشروحات. واعتماد موافقة وثيقة وإبلاغ المنسق صار بضغطة واحدة.", false, "2026-10-21"]);

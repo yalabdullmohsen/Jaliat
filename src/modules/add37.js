@@ -37,12 +37,17 @@ function wqNotifyBox(w){ const oc = wqOutcome(w) || "ملاحظات", L = wqCoor
     ${fld("wn-c", "المنسق", `<select class="f" id="wn-c">${L.sure ? "" : `<option value="" selected>— اختر المنسق (لم يتضح من الكتاب) —</option>`}${L.map((c, i) => `<option value="${i}"${L.sure && !i ? " selected" : ""}>${i < L.hit ? "★ " : ""}${esc(c.name)}، ${esc(c.comm || c.lang || "")}${c.role && c.role !== "منسق" ? " (" + esc(c.role) + ")" : ""}</option>`).join("")}</select>`)}
     <div id="wn-why-w" ${oc === "موافقة" ? "hidden" : ""}>${fld("wn-why", "السبب / الملاحظات (اختياري)", `<textarea class="f" id="wn-why" rows="2"></textarea>`)}</div>
     ${fld("wn-t", "نص الرسالة", `<textarea class="f" id="wn-t" rows="9">${esc(wqMsg(w, oc, L.sure ? L[0] : null))}</textarea>`)}
-    <button type="button" class="btn btn-ok" data-wnsend>📲 إبلاغ المنسق بالواتساب</button></div>`; }
+    <button type="button" class="btn btn-ok" data-wnsend>📲 إبلاغ المنسق بالواتساب</button>${n ? `<button type="button" class="btn btn-ghost" data-wnunmark="${esc(w.id)}">إلغاء علامة «أُبلغ»</button>` : `<button type="button" class="btn" data-wnmark="${esc(w.id)}">✓ تم الإبلاغ (أعلّمها أنا)</button>`}</div>`; }
 function wnRefresh(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[wnIdx()]; $("#wn-t").value = wqMsg(w, S.wqF.oc, c, $("#wn-why")?.value.trim()); const ww = $("#wn-why-w"); if (ww) ww.hidden = S.wqF.oc === "موافقة"; }
 async function wnSend(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[wnIdx()]; if (!c) return toast("اختر المنسق أولاً");
   waGo(c.phone, $("#wn-t").value, null, c.name);
-  const { data, error } = await sb.from("wq_notify").insert({ wq_id:w.id, outcome:S.wqF.oc, coord:c.name, phone:waNum(c.phone), comm:c.comm || null }).select().single(); if (error) return writeFail(error);
-  S.wqn.set(w.id, data); toast(`أُبلغ ${c.name} ✓`); wqForm(w.id); }
+  toast("بعد ما ترسل في واتساب اضغط «تم الإبلاغ» لتعلّمها"); }
+/* العلامة يضعها المستخدم بنفسه فقط، النظام لا يعرف هل أُرسلت الرسالة فعلاً */
+async function wnMark(id, byForm){ const w = S.wq.find(x => x.id === id); if (!w) return; const c = wqCoords(w)[byForm ? wnIdx() : 0]; if (!c) return toast("اختر المنسق أولاً");
+  const { data, error } = await sb.from("wq_notify").insert({ wq_id:w.id, outcome:(byForm && S.wqF?.oc) || wqOutcome(w) || "ملاحظات", coord:c.name, phone:waNum(c.phone), comm:c.comm || null }).select().single(); if (error) return writeFail(error);
+  S.wqn.set(w.id, data); toast(`عُلِّم: أُبلغ ${c.name} ✓`); if (byForm) wqForm(w.id); else render(); }
+async function wnUnmark(id){ const { error } = await sb.from("wq_notify").delete().eq("wq_id", id); if (error) return writeFail(error); S.wqn.delete(id); toast("أُلغيت علامة الإبلاغ"); wqForm(id); }
+document.addEventListener("click", ev => { const m = ev.target.closest("[data-wnmark],[data-wnmk],[data-wnunmark]"); if (!m) return; ev.preventDefault(); ev.stopPropagation(); if (m.dataset.wnunmark) return wnUnmark(m.dataset.wnunmark); wnMark(m.dataset.wnmark || m.dataset.wnmk, !!m.dataset.wnmark); }, true);
 
 const _wqForm37 = wqForm;
 wqForm = function(id){ _wqForm37(id); const w = S.wq.find(x => x.id === id); if (!w) return;
@@ -76,8 +81,7 @@ NEWF.splice(1, 0, ["v37-wn", "nav:watheqa", "إبلاغ المنسق برد وث
 async function wnQuick(id){ const w = S.wq.find(x => x.id === id); if (!w) return; const c = wqCoords(w)[0]; if (!c) return wqForm(id);
   const oc = wqOutcome(w) || "ملاحظات";
   waGo(c.phone, wqMsg(w, oc, c), null, c.name);
-  const { data, error } = await sb.from("wq_notify").insert({ wq_id:w.id, outcome:oc, coord:c.name, phone:waNum(c.phone), comm:c.comm || null }).select().single(); if (error) return writeFail(error);
-  S.wqn.set(w.id, data); toast(`الرسالة جاهزة لـ ${c.name}، اضغط إرسال في واتساب`); }
+  toast(`الرسالة جاهزة لـ ${c.name}، أرسلها ثم اضغط ✓ تم`); }
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wnq]"); if (!t) return; ev.preventDefault(); ev.stopPropagation(); wnQuick(t.dataset.wnq); }, true);
 const _wqForm44 = wqForm;
 wqForm = function(id){ _wqForm44(id); const w = S.wq.find(x => x.id === id); if (w && S.canWrite && typeof wqNeeds === "function" && wqNeeds(w)) setTimeout(() => { const b = $("#wn"); if (b) { b.scrollIntoView({ behavior:"smooth", block:"start" }); b.classList.add("wn-hot"); } }, 150); };
