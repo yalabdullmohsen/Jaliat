@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "جسر إنجاز (Copilot وواتساب)",
   "short_name": "Jaliyat Copilot",
-  "version": "2.4.0",
-  "description": "يعرض Microsoft 365 Copilot وواتساب ويب داخل نظام «إنجاز». يتحدّث إعداداته تلقائياً من النظام.",
+  "version": "2.5.0",
+  "description": "يعرض Copilot وواتساب داخل «إنجاز»، وينفّذ كتب «إنجاز» داخل وثيقة بجلسة الموظف نفسه.",
   "permissions": [
     "declarativeNetRequest"
   ],
@@ -24,7 +24,9 @@
     "https://*.msecnd.net/*",
     "https://*.azureedge.net/*",
     "https://*.whatsapp.com/*",
-    "https://*.whatsapp.net/*"
+    "https://*.whatsapp.net/*",
+    "https://watheqa.awqaf.gov.kw/*",
+    "https://*.supabase.co/*"
   ],
   "background": {
     "service_worker": "sw.js"
@@ -48,6 +50,15 @@
         "copilot.js"
       ],
       "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://watheqa.awqaf.gov.kw/*"
+      ],
+      "js": [
+        "wq.js"
+      ],
       "run_at": "document_idle"
     }
   ],
