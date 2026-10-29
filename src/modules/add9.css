@@ -253,7 +253,6 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .pr-go{box-shadow:0 0 0 4px var(--gold-soft);animation:prg 1.4s ease 2}@keyframes prg{50%{box-shadow:0 0 0 8px var(--gold-soft)}}
 .pd-days{display:flex;flex-wrap:wrap;gap:6px}.pd-d{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:13px;color:var(--ink);cursor:pointer}.pd-d.on{background:var(--primary);color:#fff;border-color:var(--primary)}
 /* name stamp: a rectangle under the signature, not a small circle */
-.pm-sig i{width:150px;height:72px}.pm-sig i.r{width:200px;height:84px;border:0;border-radius:0}.pm-sig i.r:empty{border:1px dashed #9fb5a8;border-radius:8px}
 
 .ib-iss{display:block;font:600 11px/1.4 inherit;color:#A63F33;margin-top:2px;white-space:normal}
 @media print{.ib-iss{display:none}}

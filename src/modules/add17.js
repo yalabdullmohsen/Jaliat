@@ -139,6 +139,11 @@ async function permitIssue(){
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
   S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id);
 }
+/* عنوان الدرس: يُستبعد ما ليس عنواناً (موضوع الكتاب أو نوع النشاط) ويُكتب «أمور عامة» عند غياب العنوان */
+const permitTopic = t => { t = String(t || "").replace(/\s+/g, " ").trim(); return !t || /^(طلب|موافقة|كتاب)(\s|$|[\(:\-–])/.test(t) || /(تجديد|إقامة|اقامة|إيقاف|تعديل)\s+(دروس|أنشطة|انشطة|نشاط)/.test(t) || /^(درس|دروس|محاضرة|دورة|نشاط)$/.test(t) ? "أمور عامة" : t; };
+/* التصريح ورقة A4 بعرض ثابت (794px) كما تُطبع وتُرسل PDF؛ على الشاشة تُصغَّر لتناسب العرض دون تغيير التنسيق */
+function fitPermit(){ const el = $("#permit-paper"); if (!el || el.closest("#permit-print")) return; const b = el.closest(".drawer-b") || el.parentElement, cs = getComputedStyle(b), w = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 24; el.style.zoom = w > 0 ? Math.min(1, w / 794).toFixed(3) : 1; }
+window.addEventListener("resize", () => { try { fitPermit(); } catch (_) {} });
 async function permitView(id){
   const p = S.permits.find(x => x.id === id); if (!p) return; await loadQR().catch(() => {});
   const d = p.data || {}, [st, c] = pStatus(p), url = VERIFY(`${p.id}.${p.code}`);
@@ -147,18 +152,21 @@ async function permitView(id){
   S.form = { kind:"permitv", id };
   openDrawer(`التصريح \u2066${p.no}\u2069`, `<div class="check ${c === "ok" ? "ok" : "warn"}"><b>${st}</b><span>حتى ${fmt(p.until)} · رمز التحقق ${p.code.slice(0, 4)}-${p.code.slice(4)}</span></div>
     <div class="permit-wrap"><div class="permit print-area" id="permit-paper">
-      <div class="pm-h"><div class="pm-org"><span>دولة الكويت</span><b>وزارة الشؤون الإسلامية</b><span>إدارة العلاقات الخارجية</span><span>قسم الجاليات ورعاية المهتدين وطلبة البعوث</span></div>
-        <div class="pm-meta"><span><b>رقم التصريح:</b> <bdi dir="ltr">${esc(p.no)}</bdi></span><span><b>تاريخ الإصدار:</b> ${fmt(p.issued_at.slice(0, 10))}</span><span><b>الموافق:</b> ${esc(H.format(new Date(p.issued_at)))}</span></div></div>
-      <h2 class="pm-title">تصريح إلقاء درس</h2><p class="pm-sub">يُبرَز لإمام المسجد عند إقامة الدرس</p>
+      <div class="pm-h"><img class="pm-logo" src="brand/kw-logo.png" alt="شعار دولة الكويت" crossorigin="anonymous"><div class="pm-org"><span class="pm-st gold">دولة الكويت</span><b class="gold">وزارة الشؤون الإسلامية</b><span>إدارة العلاقات الخارجية</span><strong>قسم الجاليات ورعاية المهتدين وطلبة البعوث</strong></div><img class="pm-logo2" src="brand/kw-new.png" alt="شعار الكويت الجديدة" crossorigin="anonymous"></div>
+      <div class="pm-rule"></div>
+      <div class="pm-meta"><div><span>رقم التصريح</span><b dir="ltr">${esc(p.no)}</b></div><div><span>تاريخ الإصدار</span><b>${fmt(p.issued_at.slice(0, 10))}</b></div><div><span>الموافق</span><b>${esc(H.format(new Date(p.issued_at)))}</b></div></div>
+      <div class="pm-ttl"><h2 class="pm-title gold">تصريح إلقاء درس</h2><div class="pm-sub">يُبرِز لإمام المسجد عند إقامة الدرس</div></div>
       <p class="pm-lead">تُصرِّح إدارة العلاقات الخارجية (قسم الجاليات ورعاية المهتدين وطلبة البعوث) لفضيلة الشيخ / <strong data-pf="sheikh">${esc(d.sheikh)}</strong> بإلقاء درس في <strong data-pf="mosque">${esc(d.mosque)}</strong>، وفق البيانات الموضحة أدناه.</p>
-      <table class="pm-t"><tr><th>اسم الشيخ</th><td data-pf="sheikh">${esc(d.sheikh)}</td></tr><tr><th>المسجد</th><td data-pf="mosque">${esc(d.mosque)}</td></tr>${d.topic ? `<tr><th>عنوان الدرس</th><td data-pf="topic">${esc(d.topic)}</td></tr>` : ""}${d.lang ? `<tr><th>لغة الدرس</th><td data-pf="lang">${esc(d.lang)}</td></tr>` : ""}<tr><th>التاريخ</th><td data-pd="date">${DAYS[dOf(d.date).getDay()]} ${fmt(d.date)}، ${esc(H.format(dOf(d.date)))}</td></tr><tr><th>الوقت</th><td data-pf="time">${esc(d.time || "")}</td></tr>${d.note ? `<tr><th>ملاحظات</th><td data-pf="note">${esc(d.note)}</td></tr>` : ""}</table>
+      <table class="pm-t"><tr><th>اسم الشيخ</th><td data-pf="sheikh">${esc(d.sheikh)}</td></tr><tr><th>المسجد</th><td data-pf="mosque">${esc(d.mosque)}</td></tr><tr><th>عنوان الدرس</th><td data-pf="topic">${esc(permitTopic(d.topic))}</td></tr>${d.lang ? `<tr><th>لغة الدرس</th><td data-pf="lang">${esc(d.lang)}</td></tr>` : ""}<tr><th>التاريخ</th><td data-pd="date">${DAYS[dOf(d.date).getDay()]} ${fmt(d.date)}، ${esc(H.format(dOf(d.date)))}</td></tr><tr><th>الوقت</th><td data-pf="time">${esc(d.time || "")}</td></tr>${d.note ? `<tr><th>ملاحظات</th><td data-pf="note">${esc(d.note)}</td></tr>` : ""}</table>
       <div class="pm-valid"><div><span>مدة التصريح</span><b>${esc(d.dur || "")}</b></div><div><span>ينتهي العمل به</span><b data-pd="until">${fmt(p.until)}، 11:59 م</b></div></div>
       <p class="pm-note">يُعدّ هذا التصريح رسمياً ونافذاً خلال مدته فقط ويُلغى تلقائياً بانتهائها. على إمام المسجد مسح الباركود للتحقق الفوري من صحته وصلاحيته عبر نظام «إنجاز».</p>
       <div class="pm-bottom"><div class="pm-appr"><span>اعتماد رئيس قسم الجاليات ورعاية المهتدين وطلبة البعوث</span><b data-pf="head">${esc(d.head || "")}</b>
-        <div class="pm-sig"><div><i>${S.pAssets.sig ? `<img src="${S.pAssets.sig}" alt="">` : ""}</i>التوقيع</div><div><i class="r">${S.pAssets.stamp ? `<img src="${S.pAssets.stamp}" alt="">` : ""}</i>الختم</div></div></div>
+        <div class="pm-sig"><div><i>${S.pAssets.sig ? `<img src="${S.pAssets.sig}" alt="">` : "موضع التوقيع"}</i></div><div><i class="r">${S.pAssets.stamp ? `<img src="${S.pAssets.stamp}" alt="">` : "موضع الختم"}</i></div></div></div>
         <div class="pm-qr">${qr}<span>امسح للتحقق</span><b dir="ltr">${p.code.slice(0, 4)}-${p.code.slice(4)}</b></div></div>
+      <div class="pm-bar"></div>
     </div></div>`,
     `<button class="btn btn-primary" data-pprint>طباعة / PDF</button><button class="btn" data-pwa="${p.id}">${icon("i-wa")} إرسال</button>${S.admin && !p.revoked ? `<button class="btn btn-ghost bad-t" data-prevoke="${p.id}">إلغاء التصريح</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
+  fitPermit();
 }
 function assetsForm(){
   if (!S.admin) return; S.form = { kind:"passets" };
