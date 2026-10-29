@@ -52,3 +52,7 @@ button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transpa
 .tabbar{grid-template-columns:repeat(5,minmax(0,1fr))}
 .tabbar button{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 @media(max-width:520px){:root .top .finder{flex:0 0 38px;width:38px;padding-inline:0;justify-content:center}:root .top .finder span,:root .top .finder kbd{display:none}}
+/* الجوال: ٧ أزرار في الشريط العلوي (قائمة، بحث، دليل، تحديث، إرفاق، تنبيهات) → أزرار أصغر وفراغ أقل ليتسع عنوان الصفحة كاملاً */
+@media(max-width:520px){:root .top{gap:4px;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+:root .top>button:not(#add-act){width:36px;min-width:36px;height:36px;padding:0;flex:0 0 36px;justify-content:center}
+:root .top>button:not(#add-act) svg{width:19px;height:19px}}
