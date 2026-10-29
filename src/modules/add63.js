@@ -116,11 +116,11 @@ NEWF.splice(1, 0, ["v85-pauto", "nav:permits", "تعبئة التصريح تلق
 function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean));
   return S.E.filter(e => e.doc && docBy[e.doc] && (docBy[e.doc].date || docBy[e.doc].start || "") >= since && (!docBy[e.doc].end || docBy[e.doc].end >= TODAY) && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id) && !S.pdone?.has(e.id))
     .map(e => ({ e, delegated:gr.has(e.id) })).sort((a, b) => (docBy[b.e.doc].date || "").localeCompare(docBy[a.e.doc].date || "")); }
-const pNeedBtns = e => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button><button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button><button type="button" class="btn btn-ghost" data-pdone="${esc(e.id)}" title="تؤكد أن التصريح صدر أو أُرسل فيختفي من القائمة">✓ تم الإصدار</button>`;
+const pNeedBtns = e => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button>${S.admin ? `<button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button>` : ""}<button type="button" class="btn btn-ghost" data-pdone="${esc(e.id)}" title="تؤكد أن التصريح صدر أو أُرسل فيختفي من القائمة">✓ تم الإصدار</button>`;
 const _vPermits85 = vPermits;
-vPermits = function(){ const h = _vPermits85(); if (!S.admin) return h; const L = permitNeeds(); if (!L.length && !S.pdone?.size) return h;
+vPermits = function(){ const h = _vPermits85(); if (!canPermit()) return h; const L = permitNeeds(); if (!L.length && !S.pdone?.size) return h;
   const all = S.f.pnall === "1", rows = all ? L : L.slice(0, 8), N = d => `<bdi dir="ltr" class="num">${esc(d)}</bdi>`;
-  return `<div class="panel pn-need"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="chip gold">${L.length}</span><span class="s">البيانات تتعبّأ تلقائياً، راجع وأصدر أو فوّض</span></div>
+  return `<div class="panel pn-need"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="chip gold">${L.length}</span><span class="s">البيانات تتعبّأ تلقائياً، راجع وأصدر التصريح مباشرة</span></div>
     <div class="pn-grid"><div class="pn-row pn-hd"><span>الشيخ / المحاضر</span><span>المسجد</span><span>الموعد</span><span>الكتاب</span><span></span></div>${rows.map(({ e, delegated }) => `<div class="pn-row">
       <span class="pn-c pn-who" data-l="الشيخ"><b>${esc(e.lect || "—")}</b></span>
       <span class="pn-c" data-l="المسجد"><b>${esc(e.mosName || "—")}</b>${e.area || e.gov ? `<span class="s">${esc([e.area, e.gov].filter(Boolean).join("، "))}</span>` : ""}</span>
@@ -148,9 +148,9 @@ document.addEventListener("click", ev => { const t = ev.target.closest("[data-pd
   if (t.dataset.pdset) return pDoneSet(t.dataset.pid, t.dataset.pdset); if (t.dataset.pundo) return pDoneUndo(t.dataset.pundo); });
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-pnall]")) return; S.f.pnall = S.f.pnall === "1" ? "" : "1"; render(); });
 const _prio85 = priorities;
-priorities = function(){ const P = _prio85(); if (S.admin) { const n = permitNeeds().filter(x => !x.delegated).length; if (n) P.push({ w:86, k:"gold", t:`${n} موافقة وصلت وتحتاج تصريح`, s:"أصدره بنفسك أو فوّض موظفاً، البيانات جاهزة", act:{ go:"permits", l:"إصدار / تفويض" } }); } return P.sort((a, b) => b.w - a.w); };
+priorities = function(){ const P = _prio85(); if (canPermit()) { const n = permitNeeds().filter(x => !x.delegated).length; if (n) P.push({ w:86, k:"gold", t:`${n} موافقة وصلت وتحتاج تصريح`, s:"البيانات جاهزة، راجع وأصدر التصريح مباشرة", act:{ go:"permits", l:"إصدار التصاريح" } }); } return P.sort((a, b) => b.w - a.w); };
 const _wqForm85 = wqForm;
-wqForm = function(id){ _wqForm85(id); const w = wqById(id); const b = $(".drawer-b"); if (!w || !b || !S.admin) return;
+wqForm = function(id){ _wqForm85(id); const w = wqById(id); const b = $(".drawer-b"); if (!w || !b || !canPermit()) return;
   const nos = new Set([w.no, wqParent(w)?.no, ...wqKids(w).map(k => k.no)].filter(Boolean)); const L = S.E.filter(e => nos.has(e.doc) && !["ملغى", "مكتمل"].includes(e.status));
   if (!L.length || !(w.approval || w.act_ok || wqKids(w).some(k => wqRes(k) === "ok"))) return;
   b.insertAdjacentHTML("beforeend", `<div class="rq-sec"><b>التصاريح لهذه الموافقة</b>${L.map(e => { const p = S.permits.find(x => x.act_id === e.id && !x.revoked); return `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")} · ${esc(daysText(e) || "")} ${esc(e.time || "")}</span></span>${p ? `<span class="chip ok">صدر ${esc(p.no || "")}</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</div>`; }).join("")}</div>`); };
@@ -204,7 +204,7 @@ grantsPanel = function(){ let h = _grantsPanel88(); if (!S.admin) return h;
   for (const g of S.grants.filter(gOpen).filter(g => g.grantee !== S.me?.id)) h = h.replace(`<button type="button" class="btn btn-ghost bad-t" data-pgrevoke="${g.id}">`, `<button type="button" class="btn btn-primary" data-pgself="${g.id}">إصدار بنفسي</button><button type="button" class="btn btn-ghost bad-t" data-pgrevoke="${g.id}">`);
   return h; };
 const _wqForm88 = wqForm;
-wqForm = function(id){ _wqForm88(id); const b = $(".drawer-f [data-pgfrom]"); if (!b || !S.admin || $(".drawer-f [data-pwqissue]")) return;
+wqForm = function(id){ _wqForm88(id); const b = $(".drawer-f [data-pgfrom]"); if (!b || !canPermit() || $(".drawer-f [data-pwqissue]")) return;
   b.insertAdjacentHTML("beforebegin", `<button class="btn btn-primary" type="button" data-pwqissue="${esc(id)}">إصدار تصريح</button>`); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-pgself],[data-pwqissue]"); if (!t) return;
   if (t.dataset.pgself) { const g = S.grants.find(x => x.id === t.dataset.pgself); if (!g) return; closeDrawer(); setTimeout(() => { permitForm({ ...(g.preset || {}) }); if (S.form) S.form.grant = g.id; const u = g.preset?.until; if (u && $("#p-date2")) $("#p-date2").value = u; }, 60); return; }

@@ -111,13 +111,13 @@ const pStatus = p => p.revoked ? ["ملغى", "bad"] : p.until < TODAY ? ["من�
 function vPermits(){
   const q = nkey(S.f.pq || ""); const L = S.permits.filter(p => !q || nkey([p.no, p.data?.sheikh, p.data?.mosque, p.data?.topic].join(" ")).includes(q));
   return `<div class="toolbar"><div class="search"><svg><use href="#i-search"/></svg><input class="f" id="pq" data-fk="pq" placeholder="ابحث برقم التصريح أو اسم الشيخ أو المسجد…" value="${esc(S.f.pq || "")}"></div>
-    ${S.admin ? `<button class="btn btn-primary" type="button" data-pnew>${icon("i-plus")} إصدار تصريح</button><button class="btn" type="button" data-pgnew>تفويض موظف بتصريح</button><button class="btn btn-ghost" type="button" data-passets>التوقيع والختم</button>` : ""}<span class="count">${S.permits.filter(p => pStatus(p)[0] === "ساري").length} ساري · ${S.permits.length} إجمالي</span></div>
-    ${grantsPanel()}${!S.admin && !myGrants().length ? `<div class="check"><b>إصدار التصاريح لرئيس القسم ومدير النظام</b><span>أو لمن يفوّضه رئيس القسم بتصريح محدد، ويظهر لك هنا عند التفويض.</span></div>` : ""}
+    ${canPermit() ? `<button class="btn btn-primary" type="button" data-pnew>${icon("i-plus")} إصدار تصريح</button>${S.admin ? `<button class="btn" type="button" data-pgnew>تفويض موظف بتصريح</button><button class="btn btn-ghost" type="button" data-passets>التوقيع والختم</button>` : ""}` : ""}<span class="count">${S.permits.filter(p => pStatus(p)[0] === "ساري").length} ساري · ${S.permits.length} إجمالي</span></div>
+    ${grantsPanel()}${!canPermit() && !myGrants().length ? `<div class="check"><b>إصدار التصاريح لرئيس القسم ومدير النظام</b><span>أو لمن يفوّضه رئيس القسم بتصريح محدد، ويظهر لك هنا عند التفويض.</span></div>` : ""}
     <div class="wq-list">${L.map(p => { const [st, c] = pStatus(p); return `<button type="button" class="wq-i" data-permit="${p.id}"><span class="num wq-no">${esc(p.no)}</span><span class="wq-t"><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.date ? fmt(p.data.date) : "")} · ${esc(p.data?.time || "")}</span></span><span class="wq-m"><span class="chip ${c}">${st}</span><span class="s">حتى ${fmt(p.until)}</span></span></button>`; }).join("") || `<div class="empty">لا توجد تصاريح بعد</div>`}</div>`;
 }
 const DUR = [["day", "يوم الدرس فقط", 1], ["3", "3 أيام", 3], ["7", "أسبوع", 7], ["30", "شهر", 30], ["90", "3 أشهر", 90], ["180", "6 أشهر", 180]];
 function permitForm(preset, grant){
-  if (!S.admin && !grant) return toast("إصدار التصاريح لرئيس القسم أو بتفويض منه");
+  if (!canPermit() && !grant) return toast("إصدار التصاريح لرئيس القسم أو لمن مُنح الصلاحية أو بتفويض منه");
   if (grant) preset = { ...grant.preset, ...preset };
   const d = { sheikh:"", mosque:"", topic:"", lang:"", date:addDays(TODAY, 1), t_from:"19:30", t_to:"20:30", dur:"day", head:S.pAssets.head || "فايز رزقان الرشيدي", ...preset };
   S.form = { kind:"permit", act:preset?.act_id || "", grant:grant?.id || "" }; const lock = grant ? " readonly" : "";
@@ -139,6 +139,8 @@ async function permitIssue(){
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
   S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id);
 }
+/* صلاحية إصدار التصريح: رئيس القسم ومدير النظام ومن مُنح الصلاحية (profiles.can_permit) دون تفويض لكل تصريح */
+const canPermit = () => !!(S.admin || S.me?.can_permit);
 /* عنوان الدرس: يُستبعد ما ليس عنواناً (موضوع الكتاب أو نوع النشاط) ويُكتب «درس ديني» عند غياب العنوان */
 const permitTopic = t => { t = String(t || "").replace(/\s+/g, " ").trim(); return !t || /^(طلب|موافقة|كتاب)(\s|$|[\(:\-–])/.test(t) || /(تجديد|إقامة|اقامة|إيقاف|تعديل)\s+(دروس|أنشطة|انشطة|نشاط)/.test(t) || /^(درس|دروس|محاضرة|دورة|نشاط)$/.test(t) ? "درس ديني" : t; };
 /* التصريح ورقة A4 بعرض ثابت (794px) كما تُطبع وتُرسل PDF؛ على الشاشة تُصغَّر لتناسب العرض دون تغيير التنسيق */
@@ -186,7 +188,7 @@ async function assetsSave(){
 
 /* ---------- wiring ---------- */
 const _actForm17 = actForm;
-actForm = function(id, preset){ _actForm17(id, preset); const e = id && S.byId.get(id); if (!e || !S.admin || S.form?.kind !== "act") return;
+actForm = function(id, preset){ _actForm17(id, preset); const e = id && S.byId.get(id); if (!e || !canPermit() || S.form?.kind !== "act") return;
   const nextD = (() => { for (let i = 0; i < 14; i++) { const iso = addDays(TODAY, i); if (e.days.includes(dOf(iso).getDay())) return iso; } return addDays(TODAY, 1); })();
   const sl = e.sl || [1140, 1200], hhmm = m => `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`;
   $(".drawer-f [data-close]")?.insertAdjacentHTML("afterend", `<button class="btn btn-ghost" type="button" data-pfrom="${esc(id)}" data-pd="${esc(JSON.stringify({ sheikh:(e.lect || "").split(" / ")[0], mosque:`${e.mosName}${e.area ? "، " + e.area : ""}`, topic:e.title || "", date:nextD, t_from:hhmm(sl[0]), t_to:hhmm(sl[1]), act_id:id }))}">تصريح</button>`); };
@@ -204,7 +206,7 @@ sysMarkdown = function(){ const L = S.wq.slice().sort((a, b) => wqDate(b).locale
 const _prio17 = priorities;
 priorities = function(){ const P = _prio17(); const n = S.wq.filter(w => w.approval && !docBy[w.no] && !(w.refs || []).some(r => docBy[r])).length; if (n) P.push({ w:78, k:"gold", t:`${n} موافقة في وثيقة غير مسجّلة في النظام`, s:"سجّلها بضغطة لتظهر الأنشطة ومواعيد انتهائها", act:{ go:"watheqa", l:"وثيقة" } }); return P.sort((a, b) => b.w - a.w); };
 const _palAll17 = palAll;
-palAll = function(){ const A = _palAll17(); if (S.admin) A.unshift({ g:"إجراءات", t:"إصدار تصريح درس (باركود)", s:"", ic:"i-badge", run:() => permitForm(), txt:"تصريح باركود درس شيخ" });
+palAll = function(){ const A = _palAll17(); if (canPermit()) A.unshift({ g:"إجراءات", t:"إصدار تصريح درس (باركود)", s:"", ic:"i-badge", run:() => permitForm(), txt:"تصريح باركود درس شيخ" });
   for (const w of S.wq.slice(0, 400)) A.push({ g:"وثيقة", t:`${w.no} ${w.subj}`, s:[fmt(wqDate(w)), w.sender].filter(Boolean).join(" · "), ic:"i-doc", run:() => { go("watheqa"); wqForm(w.id); }, txt:wqWho2(w).join(" ") + " " + [w.no, w.subj, w.sender].join(" ") });
   for (const p of S.permits.slice(0, 200)) A.push({ g:"التصاريح", t:`${p.no} ${p.data?.sheikh || ""}`, s:p.data?.mosque || "", ic:"i-badge", run:() => { go("permits"); permitView(p.id); }, txt:[p.no, p.data?.sheikh, p.data?.mosque].join(" ") });
   return A; };

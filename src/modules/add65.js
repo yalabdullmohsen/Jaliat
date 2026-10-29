@@ -23,7 +23,7 @@ function pWqItems(w){ const par = wqParent(w), nos = new Set([w.no, par?.no, ...
   const out = []; for (const x of [par, w].filter(Boolean)) { let P = null; try { P = wqPlan(x); } catch (_) {} for (const a of (P?.acts || [])) out.push({ a, w:x }); }
   return out.filter(it => !S.permits.some(p => !p.revoked && p.data?.sheikh === (it.a.lect || "").split(" / ")[0] && String(p.data?.note || "").includes("كتاب " + it.w.no))); }
 const _wqForm88b = wqForm;
-wqForm = function(id){ _wqForm88b(id); const w = wqById(id); const f = $(".drawer-f"); if (!w || !S.admin || !f || f.querySelector("[data-pwball]")) return;
+wqForm = function(id){ _wqForm88b(id); const w = wqById(id); const f = $(".drawer-f"); if (!w || !canPermit() || !f || f.querySelector("[data-pwball]")) return;
   { const par = wqParent(w), nos = new Set([w.no, par?.no, ...wqKids(w).map(k => k.no)].filter(Boolean)), L = S.E.filter(e => nos.has(e.doc) && !["ملغى", "مكتمل"].includes(e.status));
     if (L.length > 1 && !f.querySelector(".pw-st")) f.insertAdjacentHTML("afterbegin", `<div class="rq-sec pw-st"><b>حالة التصاريح لكل نشاط</b>${L.map(e => { const p = S.permits.find(x => x.act_id === e.id && !x.revoked); return `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")} · ${esc(daysText(e) || "")} ${esc(e.time || "")}</span></span>${p ? `<button type="button" class="chip ok" data-permit="${esc(p.id)}">صدر ${esc(p.no || "")}</button>` : `<span class="chip warn">يحتاج تصريح</span>`}</div>`; }).join("")}</div>`); }
   const n = pWqItems(w).length; if (n < 2) return;
@@ -41,7 +41,7 @@ function pBulkSummary(w, rows, failed){ S.form = { kind:"pbulk", ids:rows.map(r 
   openDrawer(`تصاريح الكتاب ${w.no}`, `<div class="check ${failed ? "warn" : "ok"}"><b>صدر ${rows.length} تصريح${failed ? ` · تعذّر ${failed}، أصدره من نفس الكتاب` : ""}</b><span>لكل نشاط تصريح مستقل برقمه وباركوده وملف PDF خاص.</span></div>
     <div class="wq-list">${rows.map(p => `<button type="button" class="wq-i" data-permit="${p.id}"><span class="num wq-no">${esc(p.no)}</span><span class="wq-t"><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.time || "")}</span></span><span class="wq-m"><span class="s">حتى ${fmt(p.until)}</span></span></button>`).join("")}</div>`,
     `${rows.length ? `<button class="btn btn-primary" type="button" data-pball>${icon("i-wa")} إرسال الكل PDF</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`); }
-document.addEventListener("click", async ev => { const a = ev.target.closest("[data-pwball]"); if (a) { ev.preventDefault(); if (!S.admin) return; return pBulk(a.dataset.pwball); }
+document.addEventListener("click", async ev => { const a = ev.target.closest("[data-pwball]"); if (a) { ev.preventDefault(); if (!canPermit()) return; return pBulk(a.dataset.pwball); }
   const b = ev.target.closest("[data-pball]"); if (!b || S.form?.kind !== "pbulk") return; ev.preventDefault(); ev.stopImmediatePropagation();
   const ids = S.form.ids || []; const files = []; for (const id of ids) { const f = await (PPDF.get(id) || Promise.resolve(null)).catch(() => null); if (f) files.push(f); }
   if (!files.length) return toast("ملفات PDF ما جهزت، افتح كل تصريح وأرسله");
@@ -66,7 +66,7 @@ if (typeof GUIDES === "object" && GUIDES.permits && typeof TOURS === "object") {
     { go:"permits", t:"خلصنا ✓", x:"تقدر ترجع للجولة أي وقت من زر «جولة التصاريح» أعلى هذي الصفحة، أو من زر «دليل الصفحة» فوق." } ] };
   const _tourEnd89 = tourEnd; tourEnd = function(d){ if (TR.k === "permits-new") { try { localStorage.setItem("tour-permits-new", "1"); } catch (_) {} } _tourEnd89(d); };
   const _afterRender89 = afterRender;
-  afterRender = function(v){ _afterRender89(v); if (v !== "permits" || !S.admin) return;
+  afterRender = function(v){ _afterRender89(v); if (v !== "permits" || !canPermit()) return;
     const tb = $(".toolbar"); if (tb && !$("#pn-tour")) tb.insertAdjacentHTML("beforebegin", `<div class="check ok" id="pn-tour" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="flex:1;min-width:200px"><b>جولة التصاريح</b><br><span class="s">نمشي معك على الشاشة: كيف تصدر وتعدّل وترسل، وكيف تصدر لكتاب فيه أكثر من مسجد.</span></span><button class="btn btn-primary" type="button" data-tour="permits-new">ابدأ الجولة</button></div>`);
     let seen = false; try { seen = !!localStorage.getItem("tour-permits-new"); } catch (_) { seen = true; }
     if (!seen && !TR.k && !window.__pnAuto && S.me?.username !== "yousef") { window.__pnAuto = true; setTimeout(() => { if (!TR.k && S.view === "permits") tourStart("permits-new"); }, 1200); } };
