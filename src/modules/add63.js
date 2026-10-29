@@ -175,13 +175,13 @@ grantSave = async function(){ const e = $("#p-date2")?.value, d = $("#p-date")?.
     const n = Math.round((dOf(e) - dOf(d)) / 864e5) + 1, k = "rng" + e; if (!DUR.find(x => x[0] === k)) DUR.push([k, `حتى ${fmt(e)}`, n]); const sel = $("#p-dur"); if (sel && !sel.querySelector(`[value="${k}"]`)) sel.insertAdjacentHTML("beforeend", `<option value="${k}">حتى ${fmt(e)}</option>`); if (sel) sel.value = k; }
   return _grantSave86(); };
 /* permit → PDF file sent on WhatsApp (no link): the PDF is prepared when the permit opens, one tap shares it */
-const PPDF = new Map();
+const PPDF = new Map(), PPNG = new Map();
 async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const src = $("#permit-paper"); if (!src) return null;
   const job = (async () => { await loadScript("https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     /* نسخة خارج الشاشة بعرض ثابت (A4)، فلا يقصّها صندوق التمرير ولا ضيق النافذة، ويخرج التصريح كاملاً */
     await Promise.all(['700 40px Amiri', '600 16px "IBM Plex Sans Arabic"', '400 16px "IBM Plex Sans Arabic"'].map(f => document.fonts.load(f, "تصريح"))).catch(() => {}); const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-10000px;top:0;width:794px;background:#fff;z-index:-1"; const el = src.cloneNode(true); el.removeAttribute("id"); el.classList.remove("editing"); el.style.cssText = "width:794px;min-height:1123px;max-width:none;margin:0;box-sizing:border-box;zoom:1"; host.appendChild(el); document.body.appendChild(host);
     const cv = await html2canvas(el, { scale:3, width:794, windowWidth:794, backgroundColor:"#ffffff", useCORS:true, logging:false, onclone:d => { d.querySelectorAll(".permit [contenteditable]").forEach(x => x.removeAttribute("contenteditable")); const st = d.createElement("style"); st.textContent = ".permit,.permit *{letter-spacing:0!important;word-spacing:normal!important;font-feature-settings:normal!important;text-rendering:auto!important}"; d.head.appendChild(st); } }).finally(() => host.remove()); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
-    const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/png"), "PNG", (W - w) / 2, m, w, h);
+    const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/png"), "PNG", (W - w) / 2, m, w, h); PPNG.set(id, await new Promise(ok => cv.toBlob(ok, "image/png")));
     const p = S.permits.find(x => x.id === id), d = p?.data || {}, clean = t => String(t || "").replace(/[\\/:*?"<>|\u200e\u200f\u2066-\u2069]/g, " ").replace(/\s+/g, " ").trim(), mos = clean(String(d.mosque || "").split("،")[0]), shk = clean(d.sheikh),
       ttl = ["تصريح إلقاء درس", shk && "الشيخ " + shk.replace(/^الشيخ\s+/, ""), mos].filter(Boolean).join(" - ").slice(0, 120), u16 = "\xFE\xFF" + [...ttl].map(c => { const k = c.charCodeAt(0); return String.fromCharCode(k >> 8, k & 255); }).join("");
     /* اسم الملف لاتيني فقط: الآيفون/واتساب يكسرون ترميز الأسماء العربية (Ø§Ù…) عند المشاركة من المتصفح، والعنوان العربي في داخل الملف وفي الرسالة */
@@ -194,10 +194,13 @@ document.addEventListener("click", async ev => { const b = ev.target.closest("[d
   const id = b.dataset.pwa, p = S.permits.find(x => x.id === id); if (!p) return; const old = b.innerHTML; b.disabled = true; b.textContent = "يجهّز PDF…";
   /* قائمة المشاركة في ماك وويندوز لا تعرض واتساب إلا إن وُجد له امتداد مشاركة، لذا تُستعمل على الجوال واللوحي فقط؛ وعلى الكمبيوتر يُنزَّل الملف ويُفتح واتساب برسالة جاهزة */
   const touch = matchMedia("(pointer:coarse)").matches || /iPhone|iPad|Android/i.test(navigator.userAgent), win = touch ? null : window.open("", "_blank");
+  /* على الكمبيوتر: نسخ التصريح كاملاً كصورة إلى الحافظة فوراً (Safari يشترط أن يبدأ النسخ داخل نفس الضغطة)، فيكفي لصقه في المحادثة */
+  let copied = Promise.resolve(false);
+  if (!touch && window.ClipboardItem && navigator.clipboard?.write) copied = navigator.clipboard.write([new ClipboardItem({ "image/png": permitPdf(id).then(() => PPNG.get(id)) })]).then(() => true, () => false);
   try { const f = await permitPdf(id); if (!f) throw new Error("no pdf"); const txt = `تصريح إلقاء درس رقم \u2066${p.no}\u2069\nالشيخ: ${p.data?.sheikh || ""}\nالمسجد: ${p.data?.mosque || ""}${p.data?.time ? "\nالموعد: " + p.data.time : ""}`;
     if (touch && navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:"تصريح إلقاء درس", text:txt }); } catch (_) {} }
     else { const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      toast("نزل ملف PDF في التنزيلات، اسحبه إلى محادثة واتساب"); if (win) win.location.href = "https://wa.me/?text=" + encodeURIComponent(txt); } }
+      toast(await copied ? "نُسخ التصريح كاملاً: افتح المحادثة والصقه (⌘V أو Ctrl+V)، وملف PDF نزل أيضاً" : "نزل ملف PDF في التنزيلات، اسحبه إلى محادثة واتساب"); if (win) win.location.href = "https://wa.me/?text=" + encodeURIComponent(txt); } }
   catch (e) { win?.close(); toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }
   finally { b.disabled = false; b.innerHTML = old; } }, true);
 /* the head can always issue the permit himself, wherever «تفويض» appears */
