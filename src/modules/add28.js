@@ -16,7 +16,7 @@ function renewList(){
 function renewMsg(x, c){
   const actsTxt = x.acts.slice(0, 12).map((e, i) => `${i + 1}) ${e.type || "درس"}، ${e.mosName || ""}${e.area ? " (" + e.area + ")" : ""}، ${daysText(e)} ${e.time || ""}${e.lect ? "، " + e.lect : ""}`).join("\n");
   const when = x.left < 0 ? `انتهت بتاريخ ${fmt(x.d.end)}` : x.left === 0 ? `تنتهي اليوم ${fmt(x.d.end)}` : `تنتهي بتاريخ ${fmt(x.d.end)} (بعد ${arDays(x.left)})`;
-  return `السلام عليكم ورحمة الله وبركاته\n${c ? `الأخ الفاضل / ${c.name}${c.role ? "، " + c.role : ""} الجالية ${x.comm}` : `منسق الجالية ${x.comm}`}\n\nنود إفادتكم بأن موافقة الأنشطة الدينية رقم (${x.d.no}) ${when}${x.acts.length ? `، وتشمل:\n${actsTxt}` : "."}\n\nللاستمرار في إقامة الأنشطة دون انقطاع، نأمل التكرم بإرسال طلب التجديد قبل تاريخ الانتهاء، مع بيان أي تعديل على المساجد أو المحاضرين أو الأوقات.\n\nوجزاكم الله خيراً${SIGN}`;
+  return `السلام عليكم ورحمة الله وبركاته\n${c ? `الأخ الفاضل / ${c.name}${c.role ? "، " + c.role : ""} الجالية ${commBase(x.comm)}` : `منسق الجالية ${commBase(x.comm)}`}\n\nنود إفادتكم بأن موافقة الأنشطة الدينية رقم (${x.d.no}) ${when}${x.acts.length ? `، وتشمل:\n${actsTxt}` : "."}\n\nللاستمرار في إقامة الأنشطة دون انقطاع، نأمل التكرم بإرسال طلب التجديد قبل تاريخ الانتهاء، مع بيان أي تعديل على المساجد أو المحاضرين أو الأوقات.\n\nوجزاكم الله خيراً${SIGN}`;
 }
 function vRenew(){
   const L = renewList(), pending = L.filter(x => !renewSent(x.d.no));

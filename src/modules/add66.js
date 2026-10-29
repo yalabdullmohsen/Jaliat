@@ -20,7 +20,7 @@ function rtItems(kind){
 function rtActLines(acts){ const by = new Map(); for (const e of acts) { const k = (e.lect || "").replace(/\s+/g, " ").trim() || "محاضر غير محدد"; const w = `${[e.mosName, e.area].filter(Boolean).join("، ") || "مسجد غير محدد"} — ${[daysText(e), e.time].filter(Boolean).join(" ")}`.trim(); const L = by.get(k) || by.set(k, []).get(k); if (!L.includes(w)) L.push(w); }
   const out = []; let n = 0; for (const [lect, L] of by) { if (++n > 25) { out.push(`… و${by.size - 25} محاضرين آخرين`); break; } out.push(`▪️ ${lect}\n${L.map(w => `   - ${w}`).join("\n")}`); } return out.join("\n"); }
 function rtMsg(kind, x, c){
-  const head = `السلام عليكم ورحمة الله وبركاته\n\n${c ? `الأخ الفاضل / ${c.name}\n` : ""}منسق الجالية ${x.comm}\n\n`, lines = rtActLines(x.acts), tail = `\n\nوجزاكم الله خيراً${SIGN}`;
+  const head = `السلام عليكم ورحمة الله وبركاته\n\n${c ? `الأخ الفاضل / ${c.name}\n` : ""}منسق الجالية ${commBase(x.comm)}\n\n`, lines = rtActLines(x.acts), tail = `\n\nوجزاكم الله خيراً${SIGN}`;
   if (kind === "update") return `${head}*تذكير بتحديث بيانات الأنشطة*\nنأمل مراجعة بيانات أنشطة الجالية المسجلة لدينا، وإفادتنا هنا على الواتساب بأي تغيير في المحاضرين أو المساجد أو الأوقات، أو أي نشاط توقّف أو أُضيف. وإن لم يكن هناك تغيير فيكفي الرد بـ «لا تغيير».\n\nالأنشطة المسجلة:\n${lines}${tail}`;
   const no = x.d.no, ask = "مع بيان أي تعديل على المساجد أو المحاضرين أو الأوقات";
   if (kind === "expired") return `${head}*إشعار بانتهاء الموافقة*\nموافقة الأنشطة الدينية رقم (${no}) انتهت بتاريخ ${fmt(x.d.end)} (منذ ${arDays(-x.left)})، ولم تُسجَّل موافقة جديدة بدلاً منها حتى الآن.\n\n${x.acts.length ? `الأنشطة المرتبطة بها:\n${lines}\n\n` : ""}نأمل إرسال طلب التجديد هنا على الواتساب في أقرب وقت ${ask}، حتى لا تتوقف الأنشطة.${tail}`;

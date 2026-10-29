@@ -344,13 +344,15 @@ async function copyRich(html, text){
 /* =============== 4) WhatsApp =============== */
 const waNum = p => { let d = digits(p).replace(/\D/g, ""); if (d.length === 8) d = "965" + d; return d; };
 function waOpen(phone, text){ const n = waNum(phone); if (n.length < 10) return toast("لا يوجد رقم هاتف صحيح"); window.open(`https://wa.me/${n}?text=${encodeURIComponent(text)}`, "_blank", "noopener"); }
+/* اسم الجالية بلا اسم المنسق المضاف بعد الشرطة («الباكستانية - فلان» ← «الباكستانية») حتى لا يتكرر الاسم في الرسائل */
+const commBase = c => String(c || "").split(/\s+[-–—]\s+/)[0].trim();
 const SIGN = "\n\nقسم الجاليات ورعاية المهتدين وطلبة البعوث\nوزارة الشؤون الإسلامية";
 function waAct(e, c){
-  return `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل/ ${c?.name || ""} حفظه الله\n\nنود إفادتكم بتفاصيل ${e.type} للجالية ${e.comm}:\n• المسجد: ${e.mosName || "—"}${e.area ? "، " + e.area : ""}\n• اليوم: ${daysText(e)}\n• الوقت: ${e.time || "—"}\n• المحاضر: ${e.lect || "—"}\n• المدة: من ${fmt(e.start)} إلى ${fmt(e.end)}${e.doc ? `\n• رقم الموافقة: ${e.doc}` : ""}\n\nنرجو التأكيد والالتزام بالموعد، وجزاكم الله خيراً.${SIGN}`;
+  return `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل/ ${c?.name || ""} حفظه الله\n\nنود إفادتكم بتفاصيل ${e.type} للجالية ${commBase(e.comm)}:\n• المسجد: ${e.mosName || "—"}${e.area ? "، " + e.area : ""}\n• اليوم: ${daysText(e)}\n• الوقت: ${e.time || "—"}\n• المحاضر: ${e.lect || "—"}\n• المدة: من ${fmt(e.start)} إلى ${fmt(e.end)}${e.doc ? `\n• رقم الموافقة: ${e.doc}` : ""}\n\nنرجو التأكيد والالتزام بالموعد، وجزاكم الله خيراً.${SIGN}`;
 }
 function waReq(){
   const f = rqRead(); const ok = f.status === "معتمد";
-  return `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل/ ${f.coord || ""} حفظه الله\n\n${ok ? `يسرنا إفادتكم بالموافقة على طلبكم${f.doc ? ` (رقم الوثيقة ${f.doc})` : ""}` : "نفيدكم باستلام طلبكم وهو قيد الإجراء"} لإقامة الأنشطة التالية للجالية ${f.comm}:\n${S.rqActs.map((a, i) => `${i + 1}) ${actLine(a)}`).join("\n")}${ok && f.start ? `\nالمدة: من ${fmt(f.start)} إلى ${fmt(f.end)}` : ""}\n\nوجزاكم الله خيراً.${SIGN}`;
+  return `السلام عليكم ورحمة الله وبركاته\nالأخ الفاضل/ ${f.coord || ""} حفظه الله\n\n${ok ? `يسرنا إفادتكم بالموافقة على طلبكم${f.doc ? ` (رقم الوثيقة ${f.doc})` : ""}` : "نفيدكم باستلام طلبكم وهو قيد الإجراء"} لإقامة الأنشطة التالية للجالية ${commBase(f.comm)}:\n${S.rqActs.map((a, i) => `${i + 1}) ${actLine(a)}`).join("\n")}${ok && f.start ? `\nالمدة: من ${fmt(f.start)} إلى ${fmt(f.end)}` : ""}\n\nوجزاكم الله خيراً.${SIGN}`;
 }
 function waPick(list, mk){
   if (!list.length) return toast("لا يوجد منسق مسجل لهذه الجالية");
