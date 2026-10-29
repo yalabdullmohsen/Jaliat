@@ -25,7 +25,7 @@ function rtMsg(kind, x, c){
   const no = x.d.no, ask = "مع بيان أي تعديل على المساجد أو المحاضرين أو الأوقات";
   if (kind === "expired") return `${head}*إشعار بانتهاء الموافقة*\nموافقة الأنشطة الدينية رقم (${no}) انتهت بتاريخ ${fmt(x.d.end)} (منذ ${arDays(-x.left)})، ولم تُسجَّل موافقة جديدة بدلاً منها حتى الآن.\n\n${x.acts.length ? `الأنشطة المرتبطة بها:\n${lines}\n\n` : ""}نأمل إرسال طلب التجديد هنا على الواتساب في أقرب وقت ${ask}، حتى لا تتوقف الأنشطة.${tail}`;
   const when = x.left === 0 ? `تنتهي اليوم ${fmt(x.d.end)}` : `تنتهي بتاريخ ${fmt(x.d.end)} (بعد ${arDays(x.left)})`;
-  return `${head}*تذكير بتجديد الموافقة*\nموافقة الأنشطة الدينية رقم (${no}) ${when}.\n\n${x.acts.length ? `الأنشطة المشمولة بها:\n${lines}\n\n` : ""}للاستمرار في إقامة الأنشطة دون انقطاع، نأمل إرسال طلب التجديد هنا على الواتساب قبل تاريخ الانتهاء ${ask}.${tail}`; }
+  return `${head}                        تذكير بتجديد الموافقة\nموافقة الأنشطة الدينية رقم (${no}) ${when}.\n\n${x.acts.length ? `الأنشطة المشمولة بها:\n${lines}\n\n` : ""}للاستمرار في إقامة الأنشطة دون انقطاع، نأمل إرسال طلب التجديد هنا على الواتساب قبل تاريخ الانتهاء ${ask}.${SIGN}`; }
 function rtCard(kind, x){ const K = RT_KINDS[kind], key = rtKey(kind, x), s = rtSent(kind, key);
   const left = kind === "soon" ? `<span class="rt-left ${x.left <= 7 ? "bad" : x.left <= 14 ? "warn" : "ok"}">${x.left === 0 ? "تنتهي اليوم" : "بعد " + arDays(x.left)}</span>` : kind === "expired" ? `<span class="rt-left bad">منذ ${arDays(-x.left)}</span>` : "";
   const sub = kind === "update" ? `${x.acts.length} نشاط مسجّل` : `موافقة <bdi dir="ltr">${esc(x.d.no)}</bdi> · ${kind === "expired" ? "انتهت" : "تنتهي"} ${fmt(x.d.end)} · ${x.acts.length} نشاط`;
