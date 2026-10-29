@@ -32,7 +32,7 @@ function rtCard(kind, x){ const K = RT_KINDS[kind], key = rtKey(kind, x), s = rt
   return `<div class="rt-c${s ? " sent" : ""}"><div class="rt-top"><span class="rt-badge ${K.cls}">${K.label}</span>${left}${s ? `<span class="rt-ok">✓ أُرسل ${ago(s.sent_at)}، ${esc(pname(s.sent_by) || "")}</span>` : ""}</div>
     <div class="rt-t"><b>${esc(x.comm || "—")}</b><span>${sub}</span></div>
     ${x.coords.length ? `<div class="rt-co">${x.coords.map((c, i) => `<div class="rt-p"><span class="rt-av">${esc((c.name || "؟").trim().charAt(0))}</span><div class="rt-pn"><b>${esc(c.name)}</b><span>${esc(c.role || "منسق")} · <bdi dir="ltr">${esc(c.phone)}</bdi></span></div>
-        <button type="button" class="btn ${s ? "" : "btn-primary"} rt-send" data-rtsend="${kind}|${esc(key)}|${i}">${icon("i-wa")} ${s ? "إعادة الإرسال" : K.btn}</button><button type="button" class="btn btn-ghost" data-rtcopy="${kind}|${esc(key)}|${i}">نسخ</button></div>`).join("")}</div>`
+        <button type="button" class="btn ${s ? "" : "btn-primary"} rt-send" data-rtsend="${kind}|${esc(key)}|${i}">${icon("i-wa")} ${s ? "إعادة الإرسال" : K.btn}</button>${s ? "" : `<button type="button" class="btn rt-done" data-rtdone="${kind}|${esc(key)}|${i}">✓ تم إرسال التذكير</button>`}<button type="button" class="btn btn-ghost" data-rtcopy="${kind}|${esc(key)}|${i}">نسخ</button></div>`).join("")}</div>`
       : `<div class="rn-none">لا يوجد رقم منسق لهذه الجالية، <button type="button" class="lnk" data-go="coords">أضف المنسق</button></div>`}
     <div class="rt-more"><details class="rn-pre"><summary>معاينة الرسالة</summary><pre>${esc(rtMsg(kind, x, x.coords[0]))}</pre></details>${kind !== "update" ? `<button type="button" class="btn btn-ghost" data-letter="renew:${esc(x.d.no)}">${icon("i-doc")} كتاب التجديد</button>` : ""}</div></div>`; }
 vRenew = function(){ const tab = RT_KINDS[S.rtTab] ? S.rtTab : "soon", K = RT_KINDS[tab], all = { soon:rtItems("soon"), expired:rtItems("expired"), update:rtItems("update") }, L = [...all[tab]].sort((a, b) => (rtSent(tab, rtKey(tab, a)) ? 1 : 0) - (rtSent(tab, rtKey(tab, b)) ? 1 : 0));
@@ -41,14 +41,16 @@ vRenew = function(){ const tab = RT_KINDS[S.rtTab] ? S.rtTab : "soon", K = RT_KI
     <div class="rt-info"><div><span class="rt-badge ${K.cls}">${K.label}</span><p>${K.d}</p></div>${tab === "soon" ? `<div class="rn-seg">${[[14, "١٤ يوم"], [30, "٣٠ يوم"], [60, "٦٠ يوم"]].map(([n, l]) => `<button type="button" class="${+S.renewDays === n ? "on" : ""}" data-rtdays="${n}">${l}</button>`).join("")}</div>` : ""}</div>
     <div class="rt-sum"><span><b>${L.length}</b> ${tab === "update" ? "جالية" : "موافقة"}</span><span><b>${todo}</b> باقي عليها إرسال</span></div>
     ${L.map(x => rtCard(tab, x)).join("") || `<div class="rn-empty"><b>${tab === "soon" ? `لا توجد موافقات تنتهي خلال ${S.renewDays} يوماً` : tab === "expired" ? "لا توجد موافقات منتهية تحتاج متابعة" : "لا توجد أنشطة مسجلة"} ✓</b></div>`}</div>`; };
-async function rtSend(spec, copyOnly){ const [kind, key, i] = spec.split("|"), x = rtItems(kind).find(y => rtKey(kind, y) === key); if (!x) return; const c = x.coords[+i], msg = rtMsg(kind, x, c);
+/* زر الإرسال يفتح الواتساب فقط؛ التسجيل «أُرسل» بزر «تم إرسال التذكير» بعد أن يرسل الموظف فعلاً */
+async function rtSend(spec, copyOnly, markOnly){ const [kind, key, i] = spec.split("|"), x = rtItems(kind).find(y => rtKey(kind, y) === key); if (!x) return; const c = x.coords[+i], msg = rtMsg(kind, x, c);
   if (copyOnly) { const ok = await cpCopy(msg); return toast(ok ? "نُسخت الرسالة" : "تعذّر النسخ"); }
-  waOpen(c?.phone || "", msg);
+  if (!markOnly) return waOpen(c?.phone || "", msg);
+  if (rtSent(kind, key)) return;
   const { data } = await sb.from("renew_reminders").insert({ doc_no:key, doc_end:x.d?.end || null, phone:c?.phone || "", coord:c?.name || "", sent_by:S.me.id, kind:RT_DB[kind] }).select().single();
-  if (data) { S.renewLog = [data, ...S.renewLog]; if (S.view === "renew" && $("#drawer").hidden) render(); } }
+  if (data) { S.renewLog = [data, ...S.renewLog]; toast("سُجّل: تم إرسال التذكير"); if (S.view === "renew" && $("#drawer").hidden) render(); } else toast("تعذّر التسجيل، حاول مرة أخرى"); }
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t || S.view !== "renew") return; const D = t.dataset;
   if (D.rttab) { S.rtTab = D.rttab; return render(); } if (D.rtdays) { S.renewDays = +D.rtdays; return render(); }
-  if (D.rtsend) return rtSend(D.rtsend); if (D.rtcopy) return rtSend(D.rtcopy, true); });
+  if (D.rtsend) return rtSend(D.rtsend); if (D.rtdone) return rtSend(D.rtdone, false, true); if (D.rtcopy) return rtSend(D.rtcopy, true); });
 NEWF.splice(1, 0, ["v91-rt", "nav:renew", "تذكيرات المنسقين: ثلاثة أنواع واضحة", "صفحة التذكير صارت ثلاثة أقسام: «تنتهي قريباً» (تذكير تجديد)، «انتهت» (إشعار انتهاء)، «تحديث البيانات». كل بطاقة عليها نوعها، والرسالة مرتبة بلا تكرار أسماء وبلا رابط، تُرسل بالواتساب فقط.", true, "2026-10-27"]);
 
 /* v91 — التفويض بضغطة: أول ما يفتح الموظف النظام وعنده تفويض يطلع له نموذج التصريح معبّأ مباشرة، يراجع ويضغط إصدار */

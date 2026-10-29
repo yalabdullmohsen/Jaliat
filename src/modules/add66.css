@@ -40,3 +40,6 @@ button.rn-st{cursor:pointer}.rn-st.ok{border-color:#9CC9A8;background:#EAF4EC}.r
 .drawer-f.wq-f{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;overflow:visible!important;flex-wrap:wrap}
 .drawer-f.wq-f .btn{flex:none;width:100%;min-height:44px;white-space:normal;text-align:center;justify-content:center}
 body:has(#drawer:not([hidden])) .upd-bar{display:none}
+
+.rt-p .rt-done{background:#e8f3ea;color:#1d6b3a;border:1px solid #9cc9aa;font-weight:700}
+.rt-p .rt-done:hover{background:#d9ecde}
