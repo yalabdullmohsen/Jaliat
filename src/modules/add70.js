@@ -56,3 +56,13 @@ vSermRec = function(){ if (!S.f.srtab) S.f.srtab = "co"; const t = S.f.srtab, FL
   let h; if (t === "rec" && srActive()) { const keep = S.srecs; S.srecs = FL; try { h = _vSermRec70(); } finally { S.srecs = keep; } } else h = _vSermRec70();
   h = h.replace('<div class="seg">', `<div class="seg"><button type="button" data-srtab="co">حسب المنسق</button>`).replace('<details class="sr-d"><summary>الترجمة', '<details class="sr-d" open><summary>الترجمة');
   return t === "rec" ? h.replace("</div></div>", "</div></div>" + srBar(FL.length)) : h; };
+
+/* ---- كشف المساجد: عمود المنسق، من الأنشطة المسجّلة في كل مسجد (والمتوفر فقط، والباقي يُترك فارغاً) ---- */
+const _vMosques70 = vMosques;
+vMosques = function(){ let h = _vMosques70();
+  const comms = {}; S.E.forEach(e => { if (e.mosque && e.comm) (comms[e.mosque] = comms[e.mosque] || new Set()).add(e.comm); });
+  const who = c => { const L = S.coords.filter(k => k.comm === c && k.status !== "سابق" && k.name), M = L.filter(k => k.role === "منسق"); return (M.length ? M : L).map(k => k.name); };
+  const cell = id => [...(comms[id] || [])].map(c => { const n = who(c); return n.length ? `${n.map(esc).join("، ")} <span class="s">(${esc(c)})</span>` : ""; }).filter(Boolean).join("<br>");
+  h = h.replace("<th>الأنشطة</th>", "<th>الأنشطة</th><th>المنسق</th>");
+  S.mosques.forEach(m => { const re = new RegExp(`(<tr data-open="mos:${String(esc(m.id)).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}">[\\s\\S]*?)</tr>`); h = h.replace(re, `$1<td>${cell(m.id)}</td></tr>`); });
+  return h; };
