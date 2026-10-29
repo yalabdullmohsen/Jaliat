@@ -1,5 +1,5 @@
 /* ================= v17: head of section delegates ONE specific permit to an employee ================= */
-const gOpen = g => !g.permit_id && !g.revoked && g.expires >= TODAY;
+const gOpen = g => !g.permit_id && !g.revoked && g.expires >= TODAY && !(g.preset?.act_id && S.permits.some(p => !p.revoked && p.act_id === g.preset.act_id));  /* صدر التصريح مباشرة فلا يبقى التفويض معلّقاً */
 const myGrants = () => S.grants.filter(g => g.grantee === S.me?.id && gOpen(g));
 function grantsPanel(){
   const mine = myGrants(), open = S.admin ? S.grants.filter(gOpen) : [];
