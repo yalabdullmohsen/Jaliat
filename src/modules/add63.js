@@ -132,13 +132,13 @@ const _vPermits85 = vPermits;
 vPermits = function(){ const h = _vPermits85(); if (!canPermit()) return h; const L = permitNeeds(); if (!L.length && !S.pdone?.size) return h;
   const all = S.f.pnall === "1", rows = all ? L : L.slice(0, 8), N = d => `<bdi dir="ltr" class="num">${esc(d)}</bdi>`;
   return `<div class="panel pn-need"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="chip gold">${L.length}</span><span class="s">البيانات تتعبّأ تلقائياً، راجع وأصدر التصريح مباشرة</span></div>
-    <div class="pn-grid"><div class="pn-row pn-hd"><span>الشيخ / المحاضر</span><span>المسجد</span><span>الموعد</span><span>الكتاب</span><span></span></div>${rows.map(({ e, delegated }) => `<div class="pn-row">
+    ${S.pdone?.size ? `<div class="pn-dh"><h4>تم إصدارها أو إرسالها (${S.pdone.size})</h4><button type="button" class="btn btn-ghost" data-pndone>${S.f.pndone === "0" ? "إظهار" : "إخفاء"}</button></div>${S.f.pndone === "0" ? "" : pDoneList()}` : ""}<div class="pn-grid"><div class="pn-row pn-hd"><span>الشيخ / المحاضر</span><span>المسجد</span><span>الموعد</span><span>الكتاب</span><span></span></div>${rows.map(({ e, delegated }) => `<div class="pn-row">
       <span class="pn-c pn-who" data-l="الشيخ"><b>${esc(e.lect || "—")}</b></span>
       <span class="pn-c" data-l="المسجد"><b>${esc(e.mosName || "—")}</b>${e.area || e.gov ? `<span class="s">${esc([e.area, e.gov].filter(Boolean).join("، "))}</span>` : ""}</span>
       <span class="pn-c" data-l="الموعد"><b>${esc(daysText(e) || "—")}</b>${e.time ? `<span class="s">${esc(e.time)}</span>` : ""}</span>
       <span class="pn-c" data-l="الكتاب">${N(e.doc)}</span>
       <span class="pn-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : ""}<span class="pn-b">${pNeedBtns(e, delegated)}</span></span>${coPhones(e.comm)}</div>`).join("")}</div>
-    ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}${S.pdone?.size ? `<div class="pn-dh"><h4>تم إصدارها أو إرسالها (${S.pdone.size})</h4><button type="button" class="btn btn-ghost" data-pndone>${S.f.pndone === "0" ? "إظهار" : "إخفاء"}</button></div>${S.f.pndone === "0" ? "" : pDoneList()}` : ""}</div>` + h; };
+    ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}</div>` + h; };
 /* confirmation that a permit was issued / sent: hides the approval from the list above (settings key pdone:<act id>) */
 const _loadPermits63 = loadPermits;
 loadPermits = async function(){ await _loadPermits63(); const { data, error } = await sb.from("settings").select("key,value").like("key", "pdone:%"); if (!error) S.pdone = new Map((data || []).map(r => [r.key.slice(6), r.value])); };
