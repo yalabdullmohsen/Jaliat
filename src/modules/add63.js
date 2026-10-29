@@ -192,11 +192,13 @@ const _permitView87 = permitView;
 permitView = async function(id){ await _permitView87(id); const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
 document.addEventListener("click", async ev => { const b = ev.target.closest("[data-pwa]"); if (!b) return; ev.preventDefault(); ev.stopImmediatePropagation();
   const id = b.dataset.pwa, p = S.permits.find(x => x.id === id); if (!p) return; const old = b.innerHTML; b.disabled = true; b.textContent = "يجهّز PDF…";
+  /* قائمة المشاركة في ماك وويندوز لا تعرض واتساب إلا إن وُجد له امتداد مشاركة، لذا تُستعمل على الجوال واللوحي فقط؛ وعلى الكمبيوتر يُنزَّل الملف ويُفتح واتساب برسالة جاهزة */
+  const touch = matchMedia("(pointer:coarse)").matches || /iPhone|iPad|Android/i.test(navigator.userAgent), win = touch ? null : window.open("", "_blank");
   try { const f = await permitPdf(id); if (!f) throw new Error("no pdf"); const txt = `تصريح إلقاء درس رقم \u2066${p.no}\u2069\nالشيخ: ${p.data?.sheikh || ""}\nالمسجد: ${p.data?.mosque || ""}${p.data?.time ? "\nالموعد: " + p.data.time : ""}`;
-    if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:"تصريح إلقاء درس", text:txt }); } catch (_) {} }
+    if (touch && navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:"تصريح إلقاء درس", text:txt }); } catch (_) {} }
     else { const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      toast("نزل ملف PDF، أرفقه في واتساب القسم"); if (S.view !== "whatsapp" && typeof go === "function" && TITLES.whatsapp) setTimeout(() => go("whatsapp"), 600); } }
-  catch (e) { toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }
+      toast("نزل ملف PDF في التنزيلات، اسحبه إلى محادثة واتساب"); if (win) win.location.href = "https://wa.me/?text=" + encodeURIComponent(txt); } }
+  catch (e) { win?.close(); toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }
   finally { b.disabled = false; b.innerHTML = old; } }, true);
 /* the head can always issue the permit himself, wherever «تفويض» appears */
 const _grantsPanel88 = grantsPanel;
