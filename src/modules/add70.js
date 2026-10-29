@@ -72,8 +72,10 @@ const _vMosques70b = vMosques;
 const mkM = m => nkey(String(m).replace(/^مسجد\s+/, ""));
 /* ربط مساجد الخطباء (وهي نفسها مساجد مكافآت الخطب) بكشف المساجد: تطابق تام، ثم تطابق جزئي إن كان وحيداً */
 let _mk = null;
-function mosLink(){ if (_mk && _mk.n === S.khatibs.size && _mk.m === S.mosques.length) return _mk.v; const byKey = new Map(S.mosques.map(m => [mkM(m.name), m])), ids = new Map(), lost = [];
-  for (const [id, k] of S.khatibs) { const key = mkM(k.mosque || ""); let m = byKey.get(key);
+function mosLink(){ if (_mk && _mk.n === S.khatibs.size && _mk.m === S.mosques.length) return _mk.v; const byKey = new Map(), ids = new Map(), lost = []; S.mosques.forEach(m => { const k = mkM(m.name); if (!byKey.has(k)) byKey.set(k, []); byKey.get(k).push(m); });
+  /* أسماء متكررة (مثل «الصحابة» في أبو حليفة والشرق): يُفضَّل المسجد الذي تطابق منطقته أو محافظته */
+  const pick = (L, k) => !L ? null : L.length === 1 ? L[0] : L.find(m => k.area && (m.area || "").includes(k.area)) || L.find(m => k.area && k.area.includes(m.area || "\u0000")) || L.find(m => k.gov && m.gov === k.gov) || null;
+  for (const [id, k] of S.khatibs) { const key = mkM(k.mosque || ""); let m = pick(byKey.get(key), k);
     if (!m && key.length >= 3) { const c = S.mosques.filter(x => { const a = mkM(x.name); return a.length >= 3 && (a.includes(key) || key.includes(a)); }); if (c.length === 1) m = c[0]; }
     if (m) { if (!ids.has(m.id)) ids.set(m.id, []); ids.get(m.id).push(String(id)); } else lost.push(k.mosque || String(id)); }
   _mk = { n:S.khatibs.size, m:S.mosques.length, v:{ ids, lost } }; return _mk.v; }
