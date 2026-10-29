@@ -31,3 +31,4 @@ button.rn-st{cursor:pointer}.rn-st.ok{border-color:#9CC9A8;background:#EAF4EC}.r
 /* v99 — استبدال خطيب */
 .sb-box{display:grid;gap:8px}.sb-g{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
 .sb-m{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sb-m>span{display:flex;gap:4px;flex-wrap:wrap}.sb-m .chip{font-style:normal}
+.sr-fl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.sr-fl #sr-q{flex:1 1 280px;min-width:0}.sr-fl select{flex:0 1 auto;min-width:0;max-width:100%}
