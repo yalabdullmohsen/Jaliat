@@ -125,7 +125,7 @@ function qForm(id, preset){
   const toMe = q.to_id === S.me.id;
   openDrawer(`السؤال س-${q.no}`, `<div class="q-meta"><span>من <b>${esc(pname(q.from_id))}</b> إلى <b>${esc(pname(q.to_id))}</b></span><span class="s">${fmtTime(q.created_at)}${q.seen_at ? ` · قُرئ ${fmtTime(q.seen_at)}` : " · لم يُقرأ بعد"}</span></div>
     <div class="q-body">${esc(q.body).replace(/\n/g, "<br>")}</div>
-    ${q.link ? `<button type="button" class="btn" data-tklink="${esc(q.link)}">فتح ${esc(linkName(q.link))}</button>` : ""}
+    ${q.link ? linkBtn(q.link) : ""}
     ${toMe || S.admin ? fld("q-ans", q.answer ? `الإجابة${q.answered_at ? "، " + fmtTime(q.answered_at) : ""}` : "إجابتك", `<textarea class="f" id="q-ans" rows="5" placeholder="اكتب الإجابة…">${esc(q.answer || "")}</textarea>`) : q.answer ? `<div class="q-ans"><b>💬 الإجابة</b><span class="s">${fmtTime(q.answered_at)}</span><div>${esc(q.answer).replace(/\n/g, "<br>")}</div></div>` : `<div class="empty s">لم تصل إجابة بعد</div>`}`,
     `${toMe || S.admin ? `<button class="btn btn-primary" data-qans>${q.answer ? "تعديل الإجابة" : "إرسال الإجابة"}</button>` : ""}${q.from_id === S.me.id && !q.answer ? `<button class="btn btn-ghost" data-qnew="${q.to_id}">سؤال آخر لنفس الشخص</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
   if (toMe && !q.seen_at) { q.seen_at = new Date().toISOString(); sb.from("questions").update({ seen_at:q.seen_at }).eq("id", q.id).then(() => {}); }

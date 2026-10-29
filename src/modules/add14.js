@@ -158,7 +158,7 @@ function taskForm(id, preset){
     ${fld("tk-title", "المهمة", `<input class="f" id="tk-title" value="${esc(t?.title || preset?.title || "")}" placeholder="مثال: مراجعة موافقات الجالية الفلبينية"${ro}>`)}
     ${fld("tk-det", "التفاصيل", `<textarea class="f" id="tk-det" rows="3"${ro}>${esc(t?.details || preset?.details || "")}</textarea>`)}
     <div class="g3">${fld("tk-who", "المكلّف", `<select class="f" id="tk-who"${ro}>${people.map(p => `<option value="${p.id}"${(t?.assignee || preset?.assignee) === p.id ? " selected" : ""}>${esc(p.name || p.username)}</option>`).join("")}</select>`)}${fld("tk-due", "الموعد النهائي", `<input class="f" type="date" id="tk-due" value="${esc(t?.due || preset?.due || "")}"${ro}>`)}${fld("tk-prio", "الأولوية", sel("tk-prio", PRIO, t?.prio || "متوسطة").replace('<option value="">—</option>', ""))}</div>
-    ${t?.link ? `<button type="button" class="btn" data-tklink="${esc(t.link)}">فتح ${esc(linkName(t.link))}</button>` : preset?.link ? `<span class="hint">مرتبطة بـ ${esc(linkName(preset.link))}</span>` : ""}
+    ${t?.link ? linkBtn(t.link) : preset?.link ? `<span class="hint">مرتبطة بـ ${esc(linkName(preset.link))}</span>` : ""}
     ${t ? `<div class="rq-sec"><b>متابعة التنفيذ</b>${tkTrack(t, false)}
       ${mgr ? fld("tk-st", "الحالة", `<select class="f" id="tk-st">${TK_ST.map(s => `<option${s === t.status ? " selected" : ""}>${s}</option>`).join("")}</select>`) : `<input type="hidden" id="tk-st" value="${esc(t.status)}">`}
       ${fld("tk-note", "ملاحظة الإنجاز", `<textarea class="f" id="tk-note" rows="2" placeholder="ماذا تم؟"${mine || mgr ? "" : " disabled"}>${esc(t.done_note || "")}</textarea>`)}
@@ -257,7 +257,8 @@ function tkTrack(t, mini){
   if (mini) return `<span class="tk-dots">${steps.map(([l, at]) => `<i class="${at ? "on" : ""}" title="${l}${at ? " " + fmtTime(at) : ""}"></i>`).join("")}<span class="s">${t.done_at ? "أُنجزت" : t.started_at ? "قيد التنفيذ" : t.ack_at ? "تم الاستلام" : t.seen_at ? "👁 اطّلع ولم يستلم" : "لم يطّلع بعد"}</span></span>`;
   return `<ol class="tk-track">${steps.map(([l, at]) => `<li class="${at ? "on" : ""}"><b>${l}</b><span class="s">${at ? fmtTime(at) : "—"}</span></li>`).join("")}</ol>`;
 }
-function linkName(l){ const [k, id] = String(l).replace(/^#/, "").split(":"); if (k === "act") { const e = S.byId.get(id); return e ? `النشاط #${e.n}` : "النشاط"; } if (k === "req") { const r = S.reqs.find(x => x.id === id); return r ? `الطلب ${rqNo(r)}` : "الطلب"; } if (k === "doc") return `الوثيقة ${id}`; if (k === "bk") return "الحجز"; return "المرتبط"; }
+function linkName(l){ const [k, id] = String(l).replace(/^#/, "").split(":"); if (k === "act") { const e = S.byId.get(id); return e ? `النشاط #${e.n}` : "النشاط"; } if (k === "req") { const r = S.reqs.find(x => x.id === id); return r ? `الطلب ${rqNo(r)}` : "الطلب"; } if (k === "doc") return `الوثيقة ${id}`; if (k === "bk") return "الحجز"; const N = { permit:"التصريح", pgrant:"التصريح", wq:"كتاب وثيقة", q:"السؤال", kh:"بيانات الخطيب", note:"الملاحظة", task:"المهمة", acctreq:"طلب الحساب", renew:"التجديد" }; return N[k] || "المرتبط"; }
+function linkBtn(l){ const k = String(l).replace(/^#/, "").split(":")[0]; return `<button type="button" class="btn btn-primary tk-open" data-tklink="${esc(l)}">${k === "pgrant" ? "📄 إصدار التصريح الآن" : "↗ فتح " + esc(linkName(l))}</button>`; }
 
 /* ---------- create tasks from problems (conflicts, approvals, requests) ---------- */
 function taskFrom(kind, id){
