@@ -139,8 +139,8 @@ async function permitIssue(){
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
   S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } closeDrawer(); toast(`صدر التصريح ${row.no}`); permitView(row.id);
 }
-/* عنوان الدرس: يُستبعد ما ليس عنواناً (موضوع الكتاب أو نوع النشاط) ويُكتب «أمور عامة» عند غياب العنوان */
-const permitTopic = t => { t = String(t || "").replace(/\s+/g, " ").trim(); return !t || /^(طلب|موافقة|كتاب)(\s|$|[\(:\-–])/.test(t) || /(تجديد|إقامة|اقامة|إيقاف|تعديل)\s+(دروس|أنشطة|انشطة|نشاط)/.test(t) || /^(درس|دروس|محاضرة|دورة|نشاط)$/.test(t) ? "أمور عامة" : t; };
+/* عنوان الدرس: يُستبعد ما ليس عنواناً (موضوع الكتاب أو نوع النشاط) ويُكتب «درس ديني» عند غياب العنوان */
+const permitTopic = t => { t = String(t || "").replace(/\s+/g, " ").trim(); return !t || /^(طلب|موافقة|كتاب)(\s|$|[\(:\-–])/.test(t) || /(تجديد|إقامة|اقامة|إيقاف|تعديل)\s+(دروس|أنشطة|انشطة|نشاط)/.test(t) || /^(درس|دروس|محاضرة|دورة|نشاط)$/.test(t) ? "درس ديني" : t; };
 /* التصريح ورقة A4 بعرض ثابت (794px) كما تُطبع وتُرسل PDF؛ على الشاشة تُصغَّر لتناسب العرض دون تغيير التنسيق */
 function fitPermit(){ const el = $("#permit-paper"); if (!el || el.closest("#permit-print")) return; const b = el.closest(".drawer-b") || el.parentElement, cs = getComputedStyle(b), w = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 24; el.style.zoom = w > 0 ? Math.min(1, w / 794).toFixed(3) : 1; }
 window.addEventListener("resize", () => { try { fitPermit(); } catch (_) {} });

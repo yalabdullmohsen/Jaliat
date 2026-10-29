@@ -98,7 +98,7 @@ function pFind(v){ const val = String(v || "").trim(); if (!val) return;
 function pFillLetter(w){ const t = [wqParent(w), w].filter(Boolean).map(x => x.body || "").join("\n");
   const lect = (t.match(/(?:فضيلة\s*)?(?:الشيخ|الداعية|الدكتور)\s*\/?\s*([^\n،,.(]{4,40})/) || [])[1] || "", mos = (t.match(/(مسجد\s*\/?\s*[^\n،,.(]{3,40})/) || [])[1] || "";
   const set = (id, v) => { const x = $("#" + id); if (x && v && !x.readOnly && !x.value) x.value = v; };
-  set("p-sheikh", lect.trim()); set("p-mosque", mos.trim()); set("p-topic", permitTopic(w.subj) === "أمور عامة" ? "" : w.subj); set($("#g-note") ? "g-note" : "p-note", `كتاب ${w.no}`);
+  set("p-sheikh", lect.trim()); set("p-mosque", mos.trim()); set("p-topic", permitTopic(w.subj) === "درس ديني" ? "" : w.subj); set($("#g-note") ? "g-note" : "p-note", `كتاب ${w.no}`);
   if (S.form) S.form.act = ""; toast(lect || mos ? "تعبّأت البيانات من نص الكتاب، راجعها وكمّل الناقص" : "الكتاب ما فيه اسم شيخ ولا مسجد واضح، كمّل يدوياً"); }
 document.addEventListener("input", ev => { if (ev.target.id !== "p-act") return; clearTimeout(pFind._t); const v = ev.target.value; pFind._t = setTimeout(() => pFind(v), 350); });
 document.addEventListener("click", ev => { const b = ev.target.closest("[data-pfill]"); if (!b) return; const k = b.dataset.pfill;
