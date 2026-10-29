@@ -98,3 +98,8 @@ button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transpa
 .permit-wrap{min-width:0;max-width:100%;overflow:hidden}
 .drawer-b:has(.permit-wrap){grid-template-columns:minmax(0,1fr)}
 .pm-bar{flex:none;height:4px;border-radius:2px;background:linear-gradient(270deg,#A87800,#DDAE00,#A87800)}
+#pdf-chip{position:fixed;inset-inline-start:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:12px;max-width:min(560px,calc(100vw - 40px));padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px #0003;font-size:13px}
+#pdf-chip .pc-f{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px dashed var(--primary);border-radius:10px;background:var(--surface-2);cursor:grab;font-weight:700;color:var(--primary);user-select:none;flex:none}
+#pdf-chip .pc-f:active{cursor:grabbing}
+#pdf-chip .pc-f svg{width:20px;height:20px}
+#pdf-chip button{border:0;background:none;font-size:20px;line-height:1;color:var(--muted);cursor:pointer}

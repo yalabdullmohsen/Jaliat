@@ -190,6 +190,12 @@ async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const src =
   PPDF.set(id, job); job.catch(() => PPDF.delete(id)); return job; }
 const _permitView87 = permitView;
 permitView = async function(id){ await _permitView87(id); const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
+/* بطاقة عائمة: ملف PDF قابل للسحب مباشرة إلى محادثة واتساب (Chrome يمرّر الملف للتطبيق عبر DownloadURL) */
+function pdfChip(f, url){ document.getElementById("pdf-chip")?.remove(); const c = document.createElement("div"); c.id = "pdf-chip";
+  c.innerHTML = `<div class="pc-f" draggable="true" title="اسحب إلى المحادثة">${icon("i-doc")}<b dir="ltr">${esc(f.name)}</b></div><span>اسحب الملف إلى محادثة واتساب، أو الصق (⌘V) صورة التصريح المنسوخة</span><button type="button" aria-label="إغلاق">×</button>`;
+  const close = () => { c.remove(); URL.revokeObjectURL(url); };
+  c.querySelector(".pc-f").addEventListener("dragstart", e => { e.dataTransfer.effectAllowed = "copy"; e.dataTransfer.setData("DownloadURL", `application/pdf:${f.name}:${url}`); try { e.dataTransfer.items.add(f); } catch (_) {} });
+  c.querySelector("button").addEventListener("click", close); document.body.appendChild(c); setTimeout(close, 180000); }
 document.addEventListener("click", async ev => { const b = ev.target.closest("[data-pwa]"); if (!b) return; ev.preventDefault(); ev.stopImmediatePropagation();
   const id = b.dataset.pwa, p = S.permits.find(x => x.id === id); if (!p) return; const old = b.innerHTML; b.disabled = true; b.textContent = "يجهّز PDF…";
   /* قائمة المشاركة في ماك وويندوز لا تعرض واتساب إلا إن وُجد له امتداد مشاركة، لذا تُستعمل على الجوال واللوحي فقط؛ وعلى الكمبيوتر يُنزَّل الملف ويُفتح تطبيق واتساب نفسه (whatsapp://) برسالة جاهزة */
@@ -199,7 +205,7 @@ document.addEventListener("click", async ev => { const b = ev.target.closest("[d
   if (!touch && window.ClipboardItem && navigator.clipboard?.write) copied = navigator.clipboard.write([new ClipboardItem({ "image/png": permitPdf(id).then(() => PPNG.get(id)) })]).then(() => true, () => false);
   try { const f = await permitPdf(id); if (!f) throw new Error("no pdf"); const txt = `تصريح إلقاء درس رقم \u2066${p.no}\u2069\nالشيخ: ${p.data?.sheikh || ""}\nالمسجد: ${p.data?.mosque || ""}${p.data?.time ? "\nالموعد: " + p.data.time : ""}`;
     if (touch && navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:"تصريح إلقاء درس", text:txt }); } catch (_) {} }
-    else { const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    else { const bu = URL.createObjectURL(f), a = document.createElement("a"); a.href = bu; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); pdfChip(f, bu);
       toast(await copied ? "نُسخ التصريح كاملاً: افتح المحادثة والصقه (⌘V أو Ctrl+V)، وملف PDF نزل أيضاً" : "نزل ملف PDF في التنزيلات، اسحبه إلى محادثة واتساب"); if (!touch) { const w = document.createElement("a"); w.href = "whatsapp://send?text=" + encodeURIComponent(txt); document.body.appendChild(w); w.click(); w.remove(); } } }
   catch (e) { toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }
   finally { b.disabled = false; b.innerHTML = old; } }, true);
