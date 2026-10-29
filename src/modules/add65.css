@@ -6,7 +6,8 @@
 .pn-c{display:grid;min-width:0;line-height:1.5}.pn-c b{font-weight:600;overflow-wrap:anywhere}.pn-c .s{overflow-wrap:anywhere}
 .pn-act{display:flex;justify-content:flex-end}.pn-act .pn-b{display:flex;gap:6px;flex-wrap:nowrap;white-space:nowrap}
 .pn-more{display:flex;justify-content:center;padding:10px 0 4px}
-@media (max-width:900px){.pn-hd{display:none}
+.pn-need{container:pnneed/inline-size}
+@container pnneed (max-width:860px){.pn-hd{display:none}
   .pn-row{grid-template-columns:1fr;gap:4px;padding:12px 4px}
   .pn-c{grid-template-columns:72px 1fr;gap:2px 10px;align-items:baseline}.pn-c::before{content:attr(data-l);font-size:12px;color:var(--muted)}
   .pn-c .s{grid-column:2}.pn-act{justify-content:stretch;margin-top:6px}.pn-act .pn-b{width:100%}.pn-act .pn-b .btn{flex:1}}
