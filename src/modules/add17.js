@@ -142,7 +142,7 @@ async function permitIssue(){
 async function permitView(id){
   const p = S.permits.find(x => x.id === id); if (!p) return; await loadQR().catch(() => {});
   const d = p.data || {}, [st, c] = pStatus(p), url = VERIFY(`${p.id}.${p.code}`);
-  let qr = ""; try { const q = qrcode(0, "M"); q.addData(url); q.make(); qr = q.createDataURL(6, 2); } catch (_) {}
+  let qr = ""; try { const q = qrcode(0, "M"); q.addData(url); q.make(); const n = q.getModuleCount(), z = 4; let d = ""; for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c + z} ${r + z}h1v1h-1z`; qr = `<svg class="pm-qrsvg" viewBox="0 0 ${n + 2 * z} ${n + 2 * z}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="باركود التحقق"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`; } catch (_) {}
   const H = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn", { day:"numeric", month:"long", year:"numeric" });
   S.form = { kind:"permitv", id };
   openDrawer(`التصريح \u2066${p.no}\u2069`, `<div class="check ${c === "ok" ? "ok" : "warn"}"><b>${st}</b><span>حتى ${fmt(p.until)} · رمز التحقق ${p.code.slice(0, 4)}-${p.code.slice(4)}</span></div>
@@ -156,7 +156,7 @@ async function permitView(id){
       <p class="pm-note">يُعدّ هذا التصريح رسمياً ونافذاً خلال مدته فقط ويُلغى تلقائياً بانتهائها. على إمام المسجد مسح الباركود للتحقق الفوري من صحته وصلاحيته عبر نظام «إنجاز».</p>
       <div class="pm-bottom"><div class="pm-appr"><span>اعتماد رئيس قسم الجاليات ورعاية المهتدين وطلبة البعوث</span><b data-pf="head">${esc(d.head || "")}</b>
         <div class="pm-sig"><div><i>${S.pAssets.sig ? `<img src="${S.pAssets.sig}" alt="">` : ""}</i>التوقيع</div><div><i class="r">${S.pAssets.stamp ? `<img src="${S.pAssets.stamp}" alt="">` : ""}</i>الختم</div></div></div>
-        <div class="pm-qr">${qr ? `<img src="${qr}" alt="باركود التحقق">` : ""}<span>امسح للتحقق</span><b dir="ltr">${p.code.slice(0, 4)}-${p.code.slice(4)}</b></div></div>
+        <div class="pm-qr">${qr}<span>امسح للتحقق</span><b dir="ltr">${p.code.slice(0, 4)}-${p.code.slice(4)}</b></div></div>
     </div></div>`,
     `<button class="btn btn-primary" data-pprint>طباعة / PDF</button><button class="btn" data-pwa="${p.id}">${icon("i-wa")} إرسال</button>${S.admin && !p.revoked ? `<button class="btn btn-ghost bad-t" data-prevoke="${p.id}">إلغاء التصريح</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
 }
