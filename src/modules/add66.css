@@ -43,3 +43,11 @@ body:has(#drawer:not([hidden])) .upd-bar{display:none}
 
 .rt-p .rt-done{background:#e8f3ea;color:#1d6b3a;border:1px solid #9cc9aa;font-weight:700}
 .rt-p .rt-done:hover{background:#d9ecde}
+
+/* iPhone: الحد الأدنى ١٦px لخانات الإدخال حتى لا يكبّر Safari الصفحة عند الضغط عليها، وتثبيت حجم النص وإزالة وميض اللمس */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transparent}
+@supports (-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea{font-size:max(16px,1em)}}
+/* الشاشات الضيقة (٣٢٠px): أعمدة الشريط السفلي لا تتمدد بعرض النص فيخرج الشريط عن الشاشة */
+.tabbar{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tabbar button{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
