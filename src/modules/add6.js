@@ -100,8 +100,8 @@ async function msSend(q){
     const refs = (last?.attributions || []).map(a => ({ url:a.seeMoreWebUrl || "", title:a.providerDisplayName || "" })).filter(r => r.url);
     res = { role:"assistant", text:last?.text || "—", refs }; const acts = findActions(res.text); if (acts.length) { CPX.list = acts.map(a => ({ a })); setTimeout(cpxRender, 0); }
   } catch (e) {
-    if (e?.needsAdmin) { MS.chat.pop(); $("#ms-wait")?.remove(); log.lastElementChild?.remove(); MS.busy = false; if ($("#ms-send")) $("#ms-send").disabled = false; MS.pendingQ = q; return msAdminBox(q); }
-    console.error(e); if (e.status === 404) MS.conv = null; res = { role:"assistant", err:true, text:msErr(e).t }; }
+    if (e?.needsAdmin || msErr(e).consent) res = msFallbackRes(q);
+    else { console.error(e); if (e.status === 404) MS.conv = null; res = { role:"assistant", err:true, text:msErr(e).t }; } }
   MS.busy = false; if ($("#ms-send")) $("#ms-send").disabled = false;
   MS.chat.push(res); $("#ms-wait")?.remove();
   $("#ms-log")?.insertAdjacentHTML("beforeend", msMsg(res, MS.chat.length - 1));

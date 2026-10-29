@@ -49,3 +49,17 @@ document.addEventListener("click", ev => {
 });
 document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $("#cppanel") && !$("#cppanel").hidden && !ev.target.closest?.("#drawer")) cpPanelOpen(false); });
 NEWF.splice(0, 0, ["v72-copilot", "nav:copilot", "Copilot داخل إنجاز في كل صفحة", "زر «Copilot» أسفل الشاشة في كل صفحة: اسأله عن الصفحة المفتوحة مباشرة، فهو يستلم ما على الشاشة وبيانات النظام تلقائياً مع كل سؤال، بحساب الوزارة وبلا إضافة."]);
+
+/* بدون موافقة مدير تقنية المعلومات: لا نتوقف ولا نطلب منه شيئاً. السؤال يُجهَّز كاملاً (سؤالك + الشاشة + بيانات النظام) ويُنسخ، وزر واحد يفتح Copilot للصقه. مع الجسر يُرسَل تلقائياً. */
+function msFallbackRes(q){
+  const full = `${cpCtx(q, true)}\n\nسؤالي/أمري: ${q}\n\nإذا كان طلبي تعديلاً على النظام فضع كتلة jaliyat-actions في نهاية ردك.`;
+  cpCopy(full).catch(() => {});
+  if (hasBridge()) { setTimeout(() => cpAsk(q, true), 0); return { role:"assistant", text:"أُرسل سؤالك مع بيانات الصفحة والنظام إلى Copilot عبر الجسر، والرد يظهر في صفحة Copilot." }; }
+  return { role:"assistant", text:"جهّزت سؤالك مع الصفحة المفتوحة وبيانات النظام ونسختها. اضغط «فتح Copilot» ثم الصق (Ctrl+V) واضغط إرسال. وإن طلب تعديلاً انسخ رده كاملاً والصقه في خانة السؤال هنا وأرسل، فتظهر أوامره للتنفيذ.", refs:[{ url:"https://m365.cloud.microsoft/chat/", title:"فتح Copilot" }], full };
+}
+const _msMsg72 = msMsg;
+msMsg = function(m, i){ let h = _msMsg72(m, i); if (m.full) h = h.replace(/<\/div><\/div>$/, `<div class="tools"><button type="button" data-mscf="${i}">نسخ السؤال مع البيانات</button></div></div></div>`); return h; };
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-mscf]"); if (!t) return; const m = MS.chat[+t.dataset.mscf]; if (m?.full) cpCopy(m.full).then(ok => toast(ok ? "نُسخ السؤال مع البيانات" : "تعذّر النسخ")); });
+
+const _msSend72 = msSend;
+msSend = async function(q){ const a = String(q || "").includes('"op"') ? findActions(String(q)) : []; if (a.length) { const i = $("#ms-in-q"); if (i) i.value = ""; CPX.list = a.map(x => ({ a:x })); cpxRender(); return toast(`وصلت ${a.length} أوامر من رد Copilot، راجعها ثم اضغط «تنفيذ»`); } return _msSend72(q); };
