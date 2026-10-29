@@ -134,3 +134,4 @@ body.cp-full #cp-fab{display:none}
 .as-bar .f{flex:1;border:0;background:transparent;font-size:16px}
 @media(max-width:900px){.as-bar{bottom:calc(76px + env(safe-area-inset-bottom))}}
 :root .btn-done{background:var(--ok)!important;color:#fff!important;border:0!important;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.18)!important}:root .btn-done:hover{filter:brightness(1.08)}.tk-donehd{margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+.tk-isdone{color:var(--ok);font-weight:700;padding:0 8px;align-self:center}
