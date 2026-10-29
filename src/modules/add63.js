@@ -66,7 +66,7 @@ function pFill(e){ if (!e) return; const set = (id, v) => { const x = $("#" + id
   set("p-sheikh", (e.lect || "").split(" / ")[0]); set("p-mosque", e.mosName ? pMos(e.mosName, e.area, e.gov) : (e.mosRaw || ""));
   set("p-lang", e.lang || (comm?.lang && !/متعدد/.test(comm.lang) ? comm.lang : "")); set("p-topic", e.title && e.title !== e.type ? e.title : (e.type || ""));
   const days = e.daily ? [...PD_ALL] : (e.days || []); document.querySelectorAll("#pd-days .pd-d").forEach(b => b.classList.toggle("on", days.includes(+b.dataset.pdd)));
-  const pr = prayerOf(e.time); const s = $("#p-pray"); if (s) { s.value = pr || "none"; pTimeSync(); }
+  const pr = prayerOf(e.time) || letterTime(e); const s = $("#p-pray"); if (s) { s.value = pr || "none"; pTimeSync(); }
   set("p-rep", e.rep || "weekly"); set("p-date", pNextDate(days));
   const start = doc?.start || null; if (start) { const t = dOf(start); let d0 = start; for (let i = 0; i < 8 && days.length; i++) { const x = new Date(t); x.setDate(t.getDate() + i); if (days.includes(x.getDay())) { d0 = addDays(start, i); break; } } set("p-date", d0); }
   pDurDoc(doc);

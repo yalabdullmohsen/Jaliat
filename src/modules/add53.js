@@ -3,11 +3,20 @@ const PRAYERS = ["بعد صلاة الفجر", "بعد صلاة الظهر", "ب
 const PR_HM = { "بعد صلاة الفجر":["04:45", "05:45"], "بعد صلاة الظهر":["12:00", "13:00"], "بعد صلاة العصر":["15:15", "16:15"], "بعد صلاة المغرب":["17:30", "18:30"], "بين المغرب والعشاء":["17:30", "18:45"], "بعد صلاة العشاء":["19:00", "20:00"], "بعد صلاة الجمعة":["12:15", "13:15"] };
 function prayerOf(t){ const s = String(t || ""); const p = PRAYERS.find(x => s.includes(x)) || PRAYERS.find(x => s.includes(x.replace("بعد صلاة ", ""))); if (p) return p;
   const m = s.match(/^(\d{1,2}):(\d{2})/); if (!m) return ""; const h = +m[1] + +m[2] / 60; return h < 7 ? "بعد صلاة الفجر" : h < 14 ? "بعد صلاة الظهر" : h < 17 ? "بعد صلاة العصر" : h < 18.6 ? "بعد صلاة المغرب" : "بعد صلاة العشاء"; }
+/* read the prayer period from the approval letter's text (S.wq body); returns "" when unclear, so the user picks it */
+function letterTime(e){ if (!e) return ""; const nz = x => String(x || "").replace(/[\u064B-\u0652\u0640]/g, "").replace(/[إأآ]/g, "ا").replace(/ى/g, "ي").replace(/\s+/g, " ");
+  const W = (S.wq || []).filter(w => w.body && (String(w.no) === String(e.doc) || (w.refs || []).some(r => String(r) === String(e.doc)))); if (!W.length) return "";
+  const RX = /بين (?:صلاتي )?المغرب و ?العشاء|بعد (?:صلاة )?(الفجر|الصبح|الظهر|العصر|المغرب|العشاء|الجمعة)/g, BAN = /ممنوع|يمنع|عدم|لا يجوز|تعميم|عدا|باستثناء/;
+  const pick = t => { const out = new Set(); for (const m of nz(t).matchAll(RX)) out.add(m[1] ? PRAYERS.find(x => x.endsWith(m[1] === "الصبح" ? "الفجر" : m[1]) && x.startsWith("بعد")) : "بين المغرب والعشاء"); return [...out].filter(Boolean); };
+  const mos = nz(e.mosName).replace(/^مسجد /, "").trim(), lec = nz(e.lect).split(" ").slice(0, 2).join(" ").trim();
+  const keys = [mos, lec].filter(k => k.length >= 4); let all = new Set(), hit = new Set();
+  for (const w of W) for (const seg of nz(w.body).split(/[\n.؛;]+/)) { if (BAN.test(seg)) continue; const t = pick(seg); t.forEach(x => all.add(x)); if (keys.some(k => seg.includes(k))) t.forEach(x => hit.add(x)); }
+  if (hit.size === 1) return [...hit][0]; if (hit.size > 1) return ""; return all.size === 1 ? [...all][0] : ""; }
 const _permitForm64 = permitForm;
 permitForm = function(preset, grant){ _permitForm64(preset, grant); if (S.form?.kind !== "permit") return;
-  const act = preset?.act_id ? S.byId?.get(preset.act_id) : null, cur = prayerOf(preset?.prayer || act?.time || preset?.t_from) || "بعد صلاة المغرب";
+  const act = preset?.act_id ? S.byId?.get(preset.act_id) : null, own = prayerOf(preset?.prayer || act?.time || preset?.t_from), lt = own ? "" : letterTime(act), cur = own || lt; if (lt && preset) preset.prayer = lt;
   const fw = $("#p-from")?.closest(".fld"), tw = $("#p-to")?.closest(".fld");
-  fw?.insertAdjacentHTML("beforebegin", `<div class="pr-pray-w">${fld("p-pray", "الوقت", `<select class="f" id="p-pray">${PRAYERS.map(p => `<option${p === cur ? " selected" : ""}>${p}</option>`).join("")}</select>`)}</div>`);
+  fw?.insertAdjacentHTML("beforebegin", `<div class="pr-pray-w">${fld("p-pray", "الوقت", `<select class="f" id="p-pray">${PRAYERS.map(p => `<option${p === cur ? " selected" : ""}>${p}</option>`).join("")}</select>`)}${lt ? `<span class="hint">قرأته من نص الكتاب، راجعه</span>` : !cur && act ? `<span class="hint">ما قدرت أحدد الوقت من الكتاب، اختره</span>` : ""}</div>`);
   if (fw) fw.hidden = true; if (tw) tw.hidden = true; prPraySync(); };
 function prPraySync(){ const p = $("#p-pray")?.value, hm2 = PR_HM[p]; if (!hm2) return; const f = $("#p-from"), t = $("#p-to"); if (f) f.value = hm2[0]; if (t) t.value = hm2[1]; }
 document.addEventListener("change", ev => { if (ev.target.id === "p-pray") prPraySync(); });
