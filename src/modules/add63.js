@@ -138,12 +138,15 @@ vPermits = function(){ const h = _vPermits85(); if (!canPermit()) return h; cons
       <span class="pn-c" data-l="الموعد"><b>${esc(daysText(e) || "—")}</b>${e.time ? `<span class="s">${esc(e.time)}</span>` : ""}</span>
       <span class="pn-c" data-l="الكتاب">${N(e.doc)}</span>
       <span class="pn-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : ""}<span class="pn-b">${pNeedBtns(e, delegated)}</span></span>${coPhones(e.comm)}</div>`).join("")}</div>
-    ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}${S.pdone?.size ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pndone>${S.f.pndone === "1" ? "إخفاء المؤكدة" : `المؤكدة (${S.pdone.size})`}</button></div>${S.f.pndone === "1" ? pDoneList() : ""}` : ""}</div>` + h; };
+    ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}${S.pdone?.size ? `<div class="pn-dh"><h4>تم إصدارها أو إرسالها (${S.pdone.size})</h4><button type="button" class="btn btn-ghost" data-pndone>${S.f.pndone === "0" ? "إظهار" : "إخفاء"}</button></div>${S.f.pndone === "0" ? "" : pDoneList()}` : ""}</div>` + h; };
 /* confirmation that a permit was issued / sent: hides the approval from the list above (settings key pdone:<act id>) */
 const _loadPermits63 = loadPermits;
 loadPermits = async function(){ await _loadPermits63(); const { data, error } = await sb.from("settings").select("key,value").like("key", "pdone:%"); if (!error) S.pdone = new Map((data || []).map(r => [r.key.slice(6), r.value])); };
 function pDoneList(){ const L = [...(S.pdone || [])].sort((a, b) => (b[1].at || "").localeCompare(a[1].at || ""));
-  return `<div class="pn-grid pn-dn">${L.map(([id, v]) => { const e = S.E.find(x => x.id === id); return `<div class="pn-dr"><span><b>${esc(e?.lect || "—")}</b> <span class="s">${esc(e?.mosName || "")}</span></span><span class="chip ${v.st === "sent" ? "ok" : "gold"}">${v.st === "sent" ? "أُرسل" : "صدر"}</span><span class="s">${esc(fmt((v.at || "").slice(0, 10)))}${v.by ? " · " + esc(v.by) : ""}</span><button type="button" class="btn btn-ghost" data-pundo="${esc(id)}">↺ إرجاع للقائمة</button></div>`; }).join("")}</div>`; }
+  return `<div class="pn-grid pn-dn">${L.map(([id, v]) => { const e = S.E.find(x => x.id === id), p = S.permits.find(x => x.act_id === id && !x.revoked), sent = v.st === "sent";
+    return `<div class="pn-dr"><span class="pn-dw"><b>${esc(e?.lect || "نشاط محذوف أو غير موجود")}</b><span class="s">${esc([e?.mosName, e && daysText(e), e?.time].filter(Boolean).join(" · "))}</span></span>
+      <span class="chip ${sent ? "ok" : "gold"}">${sent ? "أُرسل" : "صدر"}</span><span class="s">${esc(fmt((v.at || "").slice(0, 10)))}${v.by ? " · " + esc(v.by) : ""}</span>
+      <span class="pn-da">${p ? `<button type="button" class="btn" data-permit="${esc(p.id)}">فتح التصريح (تعديل / إلغاء)</button>` : ""}<button type="button" class="btn btn-ghost" data-pdset="${sent ? "issued" : "sent"}" data-pid="${esc(id)}">${sent ? "غيّرها إلى: صدر" : "غيّرها إلى: أُرسل"}</button><button type="button" class="btn btn-ghost bad-t" data-pundo="${esc(id)}">↺ تراجع وإرجاع للقائمة</button></span></div>`; }).join("")}</div>`; }
 function pDoneForm(id){ const e = S.E.find(x => x.id === id); if (!e) return;
   openDrawer("تأكيد التصريح", `<div class="card pad"><b>${esc(e.lect || "—")}</b><br><span class="s">${esc([e.mosName, daysText(e), e.time].filter(Boolean).join(" · "))}</span></div>
     <p class="hint" style="margin:12px 2px">اختر الحالة، وبعدها تختفي من القائمة. تقدر ترجعها من «المؤكدة».</p>
@@ -155,7 +158,7 @@ async function pDoneSet(id, st){ const v = { st, at:new Date().toISOString(), by
   (S.pdone = S.pdone || new Map()).set(id, v); closeDrawer(); render(); toast(st === "sent" ? "تم تأكيد إرسال التصريح، واختفت من القائمة" : "تم تأكيد إصدار التصريح، واختفت من القائمة"); }
 async function pDoneUndo(id){ const { error } = await sb.from("settings").delete().eq("key", "pdone:" + id); if (error) return writeFail(error); S.pdone?.delete(id); render(); toast("رجعت للقائمة"); }
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-pdone],[data-pndone],[data-pdset],[data-pundo]"); if (!t) return;
-  if (t.dataset.pdone) return pDoneForm(t.dataset.pdone); if (t.dataset.pndone !== undefined) { S.f.pndone = S.f.pndone === "1" ? "" : "1"; return render(); }
+  if (t.dataset.pdone) return pDoneForm(t.dataset.pdone); if (t.dataset.pndone !== undefined) { S.f.pndone = S.f.pndone === "0" ? "" : "0"; return render(); }
   if (t.dataset.pdset) return pDoneSet(t.dataset.pid, t.dataset.pdset); if (t.dataset.pundo) return pDoneUndo(t.dataset.pundo); });
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-pnall]")) return; S.f.pnall = S.f.pnall === "1" ? "" : "1"; render(); });
 const _prio85 = priorities;

@@ -109,3 +109,6 @@ button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transpa
 .cph-n{display:flex;flex-direction:column;min-width:120px}.cph-n small{color:var(--muted);font-size:11px}
 .cph-p{font-weight:700;letter-spacing:.02em;min-width:96px}
 .cph-b{padding:6px 12px;font-size:13px;text-decoration:none}
+.pn-dh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}.pn-dh h4{margin:0;font-size:15px}
+.pn-dw{display:flex;flex-direction:column;flex:1 1 220px;min-width:0}.pn-dw .s{font-size:12px}
+.pn-da{display:flex;gap:6px;flex-wrap:wrap}.pn-da .btn{padding:6px 12px;font-size:13px}
