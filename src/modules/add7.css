@@ -32,7 +32,7 @@ button.kpi{transition:box-shadow .15s,transform .15s} button.kpi:hover{transform
 .bad-t{color:var(--bad)!important}
 @media (max-width:700px){.wq-i{grid-template-columns:minmax(0,1fr);gap:6px}.wq-m{justify-content:flex-start}.wq-no{justify-self:start}}
 /* ===== lesson permit (A4) ===== */
-.permit-wrap{overflow:auto;background:var(--surface-2);border-radius:12px;padding:12px}
+.permit-wrap{flex:none;overflow:visible;background:var(--surface-2);border-radius:12px;padding:12px}
 .permit{background:#fff;color:#14291F;width:100%;max-width:720px;margin:auto;padding:28px 30px;border:1px solid #d9e4dd;border-radius:6px;font-size:14px;line-height:1.8;position:relative}
 .permit::before{content:"";position:absolute;inset:8px;border:1.5px solid #1E7D5E;border-radius:4px;pointer-events:none;opacity:.5}
 .pm-h{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #1E7D5E;padding-bottom:12px}
@@ -48,9 +48,9 @@ button.kpi{transition:box-shadow .15s,transform .15s} button.kpi:hover{transform
 .pm-valid>div{border:1px dashed #1E7D5E;border-radius:8px;padding:8px 12px;display:grid}
 .pm-valid span{font-size:12px;color:#5F7068}.pm-valid b{color:#145A43}
 .pm-note{font-size:12px;color:#5F7068;background:#F4F8F5;border-radius:8px;padding:8px 12px}
-.pm-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:14px}
+.pm-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:14px}.pm-bottom .pm-appr{flex:1 1 230px;min-width:0}.pm-bottom .pm-qr{flex:0 0 auto;margin-inline:auto}
 .pm-appr{display:grid;gap:4px;font-size:12.5px}.pm-appr b{font-size:15px}
-.pm-sig{display:flex;gap:18px;margin-top:6px;font-size:12px;color:#5F7068;text-align:center}
+.pm-sig{display:flex;flex-wrap:wrap;gap:18px;margin-top:6px;font-size:12px;color:#5F7068;text-align:center}
 .pm-sig>div{display:grid;gap:4px;justify-items:center}
 .pm-sig i{display:block;width:120px;height:62px;border-bottom:1px solid #9fb5a8}
 .pm-sig i.r{width:78px;height:78px;border:1px dashed #9fb5a8;border-radius:50%}
