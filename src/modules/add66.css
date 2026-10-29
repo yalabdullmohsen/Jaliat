@@ -51,3 +51,4 @@ button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transpa
 /* الشاشات الضيقة (٣٢٠px): أعمدة الشريط السفلي لا تتمدد بعرض النص فيخرج الشريط عن الشاشة */
 .tabbar{grid-template-columns:repeat(5,minmax(0,1fr))}
 .tabbar button{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+@media(max-width:520px){:root .top .finder{flex:0 0 38px;width:38px;padding-inline:0;justify-content:center}:root .top .finder span,:root .top .finder kbd{display:none}}
