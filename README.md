@@ -2,7 +2,7 @@
 
 نظام ويب يعمل بالكامل من المتصفح، لقسم الجاليات ورعاية المهتدين وطلبة البعوث في إدارة العلاقات الخارجية بوزارة الشؤون الإسلامية.
 
-- **الموقع الحي:** https://injazkwt.com/
+- **الموقع الحي:** https://yalabdullmohsen.github.io/Jaliat/
 - **الواجهة:** صفحة واحدة (`index.html`)، تُبنى من المصدر في `src/` وتُنشر على GitHub Pages.
 - **البيانات والدخول:** Supabase، وهو Postgres مع Auth وRLS وEdge Functions وRealtime.
 - **الجسر:** إضافة Edge/Chrome في `bridge/`، تعرض Copilot وواتساب ويب داخل النظام.
