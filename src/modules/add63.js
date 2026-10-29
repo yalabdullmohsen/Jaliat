@@ -116,6 +116,10 @@ NEWF.splice(1, 0, ["v85-pauto", "nav:permits", "تعبئة التصريح تلق
 function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean));
   return S.E.filter(e => e.doc && docBy[e.doc] && (docBy[e.doc].date || docBy[e.doc].start || "") >= since && (!docBy[e.doc].end || docBy[e.doc].end >= TODAY) && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id) && !S.pdone?.has(e.id))
     .map(e => ({ e, delegated:gr.has(e.id) })).sort((a, b) => (docBy[b.e.doc].date || "").localeCompare(docBy[a.e.doc].date || "")); }
+/* أرقام منسقي الجالية: نسخ الرقم أو فتح المحادثة مباشرة في تطبيق واتساب */
+function coPhones(comm){ const L = (S.coords || []).filter(c => c.comm === comm && c.status !== "سابق" && c.phone).sort((a, b) => (a.role === "نائب منسق") - (b.role === "نائب منسق")); if (!L.length) return `<div class="pn-co none">لا يوجد رقم منسق لهذه الجالية</div>`;
+  return `<div class="pn-co">${L.map(c => `<div class="cph"><span class="cph-n"><b>${esc(c.name)}</b><small>${esc(c.role || "منسق")}</small></span><bdi dir="ltr" class="cph-p">${esc(c.phone)}</bdi><button type="button" class="btn btn-ghost cph-b" data-cpph="${esc(c.phone)}">نسخ الرقم</button><a class="btn cph-b" href="whatsapp://send?phone=${waNum(c.phone)}">${icon("i-wa")} محادثة مباشرة</a></div>`).join("")}</div>`; }
+document.addEventListener("click", async ev => { const t = ev.target.closest("[data-cpph]"); if (!t) return; ev.preventDefault(); toast(await cpCopy(t.dataset.cpph) ? "نُسخ الرقم" : "تعذّر النسخ"); });
 const pNeedBtns = (e, delegated) => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button>${S.admin && !delegated ? `<button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button>` : ""}<button type="button" class="btn btn-ghost" data-pdone="${esc(e.id)}" title="تؤكد أن التصريح صدر أو أُرسل فيختفي من القائمة">✓ تم الإصدار</button>`;
 const _vPermits85 = vPermits;
 vPermits = function(){ const h = _vPermits85(); if (!canPermit()) return h; const L = permitNeeds(); if (!L.length && !S.pdone?.size) return h;
@@ -126,7 +130,7 @@ vPermits = function(){ const h = _vPermits85(); if (!canPermit()) return h; cons
       <span class="pn-c" data-l="المسجد"><b>${esc(e.mosName || "—")}</b>${e.area || e.gov ? `<span class="s">${esc([e.area, e.gov].filter(Boolean).join("، "))}</span>` : ""}</span>
       <span class="pn-c" data-l="الموعد"><b>${esc(daysText(e) || "—")}</b>${e.time ? `<span class="s">${esc(e.time)}</span>` : ""}</span>
       <span class="pn-c" data-l="الكتاب">${N(e.doc)}</span>
-      <span class="pn-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : ""}<span class="pn-b">${pNeedBtns(e, delegated)}</span></span></div>`).join("")}</div>
+      <span class="pn-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : ""}<span class="pn-b">${pNeedBtns(e, delegated)}</span></span>${coPhones(e.comm)}</div>`).join("")}</div>
     ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}${S.pdone?.size ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pndone>${S.f.pndone === "1" ? "إخفاء المؤكدة" : `المؤكدة (${S.pdone.size})`}</button></div>${S.f.pndone === "1" ? pDoneList() : ""}` : ""}</div>` + h; };
 /* confirmation that a permit was issued / sent: hides the approval from the list above (settings key pdone:<act id>) */
 const _loadPermits63 = loadPermits;
@@ -189,7 +193,7 @@ async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const src =
     pdf.setProperties({ title:u16 }); return new File([pdf.output("blob")], fname, { type:"application/pdf" }); })();
   PPDF.set(id, job); job.catch(() => PPDF.delete(id)); return job; }
 const _permitView87 = permitView;
-permitView = async function(id){ await _permitView87(id); const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
+permitView = async function(id){ await _permitView87(id); { const pp = S.permits.find(x => x.id === id), cm = (pp?.act_id && S.byId?.get(pp.act_id)?.comm) || pp?.data?.comm; if (cm) $(".drawer-b .check")?.insertAdjacentHTML("afterend", `<div class="panel"><div class="panel-h"><h3>أرقام المنسقين للإرسال المباشر</h3></div><div class="panel-b">${coPhones(cm)}</div></div>`); } const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
 /* بطاقة عائمة: ملف PDF قابل للسحب مباشرة إلى محادثة واتساب (Chrome يمرّر الملف للتطبيق عبر DownloadURL) */
 function pdfChip(f, url){ document.getElementById("pdf-chip")?.remove(); const c = document.createElement("div"); c.id = "pdf-chip";
   c.innerHTML = `<div class="pc-f" draggable="true" title="اسحب إلى المحادثة">${icon("i-doc")}<b dir="ltr">${esc(f.name)}</b></div><span>اسحب الملف إلى محادثة واتساب (نزل أيضاً في التنزيلات)</span><button type="button" aria-label="إغلاق">×</button>`;

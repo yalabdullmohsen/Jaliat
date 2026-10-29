@@ -103,3 +103,9 @@ button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transpa
 #pdf-chip .pc-f:active{cursor:grabbing}
 #pdf-chip .pc-f svg{width:20px;height:20px}
 #pdf-chip button{border:0;background:none;font-size:20px;line-height:1;color:var(--muted);cursor:pointer}
+.pn-co{grid-column:1/-1;display:grid;gap:6px;padding-top:8px;border-top:1px dashed var(--line)}
+.pn-co.none{font-size:12px;color:var(--muted)}
+.cph{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cph-n{display:flex;flex-direction:column;min-width:120px}.cph-n small{color:var(--muted);font-size:11px}
+.cph-p{font-weight:700;letter-spacing:.02em;min-width:96px}
+.cph-b{padding:6px 12px;font-size:13px;text-decoration:none}
