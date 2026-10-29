@@ -244,7 +244,7 @@ function vInbox(){
   const L = S.reqs.filter(r => tab === "all" ? true : tab === "open" ? !["معتمد", "مرفوض"].includes(r.status) : r.status === tab);
   const cnt = s => S.reqs.filter(r => r.status === s).length;
   return `<div class="iz iz-top" id="iz-drop" role="button" tabindex="0">${icon("i-cam", 26)}<span><b>استقبال طلب جديد</b><br><span class="s">اسحب صور الطلب أو ملف PDF هنا، أو اضغط، يُحلَّل ويُفرز ويُدخل تلقائياً</span></span></div>
-  <div class="toolbar"><div class="seg">${[["open", "المفتوحة", S.reqs.filter(r => !["معتمد", "مرفوض"].includes(r.status)).length], ...RQ_ST.map(s => [s, s, cnt(s)]), ["all", "الكل", S.reqs.length]].map(([k, l, n]) => `<button type="button" class="${tab === k ? "on" : ""}" data-rqt="${esc(k)}">${esc(l)} <span class="num">${n}</span></button>`).join("")}</div></div>
+  <div class="toolbar"><div class="seg">${[["open", "المفتوحة", S.reqs.filter(r => !["معتمد", "مرفوض"].includes(r.status)).length], ...RQ_ST.map(s => [s, s, cnt(s)]), ["all", "الكل", S.reqs.length]].map(([k, l, n]) => `<button type="button" class="${tab === k ? "on" : ""}" data-rqt="${esc(k)}">${esc(l)} <span class="num">${n}</span></button>`).join("")}</div>${S.admin && tab === "open" && L.length ? `<button type="button" class="btn btn-danger" data-rqcancelall>إلغاء كل الطلبات المفتوحة (${L.length})</button>` : ""}</div>
   <div class="rq-grid">${L.map(r => { const d = r.data || {}; const acts = d.acts || []; const done = acts.filter(a => actMatch(a)).length;
     return `<button type="button" class="rq-card" data-rq="${r.id}"><div class="rq-h"><span class="chip ${RQ_C[r.status] || ""}">${esc(r.status)}</span><span class="s">${fmt(d.date || r.created_at?.slice(0, 10))}</span>${(r.files || []).length ? `<span class="s">${icon("i-cam", 14)} ${r.files.length}</span>` : ""}</div>
       <b>${esc(d.org || d.subj || "طلب بدون عنوان")}</b><span class="s">${esc([d.comm, d.coord].filter(Boolean).join(" · ") || "—")}</span>
@@ -626,6 +626,7 @@ document.addEventListener("click", async ev => {
   if (D.rq) return reqForm(D.rq);
   if (D.rqsave !== undefined) return rqSave();
   if (D.rqapprove !== undefined) return rqApprove();
+  if (D.rqcancelall !== undefined) { if (!S.admin) return; const ids = S.reqs.filter(r => !["معتمد", "مرفوض"].includes(r.status)).map(r => r.id); if (!ids.length) return; if (t.dataset.sure !== "1") { t.dataset.sure = "1"; t.textContent = `اضغط مرة أخرى لإلغاء ${ids.length} طلب`; return; } t.disabled = true; const { error } = await sb.from("requests").update({ status:"مرفوض", updated_at:new Date().toISOString() }).in("id", ids); if (error) { t.disabled = false; return writeFail(error); } await loadReqs(); render(); return toast(`أُلغي ${ids.length} طلب (حالتها: مرفوض، لم تُحذف)`); }
   if (D.rqdel !== undefined) { if (!S.form?.id) return; if (t.dataset.sure !== "1") { t.dataset.sure = "1"; t.textContent = "اضغط مرة أخرى للتأكيد"; return; } const { error } = await sb.from("requests").delete().eq("id", S.form.id); if (error) return writeFail(error); S.reqs = S.reqs.filter(r => r.id !== S.form.id); closeDrawer(); render(); return toast("حُذف الطلب"); }
   if (D.rqadd !== undefined) { S.rqActs.push(tolAct({ comm:$("#rq-comm").value })); return rqActsRender(); }
   if (D.rqrm !== undefined) { S.rqActs.splice(+D.rqrm, 1); return rqActsRender(); }
