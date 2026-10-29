@@ -70,9 +70,15 @@ vMosques = function(){ let h = _vMosques70();
 /* ---- كشف المساجد: فلتر «نوع المسجد» (دروس فقط / خطب فقط / الاثنان) + عمود مكافآت الخطب لمساجد الخطباء فقط ---- */
 const _vMosques70b = vMosques;
 const mkM = m => nkey(String(m).replace(/^مسجد\s+/, ""));
-function mosKinds(){ const kh = new Map(); for (const [id, k] of S.khatibs) { const key = mkM(k.mosque || ""); if (!kh.has(key)) kh.set(key, []); kh.get(key).push(String(id)); }
-  const les = new Set(); S.E.forEach(e => { if (e.mosque && !/خطبة/.test(String(e.type || ""))) les.add(e.mosque); });
-  return m => { const k = kh.get(mkM(m.name)), l = les.has(m.id); return { ids:k || [], kind:k && l ? "both" : k ? "kh" : l ? "les" : "" }; }; }
+/* ربط مساجد الخطباء (وهي نفسها مساجد مكافآت الخطب) بكشف المساجد: تطابق تام، ثم تطابق جزئي إن كان وحيداً */
+let _mk = null;
+function mosLink(){ if (_mk && _mk.n === S.khatibs.size && _mk.m === S.mosques.length) return _mk.v; const byKey = new Map(S.mosques.map(m => [mkM(m.name), m])), ids = new Map(), lost = [];
+  for (const [id, k] of S.khatibs) { const key = mkM(k.mosque || ""); let m = byKey.get(key);
+    if (!m && key.length >= 3) { const c = S.mosques.filter(x => { const a = mkM(x.name); return a.length >= 3 && (a.includes(key) || key.includes(a)); }); if (c.length === 1) m = c[0]; }
+    if (m) { if (!ids.has(m.id)) ids.set(m.id, []); ids.get(m.id).push(String(id)); } else lost.push(k.mosque || String(id)); }
+  _mk = { n:S.khatibs.size, m:S.mosques.length, v:{ ids, lost } }; return _mk.v; }
+function mosKinds(){ const L = mosLink(), les = new Set(); S.E.forEach(e => { if (e.mosque && !/خطبة/.test(String(e.type || ""))) les.add(e.mosque); });
+  return m => { const k = L.ids.get(m.id), l = les.has(m.id); return { ids:k || [], kind:k && l ? "both" : k ? "kh" : l ? "les" : "" }; }; }
 vMosques = function(){ const keep = S.mosques, f = S.f.mkind || "", kd0 = mosKinds(), info = new Map(keep.map(m => [m.id, kd0(m)]));
   S.mosques = f ? keep.filter(m => info.get(m.id).kind === f) : keep; let h; try { h = _vMosques70b(); } finally { S.mosques = keep; }
   const sel = `<select class="f" data-fk="mkind">${[["", "كل المساجد"], ["les", "مساجد الدروس فقط"], ["kh", "مساجد الخطباء فقط"], ["both", "مساجد الدروس والخطباء"]].map(([k, l]) => `<option value="${k}"${k === f ? " selected" : ""}>${l}</option>`).join("")}</select>`;
@@ -81,4 +87,5 @@ vMosques = function(){ const keep = S.mosques, f = S.f.mkind || "", kd0 = mosKin
   const rew = ids => { let n = 0, sum = 0; for (const [, r] of SR.rows) if (ids.includes(String(r.kh_id)) && F.has(r.fri) && r.who !== "none") { n++; sum += +r.amount > 0 ? +r.amount : rate; } return n ? `${n} خطبة${rate || sum ? ` · ${kd(sum)} د.ك` : ""}` : "—"; };
   h = h.replace("<th>الأنشطة</th>", "<th>الأنشطة</th><th>مكافآت الخطب</th>");
   S.mosques.filter(m => !f || info.get(m.id).kind === f).forEach(m => { const re = new RegExp(`(<tr data-open="mos:${String(esc(m.id)).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}">[\\s\\S]*?)</tr>`), i = info.get(m.id); h = h.replace(re, `$1<td>${i.ids.length ? rew(i.ids) : ""}</td></tr>`); });
+  const lost = mosLink().lost; if (lost.length) h = h.replace('<div class="toolbar">', `<div class="check warn"><b>${lost.length} من ${S.khatibs.size} مسجد خطباء غير مربوط بكشف المساجد</b><span>${lost.slice(0, 12).map(esc).join("، ")}${lost.length > 12 ? "…" : ""}، اسمه مختلف عن المسجّل في الكشف.</span></div><div class="toolbar">`);
   return h; };
