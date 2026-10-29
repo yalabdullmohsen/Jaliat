@@ -201,8 +201,9 @@ document.addEventListener("click", async ev => { const b = ev.target.closest("[d
   /* قائمة المشاركة في ماك وويندوز لا تعرض واتساب إلا إن وُجد له امتداد مشاركة، لذا تُستعمل على الجوال واللوحي فقط؛ وعلى الكمبيوتر يُنزَّل الملف ويُفتح تطبيق واتساب نفسه (whatsapp://) برسالة جاهزة */
   const touch = matchMedia("(pointer:coarse)").matches || /iPhone|iPad|Android/i.test(navigator.userAgent);
   try { const f = await permitPdf(id); if (!f) throw new Error("no pdf");
-    if (touch && navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f] }); } catch (_) {} }
-    else { const bu = URL.createObjectURL(f), a = document.createElement("a"); a.href = bu; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); pdfChip(f, bu);
+    /* الأولوية لقائمة المشاركة في النظام (فيها واتساب إن كان مثبّتاً)؛ فإن لم تتوفر أو أُغلقت على الكمبيوتر يُنزَّل الملف وتظهر بطاقة السحب */
+    let done = false; if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f] }); done = true; } catch (_) { done = touch; } }
+    if (!done) { const bu = URL.createObjectURL(f), a = document.createElement("a"); a.href = bu; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); pdfChip(f, bu);
       toast("اسحب ملف PDF من البطاقة إلى محادثة واتساب"); if (!touch) { const w = document.createElement("a"); w.href = "whatsapp://"; document.body.appendChild(w); w.click(); w.remove(); } } }
   catch (e) { toast("تعذّر تجهيز PDF، استخدم «طباعة / PDF»"); }
   finally { b.disabled = false; b.innerHTML = old; } }, true);
