@@ -129,19 +129,35 @@ function coPhones(comm, pid){ const L = coFor(comm).sort((a, b) => String(a.comm
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-cpph]"); if (!t) return; ev.preventDefault(); toast(await cpCopy(t.dataset.cpph) ? "نُسخ الرقم" : "تعذّر النسخ"); });
 const pNeedBtns = (e, delegated) => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button>${S.admin && !delegated ? `<button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button>` : ""}<button type="button" class="btn btn-ghost" data-pdone="${esc(e.id)}" title="تؤكد أن التصريح صدر أو أُرسل فيختفي من القائمة">✓ تم الإصدار</button>`;
 const _vPermits85 = vPermits;
-const pGroups = L => { const m = new Map(); for (const x of L) { const k = String(x.e.comm || "").trim() || "—"; if (!m.has(k)) m.set(k, []); m.get(k).push(x); } return [...m].sort((a, b) => a[0].localeCompare(b[0], "ar")); };
-const pcTitle = k => k === "—" ? "بدون جالية محددة" : commBase(k), pcSub = k => k === "—" ? "" : String(k).split(/\s+[-–—]\s+/).slice(1).join(" - ");
+/* ربط ذكي: الدولة ← اللغة/الجالية ← المنسق. الكتاب أحياناً يذكر الجالية فقط («الهندية – المليبارية»)، فيُستنتج المنسق من نفس المسجد أو الشيخ في أنشطة أخرى، وإلا يبقى «غير محدد» مع أرقام كل منسقي تلك الجالية */
+const dsh = s => String(s || "").replace(/[–—]/g, "-").replace(/\s+/g, " ").trim();
+function pCommOf(e){ const cm = String(e.comm || "").replace(/\s+/g, " ").trim(), cs = S.comms || [], c = cs.find(x => x.name === cm && x.coord);
+  if (c) return { spec: c.name, coord: c.coord, group: c.group || c.name, lang: c.lang || "" };
+  const gm = cs.filter(x => x.coord && dsh(x.group) === dsh(cm));
+  if (gm.length) return { spec: "", group: gm[0].group, lang: gm.every(x => x.lang === gm[0].lang) ? gm[0].lang || "" : "", cands: gm.map(x => x.name) };
+  return { spec: "", group: cm, lang: "", cands: [] }; }
+const pCountry = g => String(g || "").split(/\s+[–-]\s+/)[0].trim() || "—";
+function pGroups(L){ const A = new Map(), B = new Map(), add = (m, k, v) => { if (!k) return; if (!m.has(k)) m.set(k, new Set()); m.get(k).add(v); };
+  for (const a of S.E) { const i = pCommOf(a); if (i.spec) { add(A, nkey(a.mosName || ""), i.spec); add(B, nkey(a.lect || ""), i.spec); } }
+  const G = new Map();
+  for (const x of L) { const i = pCommOf(x.e), pick = (m, k) => [...(m.get(k) || [])].filter(n => i.cands?.includes(n)); let via = "";
+    if (!i.spec && i.cands?.length) { let c = pick(A, nkey(x.e.mosName || "")); if (c.length === 1) via = "المسجد"; else { c = pick(B, nkey(x.e.lect || "")); if (c.length === 1) via = "الشيخ"; else c = []; } if (c.length === 1) { const f = (S.comms || []).find(y => y.name === c[0]); i.spec = c[0]; i.coord = f?.coord; i.lang = f?.lang || i.lang; } }
+    const country = pCountry(i.group), lang = i.lang || (dsh(i.group).split(" - ")[1] || ""), key = i.spec || "؟" + dsh(i.group);
+    if (!G.has(key)) G.set(key, { key, country, lang, spec: i.spec, coord: i.coord, group: i.group, comm: x.e.comm, items: [] }); G.get(key).items.push({ ...x, via }); }
+  return [...G.values()].sort((a, b) => a.country.localeCompare(b.country, "ar") || a.lang.localeCompare(b.lang, "ar") || (!a.spec - !b.spec) || String(a.coord || "").localeCompare(String(b.coord || ""), "ar")); }
 vPermits = function(){ const h = _vPermits85(); if (!canPermit()) return h; const L = permitNeeds(), D = S.pdone?.size || 0, tab = S.f.ptab || (L.length ? "need" : D ? "done" : "all");
   const tabs = [["need", "تحتاج تصريح", L.length], ["done", "تم إصدارها / إرسالها", D], ["all", "كل التصاريح الصادرة", S.permits.length]],
     bar = `<div class="pt-bar"><div class="pt-tabs" role="tablist">${tabs.map(([k, l, n]) => `<button type="button" role="tab" aria-selected="${tab === k}" class="pt-tab${tab === k ? " on" : ""}" data-ptab="${k}">${l}<span class="chip${k === "need" && n ? " gold" : ""}">${n}</span></button>`).join("")}</div>${tab === "all" ? "" : `<button type="button" class="btn btn-primary" data-pnew>${icon("i-plus")} إصدار تصريح جديد</button>`}</div>`;
   if (tab === "all") return bar + h;
   if (tab === "done") return bar + `<div class="panel pt-p"><div class="panel-h"><h3>تم إصدارها أو إرسالها</h3><span class="s">لكل صف: فتح التصريح للتعديل أو الإلغاء، تغيير الحالة، أو التراجع وإرجاعه لقائمة «تحتاج تصريح»</span></div>${D ? pDoneList() : `<div class="empty">لا يوجد شيء بعد. عند الضغط على «✓ تم الإصدار» في أي موافقة تظهر هنا.</div>`}</div>`;
-  const G = pGroups(L), fc = S.f.pcomm && G.some(([k]) => k === S.f.pcomm) ? S.f.pcomm : "", N = d => `<bdi dir="ltr" class="num">${esc(d)}</bdi>`,
-    chips = G.length > 1 ? `<div class="pt-chips"><button type="button" class="pt-chip${fc ? "" : " on"}" data-pcomm="">كل الجاليات <b>${L.length}</b></button>${G.map(([k, a]) => `<button type="button" class="pt-chip${fc === k ? " on" : ""}" data-pcomm="${esc(k)}">${esc(pcTitle(k))}${pcSub(k) ? " · " + esc(pcSub(k)) : ""} <b>${a.length}</b></button>`).join("")}</div>` : "";
-  return bar + `<div class="panel pt-p"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="s">مرتّبة حسب الجالية والمنسق. البيانات تتعبّأ تلقائياً، راجع وأصدر التصريح</span></div>${chips}
-    ${G.filter(([k]) => !fc || k === fc).map(([k, a]) => `<section class="pt-g"><header class="pt-gh"><div><h4>${esc(pcTitle(k))}</h4>${pcSub(k) ? `<span class="s">${esc(pcSub(k))}</span>` : ""}</div><span class="chip gold">${a.length}</span></header>${coPhones(k === "—" ? "" : k)}
-      <div class="pt-rows">${a.map(({ e, delegated }) => `<div class="pt-row"><div class="pt-info"><b>${esc(e.lect || "—")}</b><span class="s">${esc([e.mosName, e.area || e.gov].filter(Boolean).join("، "))}</span><span class="s">${esc([daysText(e) !== "—" && daysText(e), e.time].filter(Boolean).join(" · "))}${daysText(e) || e.time ? " · " : ""}كتاب ${N(e.doc)}</span></div><div class="pt-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : ""}${pNeedBtns(e, delegated)}</div></div>`).join("")}</div></section>`).join("")}
-    ${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}</div>`; };
+  const G = pGroups(L), cn = new Map(); for (const g of G) cn.set(g.country, (cn.get(g.country) || 0) + g.items.length);
+  const fc = S.f.pcomm && cn.has(S.f.pcomm) ? S.f.pcomm : "", N = d => `<bdi dir="ltr" class="num">${esc(d)}</bdi>`,
+    chips = cn.size > 1 ? `<div class="pt-chips"><button type="button" class="pt-chip${fc ? "" : " on"}" data-pcomm="">كل الدول <b>${L.length}</b></button>${[...cn].map(([k, n]) => `<button type="button" class="pt-chip${fc === k ? " on" : ""}" data-pcomm="${esc(k)}">${esc(k)} <b>${n}</b></button>`).join("")}</div>` : "";
+  let last = "";
+  const cards = G.filter(g => !fc || g.country === fc).map(g => { const sec = g.country + "|" + g.lang, head = sec !== last ? `<h4 class="pt-lang">${esc(g.country)}${g.lang ? ` <span>· ${esc(g.lang)}</span>` : ""}</h4>` : ""; last = sec;
+    return head + `<section class="pt-g${g.spec ? "" : " pt-un"}"><header class="pt-gh"><div><h4>${g.spec ? esc(g.coord || g.spec) : "المنسق غير محدد في الكتاب"}</h4><span class="s">${g.spec ? "منسق الجالية " + esc(g.lang || commBase(g.spec)) : esc(g.group) + " · أي المنسقين أدناه مسؤول عن المسجد؟"}</span></div><span class="chip gold">${g.items.length}</span></header>${coPhones(g.spec || g.comm)}
+      <div class="pt-rows">${g.items.map(({ e, delegated, via }) => `<div class="pt-row"><div class="pt-info"><b>${esc(e.lect || "—")}</b><span class="s">${esc([e.mosName, e.area || e.gov].filter(Boolean).join("، "))}</span><span class="s">${esc([daysText(e) !== "—" && daysText(e), e.time].filter(Boolean).join(" · "))}${daysText(e) || e.time ? " · " : ""}كتاب ${N(e.doc)}</span>${via ? `<span class="chip pt-via">المنسق مُستنتج من ${via} في أنشطة أخرى</span>` : ""}</div><div class="pt-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : ""}${pNeedBtns(e, delegated)}</div></div>`).join("")}</div></section>`; }).join("");
+  return bar + `<div class="panel pt-p"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="s">مرتّبة: الدولة ← اللغة ← المنسق. البيانات تتعبّأ تلقائياً، راجع وأصدر التصريح</span></div>${chips}${cards}${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}</div>`; };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-ptab],[data-pcomm]"); if (!t) return; if (t.dataset.ptab) S.f.ptab = t.dataset.ptab; else S.f.pcomm = t.dataset.pcomm; render(); });
 /* confirmation that a permit was issued / sent: hides the approval from the list above (settings key pdone:<act id>) */
 const _loadPermits63 = loadPermits;
