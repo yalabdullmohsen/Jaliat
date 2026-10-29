@@ -133,3 +133,17 @@ button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transpa
 .pt-lang{margin:18px 2px 8px;font-size:15px;color:var(--ink);display:flex;gap:6px;align-items:baseline}.pt-lang span{color:var(--muted);font-weight:500;font-size:13px}.pt-lang:first-of-type{margin-top:4px}
 .pt-un{border-style:dashed}.pt-un .pt-gh{background:var(--gold-soft)}
 .pt-via{align-self:flex-start;font-size:11.5px}
+/* Copilot: زر عائم + لوحة جانبية في كل الصفحات */
+.cpfab{position:fixed;z-index:19;inset-inline-start:auto;left:max(18px,env(safe-area-inset-left));bottom:calc(18px + env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:11px 18px 11px 16px;background:var(--side,#1A7356);color:#fff;font:inherit;font-weight:700;font-size:14px;box-shadow:0 8px 24px rgba(10,50,35,.28);cursor:pointer}
+.cpfab:hover{filter:brightness(1.08)}.cpfab:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.cpp-on .cpfab{display:none}
+.cpp{position:fixed;z-index:20;top:0;bottom:0;left:0;width:min(440px,100%);background:var(--surface);box-shadow:0 0 40px rgba(0,0,0,.2);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.cpp-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}.cpp-h b{display:inline-flex;gap:6px;align-items:center}.cpp-h .s{flex:1;font-size:12px;min-width:0}
+.cpp-h .cm-x{font-size:22px;line-height:1;border:0;background:transparent;cursor:pointer;color:var(--muted);padding:4px 8px}
+.cpp-b{flex:1;min-height:0;overflow:auto;padding:12px}
+.cpp-b .ai.cp{display:flex;flex-direction:column;height:100%;gap:10px}.cpp-b .ai-log{flex:1;min-height:120px;overflow:auto}
+.cpp-b .cp-bar{flex-wrap:wrap;gap:6px}.cpp-b .ai-chips{flex-wrap:wrap}
+.cpp-b .cp-simple .cp-box{padding:16px}
+.cp-mode{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0;font-size:13px}
+@media(max-width:900px){.cpfab{bottom:calc(84px + env(safe-area-inset-bottom))}.cpfab span{display:none}.cpfab{padding:13px}}
+@media print{.cpfab,.cpp{display:none!important}}

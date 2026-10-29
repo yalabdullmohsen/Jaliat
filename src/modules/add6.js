@@ -63,6 +63,7 @@ function vCopilotMS(){
   return `<div class="ai cp">
     <div class="cp-bar"><span class="cp-badge">${icon("i-spark", 16)} Microsoft 365 Copilot</span><span class="s">متصل: <b dir="ltr">${esc(MS.account.username)}</b></span><button type="button" class="btn btn-ghost" id="ms-out">خروج من مايكروسوفت</button></div>
     <div class="ai-log" id="ms-log">${MS.chat.length ? MS.chat.map(msMsg).join("") : `<div class="ai-hero"><span class="orb">${icon("i-spark", 34)}</span><h3>اسأل Copilot عن ملفاتك وبريدك وبيانات النظام</h3><div class="ai-chips">${CP_PROMPTS.slice(0, 8).map((p, i) => `<button type="button" data-msp="${i}"><b>${esc(p[0])}</b><span>${esc(p[1])}</span></button>`).join("")}</div></div>`}</div>
+    <div id="cpx"></div>
     <div style="display:grid;gap:8px">
       <div class="cp-opts"><label><input type="checkbox" id="ms-web"${MS.web ? " checked" : ""}> البحث في الإنترنت أيضاً</label>
         <button type="button" class="btn btn-ghost" id="ms-file">${icon("i-doc")}ملفاتي في OneDrive</button>${MS.files.map((f, i) => `<span class="chip">${esc(f.name)} <button type="button" class="cm-x" data-msf="${i}">×</button></span>`).join("")}</div>
@@ -83,23 +84,21 @@ async function msSend(q){
   MS.chat.push({ role:"user", text:q });
   log.insertAdjacentHTML("beforeend", msMsg(MS.chat[MS.chat.length - 1]) + `<div class="msg a" id="ms-wait"><span class="av">${icon("i-spark", 20)}</span><div class="bub"><span class="typing"><i></i><i></i><i></i></span> <span class="s">Copilot يبحث في ملفاتك وبريدك وبيانات النظام…</span></div></div>`);
   const inp = $("#ms-in-q"); if (inp) { inp.value = ""; inp.style.height = "auto"; }
-  window.scrollTo(0, document.body.scrollHeight);
+  msScroll();
   MS.busy = true; if ($("#ms-send")) $("#ms-send").disabled = true;
   let res;
   try {
-    if (!MS.copilotOk) throw { needsAdmin:true };
+    if (!MS.copilotOk) { try { await msToken(true, MS.scopes); MS.copilotOk = true; } catch (e) { if (msErr(e).consent) throw { needsAdmin:true }; throw e; } }
     if (!MS.conv) MS.conv = (await graph("/beta/copilot/conversations", {}, "POST", MS.scopes)).id;
     const body = { message:{ text:q }, locationHint:{ timeZone:"Asia/Kuwait" }, contextualResources:{ webContext:{ isWebEnabled:!!MS.web } } };
     if (MS.files.length) body.contextualResources.files = MS.files.map(f => ({ uri:f.url }));
-    if (cpNeedsData(q) || MS.chat.filter(m => m.role === "user").length === 1) {
-      const txt = cpData(q); const parts = []; for (let i = 0; i < txt.length; i += 3800) parts.push({ text:txt.slice(i, i + 3800) }); body.additionalContext = parts.slice(0, 6);
-    }
+    { const txt = cpCtx(q, MS.chat.filter(m => m.role === "user").length === 1); const parts = []; for (let i = 0; i < txt.length; i += 3800) parts.push({ text:txt.slice(i, i + 3800) }); body.additionalContext = parts.slice(0, 6); }
     let d;
     try { d = await graph(`/beta/copilot/conversations/${MS.conv}/chat`, body, "POST", MS.scopes); }
     catch (e) { if (e.status === 400 && body.additionalContext) { body.additionalContext = body.additionalContext.slice(0, 2); d = await graph(`/beta/copilot/conversations/${MS.conv}/chat`, body, "POST", MS.scopes); } else throw e; }
     const msgs = (d.messages || []).filter(m => m.text); const last = msgs[msgs.length - 1];
     const refs = (last?.attributions || []).map(a => ({ url:a.seeMoreWebUrl || "", title:a.providerDisplayName || "" })).filter(r => r.url);
-    res = { role:"assistant", text:last?.text || "—", refs };
+    res = { role:"assistant", text:last?.text || "—", refs }; const acts = findActions(res.text); if (acts.length) { CPX.list = acts.map(a => ({ a })); setTimeout(cpxRender, 0); }
   } catch (e) {
     if (e?.needsAdmin) { MS.chat.pop(); $("#ms-wait")?.remove(); log.lastElementChild?.remove(); MS.busy = false; if ($("#ms-send")) $("#ms-send").disabled = false; MS.pendingQ = q; return msAdminBox(q); }
     console.error(e); if (e.status === 404) MS.conv = null; res = { role:"assistant", err:true, text:msErr(e).t }; }
@@ -107,7 +106,7 @@ async function msSend(q){
   MS.chat.push(res); $("#ms-wait")?.remove();
   $("#ms-log")?.insertAdjacentHTML("beforeend", msMsg(res, MS.chat.length - 1));
   if (!$("#ms-new")) $("#ms-send")?.insertAdjacentHTML("afterend", `<button class="btn btn-ghost" type="button" id="ms-new">جديدة</button>`);
-  window.scrollTo(0, document.body.scrollHeight);
+  msScroll();
 }
 async function msPick(){
   const box = $("#ms-pick"); if (!box) return;
@@ -149,7 +148,7 @@ const _afterRender6 = afterRender;
 afterRender = function(v){ _afterRender6(v); if (v !== "copilot") return;
   if (msReady() && !MS.app) msInit().then(async () => { if (MS.account) { await msCheckCopilot(); if (S.view === "copilot") render(); } }).catch(() => {});
   const inp = $("#ms-in-q"); if (inp) { inp.addEventListener("input", () => { inp.style.height = "auto"; inp.style.height = Math.min(200, inp.scrollHeight) + "px"; }); if (matchMedia("(min-width:901px)").matches) inp.focus(); }
-  if (MS.chat.length) window.scrollTo(0, document.body.scrollHeight); };
+  if (MS.chat.length) msScroll(); };
 
 function msAdminBox(q){
   const box = $("#ms-pick"); if (!box) return;
