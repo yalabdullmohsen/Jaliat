@@ -114,11 +114,11 @@ NEWF.splice(1, 0, ["v85-pauto", "nav:permits", "تعبئة التصريح تلق
 
 /* approvals → permits: the head sees every approved activity without a permit, and issues it himself or delegates it in one tap (all data prefilled) */
 function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean));
-  return S.E.filter(e => e.doc && docBy[e.doc] && (docBy[e.doc].date || docBy[e.doc].start || "") >= since && (!docBy[e.doc].end || docBy[e.doc].end >= TODAY) && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id))
+  return S.E.filter(e => e.doc && docBy[e.doc] && (docBy[e.doc].date || docBy[e.doc].start || "") >= since && (!docBy[e.doc].end || docBy[e.doc].end >= TODAY) && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id) && !S.pdone?.has(e.id))
     .map(e => ({ e, delegated:gr.has(e.id) })).sort((a, b) => (docBy[b.e.doc].date || "").localeCompare(docBy[a.e.doc].date || "")); }
-const pNeedBtns = e => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button><button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button>`;
+const pNeedBtns = e => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button><button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button><button type="button" class="btn btn-ghost" data-pdone="${esc(e.id)}" title="تؤكد أن التصريح صدر أو أُرسل فيختفي من القائمة">✓ تم الإصدار</button>`;
 const _vPermits85 = vPermits;
-vPermits = function(){ const h = _vPermits85(); if (!S.admin) return h; const L = permitNeeds(); if (!L.length) return h;
+vPermits = function(){ const h = _vPermits85(); if (!S.admin) return h; const L = permitNeeds(); if (!L.length && !S.pdone?.size) return h;
   const all = S.f.pnall === "1", rows = all ? L : L.slice(0, 8), N = d => `<bdi dir="ltr" class="num">${esc(d)}</bdi>`;
   return `<div class="panel pn-need"><div class="panel-h"><h3>موافقات وصلت وتحتاج تصريح</h3><span class="chip gold">${L.length}</span><span class="s">البيانات تتعبّأ تلقائياً، راجع وأصدر أو فوّض</span></div>
     <div class="pn-grid"><div class="pn-row pn-hd"><span>الشيخ / المحاضر</span><span>المسجد</span><span>الموعد</span><span>الكتاب</span><span></span></div>${rows.map(({ e, delegated }) => `<div class="pn-row">
@@ -127,7 +127,25 @@ vPermits = function(){ const h = _vPermits85(); if (!S.admin) return h; const L 
       <span class="pn-c" data-l="الموعد"><b>${esc(daysText(e) || "—")}</b>${e.time ? `<span class="s">${esc(e.time)}</span>` : ""}</span>
       <span class="pn-c" data-l="الكتاب">${N(e.doc)}</span>
       <span class="pn-act">${delegated ? `<span class="chip">مفوَّض، بانتظار الموظف</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</span></div>`).join("")}</div>
-    ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}</div>` + h; };
+    ${L.length > 8 ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pnall>${all ? "عرض أقل" : `عرض الكل (${L.length})`}</button></div>` : ""}${!L.length ? `<div class="empty">لا توجد تصاريح معلّقة ✓</div>` : ""}${S.pdone?.size ? `<div class="pn-more"><button type="button" class="btn btn-ghost" data-pndone>${S.f.pndone === "1" ? "إخفاء المؤكدة" : `المؤكدة (${S.pdone.size})`}</button></div>${S.f.pndone === "1" ? pDoneList() : ""}` : ""}</div>` + h; };
+/* confirmation that a permit was issued / sent: hides the approval from the list above (settings key pdone:<act id>) */
+const _loadPermits63 = loadPermits;
+loadPermits = async function(){ await _loadPermits63(); const { data, error } = await sb.from("settings").select("key,value").like("key", "pdone:%"); if (!error) S.pdone = new Map((data || []).map(r => [r.key.slice(6), r.value])); };
+function pDoneList(){ const L = [...(S.pdone || [])].sort((a, b) => (b[1].at || "").localeCompare(a[1].at || ""));
+  return `<div class="pn-grid pn-dn">${L.map(([id, v]) => { const e = S.E.find(x => x.id === id); return `<div class="pn-dr"><span><b>${esc(e?.lect || "—")}</b> <span class="s">${esc(e?.mosName || "")}</span></span><span class="chip ${v.st === "sent" ? "ok" : "gold"}">${v.st === "sent" ? "أُرسل" : "صدر"}</span><span class="s">${esc(fmt((v.at || "").slice(0, 10)))}${v.by ? " · " + esc(v.by) : ""}</span><button type="button" class="btn btn-ghost" data-pundo="${esc(id)}">↺ إرجاع للقائمة</button></div>`; }).join("")}</div>`; }
+function pDoneForm(id){ const e = S.E.find(x => x.id === id); if (!e) return;
+  openDrawer("تأكيد التصريح", `<div class="card pad"><b>${esc(e.lect || "—")}</b><br><span class="s">${esc([e.mosName, daysText(e), e.time].filter(Boolean).join(" · "))}</span></div>
+    <p class="hint" style="margin:12px 2px">اختر الحالة، وبعدها تختفي من القائمة. تقدر ترجعها من «المؤكدة».</p>
+    <button type="button" class="btn btn-done tk-open" data-pdset="issued" data-pid="${esc(id)}">📄 تم إصدار التصريح</button>
+    <button type="button" class="btn btn-primary tk-open" style="margin-top:10px" data-pdset="sent" data-pid="${esc(id)}">📤 تم إرسال التصريح</button>`,
+    `<button class="btn btn-ghost" data-close>إغلاق</button>`); }
+async function pDoneSet(id, st){ const v = { st, at:new Date().toISOString(), by:S.me?.name || S.me?.username || "" };
+  const { error } = await sb.from("settings").upsert({ key:"pdone:" + id, value:v }); if (error) return writeFail(error);
+  (S.pdone = S.pdone || new Map()).set(id, v); closeDrawer(); render(); toast(st === "sent" ? "تم تأكيد إرسال التصريح، واختفت من القائمة" : "تم تأكيد إصدار التصريح، واختفت من القائمة"); }
+async function pDoneUndo(id){ const { error } = await sb.from("settings").delete().eq("key", "pdone:" + id); if (error) return writeFail(error); S.pdone?.delete(id); render(); toast("رجعت للقائمة"); }
+document.addEventListener("click", ev => { const t = ev.target.closest("[data-pdone],[data-pndone],[data-pdset],[data-pundo]"); if (!t) return;
+  if (t.dataset.pdone) return pDoneForm(t.dataset.pdone); if (t.dataset.pndone !== undefined) { S.f.pndone = S.f.pndone === "1" ? "" : "1"; return render(); }
+  if (t.dataset.pdset) return pDoneSet(t.dataset.pid, t.dataset.pdset); if (t.dataset.pundo) return pDoneUndo(t.dataset.pundo); });
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-pnall]")) return; S.f.pnall = S.f.pnall === "1" ? "" : "1"; render(); });
 const _prio85 = priorities;
 priorities = function(){ const P = _prio85(); if (S.admin) { const n = permitNeeds().filter(x => !x.delegated).length; if (n) P.push({ w:86, k:"gold", t:`${n} موافقة وصلت وتحتاج تصريح`, s:"أصدره بنفسك أو فوّض موظفاً، البيانات جاهزة", act:{ go:"permits", l:"إصدار / تفويض" } }); } return P.sort((a, b) => b.w - a.w); };
