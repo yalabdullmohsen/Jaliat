@@ -4,7 +4,10 @@ S.sd = { day:null, rows:null };
 const SD_T = { acts:"الأنشطة", khatibs:"خطب الجمعة (المساجد)", sermons:"سجل الخطب", refs:"الجاليات والمنسقين والوثائق", notes:"الملاحظات", tasks:"المهام", requests:"الطلبات الواردة", bookings:"حجوزات القاعات", permits:"التصاريح", docs:"الوثائق" };
 const SD_A = { INSERT:"إضافة", UPDATE:"تعديل", DELETE:"حذف" };
 const sdT = d => d ? new Date(d).toLocaleTimeString("ar-KW-u-nu-latn", { hour:"numeric", minute:"2-digit", hour12:true, timeZone:"Asia/Kuwait" }) : "—";
-async function sdLoad(day){ S.sd.day = day; S.sd.rows = null; render(); const { data, error } = await sb.rpc("staff_activity", { p_day:day }); S.sd.rows = error ? [] : (data || []); if (S.view === "staffday") render(); }
+async function sdLoad(day){ if (S.sd.busy === day) return; S.sd.day = day; S.sd.rows = null; S.sd.busy = day; render();
+  let rows; try { const { data, error } = await sb.rpc("staff_activity", { p_day:day }); rows = error ? [] : (data || []); } catch (_) { rows = []; }
+  if (S.sd.busy !== day) return; /* وصل طلب أحدث (يوم آخر) فنتجاهل هذا الرد */
+  S.sd.busy = null; S.sd.rows = rows; if (S.view === "staffday") render(); }
 function sdHours(r){ if (!r.first) return 0; return Math.max(0.1, (+new Date(r.last) - +new Date(r.first)) / 36e5); }
 function sdSummary(r){ const B = r.by || {}, L = [];
   const g = {}; for (const [k, n] of Object.entries(B)) { const [t, a] = k.split(":"); (g[t] = g[t] || []).push(`${SD_A[a] || a} ${n}`); }
@@ -12,7 +15,7 @@ function sdSummary(r){ const B = r.by || {}, L = [];
   if (r.tasks_done) L.push(`أنجز ${r.tasks_done} مهمة`); if (r.questions) L.push(`${r.questions} سؤال/إجابة`); if (r.chats) L.push(`${r.chats} رسالة`);
   return L; }
 function vStaffDay(){ if (!S.admin) return `<div class="empty">هذه الصفحة لرئيس القسم ومدير النظام</div>`;
-  const day = S.sd.day || TODAY; if (S.sd.day !== day || !S.sd.rows) { if (!S.sd.rows || S.sd.day !== day) setTimeout(() => sdLoad(day)); return `<div class="empty">جارٍ التحميل…</div>`; }
+  const day = S.sd.day || TODAY; if (S.sd.day !== day || !S.sd.rows) { if (S.sd.busy !== day) setTimeout(() => sdLoad(day)); return `<div class="empty">جارٍ التحميل…</div>`; }
   const R = S.sd.rows.filter(r => r.n || r.tasks_done || r.questions || r.chats), idle = S.sd.rows.filter(r => !(r.n || r.tasks_done || r.questions || r.chats));
   return `<div class="toolbar"><button type="button" class="btn" data-sdday="${addDays(day, -1)}">› اليوم السابق</button><input type="date" class="f" id="sd-d" value="${day}" style="max-width:170px"><button type="button" class="btn" data-sdday="${addDays(day, 1)}"${day >= TODAY ? " disabled" : ""}>اليوم التالي ‹</button><span class="count">${R.length} موظف عمل · ${idle.length} بلا نشاط مسجّل</span></div>
   <div class="sd-l">${R.map(r => { const h = sdHours(r), S2 = sdSummary(r);

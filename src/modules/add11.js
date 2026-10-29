@@ -495,7 +495,7 @@ function reportDownload(ym){ ym = ym || TODAY.slice(0, 7); const b = new Blob(["
 
 /* =============== 10) Backups (admin) =============== */
 S.bk = null;
-async function bkLoad(){ const { data, error } = await sb.from("backups").select("id,at").order("at", { ascending:false }).limit(60); S.bk = error ? [] : data || []; if (S.view === "backups") render(); }
+async function bkLoad(){ if (S.bkBusy) return; S.bkBusy = true; const { data, error } = await sb.from("backups").select("id,at").order("at", { ascending:false }).limit(60); S.bkBusy = false; S.bk = error ? [] : data || []; if (S.view === "backups") render(); }
 function vBackups(){
   if (!S.bk) { bkLoad(); return `<div class="empty">جارٍ التحميل…</div>`; }
   return odCard() + `<div class="toolbar"><span class="count">نسخة احتياطية تلقائية كل ليلة الساعة 3:00 ص، وتُحفظ آخر 45 يوماً</span><button class="btn btn-primary" type="button" data-bknow>نسخة احتياطية الآن</button></div>
