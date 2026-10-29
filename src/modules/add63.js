@@ -117,8 +117,8 @@ function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permi
   return S.E.filter(e => e.doc && docBy[e.doc] && (docBy[e.doc].date || docBy[e.doc].start || "") >= since && (!docBy[e.doc].end || docBy[e.doc].end >= TODAY) && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id) && !S.pdone?.has(e.id))
     .map(e => ({ e, delegated:gr.has(e.id) })).sort((a, b) => (docBy[b.e.doc].date || "").localeCompare(docBy[a.e.doc].date || "")); }
 /* أرقام منسقي الجالية: نسخ الرقم أو فتح المحادثة مباشرة في تطبيق واتساب */
-function coPhones(comm){ const L = (S.coords || []).filter(c => c.comm === comm && c.status !== "سابق" && c.phone).sort((a, b) => (a.role === "نائب منسق") - (b.role === "نائب منسق")); if (!L.length) return `<div class="pn-co none">لا يوجد رقم منسق لهذه الجالية</div>`;
-  return `<div class="pn-co">${L.map(c => `<div class="cph"><span class="cph-n"><b>${esc(c.name)}</b><small>${esc(c.role || "منسق")}</small></span><bdi dir="ltr" class="cph-p">${esc(c.phone)}</bdi><button type="button" class="btn btn-ghost cph-b" data-cpph="${esc(c.phone)}">نسخ الرقم</button><a class="btn cph-b" href="whatsapp://send?phone=${waNum(c.phone)}">${icon("i-wa")} محادثة مباشرة</a></div>`).join("")}</div>`; }
+function coPhones(comm, pid){ const L = (S.coords || []).filter(c => c.comm === comm && c.status !== "سابق" && c.phone).sort((a, b) => (a.role === "نائب منسق") - (b.role === "نائب منسق")); if (!L.length) return `<div class="pn-co none">لا يوجد رقم منسق لهذه الجالية</div>`;
+  return `<div class="pn-co">${L.map(c => `<div class="cph"><span class="cph-n"><b>${esc(c.name)}</b><small>${esc(c.role || "منسق")}</small></span><bdi dir="ltr" class="cph-p">${esc(c.phone)}</bdi><button type="button" class="btn btn-ghost cph-b" data-cpph="${esc(c.phone)}">نسخ الرقم</button><a class="btn cph-b" href="whatsapp://send?phone=${waNum(c.phone)}"${pid ? ` data-wapid="${esc(pid)}"` : ""}>${icon("i-wa")} محادثة مباشرة</a></div>`).join("")}</div>`; }
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-cpph]"); if (!t) return; ev.preventDefault(); toast(await cpCopy(t.dataset.cpph) ? "نُسخ الرقم" : "تعذّر النسخ"); });
 const pNeedBtns = (e, delegated) => `<button type="button" class="btn btn-primary" data-pact="${esc(e.id)}">إصدار تصريح</button>${S.admin && !delegated ? `<button type="button" class="btn btn-ghost" data-gact="${esc(e.id)}">تفويض موظف</button>` : ""}<button type="button" class="btn btn-ghost" data-pdone="${esc(e.id)}" title="تؤكد أن التصريح صدر أو أُرسل فيختفي من القائمة">✓ تم الإصدار</button>`;
 const _vPermits85 = vPermits;
@@ -179,13 +179,13 @@ grantSave = async function(){ const e = $("#p-date2")?.value, d = $("#p-date")?.
     const n = Math.round((dOf(e) - dOf(d)) / 864e5) + 1, k = "rng" + e; if (!DUR.find(x => x[0] === k)) DUR.push([k, `حتى ${fmt(e)}`, n]); const sel = $("#p-dur"); if (sel && !sel.querySelector(`[value="${k}"]`)) sel.insertAdjacentHTML("beforeend", `<option value="${k}">حتى ${fmt(e)}</option>`); if (sel) sel.value = k; }
   return _grantSave86(); };
 /* permit → PDF file sent on WhatsApp (no link): the PDF is prepared when the permit opens, one tap shares it */
-const PPDF = new Map();
+const PPDF = new Map(), PPNG = new Map();
 async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const src = $("#permit-paper"); if (!src) return null;
   const job = (async () => { await loadScript("https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js"); await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     /* نسخة خارج الشاشة بعرض ثابت (A4)، فلا يقصّها صندوق التمرير ولا ضيق النافذة، ويخرج التصريح كاملاً */
     await Promise.all(['700 40px Amiri', '600 16px "IBM Plex Sans Arabic"', '400 16px "IBM Plex Sans Arabic"'].map(f => document.fonts.load(f, "تصريح"))).catch(() => {}); const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-10000px;top:0;width:794px;background:#fff;z-index:-1"; const el = src.cloneNode(true); el.removeAttribute("id"); el.classList.remove("editing"); el.style.cssText = "width:794px;min-height:1123px;max-width:none;margin:0;box-sizing:border-box;zoom:1"; host.appendChild(el); document.body.appendChild(host);
     const cv = await html2canvas(el, { scale:3, width:794, windowWidth:794, backgroundColor:"#ffffff", useCORS:true, logging:false, onclone:d => { d.querySelectorAll(".permit [contenteditable]").forEach(x => x.removeAttribute("contenteditable")); const st = d.createElement("style"); st.textContent = ".permit,.permit *{letter-spacing:0!important;word-spacing:normal!important;font-feature-settings:normal!important;text-rendering:auto!important}"; d.head.appendChild(st); } }).finally(() => host.remove()); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit:"mm", format:"a4", compress:true });
-    const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/png"), "PNG", (W - w) / 2, m, w, h);
+    const W = 210, H = 297, m = 8, r = Math.min((W - 2 * m) / cv.width, (H - 2 * m) / cv.height), w = cv.width * r, h = cv.height * r; pdf.addImage(cv.toDataURL("image/png"), "PNG", (W - w) / 2, m, w, h); PPNG.set(id, await new Promise(ok => cv.toBlob(ok, "image/png")));
     const p = S.permits.find(x => x.id === id), d = p?.data || {}, clean = t => String(t || "").replace(/[\\/:*?"<>|\u200e\u200f\u2066-\u2069]/g, " ").replace(/\s+/g, " ").trim(), mos = clean(String(d.mosque || "").split("،")[0]), shk = clean(d.sheikh),
       ttl = ["تصريح إلقاء درس", shk && "الشيخ " + shk.replace(/^الشيخ\s+/, ""), mos].filter(Boolean).join(" - ").slice(0, 120), u16 = "\xFE\xFF" + [...ttl].map(c => { const k = c.charCodeAt(0); return String.fromCharCode(k >> 8, k & 255); }).join("");
     /* اسم الملف لاتيني فقط: الآيفون/واتساب يكسرون ترميز الأسماء العربية (Ø§Ù…) عند المشاركة من المتصفح، والعنوان العربي في داخل الملف وفي الرسالة */
@@ -193,13 +193,27 @@ async function permitPdf(id){ if (PPDF.has(id)) return PPDF.get(id); const src =
     pdf.setProperties({ title:u16 }); return new File([pdf.output("blob")], fname, { type:"application/pdf" }); })();
   PPDF.set(id, job); job.catch(() => PPDF.delete(id)); return job; }
 const _permitView87 = permitView;
-permitView = async function(id){ await _permitView87(id); { const pp = S.permits.find(x => x.id === id), cm = (pp?.act_id && S.byId?.get(pp.act_id)?.comm) || pp?.data?.comm; if (cm) $(".drawer-b .check")?.insertAdjacentHTML("afterend", `<div class="panel"><div class="panel-h"><h3>أرقام المنسقين للإرسال المباشر</h3></div><div class="panel-b">${coPhones(cm)}</div></div>`); } const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
+permitView = async function(id){ await _permitView87(id); { const pp = S.permits.find(x => x.id === id), cm = (pp?.act_id && S.byId?.get(pp.act_id)?.comm) || pp?.data?.comm; if (cm) $(".drawer-b .check")?.insertAdjacentHTML("afterend", `<div class="panel"><div class="panel-h"><h3>أرقام المنسقين للإرسال المباشر</h3></div><div class="panel-b">${coPhones(cm, id)}</div></div>`); } const b = $(`.drawer-f [data-pwa="${id}"]`); if (b) { b.innerHTML = `${icon("i-wa")} إرسال PDF واتساب`; b.classList.add("btn-ok"); } setTimeout(() => permitPdf(id).catch(() => {}), 300); };
 /* بطاقة عائمة: ملف PDF قابل للسحب مباشرة إلى محادثة واتساب (Chrome يمرّر الملف للتطبيق عبر DownloadURL) */
 function pdfChip(f, url){ document.getElementById("pdf-chip")?.remove(); const c = document.createElement("div"); c.id = "pdf-chip";
   c.innerHTML = `<div class="pc-f" draggable="true" title="اسحب إلى المحادثة">${icon("i-doc")}<b dir="ltr">${esc(f.name)}</b></div><span>اسحب الملف إلى محادثة واتساب (نزل أيضاً في التنزيلات)</span><button type="button" aria-label="إغلاق">×</button>`;
   const close = () => { c.remove(); URL.revokeObjectURL(url); };
   c.querySelector(".pc-f").addEventListener("dragstart", e => { e.dataTransfer.effectAllowed = "copy"; e.dataTransfer.setData("DownloadURL", `application/pdf:${f.name}:${url}`); try { e.dataTransfer.items.add(f); } catch (_) {} });
   c.querySelector("button").addEventListener("click", close); document.body.appendChild(c); setTimeout(close, 180000); }
+/* محادثة مباشرة مع منسق: يُنسخ التصريح صورةً وينزل PDF وتظهر بطاقة السحب ويُفتح واتساب على محادثته والرسالة جاهزة؛ المتصفح لا يسمح بإرفاق الملف تلقائياً فيبقى لصقه أو سحبه ثم «إرسال» */
+document.addEventListener("click", async ev => { const a = ev.target.closest("a[data-wapid]"); if (!a) return; ev.preventDefault(); ev.stopImmediatePropagation();
+  const id = a.dataset.wapid, p = S.permits.find(x => x.id === id); if (!p) return; const phone = new URL(a.href.replace("whatsapp://", "https://x/")).searchParams.get("phone"), d = p.data || {},
+    txt = `تصريح إلقاء درس رقم \u2066${p.no}\u2069\nالشيخ: ${d.sheikh || ""}\nالمسجد: ${d.mosque || ""}${d.time ? "\nالموعد: " + d.time : ""}`, touch = matchMedia("(pointer:coarse)").matches || /iPhone|iPad|Android/i.test(navigator.userAgent);
+  const open = () => { const w = document.createElement("a"); w.href = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(txt)}`; document.body.appendChild(w); w.click(); w.remove(); };
+  let copied = Promise.resolve(false);
+  if (!touch && window.ClipboardItem && navigator.clipboard?.write) copied = navigator.clipboard.write([new ClipboardItem({ "image/png": permitPdf(id).then(() => PPNG.get(id)) })]).then(() => true, () => false);
+  const old = a.innerHTML; a.style.pointerEvents = "none"; a.textContent = "يجهّز التصريح…";
+  try { const f = await permitPdf(id); if (!f) throw new Error("no pdf");
+    if (touch && navigator.canShare && navigator.canShare({ files:[f], text:txt })) { try { await navigator.share({ files:[f], text:txt }); } catch (_) {} return; }
+    const bu = URL.createObjectURL(f), dl = document.createElement("a"); dl.href = bu; dl.download = f.name; document.body.appendChild(dl); dl.click(); dl.remove(); pdfChip(f, bu); open();
+    toast(await copied ? "فُتحت المحادثة: الصق التصريح (⌘V) أو اسحب الملف من البطاقة، ثم إرسال" : "فُتحت المحادثة: اسحب الملف من البطاقة إليها، ثم إرسال"); }
+  catch (e) { toast("تعذّر تجهيز التصريح، استخدم «طباعة / PDF»"); open(); }
+  finally { a.style.pointerEvents = ""; a.innerHTML = old; } }, true);
 document.addEventListener("click", async ev => { const b = ev.target.closest("[data-pwa]"); if (!b) return; ev.preventDefault(); ev.stopImmediatePropagation();
   const id = b.dataset.pwa, p = S.permits.find(x => x.id === id); if (!p) return; const old = b.innerHTML; b.disabled = true; b.textContent = "يجهّز PDF…";
   /* قائمة المشاركة في ماك وويندوز لا تعرض واتساب إلا إن وُجد له امتداد مشاركة، لذا تُستعمل على الجوال واللوحي فقط؛ وعلى الكمبيوتر يُنزَّل الملف ويُفتح تطبيق واتساب نفسه (whatsapp://) برسالة جاهزة */
