@@ -73,3 +73,26 @@ permitIssue = async function(){ const sh = $("#p-sheikh")?.value, mo = $("#p-mos
   if (!sane(sh)) return toast("اسم الشيخ يبدو رأس جدول وليس اسماً، صحّحه قبل الإصدار");
   if (/المنطق[ةه]\s+اليوم|اليوم\s+التوقيت/.test(String(mo || ""))) return toast("اسم المسجد غير صحيح، صحّحه قبل الإصدار");
   return _permitIssue73(); };
+
+/* صفحة المنسقون: أزرار ظاهرة للإضافة والتعديل بدل البحث عنها — «إضافة جالية»، وعلى كل جالية «+ منسق» و«تعديل» */
+function ccCards(){ if (S.view !== "coords" || !canCC()) return;
+  const tb = $("#view .toolbar"); if (tb && !$("#view [data-cmnew]")) tb.insertAdjacentHTML("afterbegin", `<button class="btn btn-primary" data-cmnew>${icon("i-plus")}إضافة جالية</button>`);
+  document.querySelectorAll("#view .cocard").forEach(card => { if (card.querySelector("[data-coadd]")) return; const h = card.querySelector(".coh"), name = h?.querySelector("h3")?.textContent.trim(); if (!name || !commNames.includes(name)) return;
+    h.insertAdjacentHTML("beforeend", `<button type="button" class="btn btn-ghost cc-b" data-coadd="${esc(name)}">+ منسق</button><button type="button" class="btn btn-ghost cc-b" data-cmedit="${esc(name)}">تعديل</button>`); }); }
+const _afterRender73c = afterRender; afterRender = function(v){ _afterRender73c(v); try { ccCards(); } catch (_) {} };
+function cmEditForm(name){ const c = S.comms.find(x => x.name === name); if (!c) return toast("الجالية غير موجودة"); const groups = [...new Set(S.comms.map(x => x.group).filter(Boolean))].sort();
+  S.form = { kind:"cmedit", name };
+  openDrawer("تعديل الجالية", `<div class="check"><b>${esc(name)}</b><span>الاسم ثابت لأن الأنشطة والكتب مرتبطة به. يُعدَّل هنا اللغة والمجموعة فقط، وللمنسقين اضغط على اسمه في البطاقة.</span></div>
+    ${fld("ce-g", "المجموعة", `<select class="f" id="ce-g">${groups.map(g => `<option${g === c.group ? " selected" : ""}>${esc(g)}</option>`).join("")}<option value="__new">مجموعة جديدة…</option></select>`)}
+    <div id="ce-gn-w" hidden>${fld("ce-gn", "اسم المجموعة الجديدة", `<input class="f" id="ce-gn">`)}</div>
+    ${fld("ce-l", "اللغة", `<input class="f" id="ce-l" value="${esc(c.lang || "")}">`)}`,
+    `<button class="btn btn-primary" data-cesave>حفظ</button><button class="btn btn-ghost" data-close>إلغاء</button>`); }
+async function cmEditSave(btn){ const c = S.comms.find(x => x.name === S.form?.name); if (!c) return; const g0 = $("#ce-g").value, grp = g0 === "__new" ? $("#ce-gn").value.trim() : g0, lang = $("#ce-l").value.trim();
+  if (!grp || !lang) return toast("اكتب المجموعة واللغة"); btn.disabled = true;
+  const C = S.comms.map(x => x.name === c.name ? { ...x, group:grp, lang } : x), K = S.coords.map(x => x.comm === c.name ? { ...x, lang } : x);
+  try { await T.ref("comms", C); await T.ref("coords", K); S.comms = C; S.coords = K; closeDrawer(); toast("حُفظ تعديل الجالية ✓"); render(); } catch (e) { btn.disabled = false; writeFail(e); } }
+document.addEventListener("change", ev => { if (ev.target.id === "ce-g") { const w = $("#ce-gn-w"); if (w) w.hidden = ev.target.value !== "__new"; } });
+document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;
+  if (t.dataset.cmedit) return cmEditForm(t.dataset.cmedit); if (t.dataset.cesave !== undefined) return cmEditSave(t);
+  if (t.dataset.coadd) { const nm = t.dataset.coadd, c = S.comms.find(x => x.name === nm), has = S.coords.some(x => x.comm === nm && x.role === "منسق"); listForm("co");
+    const set = (id, v) => { const e = $("#" + id); if (e && v) e.value = v; }; set("l-comm", nm); set("l-lang", c?.lang); set("l-role", has ? "نائب منسق" : "منسق"); set("l-status", "نشط"); $("#l-name")?.focus(); } });
