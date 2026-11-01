@@ -29,7 +29,11 @@ function prepImage(file){
 }
 const digits = s => String(s || "").replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
 const DAYN = DAYS.map(norm);
+/* رأس جدول مسطَّح داخل نص الكتاب («الشيخ المسجد المنطقة اليوم التوقيت») ليس اسم شيخ: يُحذف قبل القراءة، وكلمات الرأس لا تُقبل اسماً أبداً */
+const HDR_ROW = /(?:اسم\s+)?(?:الشيخ|الشيح|المحاضر)?\s*(?:المسجد|الجامع)\s+المنطق[ةه]\s+اليوم\s+(?:التوقيت|الوقت|الموعد)/g, HDR_W = /^(?:الشيخ|الشيح|المسجد|الجامع|المنطق[ةه]|اليوم|التوقيت|الوقت|الموعد|اسم|م|ت|مسجد|جامع)$/;
+const lectOk = v => { const w = String(v || "").trim().split(/\s+/).filter(Boolean); return w.length >= 2 && !w.some(x => HDR_W.test(x)); };
 function parseLine(t, ctx){
+  const hadHdr = new RegExp(HDR_ROW.source).test(t); t = String(t).replace(HDR_ROW, " ");
   const n = norm(t), k = nkey(t), out = {};
   const days = []; DAYN.forEach((d, i) => { const dd = d.replace(/^ال/, ""); if (n.includes(dd)) days.push(i); });
   if (/يومي/.test(n)) { out.daily = true; out.days = [0, 1, 2, 3, 4, 5, 6]; } else if (days.length) out.days = [...new Set(days)];
@@ -40,7 +44,8 @@ function parseLine(t, ctx){
   const g = GOVS.find(x => n.includes(norm(x))); if (g && !out.gov) out.gov = g;
   let lect = ctx.lects.find(l => l.k.length > 5 && k.includes(l.k));
   if (lect) out.lect = lect.name;
-  else { const m = t.match(/(?:الشيخ|الشيح|مولانا|الداعية|المحاضر|الدكتور|د\.)[ \t]*[:：]?[ \t]*([؀-ۿ]+(?:[ \t]+[؀-ۿ]+){1,3})/); if (m) out.lect = m[1].trim(); }
+  else { const m = t.match(/(?:الشيخ|الشيح|مولانا|الداعية|المحاضر|الدكتور|د\.)[ \t]*[:：]?[ \t]*([؀-ۿ]+(?:[ \t]+[؀-ۿ]+){1,3})/); if (m) { const w = m[1].trim().split(/\s+/), i = w.findIndex(x => HDR_W.test(x)), c = (i < 0 ? w : w.slice(0, i)).join(" "); if (lectOk(c)) out.lect = c; } }
+  if (!out.lect && best && hadHdr) { const at = t.indexOf(best.name); if (at > 0) { const w = t.slice(0, at).replace(/[^؀-ۿ\s]/g, " ").split(/\s+/).filter(Boolean).slice(-4).filter(x => !HDR_W.test(x)); const c = w.slice(-3); if (c.length >= 2 && lectOk(c.join(" "))) out.lect = c.join(" "); } }
   return out;
 }
 function parseActs(raw){

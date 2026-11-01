@@ -59,9 +59,17 @@ permitForm = function(preset, grant){ _permitForm73b(preset, grant); if (S.form?
   const e = S.byId?.get(preset?.act_id || S.form.act); if (!e) return;
   const bk = pBook(e.id); S.form.book = bk;
   const set = (id, v) => { const el = $("#" + id); if (el && v && !el.readOnly && !el.value) { el.value = v; el.classList.add("pr-filled"); } };
-  set("p-sheikh", e.lect); set("p-mosque", e.mosName ? pMos("مسجد " + String(e.mosName).replace(/^مسجد\s+/, ""), e.area, e.gov) : ""); set("p-lang", commBase(e.comm || ""));
+  set("p-sheikh", sane(e.lect) ? e.lect : ""); set("p-mosque", e.mosName ? pMos("مسجد " + String(e.mosName).replace(/^مسجد\s+/, ""), e.area, e.gov) : ""); set("p-lang", commBase(e.comm || ""));
   if (!$("#p-date")?.value || $("#p-date").value < TODAY) { const ds = e.daily ? [0, 1, 2, 3, 4, 5, 6] : (e.days || []); for (let i = 0; i < 14 && ds.length; i++) { const t = addDays(TODAY, i); if (ds.includes(dOf(t).getDay())) { $("#p-date").value = t; break; } } }
   const from = $("#p-date")?.value || TODAY;
   if (bk?.to && bk.to > from) { const days = Math.round((dOf(bk.to) - dOf(from)) / 864e5) + 1, s = $("#p-dur"); if (s && !s.disabled) { const i = DUR.findIndex(z => z[0] === "bk"); if (i >= 0) DUR.splice(i, 1); DUR.push(["bk", `حتى نهاية كتاب الموافقة (${fmt(bk.to)})`, days]); s.insertAdjacentHTML("beforeend", `<option value="bk">${esc(DUR.at(-1)[1])}</option>`); s.value = "bk"; } }
-  const chk = [["الشيخ", $("#p-sheikh")?.value], ["المسجد", $("#p-mosque")?.value], ["اللغة", $("#p-lang")?.value], ["تاريخ الدرس", $("#p-date")?.value], ["وقت الدرس", e.time || $("#p-from")?.value], ["كتاب الموافقة", bk ? `${bk.no}${bk.to ? " · سارٍ حتى " + fmt(bk.to) : ""}` : ""]];
+  const chk = [["الشيخ", sane($("#p-sheikh")?.value) ? $("#p-sheikh").value : ""], ["المسجد", $("#p-mosque")?.value], ["اللغة", $("#p-lang")?.value], ["تاريخ الدرس", $("#p-date")?.value], ["وقت الدرس", e.time || $("#p-from")?.value], ["كتاب الموافقة", bk ? `${bk.no}${bk.to ? " · سارٍ حتى " + fmt(bk.to) : ""}` : ""]];
   $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<div class="panel pf-chk"><div class="panel-h"><h3>اكتمال بيانات التصريح</h3></div><div class="panel-b">${chk.map(([k, v]) => `<div class="li"><span class="chip ${v ? "ok" : "bad"}">${v ? "✓" : "ناقص"}</span><span><b>${esc(k)}</b> ${v ? esc(v) : ""}</span></div>`).join("")}${bk ? "" : `<div class="s">لم أجد كتاب موافقة لهذا النشاط في وثيقة. أرفق الكتاب من الأعلى أو اختره، فتُقرأ بياناته وتُضاف للتصريح.</div>`}</div></div>`); };
+
+/* حارس نهائي: لا يصدر تصريح باسم شيخ أو مسجد هو في الحقيقة رأس جدول (المسجد، المنطقة، اليوم، التوقيت…) */
+const sane = v => !!String(v || "").trim() && !String(v).trim().split(/\s+/).some(x => HDR_W.test(x) && x !== "مسجد" && x !== "جامع");
+const _permitIssue73 = permitIssue;
+permitIssue = async function(){ const sh = $("#p-sheikh")?.value, mo = $("#p-mosque")?.value;
+  if (!sane(sh)) return toast("اسم الشيخ يبدو رأس جدول وليس اسماً، صحّحه قبل الإصدار");
+  if (/المنطق[ةه]\s+اليوم|اليوم\s+التوقيت/.test(String(mo || ""))) return toast("اسم المسجد غير صحيح، صحّحه قبل الإصدار");
+  return _permitIssue73(); };
