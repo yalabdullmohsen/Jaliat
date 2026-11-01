@@ -37,7 +37,7 @@ function parseLine(t, ctx){
   const n = norm(t), k = nkey(t), out = {};
   const days = []; DAYN.forEach((d, i) => { const dd = d.replace(/^ال/, ""); if (n.includes(dd)) days.push(i); });
   if (/يومي/.test(n)) { out.daily = true; out.days = [0, 1, 2, 3, 4, 5, 6]; } else if (days.length) out.days = [...new Set(days)];
-  const tm = /الفجر|الصبح/.test(n) ? "بعد صلاة الفجر" : /بين المغرب والعشاء/.test(n) ? "بين المغرب والعشاء" : /العشاء/.test(n) ? "بعد صلاة العشاء" : /المغرب/.test(n) ? "بعد صلاة المغرب" : /العصر/.test(n) ? "بعد صلاة العصر" : /صلاه الجمعه/.test(n) ? "بعد صلاة الجمعة" : /صباح/.test(n) ? "صباحاً" : "";
+  const tm = /الفجر|الصبح/.test(n) ? "بعد صلاة الفجر" : /المغرب\s*(?:الى|الي|حتى|حتي)\s*(?:اذان\s*)?(?:صلا[ةه]\s*)?العشاء/.test(n) ? "بعد صلاة المغرب" : /بين المغرب والعشاء/.test(n) ? "بين المغرب والعشاء" : /العشاء/.test(n) ? "بعد صلاة العشاء" : /المغرب/.test(n) ? "بعد صلاة المغرب" : /العصر/.test(n) ? "بعد صلاة العصر" : /صلاه الجمعه/.test(n) ? "بعد صلاة الجمعة" : /صباح/.test(n) ? "صباحاً" : "";
   if (tm) out.time = tm; else { const m = t.match(/(\d{1,2}[:.]\d{2})\s*(?:-|–|إلى|الى|حتى)\s*(\d{1,2}[:.]\d{2})\s*(ص|م|مساء|صباحا)?/); if (m) out.time = `من ${m[1].replace(".", ":")} إلى ${m[2].replace(".", ":")}${m[3] ? " " + (m[3][0] === "ص" ? "ص" : "م") : ""}`; }
   let best = null; for (const m of S.mosques) { const mk = nkey(m.name); if (mk.length >= 4 && k.includes(mk) && (!best || mk.length > nkey(best.name).length)) best = m; }
   if (best) { out.mosque = best.id; out.gov = best.gov || ""; }

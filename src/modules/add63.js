@@ -126,8 +126,15 @@ function apPartial(e, r){ const core = cmp(String(e.mosName || "").replace(/^\s*
     if ((!days.length || days.some(d => w.includes(d))) && (!key || w.includes(cmp(key)))) return null; }
   return found ? { no:r.no, seen:[...seen] } : null; }
 const apNoLabel = p => `كتاب الموافقة ${p.no} ${p.seen.length ? "ذكر المسجد " + p.seen.map(x => "بعد " + x).join(" و") + " فقط" : "لم يذكر هذا الموعد"}`;
+/* قاعدة الحكم: ردود الإدارة على الطلب تُقرأ بالترتيب والأحدث يغلب. الرفض الذي سببه «بعد صلاة العشاء» يسقط أنشطة العشاء وحدها، والموافقة تسقط ما لم يُذكر في جدولها (apPartial). مثال: لا مانع (-02) ثم عدم موافقة بسبب دروس بعد العشاء (-03): المغرب موافَق، العشاء غير موافَق. */
+const AP_ISHA = /بعد\s*(?:صلاة\s*)?العشاء/;
+function apRuling(e, w, c){ const kids = wqKids(w).filter(x => wqDir(x) === "in").sort((a, b) => (wqDate(a) + a.no).localeCompare(wqDate(b) + b.no)); let st = null;
+  for (const r of kids) { if (wqRes(r) === "no") { if (!AP_ISHA.test(r.body || "") || AP_ISHA.test(e.time || "")) st = { k:"no", r }; }
+    else if (r.approval) { const p = apPartial(e, r); st = p ? { k:"no", partial:true, label:apNoLabel(p), r } : { k:"ok", r }; } }
+  return st; }
 function apprOf(e, c){ if (!e.doc) return { k:"none", label:"بلا رقم كتاب" }; c = c || apprCtx(); const d = docBy[e.doc], w = c.by.get(wqKeyNo(e.doc));
   const fin = (ok, r) => { if (ok.k !== "ok") return ok; const p = apPartial(e, r || (w && wqDir(w) === "in" ? w : w && c.reply.get(w.id))); return p ? { k:"no", partial:true, label:apNoLabel(p) } : ok; };
+  if (w && wqDir(w) === "out") { const g = apRuling(e, w, c); if (g) return g.k === "ok" ? { k:"ok", date:wqDate(g.r) || "", end:addMonths(wqDate(g.r) || TODAY, 6) } : g.partial ? g : { k:"no", label:"رفض كتاب " + (g.r.no || "") + (wqWhy(g.r) ? ": " + wqWhy(g.r) : "") }; }
   if (d) return fin({ k:"ok", date:d.date || d.start || "", end:d.end || "" });
   if (!w) return { k:"wait", label:"الكتاب غير موجود في وثيقة" };
   const mk = (r, dt) => fin({ k:"ok", date:wqDate(r || w) || dt || "", end:addMonths(wqDate(r || w) || TODAY, 6) }, r);
