@@ -94,10 +94,10 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
 .me{display:flex;align-items:center;gap:10px;font-size:13px}
 .online{display:grid;gap:4px;font-size:13px;padding-bottom:6px}
 .online small{color:var(--side-muted);font-size:11.5px}
-.on{display:flex;align-items:center;gap:7px}
-.on i{width:8px;height:8px;border-radius:50%;background:#3DB487;box-shadow:0 0 0 3px rgba(61,180,135,.25);flex:none}
-.on small{color:var(--side-muted)}
-.panel .on{color:var(--ink)} .panel .on small{color:var(--muted)}
+.ou{display:flex;align-items:center;gap:7px}
+.ou i{width:8px;height:8px;border-radius:50%;background:#3DB487;box-shadow:0 0 0 3px rgba(61,180,135,.25);flex:none}
+.ou small{color:var(--side-muted)}
+.panel .ou{color:var(--ink)} .panel .ou small{color:var(--muted)}
 .me .av{width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--side);display:grid;place-items:center;font-weight:700;font-family:var(--f-display);flex:none}
 .me small{display:block;color:var(--side-muted);font-size:11.5px}
 .side .btn{background:rgba(255,255,255,.08);color:var(--side-ink);font-size:13.5px;padding:8px 12px}
@@ -978,7 +978,7 @@ function joinPresence(){
   presence.subscribe(async st => { if (st === "SUBSCRIBED") await presence.track({ at: new Date().toISOString() }); });
 }
 function onlineHTML(){
-  return S.online.map(id => `<span class="on"><i></i>${esc(whoName(id))}${whoTitle(id) ? ` <small>${esc(whoTitle(id))}</small>` : ""}</span>`).join("");
+  return S.online.map(id => `<span class="ou"><i></i>${esc(whoName(id))}${whoTitle(id) ? ` <small>${esc(whoTitle(id))}</small>` : ""}</span>`).join("");
 }
 function renderOnline(){ const el = $("#online"); if (el) el.innerHTML = `<small>المتصلون الآن: ${S.online.length}</small>${onlineHTML()}`; }
 function userForm(id){
