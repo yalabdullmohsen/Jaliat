@@ -31,3 +31,20 @@ permitForm = function(preset, grant){ _permitForm73(preset, grant); if (S.form?.
   $("#p-lang")?.closest(".g2")?.insertAdjacentHTML("afterend", `<div class="fld" id="pf-co" data-act="${esc(act?.id || "")}"></div>`); pfCoSync(); };
 document.addEventListener("input", ev => { if (ev.target.closest?.("#p-sheikh,#p-lang,#p-mosque")) pfCoSync(); });
 document.addEventListener("change", ev => { if (ev.target.closest?.("#p-sheikh,#p-lang,#p-mosque")) pfCoSync(); });
+
+/* المهمة المرتبطة بتفويض إصدار تصريح: رقم منسق الجالية ظاهر بجانب زر «إصدار التصريح الآن» */
+const _linkBtn73 = linkBtn;
+function grantComm(id){ const g = (S.grants || []).find(x => x.id === id), p = g?.preset || {}, sh = String(p.sheikh || "").trim();
+  return S.byId?.get(p.act_id)?.comm || (sh && S.E.find(e => e.lect && e.lect.split(" / ").includes(sh))?.comm) || p.lang || ""; }
+linkBtn = function(l){ const [k, id] = String(l).replace(/^#/, "").split(":"), b = _linkBtn73(l); if (k !== "pgrant") return b;
+  const cm = grantComm(id); return b + `<div class="fld pf-co-t"><label>${cm ? "منسق الجالية: " + esc(cm) : "منسق الجالية"}</label>${cm ? coPhones(cm) : `<div class="pn-co none">لا يوجد رقم منسق لهذه الجالية</div>`}</div>`; };
+
+/* تفويض انتهى أو سُحب أو صدر تصريحه: مهمته تختفي من مهام الفريق ومن مهام الموظف (وتُلغى في القاعدة عند المدير). المنجزة تبقى في سجل الإنجاز */
+const tkDead = t => { if (!t || !TK_OPEN.includes(t.status)) return false; const m = /^#?pgrant:(.+)$/.exec(t.link || ""); if (!m) return false; const g = (S.grants || []).find(x => x.id === m[1]); return !!g && !gOpen(g); };
+function tkPrune(){ const dead = (S.tasks || []).filter(tkDead); if (!dead.length) return;
+  S.tasks = S.tasks.filter(t => !dead.includes(t));
+  if (S.admin) dead.forEach(async t => { const r = await sb.from("tasks").update({ status:"ملغاة" }).eq("id", t.id); if (r?.error) console.warn("tkPrune", r.error.message); }); }
+const _loadTasks73 = loadTasks;
+loadTasks = async function(){ await _loadTasks73(); tkPrune(); };
+const _vTasks73 = vTasks;
+vTasks = function(){ tkPrune(); return _vTasks73(); };
