@@ -20,7 +20,7 @@ const waRow = (ph, L) => { const last = L[0]; return lkRow("i-wa", `محادثة
 /* activity drawer: approval letter, permits, tasks, coordinator chat */
 const _actForm20 = actForm;
 actForm = function(id, preset){ _actForm20(id, preset); const e = id && S.byId.get(id); if (!e || S.form?.kind !== "act") return;
-  const co = S.coords.filter(c => c.comm === e.comm && c.phone);
+  const co = coFor(e.comm);
   const html = lkPanel("مرتبط بهذا النشاط", [
     ...(e.doc && docBy[e.doc] ? [lkRow("i-doc", `الموافقة ${e.doc}`, `${fmt(docBy[e.doc].start)} ← ${fmt(docBy[e.doc].end)}`, `doc:${e.doc}`)] : []),
     ...LK.wqDoc(e.doc).slice(0, 4).map(wqRow), ...LK.permAct(e).slice(0, 4).map(pmRow), ...LK.tasks(`#act:${id}`).map(tkRow),

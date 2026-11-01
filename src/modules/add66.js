@@ -9,12 +9,12 @@ const RT_DB = { soon:"renew", expired:"expired", update:"update" };
 const rtKey = (kind, x) => kind === "update" ? "upd:" + x.comm : x.d.no;
 const rtSent = (kind, key) => S.renewLog.find(r => r.doc_no === key && (r.kind || "renew") === RT_DB[kind] && (kind !== "update" || (Date.now() - new Date(r.sent_at)) < 30 * 864e5));
 function rtBuild(d){ const acts = S.E.filter(e => e.doc === d.no && !["ملغى", "مكتمل"].includes(e.status)), comm = d.comm || acts[0]?.comm || "";
-  return { d, acts, comm, coords:S.coords.filter(c => c.comm === comm && c.status !== "سابق" && c.phone), left:diffDays(TODAY, d.end) }; }
+  return { d, acts, comm, coords:coFor(comm), left:diffDays(TODAY, d.end) }; }
 function rtItems(kind){
   if (kind === "soon") { const lim = addDays(TODAY, +S.renewDays); return S.docs.filter(d => d.end && d.end >= TODAY && d.end <= lim).map(rtBuild).filter(x => x.acts.length || x.coords.length).sort((a, b) => a.d.end.localeCompare(b.d.end)); }
   if (kind === "expired") return S.docs.filter(d => d.end && d.end < TODAY && d.end >= addDays(TODAY, -90)).map(rtBuild).filter(x => x.acts.length).sort((a, b) => b.d.end.localeCompare(a.d.end));
   const by = new Map(); for (const e of S.E) { if (["ملغى", "مكتمل"].includes(e.status) || !e.comm) continue; (by.get(e.comm) || by.set(e.comm, []).get(e.comm)).push(e); }
-  return [...by.entries()].map(([comm, acts]) => ({ comm, acts, coords:S.coords.filter(c => c.comm === comm && c.status !== "سابق" && c.phone) }))
+  return [...by.entries()].map(([comm, acts]) => ({ comm, acts, coords:coFor(comm) }))
     .sort((a, b) => (rtSent("update", rtKey("update", a)) ? 1 : 0) - (rtSent("update", rtKey("update", b)) ? 1 : 0) || b.acts.length - a.acts.length); }
 /* الأنشطة مجمّعة حسب المحاضر: كل اسم مرة واحدة فقط */
 function rtActLines(acts){ const by = new Map(); for (const e of acts) { const k = (e.lect || "").replace(/\s+/g, " ").trim() || "محاضر غير محدد"; const w = `${[e.mosName, e.area].filter(Boolean).join("، ") || "مسجد غير محدد"} — ${[daysText(e), e.time].filter(Boolean).join(" ")}`.trim(); const L = by.get(k) || by.set(k, []).get(k); if (!L.includes(w)) L.push(w); }

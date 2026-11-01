@@ -92,7 +92,7 @@ function receiptText(r){ const f = rqRead();
   return `السلام عليكم ورحمة الله وبركاته\n${f.coord ? `الأخ الفاضل/ ${f.coord} حفظه الله\n` : ""}\nنفيدكم باستلام طلبكم${f.subj ? ` بخصوص «${f.subj}»` : ""}${f.org ? ` المقدم من ${f.org}` : ""}، وقد سُجّل برقم *${rqNo(r)}* بتاريخ ${fmt(TODAY)}.\n${S.rqActs.length ? `عدد الأنشطة المطلوبة: ${S.rqActs.length}\n` : ""}سيتم دراسة الطلب والرد عليكم في أقرب وقت، ونرجو ذكر رقم الطلب عند المراجعة.${SIGN}`; }
 async function rqAck(via){
   const r = await rqSave(true); if (!r) return;
-  if (via === "wa") { const f = rqRead(); const list = f.phone ? [{ name:f.coord, phone:f.phone }] : S.coords.filter(c => c.comm === f.comm && c.phone); if (!list.length) { const ok = await cpCopy(receiptText(r)); toast(ok ? "لا يوجد رقم، نُسخ نص التأكيد" : "لا يوجد رقم هاتف"); } else waPick(list, () => receiptText(r)); }
+  if (via === "wa") { const f = rqRead(); const list = f.phone ? [{ name:f.coord, phone:f.phone }] : coFor(f.comm); if (!list.length) { const ok = await cpCopy(receiptText(r)); toast(ok ? "لا يوجد رقم، نُسخ نص التأكيد" : "لا يوجد رقم هاتف"); } else waPick(list, () => receiptText(r)); }
   const ack = { at:new Date().toISOString(), by:S.me.id, via };
   const data = { ...r.data, ack }; const st = r.status === "جديد" ? "قيد المراجعة" : r.status;
   const { error } = await sb.from("requests").update({ data, status:st }).eq("id", r.id); if (error) return writeFail(error);

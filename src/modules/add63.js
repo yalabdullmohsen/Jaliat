@@ -147,10 +147,12 @@ function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permi
 /* أرقام منسقي الجالية: نسخ الرقم أو فتح المحادثة مباشرة في تطبيق واتساب */
 /* منسقو جالية النشاط: تطابق تام، وإلا فبالجالية الأساسية («الهندية – المليبارية» ← كل منسقي المليبارية ونوابهم) */
 function coFor(comm){ const live = c => c.status !== "سابق" && c.phone, all = (S.coords || []).filter(live), cm = String(comm || "").trim();
+  const nz = x => String(x || "").replace(/[\u064B-\u0652\u0640]/g, "").replace(/[إأآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").replace(/\s+/g, " ").trim().replace(/(^|\s)ال/g, "$1");
   let L = all.filter(c => c.comm === cm); if (L.length) return L;
+  const gm = new Set((S.comms || []).filter(g => g.group && nz(g.group) === nz(cm)).map(g => g.name)); if (gm.size) { L = all.filter(c => gm.has(c.comm)); if (L.length) return L; }
   const parts = cm.split(/\s+[–-]\s+/).map(x => x.trim()).filter(Boolean).reverse(), base = c => String(c.comm || "").split(/\s+[–-]\s+/)[0].trim();
-  for (const p of parts) { L = all.filter(c => base(c) === p); if (L.length) return L; }
-  for (const p of parts) { L = all.filter(c => c.name && (c.name === p || c.name.includes(p) || p.includes(c.name))); if (L.length) return L; }
+  for (const p of parts) { L = all.filter(c => nz(base(c)) === nz(p)); if (L.length) return L; }
+  for (const p of parts) { L = all.filter(c => c.name && c.name.length > 2 && (c.name === p || c.name.includes(p) || p.includes(c.name))); if (L.length) return L; }
   return []; }
 function coPhones(comm, pid){ const L = coFor(comm).sort((a, b) => String(a.comm).localeCompare(String(b.comm), "ar") || (a.role === "نائب منسق") - (b.role === "نائب منسق")); if (!L.length) return `<div class="pn-co none">لا يوجد رقم منسق لهذه الجالية</div>`;
   return `<div class="pn-co">${L.map(c => `<div class="cph"><span class="cph-n"><b>${esc(c.name)}</b><small>${esc(c.role || "منسق")}${new Set(L.map(x => x.comm)).size > 1 ? " · " + esc(c.comm) : ""}</small></span><bdi dir="ltr" class="cph-p">${esc(c.phone)}</bdi><button type="button" class="btn btn-ghost cph-b" data-cpph="${esc(c.phone)}">نسخ الرقم</button><a class="btn cph-b" href="whatsapp://send?phone=${waNum(c.phone)}"${pid ? ` data-wapid="${esc(pid)}"` : ""}>${icon("i-wa")} محادثة مباشرة</a></div>`).join("")}</div>`; }

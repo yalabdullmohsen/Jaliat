@@ -9,7 +9,7 @@ function renewList(){
   return S.docs.filter(d => d.end && d.end >= addDays(TODAY, -7) && d.end <= lim).map(d => {
     const acts = S.E.filter(e => e.doc === d.no && !["ملغى", "مكتمل"].includes(e.status));
     const comm = d.comm || acts[0]?.comm || "";
-    const coords = S.coords.filter(c => c.comm === comm && c.status !== "سابق" && c.phone);
+    const coords = coFor(comm);
     return { d, acts, comm, coords, left:diffDays(TODAY, d.end) };
   }).filter(x => x.acts.length || x.coords.length).sort((a, b) => a.d.end.localeCompare(b.d.end));
 }

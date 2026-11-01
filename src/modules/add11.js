@@ -641,8 +641,8 @@ document.addEventListener("click", async ev => {
   if (D.ltcopy !== undefined) { const x = S.letters[+D.ltcopy]; const tmp = document.createElement("div"); tmp.innerHTML = x.html; return toast(await copyRich(x.html, tmp.innerText) ? "نُسخ نص الكتاب بتنسيقه، الصقه في وثيقة" : "تعذّر النسخ"); }
   if (D.ltsubj !== undefined) { const ok = await cpCopy(S.letters[+D.ltsubj].subj); return toast(ok ? "نُسخ الموضوع" : "تعذّر النسخ"); }
   if (D.ltprint !== undefined) { const w = window.open("", "_blank"); if (!w) return; w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>${esc(S.letters[+D.ltprint].subj)}</title></head><body style="padding:40px">${S.letters[+D.ltprint].html}</body></html>`); w.document.close(); w.print(); return; }
-  if (D.wa) { if (D.wa === "req") { const f = rqRead(); const list = f.phone ? [{ name:f.coord, phone:f.phone }] : S.coords.filter(c => c.comm === f.comm && c.phone); return waPick(list, () => waReq()); }
-    const e = S.byId.get(D.wa.slice(4)); if (!e) return; return waPick(S.coords.filter(c => c.comm === e.comm && c.phone), c => waAct(e, c)); }
+  if (D.wa) { if (D.wa === "req") { const f = rqRead(); const list = f.phone ? [{ name:f.coord, phone:f.phone }] : coFor(f.comm); return waPick(list, () => waReq()); }
+    const e = S.byId.get(D.wa.slice(4)); if (!e) return; return waPick(coFor(e.comm), c => waAct(e, c)); }
   if (D.wko !== undefined) { S.f.wko = D.wko === "0" ? 0 : (S.f.wko || 0) + +D.wko; return render(); }
   if (D.wkprint !== undefined) return printArea("#wk-sheet");
   if (D.wktxt !== undefined) { const ok = await cpCopy(weekText()); return toast(ok ? "نُسخ الجدول، الصقه في الواتساب" : "تعذّر النسخ"); }
