@@ -9,10 +9,10 @@ permitForm = function(preset, grant){ _permitForm63(preset, grant); if (S.form?.
       ${L.length ? `<select class="f" id="pr-wq"><option value="">أو اختر كتاب موافقة من وثيقة…</option>${L.map(w => `<option value="${esc(w.id)}">${esc(w.no || "")} · ${esc((w.subj || "").slice(0, 60))}</option>`).join("")}</select>` : ""}</div>
     <div id="pr-st" class="pr-st" hidden></div><div id="pr-items" class="pr-items" hidden></div></div>`); };
 const b64of = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = () => no(r.error); r.readAsDataURL(f); });
-async function prSmall(f){ if (!f.type.startsWith("image/") || f.size < 1.5e6 || typeof compressImg !== "function") return f; try { const { blob } = await compressImg(f, 2000, .85); return new File([blob], f.name, { type:"image/jpeg" }); } catch (_) { return f; } }
+async function prSmall(f){ if (!f.type.startsWith("image/") || f.size < 4e5 || typeof compressImg !== "function") return f; try { const { blob } = await compressImg(f, 1600, .78); return new File([blob], f.name, { type:"image/jpeg" }); } catch (_) { return f; } }
 function prSt(t, cls){ const e = $("#pr-st"); if (!e) return; e.hidden = !t; e.className = "pr-st " + (cls || ""); e.innerHTML = t || ""; }
 async function prRead(body){ if (PR.busy) return; PR.busy = true; prSt(`<span class="spin"></span> يقرأ الذكاء الاصطناعي الكتاب… (ثوانٍ)`);
-  try { const { data, error } = await sb.functions.invoke("doc-read", { body }); if (error || data?.error) throw new Error(data?.error || (await error?.context?.json?.().catch(() => null))?.error || error?.message);
+  try { const { data, error } = await Promise.race([sb.functions.invoke("doc-read", { body }), new Promise((_, no) => setTimeout(() => no(new Error("تأخرت القراءة أكثر من دقيقة، أعد المحاولة أو عبّئ يدوياً")), 60000))]); if (error || data?.error) throw new Error(data?.error || (await error?.context?.json?.().catch(() => null))?.error || error?.message);
     PR.meta = data; PR.items = (data.items || []).filter(x => x && (x.sheikh || x.mosque));
     if (!PR.items.length) { prSt("لم أجد في الكتاب بيانات درس (شيخ أو مسجد). عبّئ الحقول يدوياً.", "warn"); return; }
     prFill(0); const box = $("#pr-items");
