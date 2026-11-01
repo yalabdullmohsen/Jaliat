@@ -96,3 +96,18 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
   if (t.dataset.cmedit) return cmEditForm(t.dataset.cmedit); if (t.dataset.cesave !== undefined) return cmEditSave(t);
   if (t.dataset.coadd) { const nm = t.dataset.coadd, c = S.comms.find(x => x.name === nm), has = S.coords.some(x => x.comm === nm && x.role === "منسق"); listForm("co");
     const set = (id, v) => { const e = $("#" + id); if (e && v) e.value = v; }; set("l-comm", nm); set("l-lang", c?.lang); set("l-role", has ? "نائب منسق" : "منسق"); set("l-status", "نشط"); $("#l-name")?.focus(); } });
+
+/* منسقون بلا جالية (مثل النيبالية): لا تظهر في قائمة الجاليات فلا يمكن اختيارها. زر «إنشاء جالية لهم» يسجّل الجالية ويربط المنسق بها بدل تكراره */
+const unCo = () => S.coords.map((c, i) => ({ ...c, i })).filter(c => !c.comm || !commNames.includes(c.comm));
+const _ccCards73d = ccCards;
+ccCards = function(){ _ccCards73d(); if (S.view !== "coords" || !canCC()) return;
+  document.querySelectorAll("#view .cocard").forEach(card => { const h = card.querySelector(".coh"); if (!h || h.querySelector("[data-cmlink]") || h.querySelector("h3")?.textContent.trim() !== "جالية غير محددة") return;
+    h.insertAdjacentHTML("beforeend", `<button type="button" class="btn btn-primary cc-b" data-cmlink>إنشاء جالية لهم</button>`); }); };
+document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;
+  if (t.dataset.cmlink !== undefined) { const u = unCo(), m = u.find(x => x.role === "منسق") || u[0]; if (!m) return; cmForm(); S.form.link = u.map(x => x.i);
+    const clean = String(m.name || "").split(/\s*[-–]\s*/)[0].trim(); $("#cm-l").value = m.lang || ""; $("#cm-c").value = clean; $("#cm-p").value = m.phone || "";
+    const b = $(".drawer-f [data-cmsave]"); if (b) { b.removeAttribute("data-cmsave"); b.dataset.cmlsave = ""; } }
+  if (t.dataset.cmlsave !== undefined) { ev.stopImmediatePropagation(); const g0 = $("#cm-g").value, grp = g0 === "__new" ? $("#cm-gn").value.trim() : g0, lang = $("#cm-l").value.trim(), co = $("#cm-c").value.trim(), ph = $("#cm-p").value.replace(/\D/g, "");
+    if (!grp || !lang || !co) return toast("اكتب المجموعة واللغة واسم المنسق"); const name = `${lang} - ${co}`; if (S.comms.some(c => c.name === name)) return toast("هذه الجالية موجودة"); t.disabled = true;
+    const idx = new Set(S.form.link || []), C = [...S.comms, { no:Math.max(0, ...S.comms.map(c => +c.no || 0)) + 1, lang, name, coord:co, group:grp }], K = S.coords.map((c, i) => idx.has(i) ? { ...c, comm:name, lang: c.lang || lang, ...(c.role === "منسق" ? { name:co, ...(ph ? { phone:ph } : {}) } : {}) } : c);
+    Promise.all([T.ref("comms", C), T.ref("coords", K)]).then(() => { S.comms = C; S.coords = K; derive?.(); closeDrawer(); toast("أُنشئت الجالية وربط المنسق بها ✓"); render(); }).catch(e => { t.disabled = false; writeFail(e); }); } }, true);
