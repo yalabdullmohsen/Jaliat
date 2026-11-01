@@ -131,8 +131,9 @@ function apprOf(e, c){ if (!e.doc) return { k:"none", label:"بلا رقم كت�
   if (d) return fin({ k:"ok", date:d.date || d.start || "", end:d.end || "" });
   if (!w) return { k:"wait", label:"الكتاب غير موجود في وثيقة" };
   const mk = (r, dt) => fin({ k:"ok", date:wqDate(r || w) || dt || "", end:addMonths(wqDate(r || w) || TODAY, 6) }, r);
-  if (wqDir(w) === "in") return w.approval ? mk(w) : wqRes(w) === "no" ? { k:"no", label:"اعتذار / رفض" } : { k:"wait", label:"لم تصل موافقة" };
-  const st = wqState(w, c.reply); return st[1] === "ok" ? mk(st[2]) : st[1] === "bad" ? { k:"no", label:"رفض" } : { k:"wait", label:st[0] }; }
+  const no = r => ({ k:"no", label:"رفض كتاب " + (r.no || "") + (wqWhy(r) ? ": " + wqWhy(r) : "") });
+  if (wqDir(w) === "in") return wqRes(w) === "no" ? no(w) : w.approval ? mk(w) : { k:"wait", label:"لم تصل موافقة" };
+  const st = wqState(w, c.reply); return st[1] === "ok" ? mk(st[2]) : st[1] === "bad" ? no(st[2] || w) : { k:"wait", label:st[0] }; }
 function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean)), c = apprCtx();
   return S.E.filter(e => e.doc && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id) && !S.pdone?.has(e.id)).map(e => ({ e, delegated:gr.has(e.id), ap:apprOf(e, c) }))
     .filter(x => x.ap.k === "ok" && (x.ap.date || "") >= since && (!x.ap.end || x.ap.end >= TODAY)).sort((a, b) => (b.ap.date || "").localeCompare(a.ap.date || "")); }

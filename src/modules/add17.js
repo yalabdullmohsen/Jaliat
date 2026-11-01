@@ -40,7 +40,10 @@ const wqClean = s => String(s || "").replace(/السيد[ةه]?\s+الفاضل[�
 const wqFrom = w => (String(w.body || "").match(/(?:تهدي|يهدي)\S*\s+((?:إدارة|ادارة|مكتب)\s+[^،,.]{3,45}?)\s+(?:أطيب|اطيب|خالص)/) || [])[1] || wqClean(wqWho(w));
 const wqCommName = w => { const m = String(w.subj || "").match(/للجالي[ةه]\s+(\S+)(?:\s+(\S+ي[ةه]))?/); return m ? [m[1], m[2]].filter(Boolean).join(" ").replace(/[()]/g, "") : ""; };
 const WQ_REJ = /(عدم الموافق|نعتذر|يتعذر|تعذّر|تعذر|لا يمكن|عدم إمكان|عدم امكان|لا نوافق|غير موافق|رفض)/;
-const wqRes = w => w.approval ? "ok" : WQ_REJ.test(w.body || "") ? "no" : "";
+/* الرفض الصريح («نحيطكم علماً بعدم الموافقة على…») يغلب علامة الموافقة، فقد يُسجَّل كتاب الرد على أنه موافقة وهو رفض */
+const WQ_EXPL = /(?:بعدم|عدم)\s+الموافقة\s+على/;
+const wqWhy = w => { const m = String(w.body || "").match(/عدم\s+الموافقة[^.\n]*?(?:نظر[اً]*\s+(?:ل|إلى)\s*([^.\n:؛]{4,120}))/); return m ? m[1].trim() : ""; };
+const wqRes = w => WQ_EXPL.test(w.body || "") ? "no" : w.approval ? "ok" : WQ_REJ.test(w.body || "") ? "no" : "";
 function wqIndex(){ const by = new Map(); S.wq.forEach(w => w.no && by.set(wqKeyNo(w.no), w)); const reply = new Map();
   for (const w of S.wq) if (wqDir(w) === "in") for (const r of [...(w.refs || []), ...((w.body || "").match(/\d{4}-\d{4}/g) || [])]) { const o = by.get(wqKeyNo(r)); if (o && o !== w && wqDir(o) === "out" && !reply.has(o.id)) reply.set(o.id, w); }
   return reply; }
