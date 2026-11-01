@@ -4,7 +4,7 @@ function apStage(e, c){ const a = apprOf(e, c); return a.k === "ok" ? "ap_" + ap
 function apBadge(e, c){ const a = apprOf(e, c);
   if (a.k === "ok") { const p = apPermit(e); return `<span class="chip ok">✓ تمت الموافقة</span>${p === "need" ? `<span class="chip gold">متبقي: إصدار تصريح</span>` : `<span class="chip ok">✓ ${p === "sent" ? "أُرسل التصريح" : "صدر التصريح"}</span>`}`; }
   if (a.k === "none") return `<span class="chip">بلا رقم كتاب</span>`;
-  return `<span class="chip bad">لم تتم الموافقة</span><span class="s ap-n">يرجى إبلاغ المنسق${a.label && a.k === "wait" ? " · " + esc(a.label) : ""}</span>`; }
+  return `<span class="chip bad">لم تتم الموافقة${a.partial ? " على هذا الموعد" : ""}</span><span class="s ap-n">${a.partial ? esc(a.label) + "<br>" : ""}يرجى إبلاغ المنسق${a.label && a.k === "wait" ? " · " + esc(a.label) : ""}</span>`; }
 const _filterActs73 = filterActs;
 filterActs = function(L, f){ const m = String(f.st || "").startsWith("ap_") ? f.st : ""; if (!m) return _filterActs73(L, f); const c = apprCtx();
   const rest = _filterActs73(L, { ...f, st:"" }); return rest.filter(e => m === "ap_no" ? ["no", "wait"].includes(apprOf(e, c).k) : m === "ap_issued" ? ["ap_issued", "ap_sent"].includes(apStage(e, c)) : apStage(e, c) === m); };

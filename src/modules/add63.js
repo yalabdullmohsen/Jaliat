@@ -115,10 +115,22 @@ NEWF.splice(1, 0, ["v85-pauto", "nav:permits", "تعبئة التصريح تلق
 /* approvals → permits: the head sees every approved activity without a permit, and issues it himself or delegates it in one tap (all data prefilled) */
 /* حالة الموافقة لكل نشاط، من كتابه في وثيقة: تمت الموافقة (مسجّلة في الوثائق، أو وصل كتاب موافقة، أو مكتوبة في الإجراءات) / لم تتم الموافقة (رفض) / لم تصل بعد */
 const apprCtx = () => ({ reply:wqIndex(), by:new Map((S.wq || []).filter(w => w.no).map(w => [wqKeyNo(w.no), w])) });
-function apprOf(e, c){ if (!e.doc) return { k:"none", label:"بلا رقم كتاب" }; const d = docBy[e.doc];
-  if (d) return { k:"ok", date:d.date || d.start || "", end:d.end || "" };
-  const w = (c || (c = apprCtx())).by.get(wqKeyNo(e.doc)); if (!w) return { k:"wait", label:"الكتاب غير موجود في وثيقة" };
-  const mk = (r, dt) => ({ k:"ok", date:wqDate(r || w) || dt || "", end:addMonths(wqDate(r || w) || TODAY, 6) });
+/* موافقة جزئية: كتاب الموافقة يذكر في جدوله الأنشطة الموافَق عليها فقط. مثال حقيقي: طلبنا درسين يوم الجمعة في نفس المسجد (بعد المغرب وبعد العشاء) فجاء كتاب إدارة مساجد حولي بذكر «بعد المغرب» فقط، أي أن درس العشاء لم تتم الموافقة عليه.
+   الفحص: نبحث عن اسم المسجد في نص كتاب الموافقة، وبعده مباشرة (حتى المسجد التالي أو 80 حرفاً) يجب أن يظهر اليوم والفترة نفسها. إن لم يُذكر المسجد إطلاقاً (موافقة عامة) فالنشاط موافَق عليه. */
+const PRAY_KEYS = ["الفجر", "الظهر", "العصر", "المغرب", "العشاء", "الضحى"], cmp = s => nkey(String(s || "")).replace(/\s+/g, "");
+function apPartial(e, r){ const core = cmp(String(e.mosName || "").replace(/^\s*(مسجد|جامع)\s+/, "")); if (core.length < 4 || !r?.body) return null;
+  const body = cmp(r.body), key = PRAY_KEYS.find(p => cmp(e.time).includes(cmp(p))), days = (e.days || []).map(d => cmp(DAYS[d])).filter(Boolean), seen = new Set(); let at = body.indexOf(core), found = false;
+  if (at < 0) return null;
+  for (; at >= 0; at = body.indexOf(core, at + 1)) { const start = at + core.length, nx = body.indexOf(core, start), w = body.slice(start, Math.min(start + 80, nx > 0 ? nx : 1e9)); found = true;
+    PRAY_KEYS.forEach(p => { if (w.includes(cmp(p))) seen.add(p); });
+    if ((!days.length || days.some(d => w.includes(d))) && (!key || w.includes(cmp(key)))) return null; }
+  return found ? { no:r.no, seen:[...seen] } : null; }
+const apNoLabel = p => `كتاب الموافقة ${p.no} ${p.seen.length ? "ذكر المسجد " + p.seen.map(x => "بعد " + x).join(" و") + " فقط" : "لم يذكر هذا الموعد"}`;
+function apprOf(e, c){ if (!e.doc) return { k:"none", label:"بلا رقم كتاب" }; c = c || apprCtx(); const d = docBy[e.doc], w = c.by.get(wqKeyNo(e.doc));
+  const fin = (ok, r) => { if (ok.k !== "ok") return ok; const p = apPartial(e, r || (w && wqDir(w) === "in" ? w : w && c.reply.get(w.id))); return p ? { k:"no", partial:true, label:apNoLabel(p) } : ok; };
+  if (d) return fin({ k:"ok", date:d.date || d.start || "", end:d.end || "" });
+  if (!w) return { k:"wait", label:"الكتاب غير موجود في وثيقة" };
+  const mk = (r, dt) => fin({ k:"ok", date:wqDate(r || w) || dt || "", end:addMonths(wqDate(r || w) || TODAY, 6) }, r);
   if (wqDir(w) === "in") return w.approval ? mk(w) : wqRes(w) === "no" ? { k:"no", label:"اعتذار / رفض" } : { k:"wait", label:"لم تصل موافقة" };
   const st = wqState(w, c.reply); return st[1] === "ok" ? mk(st[2]) : st[1] === "bad" ? { k:"no", label:"رفض" } : { k:"wait", label:st[0] }; }
 function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean)), c = apprCtx();
