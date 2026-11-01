@@ -48,3 +48,20 @@ const _loadTasks73 = loadTasks;
 loadTasks = async function(){ await _loadTasks73(); tkPrune(); };
 const _vTasks73 = vTasks;
 vTasks = function(){ tkPrune(); return _vTasks73(); };
+
+/* إصدار التصريح: البيانات تكتمل تلقائياً من كتاب النشاط في وثيقة (الطلب والرد والموافقة)، وتُسجَّل في التصريح */
+function pBook(actId){ const e = S.byId?.get(actId); if (!e?.doc) return null; const c = apprCtx(), a = apprOf(e, c); if (a.k !== "ok") return null;
+  const w = c.by.get(wqKeyNo(e.doc)), r = w && (wqDir(w) === "in" ? w : c.reply.get(w.id)), d = docBy[e.doc];
+  return { no:r?.no || d?.no || e.doc, req:e.doc, date:a.date || "", to:a.end || "" }; }
+const pBookD = () => S.form?.book ? { book:S.form.book } : {};
+const _permitForm73b = permitForm;
+permitForm = function(preset, grant){ _permitForm73b(preset, grant); if (S.form?.kind !== "permit") return;
+  const e = S.byId?.get(preset?.act_id || S.form.act); if (!e) return;
+  const bk = pBook(e.id); S.form.book = bk;
+  const set = (id, v) => { const el = $("#" + id); if (el && v && !el.readOnly && !el.value) { el.value = v; el.classList.add("pr-filled"); } };
+  set("p-sheikh", e.lect); set("p-mosque", e.mosName ? pMos("مسجد " + String(e.mosName).replace(/^مسجد\s+/, ""), e.area, e.gov) : ""); set("p-lang", commBase(e.comm || ""));
+  if (!$("#p-date")?.value || $("#p-date").value < TODAY) { const ds = e.daily ? [0, 1, 2, 3, 4, 5, 6] : (e.days || []); for (let i = 0; i < 14 && ds.length; i++) { const t = addDays(TODAY, i); if (ds.includes(dOf(t).getDay())) { $("#p-date").value = t; break; } } }
+  const from = $("#p-date")?.value || TODAY;
+  if (bk?.to && bk.to > from) { const days = Math.round((dOf(bk.to) - dOf(from)) / 864e5) + 1, s = $("#p-dur"); if (s && !s.disabled) { const i = DUR.findIndex(z => z[0] === "bk"); if (i >= 0) DUR.splice(i, 1); DUR.push(["bk", `حتى نهاية كتاب الموافقة (${fmt(bk.to)})`, days]); s.insertAdjacentHTML("beforeend", `<option value="bk">${esc(DUR.at(-1)[1])}</option>`); s.value = "bk"; } }
+  const chk = [["الشيخ", $("#p-sheikh")?.value], ["المسجد", $("#p-mosque")?.value], ["اللغة", $("#p-lang")?.value], ["تاريخ الدرس", $("#p-date")?.value], ["وقت الدرس", e.time || $("#p-from")?.value], ["كتاب الموافقة", bk ? `${bk.no}${bk.to ? " · سارٍ حتى " + fmt(bk.to) : ""}` : ""]];
+  $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<div class="panel pf-chk"><div class="panel-h"><h3>اكتمال بيانات التصريح</h3></div><div class="panel-b">${chk.map(([k, v]) => `<div class="li"><span class="chip ${v ? "ok" : "bad"}">${v ? "✓" : "ناقص"}</span><span><b>${esc(k)}</b> ${v ? esc(v) : ""}</span></div>`).join("")}${bk ? "" : `<div class="s">لم أجد كتاب موافقة لهذا النشاط في وثيقة. أرفق الكتاب من الأعلى أو اختره، فتُقرأ بياناته وتُضاف للتصريح.</div>`}</div></div>`); };

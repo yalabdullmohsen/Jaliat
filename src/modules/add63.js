@@ -24,7 +24,7 @@ permitIssue = async function(){ const v = id => $("#" + id)?.value.trim() || "",
   const time = [pRepText(rep, days, v("p-date")), tTxt].filter(Boolean).join("، ") || (v("p-note") ? "حسب الملاحظات" : "");
   const dur = DUR.find(x => x[0] === v("p-dur")) || DUR.find(x => x[0] === "180") || DUR[0]; const until = rep === "once" ? v("p-date") : addDays(v("p-date"), dur[2] - 1);
   const data = { sheikh:v("p-sheikh"), mosque:v("p-mosque"), topic:v("p-topic"), lang:v("p-lang"), date:v("p-date"), t_from:mode === "clock" ? v("p-from") : "", t_to:mode === "clock" ? v("p-to") : "",
-    time_mode:mode, prayer, days, rep, ...(rep in PNTH ? { nth:PNTH[rep] } : {}), ...(rep === "once" ? { once:true } : {}), time, dur:rep === "once" ? "يوم الدرس فقط" : dur[1], head:v("p-head"), note:v("p-note") };
+    time_mode:mode, prayer, days, rep, ...(rep in PNTH ? { nth:PNTH[rep] } : {}), ...(rep === "once" ? { once:true } : {}), time, dur:rep === "once" ? "يوم الدرس فقط" : dur[1], head:v("p-head"), note:v("p-note"), ...pBookD() };
   if (S.form?.edit) { if (!S.admin) return toast("تعديل التصريح لرئيس القسم أو مدير النظام"); const eid = S.form.edit; const { data:er, error:ee } = await sb.from("permits").update({ data, until }).eq("id", eid).select().single(); if (ee) return writeFail(ee);
     S.permits = S.permits.map(x => x.id === eid ? er : x); closeDrawer(); toast(`تعدّل التصريح ${er.no}، نفس الرقم والباركود`); render(); return permitView(er.id); }
   { const act = S.form?.act || "", live = x => !x.revoked && (!x.until || x.until >= TODAY), nk = t => String(t || "").replace(/\s+/g, " ").trim();
