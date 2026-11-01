@@ -229,7 +229,9 @@ document.addEventListener("click", async ev => {
   if (D.permit) return permitView(D.permit);
   if (D.passets !== undefined) return assetsForm();
   if (D.pasave !== undefined) return assetsSave();
-  if (D.pprint !== undefined) { let pp = $("#permit-print"); if (!pp) { pp = document.createElement("div"); pp.id = "permit-print"; pp.className = "print-area"; document.body.appendChild(pp); } pp.innerHTML = $("#permit-paper").outerHTML.replace('id="permit-paper"', ""); return printArea("#permit-print"); }
+  if (D.pprint !== undefined) { $("#permit-print")?.remove(); const src = $("#permit-paper"); if (!src) return; const pp = document.createElement("div"); pp.id = "permit-print"; pp.className = "print-area"; document.body.appendChild(pp); pp.innerHTML = src.outerHTML.replace('id="permit-paper"', "");
+    /* اسم ملف PDF الافتراضي = رقم هذا التصريح، فلا يختلط بملف قديم محفوظ */
+    const no = (src.textContent.match(/JL-\d{4,8}-\d{3,4}/) || [])[0], t0 = document.title; if (no) { document.title = no; setTimeout(() => { document.title = t0; }, 4000); } return printArea("#permit-print"); }
   if (D.pwa) { const p = S.permits.find(x => x.id === D.pwa); if (!p) return; const txt = `تصريح إلقاء درس رقم ${p.no}\nالشيخ: ${p.data?.sheikh}\nالمسجد: ${p.data?.mosque}\nالتاريخ: ${fmt(p.data?.date)} ${p.data?.time || ""}\nللتحقق: ${VERIFY(`${p.id}.${p.code}`)}${SIGN}`; if (navigator.share) { try { await navigator.share({ text:txt }); return; } catch (_) { return; } } const ok = await cpCopy(txt); return toast(ok ? "نُسخ نص التصريح ورابط التحقق" : "تعذّر النسخ"); }
   if (D.prevoke) { if (D.sure !== "1") { D.sure = "1"; t.textContent = "اضغط مرة أخرى للتأكيد"; return; } const { error } = await sb.from("permits").update({ revoked:true }).eq("id", D.prevoke); if (error) return writeFail(error); const p = S.permits.find(x => x.id === D.prevoke); if (p) p.revoked = true; toast("أُلغي التصريح، يظهر للإمام «ملغى» عند المسح"); return permitView(D.prevoke); }
 });
