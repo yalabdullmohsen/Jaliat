@@ -9,7 +9,7 @@ function renewList(){
   return S.docs.filter(d => d.end && d.end >= addDays(TODAY, -7) && d.end <= lim).map(d => {
     const acts = S.E.filter(e => e.doc === d.no && !["ملغى", "مكتمل"].includes(e.status));
     const comm = d.comm || acts[0]?.comm || "";
-    const coords = coFor(comm);
+    const coords = coFor(comm, acts);
     return { d, acts, comm, coords, left:diffDays(TODAY, d.end) };
   }).filter(x => x.acts.length || x.coords.length).sort((a, b) => a.d.end.localeCompare(b.d.end));
 }
@@ -27,7 +27,7 @@ function vRenew(){
     ${L.map(x => { const s = renewSent(x.d.no), urg = x.left <= 7 ? "bad" : x.left <= 14 ? "warn" : "ok";
       return `<div class="rn-c${s ? " sent" : ""}"><div class="rn-ct"><span class="rn-left ${urg}">${x.left < 0 ? "انتهت" : x.left === 0 ? "اليوم" : arDays(x.left)}</span><div><b>${esc(x.comm || "—")}</b><span>موافقة ${esc(x.d.no)} · تنتهي ${fmt(x.d.end)} · ${x.acts.length} نشاط</span></div>
           ${s ? `<span class="rn-ok">✓ ذُكِّر ${ago(s.sent_at)}، ${esc(pname(s.sent_by) || "")}</span>` : ""}</div>
-        ${x.coords.length ? `<div class="rn-co">${x.coords.map((c, i) => `<div class="rn-p"><span class="rn-av">${esc((c.name || "؟").trim().charAt(0))}</span><div><b>${esc(c.name)}</b><span>${esc(c.role || "منسق")} · <bdi dir="ltr">${esc(c.phone)}</bdi></span></div>
+        ${new Set(x.coords.map(c => c.comm)).size > 1 ? `<div class="rn-none">تنبيه: «${esc(x.comm)}» تضم ${new Set(x.coords.map(c => c.comm)).size} جاليات ولم يتحدد صاحب الموافقة، تأكد من المنسق قبل الإرسال.</div>` : ""}${x.coords.length ? `<div class="rn-co">${x.coords.map((c, i) => `<div class="rn-p"><span class="rn-av">${esc((c.name || "؟").trim().charAt(0))}</span><div><b>${esc(c.name)}</b><span>${esc(c.role || "منسق")} · <bdi dir="ltr">${esc(c.phone)}</bdi></span></div>
             <button type="button" class="btn btn-primary rn-send" data-rnsend="${esc(x.d.no)}" data-rni="${i}">${icon("i-wa")} إرسال تذكير</button><button type="button" class="btn btn-ghost" data-rncopy="${esc(x.d.no)}" data-rni="${i}">نسخ</button></div>`).join("")}</div>`
         : `<div class="rn-none">لا يوجد رقم منسق لهذه الجالية، <button type="button" class="lnk" data-go="coords">أضف المنسق</button></div>`}
         <details class="rn-pre"><summary>معاينة الرسالة</summary><pre>${esc(renewMsg(x, x.coords[0]))}</pre></details></div>`; }).join("") || `<div class="rn-empty"><b>لا توجد موافقات تنتهي خلال ${S.renewDays} يوماً ✓</b></div>`}

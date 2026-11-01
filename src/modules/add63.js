@@ -146,10 +146,13 @@ function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permi
     .filter(x => x.ap.k === "ok" && (x.ap.date || "") >= since && (!x.ap.end || x.ap.end >= TODAY)).sort((a, b) => (b.ap.date || "").localeCompare(a.ap.date || "")); }
 /* أرقام منسقي الجالية: نسخ الرقم أو فتح المحادثة مباشرة في تطبيق واتساب */
 /* منسقو جالية النشاط: تطابق تام، وإلا فبالجالية الأساسية («الهندية – المليبارية» ← كل منسقي المليبارية ونوابهم) */
-function coFor(comm){ const live = c => c.status !== "سابق" && c.phone, all = (S.coords || []).filter(live), cm = String(comm || "").trim();
+function coFor(comm, acts){ const live = c => c.status !== "سابق" && c.phone, all = (S.coords || []).filter(live), cm = String(comm || "").trim();
   const nz = x => String(x || "").replace(/[\u064B-\u0652\u0640]/g, "").replace(/[إأآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").replace(/\s+/g, " ").trim().replace(/(^|\s)ال/g, "$1");
   let L = all.filter(c => c.comm === cm); if (L.length) return L;
-  const gm = new Set((S.comms || []).filter(g => g.group && nz(g.group) === nz(cm)).map(g => g.name)); if (gm.size) { L = all.filter(c => gm.has(c.comm)); if (L.length) return L; }
+  const gm = new Set((S.comms || []).filter(g => g.group && nz(g.group) === nz(cm)).map(g => g.name)); if (gm.size) { L = all.filter(c => gm.has(c.comm));
+    /* اسم المجموعة يشمل عدة جاليات: يُحصر في الجالية التي منسقها أو نائبه محاضر في هذه الأنشطة، وإلا يبقى الكل ويُنبَّه المستخدم */
+    const ls = (acts || []).flatMap(e => String(e.lect || "").split(/\s*[\/،,]\s*/)).map(nz).filter(x => x.length > 2), hit = new Set(L.filter(c => { const n = nz(c.name); return n.length > 2 && ls.some(l => l === n || l.includes(n) || n.includes(l)); }).map(c => c.comm));
+    if (hit.size) L = L.filter(c => hit.has(c.comm)); if (L.length) return L; }
   const parts = cm.split(/\s+[–-]\s+/).map(x => x.trim()).filter(Boolean).reverse(), base = c => String(c.comm || "").split(/\s+[–-]\s+/)[0].trim();
   for (const p of parts) { L = all.filter(c => nz(base(c)) === nz(p)); if (L.length) return L; }
   for (const p of parts) { L = all.filter(c => c.name && c.name.length > 2 && (c.name === p || c.name.includes(p) || p.includes(c.name))); if (L.length) return L; }

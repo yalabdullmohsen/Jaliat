@@ -9,12 +9,12 @@ const RT_DB = { soon:"renew", expired:"expired", update:"update" };
 const rtKey = (kind, x) => kind === "update" ? "upd:" + x.comm : x.d.no;
 const rtSent = (kind, key) => S.renewLog.find(r => r.doc_no === key && (r.kind || "renew") === RT_DB[kind] && (kind !== "update" || (Date.now() - new Date(r.sent_at)) < 30 * 864e5));
 function rtBuild(d){ const acts = S.E.filter(e => e.doc === d.no && !["ملغى", "مكتمل"].includes(e.status)), comm = d.comm || acts[0]?.comm || "";
-  return { d, acts, comm, coords:coFor(comm), left:diffDays(TODAY, d.end) }; }
+  return { d, acts, comm, coords:coFor(comm, acts), left:diffDays(TODAY, d.end) }; }
 function rtItems(kind){
   if (kind === "soon") { const lim = addDays(TODAY, +S.renewDays); return S.docs.filter(d => d.end && d.end >= TODAY && d.end <= lim).map(rtBuild).filter(x => x.acts.length || x.coords.length).sort((a, b) => a.d.end.localeCompare(b.d.end)); }
   if (kind === "expired") return S.docs.filter(d => d.end && d.end < TODAY && d.end >= addDays(TODAY, -90)).map(rtBuild).filter(x => x.acts.length).sort((a, b) => b.d.end.localeCompare(a.d.end));
   const by = new Map(); for (const e of S.E) { if (["ملغى", "مكتمل"].includes(e.status) || !e.comm) continue; (by.get(e.comm) || by.set(e.comm, []).get(e.comm)).push(e); }
-  return [...by.entries()].map(([comm, acts]) => ({ comm, acts, coords:coFor(comm) }))
+  return [...by.entries()].map(([comm, acts]) => ({ comm, acts, coords:coFor(comm, acts) }))
     .sort((a, b) => (rtSent("update", rtKey("update", a)) ? 1 : 0) - (rtSent("update", rtKey("update", b)) ? 1 : 0) || b.acts.length - a.acts.length); }
 /* الأنشطة مجمّعة حسب المحاضر: كل اسم مرة واحدة فقط */
 function rtActLines(acts){ const by = new Map(); for (const e of acts) { const k = (e.lect || "").replace(/\s+/g, " ").trim() || "محاضر غير محدد"; const w = `${[e.mosName, e.area].filter(Boolean).join("، ") || "مسجد غير محدد"} — ${[daysText(e), e.time].filter(Boolean).join(" ")}`.trim(); const L = by.get(k) || by.set(k, []).get(k); if (!L.includes(w)) L.push(w); }
@@ -31,7 +31,7 @@ function rtCard(kind, x){ const K = RT_KINDS[kind], key = rtKey(kind, x), s = rt
   const sub = kind === "update" ? `${x.acts.length} نشاط مسجّل` : `موافقة <bdi dir="ltr">${esc(x.d.no)}</bdi> · ${kind === "expired" ? "انتهت" : "تنتهي"} ${fmt(x.d.end)} · ${x.acts.length} نشاط`;
   return `<div class="rt-c${s ? " sent" : ""}"><div class="rt-top"><span class="rt-badge ${K.cls}">${K.label}</span>${left}${s ? `<span class="rt-ok">✓ أُرسل ${ago(s.sent_at)}، ${esc(pname(s.sent_by) || "")}</span>` : ""}</div>
     <div class="rt-t"><b>${esc(x.comm || "—")}</b><span>${sub}</span></div>
-    ${x.coords.length ? `<div class="rt-co">${x.coords.map((c, i) => `<div class="rt-p"><span class="rt-av">${esc((c.name || "؟").trim().charAt(0))}</span><div class="rt-pn"><b>${esc(c.name)}</b><span>${esc(c.role || "منسق")} · <bdi dir="ltr">${esc(c.phone)}</bdi></span></div>
+    ${new Set(x.coords.map(c => c.comm)).size > 1 ? `<div class="rn-none">تنبيه: «${esc(x.comm)}» تضم ${new Set(x.coords.map(c => c.comm)).size} جاليات ولم يتحدد صاحب الموافقة، تأكد من المنسق قبل الإرسال.</div>` : ""}${x.coords.length ? `<div class="rt-co">${x.coords.map((c, i) => `<div class="rt-p"><span class="rt-av">${esc((c.name || "؟").trim().charAt(0))}</span><div class="rt-pn"><b>${esc(c.name)}</b><span>${esc(c.role || "منسق")} · <bdi dir="ltr">${esc(c.phone)}</bdi></span></div>
         <button type="button" class="btn ${s ? "" : "btn-primary"} rt-send" data-rtsend="${kind}|${esc(key)}|${i}">${icon("i-wa")} ${s ? "إعادة الإرسال" : K.btn}</button>${s ? "" : `<button type="button" class="btn rt-done" data-rtdone="${kind}|${esc(key)}|${i}">✓ تم إرسال التذكير</button>`}<button type="button" class="btn btn-ghost" data-rtcopy="${kind}|${esc(key)}|${i}">نسخ</button></div>`).join("")}</div>`
       : `<div class="rn-none">لا يوجد رقم منسق لهذه الجالية، <button type="button" class="lnk" data-go="coords">أضف المنسق</button></div>`}
     <div class="rt-more"><details class="rn-pre"><summary>معاينة الرسالة</summary><pre>${esc(rtMsg(kind, x, x.coords[0]))}</pre></details>${kind !== "update" ? `<button type="button" class="btn btn-ghost" data-letter="renew:${esc(x.d.no)}">${icon("i-doc")} كتاب التجديد</button>` : ""}</div></div>`; }
