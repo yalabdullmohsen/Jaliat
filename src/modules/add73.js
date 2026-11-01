@@ -20,3 +20,14 @@ vActs = function(){ let h = _vActs73(); const c = apprCtx(), cnt = { ap_need:0, 
   return bar + h.replace(/(<select class="f" data-fk="st">[\s\S]*?)(<\/select>)/, `$1<option value="ap_need"${cur === "ap_need" ? " selected" : ""}>تمت الموافقة · متبقي تصريح</option><option value="ap_no"${cur === "ap_no" ? " selected" : ""}>لم تتم الموافقة</option><option value="ap_issued"${cur === "ap_issued" ? " selected" : ""}>صدر / أُرسل التصريح</option>$2`); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-apf]"); if (!t) return; S.f.st = t.dataset.apf; render(); });
 NEWF.splice(0, 0, ["v73-appr", "nav:acts", "حالة الموافقة في الأنشطة", "كل نشاط يظهر معه الآن: «✓ تمت الموافقة · متبقي إصدار تصريح»، أو «لم تتم الموافقة، يرجى إبلاغ المنسق». وفوق الجدول أزرار تصفية بنقرة، وموافقات وثيقة التي وصلت تظهر في «تصاريح الدروس» دون اعتماد يدوي."]);
+
+/* إصدار تصريح: أرقام منسق الجالية تظهر في النموذج نفسه للتواصل المباشر (تتبع الشيخ/اللغة أو النشاط المحدد) */
+const _permitForm73 = permitForm;
+function pfCoSync(){ const box = $("#pf-co"); if (!box) return; const sh = $("#p-sheikh")?.value.trim(), lg = $("#p-lang")?.value.trim(), mo = $("#p-mosque")?.value || "";
+  const hit = S.E.find(e => (e.id === box.dataset.act)) || (sh && S.E.find(e => e.lect && e.lect.split(" / ").includes(sh) && mo.includes(String(e.mosName || "").replace(/^مسجد\s+/, "")))) || (sh && S.E.find(e => e.lect && e.lect.split(" / ").includes(sh)));
+  const cm = hit?.comm || lg || ""; box.innerHTML = cm ? `<label>منسق الجالية: ${esc(cm)}</label>${coPhones(cm)}` : ""; }
+permitForm = function(preset, grant){ _permitForm73(preset, grant); if (S.form?.kind !== "permit") return;
+  const act = preset?.act_id ? S.byId?.get(preset.act_id) : null;
+  $("#p-lang")?.closest(".g2")?.insertAdjacentHTML("afterend", `<div class="fld" id="pf-co" data-act="${esc(act?.id || "")}"></div>`); pfCoSync(); };
+document.addEventListener("input", ev => { if (ev.target.closest?.("#p-sheikh,#p-lang,#p-mosque")) pfCoSync(); });
+document.addEventListener("change", ev => { if (ev.target.closest?.("#p-sheikh,#p-lang,#p-mosque")) pfCoSync(); });
