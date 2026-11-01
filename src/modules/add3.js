@@ -48,6 +48,29 @@ function parseLine(t, ctx){
   if (!out.lect && best && hadHdr) { const at = t.indexOf(best.name); if (at > 0) { const w = t.slice(0, at).replace(/[^؀-ۿ\s]/g, " ").split(/\s+/).filter(Boolean).slice(-4).filter(x => !HDR_W.test(x)); const c = w.slice(-3); if (c.length >= 2 && lectOk(c.join(" "))) out.lect = c.join(" "); } }
   return out;
 }
+/* ===== جدول الكتاب المسطَّح (بلا فواصل بين الخلايا): الشيخ/الشيوخ، المسجد، المنطقة، اليوم والوقت =====
+   يُقرأ بالمعجم المعروف (الجاليات، المساجد، المناطق، المحافظات) لا بالتخمين، وما لا يُعرف يبقى كما ورد ولا يُخترع. */
+const L1 = c => c.replace(/[ً-ٰٟـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي");
+const HDR_TBL = /(?:م\s*)?(?:الجالي[ةه]\s*)?(?:اسم\s*)?(?:الشيخ|الشيح|المحاضر)\s*(?:اسم\s*)?(?:المسجد|الجامع)\s*المنطق[ةه]\s*(?:اليوم\s*(?:و\s*)?)?(?:الوقت|التوقيت|الموعد)/;
+const TAIL_DAY = /(?:يوم\s*)?(?:ال)?(?:احد|أحد|اثنين|إثنين|ثلاثاء|اربعاء|أربعاء|خميس|جمعه|جمعة|سبت)[^\d]*?(?:بعد\s*صلا[ةه]\s*[؀-ۿ]+(?:\s*مباشر[ةه])?|بعد\s*[؀-ۿ]+(?:\s*مباشر[ةه])?)/g;
+function tableRows(text, ctx){
+  const m = HDR_TBL.exec(text); if (!m) return []; let rest = text.slice(m.index + m[0].length); const cut = rest.search(/موضوعات|علم[اً]*\s*بأن|نحيطكم|وتفضلوا|المرفقات|شاكر/); if (cut >= 0) rest = rest.slice(0, cut);
+  const areas = [...new Set([...S.mosques.map(x => x.area), ...GOVS].filter(Boolean))].sort((a, b) => b.length - a.length), mosques = [...S.mosques].filter(x => x.name).sort((a, b) => b.name.length - a.name.length);
+  const out = []; let pos = 0; TAIL_DAY.lastIndex = 0;
+  for (let t; (t = TAIL_DAY.exec(rest));) { const pre = rest.slice(pos, t.index).trim(), tail = t[0]; pos = t.index + tail.length;
+    let r = pre.replace(/^\d+\s*/, ""); const cm = commNames.map(c => c.split(/\s*[–-]\s*/)[0].trim()).filter(Boolean).sort((a, b) => b.length - a.length).find(c => L1(r).startsWith(L1(c))); if (cm) r = r.slice(cm.length).replace(/^\s*\d*\s*/, "");
+    else r = r.replace(/^[؀-ۿ]+?[يى][ةه](?=\s*\d)\s*/, "");
+    let area = ""; const ar = areas.find(x => L1(r).endsWith(L1(x))); if (ar) { area = ar; r = r.slice(0, r.length - ar.length).trim(); }
+    let mos = null, mosRaw = ""; const rn = L1(r).replace(/\s+/g, "");
+    for (const x of mosques) { const xn = L1(x.name.replace(/\([^)]*\)/g, "")).replace(/\s+/g, ""); if (xn.length >= 4 && rn.endsWith(xn) && (!area || !x.area || L1(x.area) === L1(area) || L1(x.gov || "") === L1(area))) { mos = x; break; } }
+    let sheikhs = r;
+    if (mos) { let k = r.length, tgt = L1(mos.name.replace(/\([^)]*\)/g, "")).replace(/\s+/g, "").length; for (let c = 0; k > 0 && c < tgt; k--) if (!/\s/.test(r[k - 1])) c++; sheikhs = r.slice(0, k).trim(); }
+    else { const i = r.lastIndexOf("إ"); if (i > 0 && /[؀-ۿ]/.test(r[i - 1])) { sheikhs = r.slice(0, i).trim(); mosRaw = r.slice(i).trim(); } else if (i === 0) { sheikhs = ""; mosRaw = r; } }
+    const names = sheikhs.split(/\d+\s*[-–.]\s*/).map(x => x.replace(/\s+/g, " ").trim()).filter(Boolean);
+    const p = parseLine(tail, ctx), gov = mos?.gov || (GOVS.includes(area) ? area : "");
+    out.push({ ...(names.length ? { lect:names.join(" / ") } : {}), mosque:mos?.id || "", mosRaw:mos ? "" : (mosRaw ? `${/^(مسجد|جامع)/.test(mosRaw) ? "" : "مسجد "}${mosRaw}${area ? "، " + area : ""}` : ""), gov, days:p.days || [], daily:!!p.daily, time:p.time || "" }); }
+  return out;
+}
 function parseActs(raw){
   const text = digits(raw); const n = norm(text);
   const ctx = { lects:[...new Set(S.E.flatMap(e => (e.lect || "").split(" / ")).filter(Boolean))].map(name => ({ name, k:nkey(name) })) };
@@ -62,6 +85,8 @@ function parseActs(raw){
   let comm = ""; let cl = 0; for (const c of commNames) { const ck = nkey(c).replace(/^ال/, ""); const parts = norm(c).split(/[–\-\s]+/).map(x => nkey(x).replace(/^ال/, "")).filter(x => x.length >= 4);
     if (ck.length >= 4 && nkey(text).includes(ck) && ck.length > cl) { comm = c; cl = ck.length; } else if (!comm && parts.length && parts.every(p => nkey(text).includes(p))) comm = c; }
   if (!comm && docBy[base.doc]?.comm) comm = docBy[base.doc].comm; if (comm) base.comm = comm;
+  const tr = tableRows(text, ctx);
+  if (tr.length) return { acts:tr.map(r => ({ ...base, ...r, area:"", status:"مجدول" })), text };
   const whole = parseLine(text, ctx);
   const lines = text.split(/\n+/).map(x => x.trim()).filter(x => x.length > 3);
   const items = []; const seen = new Set();

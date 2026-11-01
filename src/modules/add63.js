@@ -63,7 +63,7 @@ function pActBox(){ const L = S.E.filter(e => !["ملغى", "مكتمل"].includ
 const pMos = (name, area, gov) => [name, area, gov ? (/^محافظة/.test(gov) ? gov : "محافظة " + gov) : ""].filter((x, i, a) => x && a.indexOf(x) === i).join("، ");
 function pFill(e){ if (!e) return; const set = (id, v) => { const x = $("#" + id); if (x && v != null && !x.readOnly) x.value = v; };
   const doc = docBy[e.doc], comm = S.comms.find(c => c.name === e.comm);
-  set("p-sheikh", (e.lect || "").split(" / ")[0]); set("p-mosque", e.mosName ? pMos(e.mosName, e.area, e.gov) : (e.mosRaw || ""));
+  set("p-sheikh", (e.lect || "").split(" / ").filter(Boolean).join(" و ")); set("p-mosque", e.mosName ? pMos(e.mosName, e.area, e.gov) : (e.mosRaw || ""));
   set("p-lang", e.lang || (comm?.lang && !/متعدد/.test(comm.lang) ? comm.lang : "")); set("p-topic", e.title && e.title !== e.type ? e.title : (e.type || ""));
   const days = e.daily ? [...PD_ALL] : (e.days || []); document.querySelectorAll("#pd-days .pd-d").forEach(b => b.classList.toggle("on", days.includes(+b.dataset.pdd)));
   const pr = prayerOf(e.time) || letterTime(e); const s = $("#p-pray"); if (s) { s.value = pr || "none"; pTimeSync(); }
