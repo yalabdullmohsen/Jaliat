@@ -54,13 +54,20 @@ function pNextDate(p){ const d = p.data || {}, wd = (d.days || [])[0], rep = d.r
   for (let i = 0; i < 70; i++) { const s = addDays(TODAY, i), dt = dOf(s); if (dt.getDay() !== wd) continue; const dm = dt.getDate(), last = dm + 7 > new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate();
     if (rep === "weekly" || rep === "once") return s; if (rep === "last" ? last : /^n\d$/.test(rep) ? Math.ceil(dm / 7) === +rep[1] : true) return s; }
   return addDays(TODAY, 1); }
-function pReissue(no){ const p = S.permits.find(x => x.no === String(no).trim().toUpperCase()); if (!p) return toast("لم أجد تصريحاً بهذا الرقم، اكتبه كما في أعلى التصريح (JL-…)");
-  const d = p.data || {}; permitForm({ act_id:p.act_id || "", sheikh:d.sheikh || "", mosque:d.mosque || "", topic:d.topic || "", lang:d.lang || "", note:d.note || "", rep:d.rep, nth:d.nth, days:d.days, t_from:d.t_from || undefined, t_to:d.t_to || undefined, head:d.head, time_mode:d.time_mode, prayer:d.prayer, date:pNextDate(p) }); }
+function pReissue(txt){ const nos = [...new Set(String(txt).toUpperCase().match(/JL-\d{4,8}-\d{3,4}/g) || [])]; if (!nos.length) return toast("اكتب رقماً واحداً أو أكثر بصيغة JL-…");
+  const L = [], miss = []; for (const n of nos) { const p = S.permits.find(x => x.no === n); p ? L.push(p) : miss.push(n); }
+  if (miss.length) toast("لم أجد: " + miss.join("، ")); if (!L.length) return; S.preQ = L; pReNext(); }
+function pReNext(){ const p = (S.preQ || []).shift(); if (!p) return; const d = p.data || {};
+  permitForm({ act_id:p.act_id || "", sheikh:d.sheikh || "", mosque:d.mosque || "", topic:d.topic || "", lang:d.lang || "", note:d.note || "", rep:d.rep, nth:d.nth, days:d.days, t_from:d.t_from || undefined, t_to:d.t_to || undefined, head:d.head, time_mode:d.time_mode, prayer:d.prayer, date:pNextDate(p) });
+  if (S.preQ.length) toast(`تصريح ${p.no}، باقي ${S.preQ.length} بعده`); }
+/* المُصدِر هو المستخدم الذي يضغط «إصدار التصريح» (يظهر في خانة «أصدره»)؛ بعد كل إصدار يُفتح التالي من الطابور */
+const _permitIssue74 = permitIssue;
+permitIssue = async function(){ const n0 = S.permits.length; await _permitIssue74(); if (S.preQ?.length && S.permits.length > n0) setTimeout(pReNext, 700); };
 const _vPermits74 = vPermits;
 vPermits = function(){ const h = _vPermits74(); if (!canPermit()) return h;
   const card = `<div class="panel pr-re"><div class="panel-h"><h3>إصدار تصريح جديد بنفس بيانات تصريح سابق</h3></div>
     <div class="g2"><label class="fld"><span>أرفق التصريح القديم (PDF أو صورة)</span><input class="f" type="file" id="pr-re-f" accept="application/pdf,image/*"></label>
-    <label class="fld"><span>رقم التصريح القديم</span><input class="f" id="pr-re-n" list="pr-re-l" placeholder="JL-20261030-001" dir="ltr" autocomplete="off"><datalist id="pr-re-l">${S.permits.slice(0, 150).map(p => `<option value="${esc(p.no)}">${esc((p.data?.sheikh || "") + " · " + (p.data?.mosque || ""))}</option>`).join("")}</datalist></label></div>
+    <label class="fld"><span>رقم التصريح القديم (أو عدة أرقام بينها مسافة لإصدارها تباعاً)</span><input class="f" id="pr-re-n" list="pr-re-l" placeholder="JL-20261030-001" dir="ltr" autocomplete="off"><datalist id="pr-re-l">${S.permits.slice(0, 150).map(p => `<option value="${esc(p.no)}">${esc((p.data?.sheikh || "") + " · " + (p.data?.mosque || ""))}</option>`).join("")}</datalist></label></div>
     <button type="button" class="btn btn-primary" data-prre>فتح تصريح جديد بنفس البيانات</button></div>`;
   return h.replace(/(<div class="pt-bar">)/, card + "$1"); };
 document.addEventListener("change", ev => { if (ev.target.id !== "pr-re-f") return; const f = ev.target.files?.[0]; if (!f) return; const m = (f.name || "").toUpperCase().match(/JL-\d{8}-\d{3}/); if (m) { const n = $("#pr-re-n"); if (n) n.value = m[0]; toast("قُرئ رقم التصريح من اسم الملف"); } else toast("اكتب رقم التصريح من أعلى الملف (JL-…)"); });
