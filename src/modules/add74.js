@@ -29,3 +29,22 @@ vFix = function(){ const R = auditRun(), bad = R.filter(r => r.sev === "bad").le
     <div class="fx-l">${R.map(r => `<button type="button" class="fx-i" data-go="${r.go}"><span class="fx-n">${r.sev === "bad" ? "!!" : "!"}</span><span class="fx-t"><b>${esc(r.t)}</b><span>${esc(r.area)}${r.d ? " · " + esc(r.d) : ""}</span></span></button>`).join("")}</div></div>` + _vFix74(); };
 const _rnSend74 = renewSend; renewSend = function(no, i, copyOnly){ if (!copyOnly) { const x = renewList().find(y => y.d.no === no); if (x && !gSend(x, x.coords[+i])) return; } return _rnSend74(no, i, copyOnly); };
 const _rtSend74 = rtSend; rtSend = function(spec, copyOnly, markOnly){ if (!copyOnly && !markOnly) { const [kind, key, i] = spec.split("|"), x = rtItems(kind).find(y => rtKey(kind, y) === key); if (x && !gSend(x, x.coords[+i])) return; } return _rtSend74(spec, copyOnly, markOnly); };
+
+/* ================= التحديث المركزي: كل حفظ للقوائم يمر من T.ref، فإعادة تسمية جالية تنتشر تلقائياً إلى المنسقين والأنشطة والموافقات ================= */
+S.renamed = S.renamed || {};
+const _ref74 = T.ref.bind(T);
+T.ref = async function(r, list){
+  if (r === "coords") list = list.map(k => S.renamed[k.comm] ? { ...k, comm:S.renamed[k.comm] } : k); /* حفظ قديم متأخر لا يعيد الاسم القديم */
+  const old = r === "comms" ? (S.comms || []).slice() : null;
+  await _ref74(r, list);
+  if (r === "comms") {
+    const ren = {}; for (const n of list) { const o = old.find(x => x.no === n.no); if (o && o.name !== n.name) ren[o.name] = n.name; }
+    if (Object.keys(ren).length) { Object.assign(S.renamed, ren); setTimeout(() => { for (const k of Object.keys(ren)) delete S.renamed[k]; }, 6e4);
+      const nz = c => ren[c] || c, K = (S.coords || []).map(k => ren[k.comm] ? { ...k, comm:ren[k.comm] } : k), D = (S.docs || []).map(d => ren[d.comm] ? { ...d, comm:ren[d.comm] } : d);
+      if (K.some((k, i) => k !== S.coords[i])) { await _ref74("coords", K); S.coords = K; }
+      if (D.some((d, i) => d !== S.docs[i])) { try { await _ref74("docs", D); S.docs = D; } catch (e) { console.warn("docs cascade", e); } }
+      let n = 0; for (const [id, a] of S.acts) if (ren[a.comm]) { await T.put("acts", id, { ...a, comm:ren[a.comm] }); n++; }
+      toast(`حُدّث الاسم تلقائياً في المنسقين والأنشطة (${n} نشاط)`); }
+  }
+  try { derive(); } catch (e) { console.warn("derive", e); }
+};
