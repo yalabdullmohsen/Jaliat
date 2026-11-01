@@ -113,9 +113,17 @@ grantForm = function(preset){ _grantForm84(preset); if ($("#p-act")) return; con
 NEWF.splice(1, 0, ["v85-pauto", "nav:permits", "تعبئة التصريح تلقائياً", "في «إصدار تصريح» و«تفويض موظف»: اختر النشاط (بالشيخ أو المسجد أو رقم الموافقة) فتتعبّأ كل البيانات: الشيخ، المسجد، اللغة، الأيام، الوقت، أقرب موعد، مدة الموافقة، والملاحظات. أنت فقط تراجع وترسل.", true, "2026-10-26"]);
 
 /* approvals → permits: the head sees every approved activity without a permit, and issues it himself or delegates it in one tap (all data prefilled) */
-function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean));
-  return S.E.filter(e => e.doc && docBy[e.doc] && (docBy[e.doc].date || docBy[e.doc].start || "") >= since && (!docBy[e.doc].end || docBy[e.doc].end >= TODAY) && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id) && !S.pdone?.has(e.id))
-    .map(e => ({ e, delegated:gr.has(e.id) })).sort((a, b) => (docBy[b.e.doc].date || "").localeCompare(docBy[a.e.doc].date || "")); }
+/* حالة الموافقة لكل نشاط، من كتابه في وثيقة: تمت الموافقة (مسجّلة في الوثائق، أو وصل كتاب موافقة، أو مكتوبة في الإجراءات) / لم تتم الموافقة (رفض) / لم تصل بعد */
+const apprCtx = () => ({ reply:wqIndex(), by:new Map((S.wq || []).filter(w => w.no).map(w => [wqKeyNo(w.no), w])) });
+function apprOf(e, c){ if (!e.doc) return { k:"none", label:"بلا رقم كتاب" }; const d = docBy[e.doc];
+  if (d) return { k:"ok", date:d.date || d.start || "", end:d.end || "" };
+  const w = (c || (c = apprCtx())).by.get(wqKeyNo(e.doc)); if (!w) return { k:"wait", label:"الكتاب غير موجود في وثيقة" };
+  const mk = (r, dt) => ({ k:"ok", date:wqDate(r || w) || dt || "", end:addMonths(wqDate(r || w) || TODAY, 6) });
+  if (wqDir(w) === "in") return w.approval ? mk(w) : wqRes(w) === "no" ? { k:"no", label:"اعتذار / رفض" } : { k:"wait", label:"لم تصل موافقة" };
+  const st = wqState(w, c.reply); return st[1] === "ok" ? mk(st[2]) : st[1] === "bad" ? { k:"no", label:"رفض" } : { k:"wait", label:st[0] }; }
+function permitNeeds(){ const since = addDays(TODAY, -45), has = new Set(S.permits.filter(p => !p.revoked).map(p => p.act_id).filter(Boolean)), gr = new Set((S.grants || []).filter(g => !g.permit_id).map(g => g.preset?.act_id).filter(Boolean)), c = apprCtx();
+  return S.E.filter(e => e.doc && !["ملغى", "مكتمل"].includes(e.status) && !has.has(e.id) && !S.pdone?.has(e.id)).map(e => ({ e, delegated:gr.has(e.id), ap:apprOf(e, c) }))
+    .filter(x => x.ap.k === "ok" && (x.ap.date || "") >= since && (!x.ap.end || x.ap.end >= TODAY)).sort((a, b) => (b.ap.date || "").localeCompare(a.ap.date || "")); }
 /* أرقام منسقي الجالية: نسخ الرقم أو فتح المحادثة مباشرة في تطبيق واتساب */
 /* منسقو جالية النشاط: تطابق تام، وإلا فبالجالية الأساسية («الهندية – المليبارية» ← كل منسقي المليبارية ونوابهم) */
 function coFor(comm){ const live = c => c.status !== "سابق" && c.phone, all = (S.coords || []).filter(live), cm = String(comm || "").trim();
