@@ -181,7 +181,7 @@ function assetsForm(){
     <span class="hint">يُفضّل صورة PNG بخلفية شفافة. تظهر على كل التصاريح الجديدة والقديمة عند الطباعة.</span>`,
     `<button class="btn btn-primary" data-pasave>حفظ</button><button class="btn btn-ghost" data-close>إغلاق</button>`);
 }
-const readImg = f => new Promise(res => { if (!f) return res(null); compressImg(f, 600, .92).then(({ canvas }) => res(canvas.toDataURL("image/png"))).catch(() => res(null)); });
+const readImg = f => new Promise(res => { if (!f) return res(null); compressImg(f, 600, .92).then(({ canvas }) => flatImg(canvas.toDataURL("image/png")).then(res)).catch(() => res(null)); });
 async function assetsSave(){
   const sig = await readImg($("#pa-sig").files[0]), stamp = await readImg($("#pa-stamp").files[0]);
   const v = { ...S.pAssets, head:$("#pa-head").value.trim() }; if (sig) v.sig = sig; if (stamp) v.stamp = stamp;

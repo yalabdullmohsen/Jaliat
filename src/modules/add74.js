@@ -65,3 +65,9 @@ vPermits = function(){ const h = _vPermits74(); if (!canPermit()) return h;
   return h.replace(/(<div class="pt-bar">)/, card + "$1"); };
 document.addEventListener("change", ev => { if (ev.target.id !== "pr-re-f") return; const f = ev.target.files?.[0]; if (!f) return; const m = (f.name || "").toUpperCase().match(/JL-\d{8}-\d{3}/); if (m) { const n = $("#pr-re-n"); if (n) n.value = m[0]; toast("قُرئ رقم التصريح من اسم الملف"); } else toast("اكتب رقم التصريح من أعلى الملف (JL-…)"); });
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-prre]"); if (!t) return; pReissue($("#pr-re-n")?.value || ""); });
+
+/* ================= الختم والتوقيع يظهران بخلفية خضراء عند الطباعة إلى PDF: شفافية الصورة (ألفا) لا تُطبع جيداً، فتُسطَّح على الأبيض عند التحميل والرفع ================= */
+const flatImg = src => new Promise(res => { if (!src || !String(src).startsWith("data:image")) return res(src); const im = new Image(); im.onload = () => { try { const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0); res(c.toDataURL("image/png")); } catch (e) { res(src); } }; im.onerror = () => res(src); im.src = src; });
+const _loadPermits74 = loadPermits;
+loadPermits = async function(){ await _loadPermits74(); const a = S.pAssets || {}; if (a._flat) return;
+  const [sig, stamp] = await Promise.all([flatImg(a.sig), flatImg(a.stamp)]); S.pAssets = { ...a, ...(sig ? { sig } : {}), ...(stamp ? { stamp } : {}), _flat:1 }; };
