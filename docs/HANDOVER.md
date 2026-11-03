@@ -26,7 +26,7 @@
 - **صفحة تأكيد الخطيب**: `sermon.html`. **التحقق من التصريح**: `verify.html`.
 - **إضافة «جسر إنجاز»** لمتصفح Chrome: مجلد `bridge/` ومعه `jaliyat-copilot.zip`.
 - الاستضافة: GitHub Pages من الفرع `main` (المستودع `yalabdullmohsen/Jaliat`).
-- الرابط العامل الآن: `https://yalabdullmohsen.github.io/Jaliat/`.
+- الرابط الرسمي: `https://injazkwt.com` (أُعيد في 3/11/2026 بطلب يوسف، والرابط القديم يحوّل إليه).
 - قاعدة البيانات: Supabase، المشروع `nybuospfwbbtejvjivhd`.
 
 ### البناء والنشر
