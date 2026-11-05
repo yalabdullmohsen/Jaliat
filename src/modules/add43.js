@@ -50,13 +50,12 @@ const kwT = d => d ? new Date(d).toLocaleTimeString("ar-KW-u-nu-latn", { hour:"n
 const kwD = d => d ? new Date(d).toLocaleDateString("ar-KW-u-nu-latn", { weekday:"long", day:"2-digit", month:"2-digit", year:"numeric", timeZone:"Asia/Kuwait" }) : "—";
 const mmss2 = n => `${Math.floor((n || 0) / 60)}:${String((n || 0) % 60).padStart(2, "0")}`;
 function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, en = p.ended || (st && r.secs ? new Date(+new Date(st) + r.secs * 1000).toISOString() : null);
-  const ok = p.rule ? p.in_rule !== false : null;
-  const rule = p.rule === "friday" ? `وقت الخطبة ${kwT(p.win_open).replace(/:\d\d (?=[صم])/, " ")} – ${kwT(p.win_close).replace(/:\d\d (?=[صم])/, " ")}` : p.rule === "lesson_day" ? `في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "بطلب من القسم" : "";
+  const ok = p.rule ? p.in_rule !== false : null, hm = d => kwT(d).replace(/:\d\d (?=[صم])/, " ");
+  const msg = ok === null ? "" : ok === false ? `⚠ سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
   return `<div class="sr-pf${ok === false ? " bad" : ok ? " ok" : ""}">
-    <div><span>التاريخ</span><b>${kwD(st)}</b></div><div><span>بدأ التسجيل</span><b class="num">${kwT(st)}</b></div><div><span>انتهى</span><b class="num">${kwT(en)}</b></div>
-    <div><span>المدة</span><b class="num">${mmss2(r.secs)}</b></div><div><span>وصل للقسم</span><b class="num">${kwT(p.sent || r.created_at)}</b></div>
-    <div><span>سجّله</span><b>${esc(p.by || "—")}</b></div>${p.civil ? `<div><span>الرقم المدني</span><b class="num">${esc(p.civil)}</b></div>` : ""}${p.phone ? `<div><span>الهاتف</span><b class="num"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a></b></div>` : ""}${r.mosque ? `<div><span>المسجد</span><b>${esc(r.mosque)}</b></div>` : ""}
-    <p>${ok === null ? "سُجّل قبل تفعيل الضوابط الصارمة" : `${ok ? "✓" : "⚠"} تسجيل مباشر من البوابة، بلا إرفاق ملف${rule ? "، " + rule : ""}${ok === false ? " — خارج الوقت المسموح" : ""}`}</p></div>`; }
+    <div><span>التاريخ</span><b>${kwD(st)}</b></div><div><span>الوقت</span><b class="num">${kwT(st)} إلى ${kwT(en)}</b></div><div><span>المدة</span><b class="num">${mmss2(r.secs)}</b></div>${r.mosque ? `<div><span>المسجد</span><b>${esc(r.mosque)}</b></div>` : ""}
+    ${msg ? `<p>${msg}</p>` : ""}
+    <details class="sr-who"><summary>بيانات من سجّل</summary><div class="sr-who-g"><div><span>سجّله</span><b>${esc(p.by || "—")}</b></div>${p.civil ? `<div><span>الرقم المدني</span><b class="num">${esc(p.civil)}</b></div>` : ""}${p.phone ? `<div><span>الهاتف</span><b class="num"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a></b></div>` : ""}<div><span>وصل للقسم</span><b class="num">${kwT(p.sent || r.created_at)}</b></div></div></details></div>`; }
 function vSermRec(){ const f = S.f.srf || "all", L = S.srecs.filter(r => f === "all" || (f === "new" ? !r.reviewed_at : f === "flag" ? r.flags && !/لا ملاحظات/.test(r.flags) : f === "off" ? r.adherence && r.adherence !== "ملتزم" : true));
   const wk = S.srecs.some(r => r.status === "waiting_key");
   return `${wk ? `<div class="check"><b>الترجمة التلقائية تحتاج تفعيلاً</b><span>التسجيلات تصل وتُسمع الآن. للترجمة المجانية: مفتاح Gemini مجاني من aistudio.google.com يُضاف باسم GEMINI_API_KEY في Supabase (Edge Functions ثم Secrets)، ثم «إعادة الترجمة».</span></div>` : ""}
@@ -65,7 +64,7 @@ function vSermRec(){ const f = S.f.srf || "all", L = S.srecs.filter(r => f === "
   <div class="sr-l">${L.map(r => { const st = r.status === "working" && r.seg ? [`جارٍ الترجمة: الجزء ${r.seg + 1}${r.segs ? " من " + r.segs : ""}`, "warn"] : SREC_ST[r.status] || SREC_ST.new, fl = r.flags && !/لا ملاحظات/.test(r.flags);
     return `<div class="panel sr-i"><div class="sr-h"><div><b>${esc(r.khatib || "خطيب")}</b><span class="s">${esc(r.comm)}${r.mosque ? " · " + esc(r.mosque) : ""} · ${r.fri ? fmt(r.fri) : fmt(String(r.created_at).slice(0, 10))}${r.lang ? " · " + esc(r.lang) : ""}${r.secs ? " · " + Math.round(r.secs / 60) + " دقيقة" : ""}</span></div>
       <div class="sr-c">${r.kind === "lesson" ? `<span class="chip gold">درس</span>` : ""}<span class="chip ${st[1]}">${st[0]}</span>${r.reviewed_at ? `<span class="chip ok">اطُّلع عليها</span>` : ""}</div></div>${srProof(r)}
-      <div class="sr-a" id="sra-${r.id}"><button type="button" class="btn" data-srplay="${r.id}">${icon("i-mic")} استماع</button></div>
+      <div class="sr-a" id="sra-${r.id}"><button type="button" class="btn" data-srplay="${r.id}">${icon("i-play")} استماع</button></div>
       ${r.adherence ? `<div class="sr-adh ${r.adherence === "ملتزم" ? "ok" : r.adherence === "خرج جزئياً" ? "warn" : "bad"}"><div><b>${esc(r.adherence)}</b>${r.adherence_score != null ? `<span>${r.adherence_score}% التزام بموضوع الخطبة</span>` : ""}</div>${r.adherence_note ? `<p>${esc(r.adherence_note)}</p>` : ""}</div>` : r.adherence_note ? `<span class="s bad-t">${esc(r.adherence_note)}</span>` : ""}
       ${fl ? `<div class="check"><b>ملاحظات تستحق الانتباه</b><span>${esc(r.flags)}</span></div>` : ""}
       ${r.summary ? `<div class="sr-s"><b>الملخص</b><p>${esc(r.summary)}</p></div>` : ""}
@@ -81,13 +80,17 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
     const { data, error } = await sb.rpc("staff_topic_save", { p_fri:fri, p_title:title, p_points:pts }); if (error) return writeFail(error); toast(data?.compared ? `حُفظ الموضوع، وتجري مقارنة ${data.compared} خطبة` : "حُفظ موضوع الخطبة"); await srecLoad(); render(); if (data?.compared) setTimeout(async () => { await srecLoad(); render(); }, 30000); return; }
   if (D.srf) { S.f.srf = D.srf; return render(); }
   if (D.srplay) { const r = S.srecs.find(x => x.id === D.srplay); const { data } = await sb.storage.from("requests").createSignedUrl(r.path, 3600); if (!data?.signedUrl) return toast("تعذّر تحميل التسجيل");
-    $("#sra-" + r.id).innerHTML = `<audio controls autoplay src="${data.signedUrl}" style="width:100%"></audio>`; return; }
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
+    const box = $("#sra-" + r.id), noPlay = () => { box.innerHTML = `<p class="sr-nop">هذا التسجيل بصيغة لا يشغّلها هذا الجهاز. <a href="${data.signedUrl}" target="_blank" rel="noopener">تحميل التسجيل</a> أو افتحه من الكمبيوتر. التسجيلات الجديدة تعمل على كل الأجهزة.</p>`; };
+    if (/\.webm$/i.test(r.path) && !document.createElement("audio").canPlayType("audio/webm; codecs=opus")) { noPlay(); return; }
+    box.innerHTML = `<audio controls autoplay playsinline preload="auto" src="${data.signedUrl}" style="width:100%"></audio>`; box.querySelector("audio").addEventListener("error", noPlay); return; }
   if (D.srok) { const id = D.srok, note = $("#srn-" + id)?.value.trim() || null; const { error } = await sb.from("sermon_recs").update({ reviewed_by:S.me?.id, reviewed_at:new Date().toISOString(), review_note:note }).eq("id", id); if (error) return writeFail(error); await srecLoad(); render(); return toast("سُجّل الاطلاع"); }
   if (D.srretry) { const { error } = await sb.rpc("staff_sermon_retry", { p_id:D.srretry }); if (error) return writeFail(error); toast("أُعيد إرسالها للترجمة"); setTimeout(async () => { await srecLoad(); render(); }, 4000); } });
 const _prio53s = priorities;
 priorities = function(){ const P = _prio53s(); const n = S.srecs.filter(r => !r.reviewed_at).length;
   if (n) P.push({ w:60, k:"gold", t:`${n} تسجيل خطبة لم يُطّلع عليه`, s:"من بوابة إنجاز، مع الترجمة العربية", act:{ go:"sermrec", l:"استماع" } }); return P.sort((a, b) => b.w - a.w); };
 
+NEWF.splice(1, 0, ["v213-sermrec", "nav:inbox", "تسجيلات الخطب أوضح", "زر الاستماع بعلامة تشغيل، والبيانات مختصرة، وبيانات من سجّل تُفتح عند الحاجة، والترجمة تُعاد تلقائياً إذا تأخرت.", false, "2026-11-05"]);
 NEWF.splice(1, 0, ["v53-journey", "nav:inbox", "رحلة الطلب وتسجيلات الخطب", "داخل كل طلب: خريطة رحلته وأين وصل ومتى يكتمل عادةً، ومدة انتظار كل طلب على بطاقته. وصفحة «تسجيلات الخطب» لسماع خطب الجاليات مع ترجمتها، و«التحليل» في بوابة إنجاز لتقاريرهم الشهرية.", false, "2026-10-20"]);
 
 /* the week's official sermon topic: sermons are compared against it automatically */

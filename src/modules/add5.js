@@ -74,5 +74,4 @@ const _palAll5 = palAll;
 palAll = function(){ const A = _palAll5(); A.splice(1, 0, { g:"إجراءات", t:"اسأل Copilot", s:"ملفاتك وبريدك واجتماعاتك + بيانات النظام", ic:"i-spark", run:() => go("copilot"), txt:"copilot كوبايلت مايكروسوفت ذكاء ملفات بريد" }); return A; };
 
 /* floating Copilot button on every page */
-document.body.insertAdjacentHTML("beforeend", `<button type="button" class="cp-fab" id="cp-fab" title="اسأل Copilot" hidden>${icon("i-spark", 22)}<span>Copilot</span></button>`);
 const _boot9c = boot9; boot9 = function(){ _boot9c(); const f = $("#cp-fab"); if (f) f.hidden = S.view === "copilot"; };
