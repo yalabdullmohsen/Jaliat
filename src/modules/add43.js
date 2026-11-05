@@ -67,8 +67,10 @@ async function srPlay(url, r, box){
   setInterval(() => { if (!a.paused && a.isConnected) ui(); }, 500);
   pb.addEventListener("click", () => { ctx?.resume?.().catch(() => {}); if (a.paused) a.play().catch(() => toast("اضغط التشغيل مرة ثانية")); else a.pause(); });
   rg.addEventListener("input", () => { drag = true; tc.textContent = mmss2(Math.floor(+rg.value)); });
-  rg.addEventListener("change", () => { a.currentTime = +rg.value; drag = false; });
-  a.play().catch(() => {}); ui(); }
+  const seek = () => { a.currentTime = Math.min(+rg.value, Math.max(0, total - 0.2)); drag = false; ui(); }; rg.addEventListener("change", seek);
+  /* ملفات التسجيل المباشر لا تحفظ مدتها، فلا يقبل المتصفح التقديم حتى يعرف المدة: نحسبها أولاً ثم نشغّل من البداية */
+  const fixDur = () => new Promise(res => { if (isFinite(a.duration) && a.duration > 0) return res(); const f = () => { if (isFinite(a.duration) && a.duration > 0) { a.removeEventListener("durationchange", f); res(); } }; a.addEventListener("durationchange", f); a.currentTime = 1e7; setTimeout(res, 4000); });
+  a.addEventListener("loadedmetadata", async () => { await fixDur(); setTotal(); a.currentTime = 0; a.play().catch(() => {}); ui(); }, { once:true }); ui(); }
 function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, en = p.ended || (st && r.secs ? new Date(+new Date(st) + r.secs * 1000).toISOString() : null);
   const ok = p.rule ? p.in_rule !== false : null, hm = d => kwT(d).replace(/:\d\d (?=[صم])/, " ");
   const msg = ok === null ? "" : ok === false ? `⚠ سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
