@@ -49,6 +49,16 @@ const SREC_ST = { new:["بانتظار التفريغ", ""], working:["جارٍ 
 const kwT = d => d ? new Date(d).toLocaleTimeString("ar-KW-u-nu-latn", { hour:"numeric", minute:"2-digit", second:"2-digit", hour12:true, timeZone:"Asia/Kuwait" }) : "—";
 const kwD = d => d ? new Date(d).toLocaleDateString("ar-KW-u-nu-latn", { weekday:"long", day:"2-digit", month:"2-digit", year:"numeric", timeZone:"Asia/Kuwait" }) : "—";
 const mmss2 = n => `${Math.floor((n || 0) / 60)}:${String((n || 0) % 60).padStart(2, "0")}`;
+/* مشغّل التسجيلات: يحمّل الملف كاملاً ليعمل العداد والتقديم، ويرفع الصوت الضعيف بلا تشويش */
+async function srPlay(url, r, box){
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
+  const noPlay = () => { box.innerHTML = `<p class="sr-nop">هذا التسجيل بصيغة لا يشغّلها هذا الجهاز. <a href="${url}" target="_blank" rel="noopener">تحميل التسجيل</a> أو افتحه من الكمبيوتر. التسجيلات الجديدة تعمل على كل الأجهزة.</p>`; };
+  const webm = /\.webm$/i.test(r.path); if (webm && !document.createElement("audio").canPlayType("audio/webm; codecs=opus")) return noPlay();
+  box.innerHTML = `<span class="s">جارٍ تحميل التسجيل…</span>`; const ctx = (() => { try { return new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { return null; } })();
+  let src = url; try { const b = await fetch(url).then(x => { if (!x.ok) throw 0; return x.blob(); }); src = URL.createObjectURL(b); } catch (_) {}
+  box.innerHTML = `<audio controls playsinline preload="auto" src="${src}" style="width:100%"></audio>`; const a = box.querySelector("audio"); a.addEventListener("error", noPlay);
+  if (ctx && src !== url) try { const n = ctx.createMediaElementSource(a), g = ctx.createGain(), c = ctx.createDynamicsCompressor(); g.gain.value = 4; c.threshold.value = -6; c.ratio.value = 12; n.connect(g); g.connect(c); c.connect(ctx.destination); a.addEventListener("play", () => ctx.resume()); } catch (_) {}
+  a.addEventListener("loadedmetadata", () => { const go2 = () => a.play().catch(() => {}); if (a.duration !== Infinity) return go2(); a.currentTime = 1e7; a.addEventListener("timeupdate", function f(){ a.removeEventListener("timeupdate", f); a.currentTime = 0; go2(); }); }, { once:true }); }
 function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, en = p.ended || (st && r.secs ? new Date(+new Date(st) + r.secs * 1000).toISOString() : null);
   const ok = p.rule ? p.in_rule !== false : null, hm = d => kwT(d).replace(/:\d\d (?=[صم])/, " ");
   const msg = ok === null ? "" : ok === false ? `⚠ سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
@@ -80,10 +90,7 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
     const { data, error } = await sb.rpc("staff_topic_save", { p_fri:fri, p_title:title, p_points:pts }); if (error) return writeFail(error); toast(data?.compared ? `حُفظ الموضوع، وتجري مقارنة ${data.compared} خطبة` : "حُفظ موضوع الخطبة"); await srecLoad(); render(); if (data?.compared) setTimeout(async () => { await srecLoad(); render(); }, 30000); return; }
   if (D.srf) { S.f.srf = D.srf; return render(); }
   if (D.srplay) { const r = S.srecs.find(x => x.id === D.srplay); const { data } = await sb.storage.from("requests").createSignedUrl(r.path, 3600); if (!data?.signedUrl) return toast("تعذّر تحميل التسجيل");
-    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
-    const box = $("#sra-" + r.id), noPlay = () => { box.innerHTML = `<p class="sr-nop">هذا التسجيل بصيغة لا يشغّلها هذا الجهاز. <a href="${data.signedUrl}" target="_blank" rel="noopener">تحميل التسجيل</a> أو افتحه من الكمبيوتر. التسجيلات الجديدة تعمل على كل الأجهزة.</p>`; };
-    if (/\.webm$/i.test(r.path) && !document.createElement("audio").canPlayType("audio/webm; codecs=opus")) { noPlay(); return; }
-    box.innerHTML = `<audio controls autoplay playsinline preload="auto" src="${data.signedUrl}" style="width:100%"></audio>`; box.querySelector("audio").addEventListener("error", noPlay); return; }
+    return srPlay(data.signedUrl, r, $("#sra-" + r.id)); }
   if (D.srok) { const id = D.srok, note = $("#srn-" + id)?.value.trim() || null; const { error } = await sb.from("sermon_recs").update({ reviewed_by:S.me?.id, reviewed_at:new Date().toISOString(), review_note:note }).eq("id", id); if (error) return writeFail(error); await srecLoad(); render(); return toast("سُجّل الاطلاع"); }
   if (D.srretry) { const { error } = await sb.rpc("staff_sermon_retry", { p_id:D.srretry }); if (error) return writeFail(error); toast("أُعيد إرسالها للترجمة"); setTimeout(async () => { await srecLoad(); render(); }, 4000); } });
 const _prio53s = priorities;

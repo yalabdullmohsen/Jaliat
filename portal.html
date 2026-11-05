@@ -491,6 +491,7 @@ async function enter(t){S_=t;LS.s("s",t);tab="home";team=[];acts=[{}];SERMS=null
 try{I=await rpc("portal_me",{p_s:S_});if(!I.ok)throw new Error("");$("cm").textContent=I.comm;const a=$("av");a.hidden=false;a.textContent=((I.me||{}).name||"؟").trim()[0];draw()}catch(x){S_="";LS.s("s","");mode="in";login(x.message)}}
 function logout(){const t=S_;S_="";LS.s("s","");if(t)rpc("portal_logout",{p_s:t}).catch(()=>{});mode="in";login()}
 const hs=(location.hash.match(/^#s=([0-9a-f]+)/)||[])[1],hr=(location.hash.match(/^#r=([0-9a-f]+)/)||[])[1];if(location.hash&&!hr)history.replaceState(null,"",location.pathname);
+document.addEventListener("loadedmetadata",ev=>{const a=ev.target;if(a.tagName==="AUDIO"&&a.duration===Infinity&&!a.dataset.df){a.dataset.df="1";a.currentTime=1e7;a.addEventListener("timeupdate",function f(){a.removeEventListener("timeupdate",f);a.currentTime=0})}},true);
 const t0=hs||LS.g("s");langInit().then(()=>{if(hr)enterRec(hr);else if(t0)enter(t0);else login()});
 document.addEventListener("change",ev=>{if(ev.target&&ev.target.id==="la"&&!(REC&&(REC.on||REC.url))){LS.s("la",ev.target.value);const y=scrollY;draw();scrollTo(0,y)}});
 </script></body></html>

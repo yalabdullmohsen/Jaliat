@@ -33,11 +33,7 @@ async function cpPanelOpen(on){
   cpPanelFill(true);
   if (msReady() && !MS.app) { try { await msInit(); if (MS.account) await msCheckCopilot(); } catch (_) {} cpPanelFill(); }
 }
-function cpFab(){
-  if (!S.me) return; let b = $("#cpfab");
-  if (!b) { document.body.insertAdjacentHTML("beforeend", `<button type="button" id="cpfab" class="cpfab" title="اسأل Copilot عن هذه الصفحة" aria-label="Copilot">${icon("i-spark", 22)}<span>Copilot</span></button>`); b = $("#cpfab"); }
-  const onPage = S.view === "copilot"; b.hidden = onPage; if (onPage && !$("#cppanel")?.hidden) cpPanelOpen(false);
-}
+function cpFab(){ if (S.view === "copilot" && $("#cppanel") && !$("#cppanel").hidden) cpPanelOpen(false); }
 const _afterRender72 = afterRender;
 afterRender = function(v){ _afterRender72(v); cpFab(); if (v !== "copilot") cpPanelFill(); };
 const _msSignIn72 = msSignIn;
