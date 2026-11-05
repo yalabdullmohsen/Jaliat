@@ -56,6 +56,8 @@ Playwright مثبّت. المنهج: خادم محلي (`python3 -m http.server`
 
 - البوابة: `portal_info` و`portal_me` وportal_signin وportal_self_signup وportal_register وportal_submit وportal_me_submit.
 - التجديد: `portal_renew` (تحفظ قائمة أنشطة الموافقة مع الرد) وportal_me_renew وportal_me_renew_cancel.
+- جولة البوابة التعليمية: `tgHome` و`tgRec` في `portal.html`، تظهر أول مرة فقط (`pc-tg1` و`pc-tg2`)، وتُعاد من «جولة تعريفية بالبوابة» و«كيف أسجّل؟».
+- الترجمة: `sermon-transcribe` يعيد المحاولة عبر الدالة `sermon_watch` كل دقيقتين، ونماذج الصوت تُغيَّر بلا نشر من `app_secrets` (`sermon_audio_models`).
 - التسجيل الصوتي: `portal_sermon_window` وportal_sermon_start وportal_lesson_start وportal_me_sermon (مفتوحة في أي وقت، ويُحفظ الوقت بالضبط في proof).
 - رابط الخطباء والمحاضرين: `portal_me_rec_link` وportal_rec_info، وحساب بدور «مسجّل» لكل جالية؛ `pa_acc` يرفض هذا الدور، و`pa_acc_r` وحدها تقبله في دوال التسجيل.
 - روابط تأكيد الخطباء: `portal_me_khatib_links` وsermon_info وsermon_confirm.
