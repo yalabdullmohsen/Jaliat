@@ -49,16 +49,26 @@ const SREC_ST = { new:["بانتظار التفريغ", ""], working:["جارٍ 
 const kwT = d => d ? new Date(d).toLocaleTimeString("ar-KW-u-nu-latn", { hour:"numeric", minute:"2-digit", second:"2-digit", hour12:true, timeZone:"Asia/Kuwait" }) : "—";
 const kwD = d => d ? new Date(d).toLocaleDateString("ar-KW-u-nu-latn", { weekday:"long", day:"2-digit", month:"2-digit", year:"numeric", timeZone:"Asia/Kuwait" }) : "—";
 const mmss2 = n => `${Math.floor((n || 0) / 60)}:${String((n || 0) % 60).padStart(2, "0")}`;
-/* مشغّل التسجيلات: يحمّل الملف كاملاً ليعمل العداد والتقديم، ويرفع الصوت الضعيف بلا تشويش */
+/* مشغّل التسجيلات: واجهته من النظام نفسه، فالعداد يعمل ولو لم يحفظ المتصفح مدة الملف، ويرفع الصوت الضعيف بلا تشويش */
 async function srPlay(url, r, box){
   try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
   const noPlay = () => { box.innerHTML = `<p class="sr-nop">هذا التسجيل بصيغة لا يشغّلها هذا الجهاز. <a href="${url}" target="_blank" rel="noopener">تحميل التسجيل</a> أو افتحه من الكمبيوتر. التسجيلات الجديدة تعمل على كل الأجهزة.</p>`; };
-  const webm = /\.webm$/i.test(r.path); if (webm && !document.createElement("audio").canPlayType("audio/webm; codecs=opus")) return noPlay();
-  box.innerHTML = `<span class="s">جارٍ تحميل التسجيل…</span>`; const ctx = (() => { try { return new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { return null; } })();
+  if (/\.webm$/i.test(r.path) && !document.createElement("audio").canPlayType("audio/webm; codecs=opus")) return noPlay();
+  const ctx = (() => { try { return new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { return null; } })(); ctx?.resume?.().catch(() => {});
+  box.innerHTML = `<span class="s">جارٍ تحميل التسجيل…</span>`;
   let src = url; try { const b = await fetch(url).then(x => { if (!x.ok) throw 0; return x.blob(); }); src = URL.createObjectURL(b); } catch (_) {}
-  box.innerHTML = `<audio controls playsinline preload="auto" src="${src}" style="width:100%"></audio>`; const a = box.querySelector("audio"); a.addEventListener("error", noPlay);
-  if (ctx && src !== url) try { const n = ctx.createMediaElementSource(a), g = ctx.createGain(), c = ctx.createDynamicsCompressor(); g.gain.value = 4; c.threshold.value = -6; c.ratio.value = 12; n.connect(g); g.connect(c); c.connect(ctx.destination); a.addEventListener("play", () => ctx.resume()); } catch (_) {}
-  a.addEventListener("loadedmetadata", () => { const go2 = () => a.play().catch(() => {}); if (a.duration !== Infinity) return go2(); a.currentTime = 1e7; a.addEventListener("timeupdate", function f(){ a.removeEventListener("timeupdate", f); a.currentTime = 0; go2(); }); }, { once:true }); }
+  box.innerHTML = `<div class="sr-pl"><button type="button" class="btn btn-primary sr-pb" aria-label="تشغيل">${icon("i-play")}</button><span class="num sr-tc">0:00</span><input type="range" class="sr-rg" min="0" max="${r.secs || 1}" step="0.1" value="0" aria-label="التقديم"><span class="num sr-td">${mmss2(r.secs || 0)}</span><audio preload="auto" playsinline src="${src}" hidden></audio></div>`;
+  const a = box.querySelector("audio"), pb = box.querySelector(".sr-pb"), tc = box.querySelector(".sr-tc"), td = box.querySelector(".sr-td"), rg = box.querySelector(".sr-rg"); let total = r.secs || 0, drag = false;
+  a.addEventListener("error", noPlay);
+  if (ctx && src !== url) try { const n = ctx.createMediaElementSource(a), g = ctx.createGain(), c = ctx.createDynamicsCompressor(); g.gain.value = 4; c.threshold.value = -6; c.ratio.value = 12; n.connect(g); g.connect(c); c.connect(ctx.destination); } catch (_) {}
+  const ui = () => { const t = Math.min(a.currentTime || 0, total || 1e9); tc.textContent = mmss2(Math.floor(t)); if (!drag) rg.value = t; pb.innerHTML = a.paused ? icon("i-play") : `<svg width="16" height="16" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>`; pb.setAttribute("aria-label", a.paused ? "تشغيل" : "إيقاف"); };
+  const setTotal = () => { if (isFinite(a.duration) && a.duration > 0) { total = a.duration; rg.max = total; td.textContent = mmss2(Math.round(total)); } };
+  ["timeupdate", "play", "pause", "seeked", "ended"].forEach(e => a.addEventListener(e, ui)); a.addEventListener("durationchange", setTotal);
+  setInterval(() => { if (!a.paused && a.isConnected) ui(); }, 500);
+  pb.addEventListener("click", () => { ctx?.resume?.().catch(() => {}); if (a.paused) a.play().catch(() => toast("اضغط التشغيل مرة ثانية")); else a.pause(); });
+  rg.addEventListener("input", () => { drag = true; tc.textContent = mmss2(Math.floor(+rg.value)); });
+  rg.addEventListener("change", () => { a.currentTime = +rg.value; drag = false; });
+  a.play().catch(() => {}); ui(); }
 function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, en = p.ended || (st && r.secs ? new Date(+new Date(st) + r.secs * 1000).toISOString() : null);
   const ok = p.rule ? p.in_rule !== false : null, hm = d => kwT(d).replace(/:\d\d (?=[صم])/, " ");
   const msg = ok === null ? "" : ok === false ? `⚠ سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
