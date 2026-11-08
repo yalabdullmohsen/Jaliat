@@ -63,8 +63,8 @@ function inqPaint(){ const o = $("#inq-out"); if (!o) return; const b = INQ.res.
   o.innerHTML = INQ.st ? `<div class="inq-st">${INQ.st}</div>` : "";
   if (INQ.res.length) o.innerHTML += `<div class="inq-sum ${b ? "bad" : w ? "warn" : "ok"}"><b>${b ? `${b} من ${INQ.res.length} فيها تعارض` : w ? `لا تعارض حقيقي، و${w} فيها تنبيه` : `سليم: لا تعارض في الـ${INQ.res.length}`}</b><span>${esc(INQ.name)}</span></div>` + INQ.res.map(inqCard).join(""); }
 async function inqRun(bodies, name){ if (INQ.busy) return; INQ.busy = true; INQ.res = []; INQ.name = name || ""; const all = [];
-  try { for (let i = 0; i < bodies.length; i++) { INQ.st = `<span class="spin"></span> يقرأ الذكاء الاصطناعي الكتاب${bodies.length > 1 ? ` (${i + 1} من ${bodies.length})` : ""}…`; inqPaint();
-      const { data, error } = await Promise.race([sb.functions.invoke("doc-read", { body:bodies[i] }), new Promise((_, no) => setTimeout(() => no(new Error("تأخرت القراءة أكثر من دقيقة، أعد المحاولة")), 60000))]);
+  try { for (let i = 0; i < bodies.length; i++) { INQ.st = `<span class="spin"></span> يقرأ الذكاء الاصطناعي الكتاب${bodies.length > 1 ? ` (${i + 1} من ${bodies.length})` : ""}… قد يستغرق حتى دقيقتين`; inqPaint();
+      const { data, error } = await Promise.race([sb.functions.invoke("doc-read", { body:bodies[i] }), new Promise((_, no) => setTimeout(() => no(new Error("تأخرت القراءة أكثر من دقيقتين، أعد المحاولة")), 150000))]);
       if (error || data?.error) throw new Error(data?.error || error?.message || "تعذّرت القراءة"); all.push(...(data.items || []).filter(x => x && (x.sheikh || x.mosque))); }
     if (!all.length) { INQ.st = "لم أجد في الكتاب دروساً (شيخ أو مسجد). جرّب صورة أوضح أو ألصق النص."; return; }
     INQ.st = ""; INQ.res = inqCheck(all);
