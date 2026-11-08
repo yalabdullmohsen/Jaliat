@@ -1,4 +1,4 @@
-const C='jaliyat-v218';
+const C='jaliyat-v219';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','manifest.webmanifest','icon-v2-192.png','favicon-32.png'])))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{const q=e.request,u=new URL(q.url);if(q.method!=='GET'||u.origin!==location.origin)return;const put=r=>{if(r&&r.ok){const cp=r.clone();caches.open(C).then(c=>c.put(q,cp))}return r};if(q.mode==='navigate'||/\/(index\.html)?$/.test(u.pathname)){e.respondWith(new Promise(res=>{let done=false;const t=setTimeout(()=>{caches.match(q).then(r=>{if(r&&!done){done=true;res(r)}})},5000);fetch(q,{cache:'no-store'}).then(r=>{clearTimeout(t);put(r);if(!done){done=true;res(r)}}).catch(()=>caches.match(q).then(r=>{if(!done){done=true;res(r||caches.match('./'))}}))}));return}e.respondWith(caches.match(q).then(hit=>{const net=fetch(q).then(put).catch(()=>hit);return hit||net}))});

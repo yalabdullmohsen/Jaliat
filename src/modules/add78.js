@@ -83,8 +83,8 @@ document.addEventListener("change", async ev => { const t = ev.target;
   if (t.id === "inq-file") { const fs = [...t.files].filter(f => f.size <= 10e6); if (!fs.length) return toast("الملف أكبر من 10 ميغا"); const B = []; for (const f of fs) { const g = await prSmall(f); B.push({ b64:await b64of(g), mime:g.type || "application/pdf" }); } t.value = ""; inqRun(B, fs.map(f => f.name).join("، ")); }
   if (t.id === "inq-wq" && t.value) { const w = S.wq.find(x => x.id === t.value); if (w) inqRun([{ text:`رقم الكتاب: ${w.no}\nالتاريخ: ${w.doc_date}\nالموضوع: ${w.subj}\nمن: ${w.signer}\n\n${w.body}` }], `${w.no || ""} ${w.subj || ""}`); } });
 document.addEventListener("click", ev => { if (ev.target.id !== "inq-go") return; const v = ($("#inq-text")?.value || "").trim(); if (v.length < 20) return toast("ألصق نص الكتاب أولاً"); inqRun([{ text:v }], "نص ملصوق"); });
-if (typeof TOURS === "object") delete TOURS["g-avail"];
 GUIDES.avail = { g:"الأنشطة والجدولة", d:"ارفع كتاباً وأعرف قبل الإرسال إن كان فيه تعارض مع أي نشاط أو تصريح أو كتاب في وثيقة.", s:[
   { sel:"#inq-file", t:"ارفع الكتاب", x:"PDF أو صورة، أو اختر كتاباً من وثيقة، أو ألصق نصه. يقرؤه الذكاء الاصطناعي ويفحص كل درس." },
   { sel:"#inq-out", t:"النتيجة", x:"لكل درس: ✕ تعارض حقيقي، ⚠ تنبيه (مثل ممنوع بعد العشاء أو كتاب جارٍ بنفس الموعد)، ✓ سليم. اضغط على السبب لفتح النشاط أو الكتاب." }] };
+TOURS["g-avail"] = { title:"دليل: استعلام", steps:[{ t:"استعلام", x:GUIDES.avail.d + "<br><br>سنمرّ على أجزاء الصفحة واحداً واحداً. اضغط «التالي»." }, ...GUIDES.avail.s.map(z => ({ go:"avail", ...z }))] };
 NEWF.splice(0, 0, ["v78-inq", "nav:avail", "استعلام: افحص الكتاب قبل الإرسال", "ارفع الكتاب أو ألصق نصه، فيفحص «إنجاز» كل درس فيه مع الأنشطة والتصاريح وكتب وثيقة ويخبرك بالتعارض قبل الإرسال. حلّ محلّ «هل الوقت متاح؟»."]);
