@@ -2,7 +2,7 @@
 S.wqn = new Map();
 const WQ_REL = /جالي|درس|دروس|محاضر|دورة|دورات|خطب|خطبة|تجديد|حلق|مهتد/;
 const WQ_NO = /(عدم الموافق|نعتذر|يتعذر|تعذّر|تعذر|لا يمكن|عدم إمكان|عدم امكان|لا نوافق|غير موافق|رفض)/;
-const WQ_FROM = "2026-10-01";
+const WQ_FROM = "2026-11-08";
 function wqOutcome(w){ if (wqDir(w) !== "in") return null; const t = (w.subj || "") + " " + (w.body || ""); if (!WQ_REL.test(t)) return null; if (w.approval) return "موافقة"; if (WQ_NO.test(w.body || "")) return "اعتذار"; return null; }
 const wqNeeds = w => wqDate(w) >= WQ_FROM && !!wqOutcome(w) && !S.wqn.has(w.id);
 const wqPendList = () => S.wq.filter(wqNeeds);
