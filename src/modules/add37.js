@@ -1,5 +1,5 @@
 /* ================= v37: replies arriving from Watheqa → clear path to the coordinator (approved or not) ================= */
-S.wqn = new Map(); S.wqPend = false;
+S.wqn = new Map();
 const WQ_REL = /جالي|درس|دروس|محاضر|دورة|دورات|خطب|خطبة|تجديد|حلق|مهتد/;
 const WQ_NO = /(عدم الموافق|نعتذر|يتعذر|تعذّر|تعذر|لا يمكن|عدم إمكان|عدم امكان|لا نوافق|غير موافق|رفض)/;
 const WQ_FROM = "2026-10-01";
@@ -46,21 +46,17 @@ document.addEventListener("click", ev => { const m = ev.target.closest("[data-wn
 
 /* Watheqa page: banner + filter for replies still waiting to be passed on */
 const _vWatheqa37 = vWatheqa;
-vWatheqa = function(){ const P = wqPendList();
-  const ban = P.length || S.wqPend ? `<div class="check ${P.length ? "warn" : "ok"} wn-ban"><b>${P.length ? `${P.length === 1 ? "رد واحد" : P.length === 2 ? "ردّان" : P.length + (P.length < 11 ? " ردود" : " رداً")} من وثيقة بانتظار إبلاغ المنسق` : "أُبلغ المنسقون بكل الردود ✓"}</b><span>موافقات وردود اعتذار وصلت منذ بداية أكتوبر، افتح الرد واضغط «إبلاغ المنسق».</span><button type="button" class="btn ${S.wqPend ? "" : "btn-primary"}" data-wnpend>${S.wqPend ? "عرض كل الكتب" : "عرضها فقط"}</button></div>` : "";
-  let h; if (S.wqPend) { const all = S.wq; S.wq = P; try { h = _vWatheqa37(); } finally { S.wq = all; } } else h = _vWatheqa37();
-  const i = h.indexOf('<div class="toolbar">'); return i < 0 ? ban + h : h.slice(0, i) + ban + h.slice(i); };
+vWatheqa = function(){ const h = _vWatheqa37(), ban = wqTodoBox(), i = h.indexOf('<div class="toolbar">'); return i < 0 ? ban + h : h.slice(0, i) + ban + h.slice(i); };
 const _afterRender37 = afterRender;
 afterRender = function(v){ _afterRender37(v); if (S.view !== "watheqa") return;
   document.querySelectorAll(".wq-i[data-wq]:not(.wq2)").forEach(b => { if (b.querySelector(".wn-c")) return; const w = S.wq.find(x => x.id === b.dataset.wq); if (!w || wqDate(w) < WQ_FROM) return; const oc = wqOutcome(w); if (!oc) return;
     const n = S.wqn.get(w.id); b.insertAdjacentHTML("beforeend", `<span class="chip wn-c ${n ? "ok" : "warn"}">${n ? "أُبلغ المنسق ✓" : oc === "موافقة" ? "موافقة، أبلغ المنسق" : "اعتذار، أبلغ المنسق"}</span>`); }); };
 const _prio37 = priorities;
-priorities = function(){ const P = _prio37(); const n = S.canWrite ? wqPendList().length : 0; if (n) P.push({ w:90, k:"warn", t:`ردود وثيقة بانتظار إبلاغ المنسق: ${n}`, s:"موافقة أو اعتذار، المنسق ينتظر", act:{ go:"watheqa", l:"أبلغهم" } }); return P.sort((a, b) => b.w - a.w); };
+priorities = function(){ const P = _prio37(); const n = S.canWrite ? wqTodo().length : 0; if (n) P.push({ w:90, k:"warn", t:`كتب وثيقة تحتاج إجراء منك: ${n}`, s:"سجّل الموافقة، أصدر التصريح، أرسله للمنسق", act:{ go:"watheqa", l:"افتحها" } }); return P.sort((a, b) => b.w - a.w); };
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
   if (D.wnoc) { S.wqF.oc = D.wnoc; document.querySelectorAll("#wn-oc button").forEach(x => x.classList.toggle("on", x === t)); return wnRefresh(); }
   if (D.wnsend !== undefined) return wnSend();
   if (D.wngo !== undefined) { $("#wn")?.scrollIntoView({ behavior:"smooth", block:"start" }); return; }
-  if (D.wnpend !== undefined) { S.wqPend = !S.wqPend; return render(); }
 });
 document.addEventListener("change", ev => { if (ev.target.id === "wn-c") wnRefresh(); });
 document.addEventListener("input", ev => { if (ev.target.id === "wn-why") wnRefresh(); });

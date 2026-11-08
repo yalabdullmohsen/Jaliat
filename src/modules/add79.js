@@ -92,4 +92,19 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
       const bu = URL.createObjectURL(f), a = document.createElement("a"); a.href = bu; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(bu), 8000); toast("نزل ملف PDF"); }
     catch (_) { toast("تعذّر تجهيز PDF، حاول مرة ثانية"); }
     finally { t.disabled = false; t.innerHTML = old; } } });
+
+/* ---------- «المطلوب منك الآن»: أعلى صفحة وثيقة، لكل كتاب خطوته التالية وزرها ---------- */
+function wqTodo(){ if (!S.canWrite) return []; const out = [];
+  for (const w of S.wq) { if (wqDate(w) < WQ_FROM || S.wqn.has(w.id) || wqDir(w) !== "in") continue;
+    const comm = (typeof wqComm === "function" && wqComm(w)) || "";
+    if (!wqIsApproval(w)) { if (wqOutcome(w) === "اعتذار") out.push({ w, comm, k:3, step:"اعتذار: أبلغ المنسق", btn:`<button class="btn btn-ok" type="button" data-wnq="${esc(w.id)}">أبلغ المنسق</button>` }); continue; }
+    const acts = wqActsOf(w), inSys = wqRegNo(w), perms = wqPermitsOf(w, acts), can = canPermit(), pend = can && inSys ? pWqItems(w).length : 0;
+    if (!inSys) out.push({ w, comm, k:0, step:"١ تسجيل الموافقة", btn:`<button class="btn btn-primary" type="button" data-wqap="${esc((w.approval ? w : (wqKids(w).find(k => k.approval) || w)).id)}">سجّل الموافقة</button>` });
+    else if (!perms.length || pend) out.push({ w, comm, k:1, step:"٢ إصدار التصريح", btn: !can ? `<span class="s">بانتظار من يصدر التصريح</span>` : pend > 1 ? `<button class="btn btn-primary" type="button" data-pwball="${esc(w.id)}">أصدر التصاريح (${pend})</button>` : `<button class="btn btn-primary" type="button" data-pwqissue="${esc(w.id)}">أصدر التصريح</button>` });
+    else out.push({ w, comm, k:2, step:"٣ إرسال التصريح للمنسق", btn: perms.length === 1 ? `<button class="btn btn-ok" type="button" data-permit="${esc(perms[0].id)}">أرسله للمنسق</button>` : `<button class="btn btn-ok" type="button" data-wqsendall="${esc(w.id)}">أرسلها للمنسق (${perms.length})</button>` }); }
+  return out.sort((a, b) => a.k - b.k || wqDate(b.w).localeCompare(wqDate(a.w))); }
+function wqTodoBox(){ const L = wqTodo(); if (!S.canWrite) return "";
+  if (!L.length) return `<div class="wqtodo ok"><b>✓ لا يوجد كتاب ينتظر إجراءً منك</b></div>`;
+  return `<div class="wqtodo"><div class="wqtodo-h"><b>المطلوب منك الآن</b><span class="chip warn">${L.length}</span></div><span class="s">كل كتاب موافقة يمرّ بثلاث خطوات: ١ سجّل الموافقة، ٢ أصدر التصريح، ٣ أرسله للمنسق. اضغط الزر وكمّل.</span>
+    ${L.slice(0, 12).map(x => `<div class="wqt-r"><button type="button" class="wqt-t" data-wq="${esc(x.w.id)}"><b>${esc(String(x.w.subj || "").replace(/^بشأن\s*:?\s*/, "").slice(0, 70))}</b><span class="s">${x.comm ? esc(x.comm) + " · " : ""}<span class="num">${esc(x.w.no || "")}</span> · ${x.step}</span></button>${x.btn}</div>`).join("")}${L.length > 12 ? `<span class="s">و${L.length - 12} كتاب آخر تظهر بعد إنجاز ما فوق.</span>` : ""}</div>`; }
 NEWF.splice(1, 0, ["v79-wqpath", "nav:watheqa", "كتاب وثيقة بمسار واحد", "افتح أي كتاب موافقة: ثلاث خطوات واضحة (سجّل الموافقة، أصدر التصاريح، أرسل التصريح للمنسق)، وزر «عرض الكتاب كاملاً» يفتحه داخل النظام بدون الدخول لوثيقة، مع تنزيل PDF.", true, "2026-11-08"]);
