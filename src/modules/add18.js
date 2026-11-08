@@ -46,11 +46,6 @@ palAll = function(){ const A = _palAll18(); if (S.admin) A.unshift({ g:"إجرا
 // add «تفويض» next to «تصريح» in the activity drawer, and in the Watheqa letter drawer
 const _actForm18 = actForm;
 actForm = function(id, preset){ _actForm18(id, preset); const b = $(".drawer-f [data-pfrom]"); if (b && S.admin) b.insertAdjacentHTML("afterend", `<button class="btn btn-ghost" type="button" data-pgfrom="1" data-pd='${esc(b.dataset.pd)}'>تفويض تصريح</button>`); };
-const _wqForm18 = wqForm;
-wqForm = function(id){ _wqForm18(id); const w = S.wq.find(x => x.id === id); if (!w || !S.admin) return;
-  const lect = (w.body.match(/(?:الشيخ|فضيلة الشيخ|الداعية)\s*\/?\s*([^\n،,.(]{4,40})/) || [])[1] || "";
-  const mos = (w.body.match(/(مسجد\s*\/?\s*[^\n،,.(]{3,40})/) || [])[1] || "";
-  $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-ghost" type="button" data-pgfrom="1" data-pd='${esc(JSON.stringify({ sheikh:lect.trim(), mosque:mos.trim(), topic:w.subj || "", source:`#wq:${w.id}` }))}'>تفويض تصريح</button>`); };
 // show «صدر بتفويض» on a delegated permit
 const _permitView18 = permitView;
 permitView = async function(id){ await _permitView18(id); const p = S.permits.find(x => x.id === id); if (!p?.grant_id) return; const g = S.grants.find(x => x.id === p.grant_id);

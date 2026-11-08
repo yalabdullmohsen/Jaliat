@@ -15,22 +15,6 @@ function wqDocBox(o, title, open){ if (!o) return "";
   return `<details class="wqp"${open ? " open" : ""}><summary><b>${title}</b><span class="num">${esc(o.no || "")}</span><span class="s">${fmt(wqDate(o))}</span><button type="button" class="lnk" data-wq="${esc(o.id)}">فتح</button></summary>
     <div class="wqp-m"><b>${esc(o.subj || "")}</b><span class="s">${wqDir(o) === "out" ? "إلى" : "من"}: ${esc(wqClean(wqDir(o) === "out" ? o.to_whom : (wqFrom(o) || o.sender || "")) || "—")}</span></div>
     <div class="q-body">${esc(o.body || "لا يوجد نص").replace(/\n/g, "<br>")}</div></details>`; }
-const _wqForm82 = wqForm;
-wqForm = function(id){ _wqForm82(id); const w = wqById(id); const b = $(".drawer-b"); if (!w || !b) return;
-  let h = "";
-  if (wqDir(w) === "out") {
-    const kids = wqKids(w);
-    h = `<div class="rq-sec wqk"><b>كتاب الموافقة</b>${kids.length ? kids.map(k => `<button type="button" class="as-i" data-wq="${esc(k.id)}"><span>${wqRes(k) === "ok" ? "✓ موافقة" : wqRes(k) === "no" ? "✕ اعتذار" : "رد"} · <span class="num">${esc(k.no || "")}</span> · ${fmt(wqDate(k))} · ${esc(wqFrom(k) || "")}</span></button>`).join("")
-      : w.act_ok ? `<div class="check ok"><b>لا يوجد كتاب موافقة، الموافقة مكتوبة في الإجراءات</b><span>${esc(wqActSnip(w) || "«لا مانع»")}</span></div>`
-      : `<span class="s">لا يوجد رد بعد${w.actions ? "، ولا موافقة مكتوبة في الإجراءات" : ""}.</span>`}</div>`;
-  } else {
-    const p = wqParent(w), ownActs = /بعد\s*صلا|الساعة|\d{1,2}[:.]\d{2}\s*(ص|م|مساء|صباح)/.test(w.body || "");
-    h = p ? `<div class="rq-sec wqk"><b>هذا ${wqRes(w) === "no" ? "اعتذار" : "رد"} على كتابنا الأصلي</b><span class="s">${ownActs ? "" : "كتاب الموافقة ليس فيه الأوقات ولا الجدول، التفاصيل من الكتاب الأصلي:"}</span>${wqDocBox(p, "الكتاب الأصلي", !ownActs)}</div>`
-      : (w.approval || /موافق|رد/.test(w.kind || "")) ? `<div class="rq-sec wqk"><b>الكتاب الأصلي</b><span class="s">لم يُعثر على كتابنا الأصلي لهذا الرد في وثيقة.</span></div>` : "";
-  }
-  if (h) { const meta = b.querySelector(".q-meta"); meta ? meta.insertAdjacentHTML("afterend", h) : b.insertAdjacentHTML("afterbegin", h); }
-  if (wqDir(w) === "out" && w.act_ok && !docBy[w.no] && S.canWrite && !$(".drawer-f [data-wqap]")) $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-ok" type="button" data-wqap="${esc(w.id)}">اعتماد الموافقة وتسجيل أنشطتها</button>`);
-};
 /* activities come from the original letter when the approval has no table; the approval number stays the reference */
 const _wqPlan82 = wqPlan;
 wqPlan = function(w){ const P = _wqPlan82(w); const p = wqParent(w); if (!p) return P; const Q = _wqPlan82(p);

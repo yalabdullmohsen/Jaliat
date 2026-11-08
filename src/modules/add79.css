@@ -1,0 +1,20 @@
+.wqpath{display:grid;gap:8px;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.wqpath.wn-hot{box-shadow:0 0 0 2px var(--gold)}
+.wqpath-h{font-weight:700;font-size:.95rem;color:var(--gold)}
+.wqstep{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
+.wqstep>i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;background:var(--surface);border:1px solid var(--line)}
+.wqstep>div{display:grid;gap:2px;min-width:0}.wqstep>div>span{font-size:.82rem;opacity:.75;line-height:1.6}
+.wqstep.done{border-color:#9cc9ab;background:#eef7f1}.wqstep.done>i{background:#2b6b43;color:#fff;border-color:#2b6b43}
+.wqstep.now{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 9%,var(--surface))}.wqstep.now>i{background:var(--gold);color:#fff;border-color:var(--gold)}
+.wqstep.wait{opacity:.6}
+.wqstep .btn{white-space:nowrap}
+@media(max-width:520px){.wqstep{grid-template-columns:30px 1fr}.wqstep .btn{grid-column:1/-1}}
+.wqmark{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wq-more{margin-top:12px;border:1px dashed var(--line);border-radius:12px;padding:8px 12px}
+.wq-more summary{cursor:pointer;font-weight:600}.wq-more-b{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.wq-more-b .fld{flex:1 1 100%}
+.wqpaper{background:#fff;color:#1b1b1b;border:1px solid var(--line);border-radius:6px;padding:28px 26px;line-height:2;box-shadow:0 2px 14px rgba(0,0,0,.08);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif}
+.wqp-top{display:flex;justify-content:space-between;gap:10px;border-bottom:2px solid var(--gold);padding-bottom:8px;margin-bottom:12px;font-size:.9rem}
+.wqp-t{width:100%;border-collapse:collapse;font-size:.88rem;margin-bottom:14px}.wqp-t th{background:none;width:72px;text-align:start;color:#6b6558;font-weight:600;padding:3px 0;vertical-align:top}.wqp-t td{padding:3px 0}
+.wqpaper h2{font-family:Amiri,serif;font-size:1.25rem;line-height:1.9;margin:6px 0 12px}
+.wqp-body{font-size:.98rem;white-space:normal;overflow-wrap:anywhere}
+.wqp-sg{margin-top:18px;font-weight:700}.wqp-rf{margin-top:12px;font-size:.82rem;color:#6b6558}

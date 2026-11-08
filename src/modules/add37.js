@@ -25,12 +25,6 @@ function wqMsg(w, oc, c, why){
   if (oc === "اعتذار") return `${hi}نفيدكم بأنه تعذّرت الموافقة على طلبكم ${sub}${why ? `\nالسبب: ${why}` : ""}\n\nيسعدنا تواصلكم مع القسم لتعديل الطلب وإعادة تقديمه، وجزاكم الله خيراً.${SIGN}`;
   return `${hi}نفيدكم بورود الرد على طلبكم ${sub}\nوقد تضمّن ملاحظات تحتاج إلى استكمال${why ? `:\n${why}` : ""}\n\nنرجو تزويدنا بها لاستكمال الإجراء، وجزاكم الله خيراً.${SIGN}`; }
 
-function wqFlow(w){ const oc = wqOutcome(w), n = S.wqn.get(w.id), inSys = docBy[w.no] ? w.no : (w.refs || []).find(r => docBy[r]);
-  const st = [["وصل الرد من وثيقة", true, fmt(wqDate(w))], ["النتيجة", !!oc, oc ? WQ_OC[oc][0] : "حدّدها عند الإبلاغ"]];
-  if (oc === "موافقة") st.push(["تسجيل الموافقة في النظام", !!inSys, inSys ? `برقم ${inSys}` : "اضغط «تسجيل الموافقة في النظام»"]);
-  st.push(["إبلاغ المنسق", !!n, n ? `${n.coord || ""} · ${fmtTime(n.sent_at)}` : "بالواتساب من هنا"]);
-  const next = st.findIndex(s => !s[1]);
-  return `<div class="wf">${st.map(([t, ok, s], i) => `<div class="wf-s${ok ? " ok" : i === next ? " now" : ""}"><i>${ok ? "✓" : i + 1}</i><b>${t}</b><span>${esc(s)}</span></div>`).join("")}</div>`; }
 function wqNotifyBox(w){ const oc = wqOutcome(w) || "ملاحظات", L = wqCoords(w), n = S.wqn.get(w.id); S.wqF = { id:w.id, oc, ci:0 };
   return `<div class="rq-sec wn" id="wn"><b>📲 إبلاغ المنسق${n ? " (أُبلغ سابقاً، يمكن الإعادة)" : ""}</b>
     <div class="seg" id="wn-oc">${Object.keys(WQ_OC).map(k => `<button type="button" data-wnoc="${k}" class="${k === oc ? "on" : ""}">${WQ_OC[k][0]}</button>`).join("")}</div>
@@ -49,11 +43,6 @@ async function wnMark(id, byForm){ const w = S.wq.find(x => x.id === id); if (!w
 async function wnUnmark(id){ const { error } = await sb.from("wq_notify").delete().eq("wq_id", id); if (error) return writeFail(error); S.wqn.delete(id); toast("أُلغيت علامة الإبلاغ"); wqForm(id); }
 document.addEventListener("click", ev => { const m = ev.target.closest("[data-wnmark],[data-wnmk],[data-wnunmark]"); if (!m) return; ev.preventDefault(); ev.stopPropagation(); if (m.dataset.wnunmark) return wnUnmark(m.dataset.wnunmark); wnMark(m.dataset.wnmark || m.dataset.wnmk, !!m.dataset.wnmark); }, true);
 
-const _wqForm37 = wqForm;
-wqForm = function(id){ _wqForm37(id); const w = S.wq.find(x => x.id === id); if (!w) return;
-  const b = $(".drawer-b"); if (!b) return; b.insertAdjacentHTML("afterbegin", wqFlow(w));
-  if (S.canWrite) { const q = b.querySelector(".q-body"); (q || b.lastElementChild).insertAdjacentHTML("beforebegin", wqNotifyBox(w));
-    $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-ok" type="button" data-wngo>📲 إبلاغ المنسق</button>`); } };
 
 /* Watheqa page: banner + filter for replies still waiting to be passed on */
 const _vWatheqa37 = vWatheqa;
@@ -83,5 +72,3 @@ async function wnQuick(id){ const w = S.wq.find(x => x.id === id); if (!w) retur
   waGo(c.phone, wqMsg(w, oc, c), null, c.name);
   toast(`الرسالة جاهزة لـ ${c.name}، أرسلها ثم اضغط ✓ تم`); }
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wnq]"); if (!t) return; ev.preventDefault(); ev.stopPropagation(); wnQuick(t.dataset.wnq); }, true);
-const _wqForm44 = wqForm;
-wqForm = function(id){ _wqForm44(id); const w = S.wq.find(x => x.id === id); if (w && S.canWrite && typeof wqNeeds === "function" && wqNeeds(w)) setTimeout(() => { const b = $("#wn"); if (b) { b.scrollIntoView({ behavior:"smooth", block:"start" }); b.classList.add("wn-hot"); } }, 150); };

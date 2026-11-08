@@ -216,11 +216,6 @@ document.addEventListener("click", ev => { const t = ev.target.closest("[data-pd
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-pnall]")) return; S.f.pnall = S.f.pnall === "1" ? "" : "1"; render(); });
 const _prio85 = priorities;
 priorities = function(){ const P = _prio85(); if (canPermit()) { const n = permitNeeds().length; if (n) P.push({ w:86, k:"gold", t:`${n} موافقة وصلت وتحتاج تصريح`, s:"البيانات جاهزة، راجع وأصدر التصريح مباشرة", act:{ go:"permits", l:"إصدار التصاريح" } }); } return P.sort((a, b) => b.w - a.w); };
-const _wqForm85 = wqForm;
-wqForm = function(id){ _wqForm85(id); const w = wqById(id); const b = $(".drawer-b"); if (!w || !b || !canPermit()) return;
-  const nos = new Set([w.no, wqParent(w)?.no, ...wqKids(w).map(k => k.no)].filter(Boolean)); const L = S.E.filter(e => nos.has(e.doc) && !["ملغى", "مكتمل"].includes(e.status));
-  if (!L.length || !(w.approval || w.act_ok || wqKids(w).some(k => wqRes(k) === "ok"))) return;
-  b.insertAdjacentHTML("beforeend", `<div class="rq-sec"><b>التصاريح لهذه الموافقة</b>${L.map(e => { const p = S.permits.find(x => x.act_id === e.id && !x.revoked); return `<div class="li pn-i"><span class="pn-t"><b>${esc(e.lect || "—")}</b><span class="s">${esc(e.mosName || "")} · ${esc(daysText(e) || "")} ${esc(e.time || "")}</span></span>${p ? `<span class="chip ok">صدر ${esc(p.no || "")}</span>` : `<span class="pn-b">${pNeedBtns(e)}</span>`}</div>`; }).join("")}</div>`); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-pact],[data-gact]"); if (!t) return; const id = t.dataset.pact || t.dataset.gact; closeDrawer();
   setTimeout(() => t.dataset.pact ? permitForm({ act_id:id }) : grantForm({ act_id:id }), 60); });
 
@@ -293,9 +288,6 @@ const _grantsPanel88 = grantsPanel;
 grantsPanel = function(){ let h = _grantsPanel88(); if (!S.admin) return h;
   for (const g of S.grants.filter(gOpen).filter(g => g.grantee !== S.me?.id)) h = h.replace(`<button type="button" class="btn btn-ghost bad-t" data-pgrevoke="${g.id}">`, `<button type="button" class="btn btn-primary" data-pgself="${g.id}">إصدار بنفسي</button><button type="button" class="btn btn-ghost bad-t" data-pgrevoke="${g.id}">`);
   return h; };
-const _wqForm88 = wqForm;
-wqForm = function(id){ _wqForm88(id); const b = $(".drawer-f [data-pgfrom]"); if (!b || !canPermit() || $(".drawer-f [data-pwqissue]")) return;
-  b.insertAdjacentHTML("beforebegin", `<button class="btn btn-primary" type="button" data-pwqissue="${esc(id)}">إصدار تصريح</button>`); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-pgself],[data-pwqissue]"); if (!t) return;
   if (t.dataset.pgself) { const g = S.grants.find(x => x.id === t.dataset.pgself); if (!g) return; closeDrawer(); setTimeout(() => { permitForm({ ...(g.preset || {}) }); if (S.form) S.form.grant = g.id; const u = g.preset?.until; if (u && $("#p-date2")) $("#p-date2").value = u; }, 60); return; }
   const w = wqById(t.dataset.pwqissue); if (!w) return; closeDrawer(); setTimeout(() => { permitForm({}); const i = $("#p-act"); if (i) { i.value = w.no; pFind(w.no); } }, 60); });

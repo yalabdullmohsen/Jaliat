@@ -26,8 +26,6 @@ async function wqApproveGo(){ const F = S.form; if (F?.kind !== "wqap") return; 
     let n = Math.max(0, ...[...S.acts.values()].map(a => a.n || 0));
     for (const a of pick) { n++; const { mosRaw, ...x } = a; await T.put("acts", null, { ...x, comm, doc:w.no, start:"", end:"", status:"مجدول", n, notes:[x.notes, mosRaw && !x.mosque ? "المسجد كما ورد: " + mosRaw : ""].filter(Boolean).join(" · ") }); }
     closeDrawer(); toast(`سُجّلت الموافقة ${w.no}${pick.length ? ` و${pick.length} نشاط` : ""} ✓`); setTimeout(() => wqForm(w.id), 400); } catch (er) { writeFail(er); } }
-const _wqForm49 = wqForm;
-wqForm = function(id){ _wqForm49(id); const b = $('.drawer-f [data-wqadd]'); if (b) { b.removeAttribute("data-wqadd"); b.dataset.wqap = id; b.textContent = "اعتماد الموافقة وتسجيل أنشطتها"; } };
 
 /* ---------- (3) renewals: the coordinator answers from the portal, the letter is prepared in one tap ---------- */
 const _renewMsg49 = renewMsg;

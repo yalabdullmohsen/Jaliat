@@ -2,14 +2,6 @@
 async function wqtSet(id, state){ const note = $("#wqt-n")?.value.trim() || null;
   const { data, error } = await sb.from("wq_track").upsert({ wq_id:id, state, note, by_user:S.me.id, at:new Date().toISOString() }).select().single(); if (error) return writeFail(error);
   S.wqt.set(id, data); toast(state === "done" ? "سُجّل الكتاب منجزاً ✓" : "أُعيد الكتاب لقيد المتابعة"); closeDrawer(); render(); }
-const _wqForm39 = wqForm;
-wqForm = function(id){ _wqForm39(id); const w = S.wq.find(x => x.id === id); if (!w) return; const reply = wqIndex(), st = wqStage(w, reply), tr = S.wqt.get(id), r = reply.get(id);
-  const b = $(".drawer-b"); if (!b) return;
-  b.insertAdjacentHTML("afterbegin", `<div class="wqs ${st || ""}"><b>${st === "done" ? "✓ منجز" : st === "follow" ? "⏳ قيد المتابعة" : "كتاب وارد"}</b><span>${wqDir(w) === "out" ? (r ? `وصل الرد ${esc(r.no || "")} بتاريخ ${fmt(wqDate(r))}` : `أُرسل ${fmt(wqDate(w))}، بانتظار رد ${esc(wqClean(w.to_whom).replace(/^مدير\s+/, "") || "الجهة")}`) : esc(wqFrom(w) || "")}${tr?.note ? ` · ملاحظة: ${esc(tr.note)}` : ""}</span>
-    ${r ? `<button type="button" class="lnk" data-wq="${esc(r.id)}">فتح الرد</button>` : ""}</div>`);
-  if (!S.canWrite) return;
-  $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", st === "done" ? `<button class="btn btn-ghost" type="button" data-wqts="follow:${esc(id)}">↺ إرجاع لقيد المتابعة</button>` : `<button class="btn btn-ok" type="button" data-wqts="done:${esc(id)}">✓ تم الإنجاز</button>`);
-  if (st !== "done") b.insertAdjacentHTML("beforeend", fld("wqt-n", "ملاحظة المتابعة (اختياري)", `<input class="f" id="wqt-n" placeholder="مثال: تم الاتصال بالإدارة وأفادوا بالموافقة" value="${esc(tr?.note || "")}">`)); };
 
 /* halls page: letters we sent to book halls, with their state */
 const WQ_HALL = /حجز|قاعة|قاعه|مسرح|خيمة|خيمه/;

@@ -87,19 +87,6 @@ function vWatheqa(){
     <div class="wq-list">${groups.map(([m, G]) => `<div class="wq-mh">${m ? monLabel(m) : "بدون تاريخ"} <span class="num">${G.length}</span></div>${G.map(card).join("")}`).join("") || `<div class="empty">لا توجد كتب في هذا التصنيف</div>`}</div>`;
 }
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wqall]"); if (t) { S.f.wqall = S.f.wqall === "1" ? "" : "1"; S.f.wqt = "all"; render(); } });
-function wqForm(id){
-  const w = S.wq.find(x => x.id === id); if (!w) return; S.form = { kind:"wq", id };
-  const inSys = docBy[w.no] ? w.no : (w.refs || []).find(r => docBy[r]);
-  const acts = S.E.filter(e => e.doc && (e.doc === w.no || (w.refs || []).includes(e.doc)));
-  openDrawer(`كتاب وثيقة \u2066${w.no || ""}\u2069`, `
-    <div class="q-meta"><b>${esc(w.subj)}</b><span class="s">${esc(fmt(wqDate(w)))} · ${esc(w.sender || "")}${w.status ? " · " + esc(w.status) : ""}</span><span class="s">${esc(w.to_whom || "")}</span></div>
-    ${w.approval ? `<div class="check ok"><b>هذا الكتاب يتضمّن موافقة («لا مانع»)</b><span>${inSys ? `مسجّلة في النظام برقم ${esc(inSys)}` : "غير مسجّلة في النظام بعد"}</span></div>` : ""}
-    <div class="q-body">${esc(w.body || "لا يوجد نص").replace(/\n/g, "<br>")}</div>
-    ${w.signer ? `<span class="s">التوقيع: ${esc(w.signer)}</span>` : ""}
-    ${(w.refs || []).length ? `<span class="s">كتب مشار إليها: ${w.refs.map(r => docBy[r] ? `<button type="button" class="chip t1" data-wqdoc="${esc(r)}">${esc(r)} ✓</button>` : `<span class="chip">${esc(r)}</span>`).join(" ")}</span>` : ""}
-    ${acts.length ? `<div class="rq-sec"><b>أنشطة مرتبطة (${acts.length})</b>${acts.map(e => `<button type="button" class="as-i" data-prio-open="act:${e.id}"><span>#${e.n} · ${esc(e.comm || "")} · ${esc(e.mosName || "")}</span></button>`).join("")}</div>` : ""}`,
-    `<button class="btn btn-primary" type="button" data-ext="${WQ_VIEW(w.id)}">فتح في وثيقة</button>${w.approval && !inSys && S.canWrite ? `<button class="btn btn-ok" type="button" data-wqadd="${esc(w.id)}">تسجيل الموافقة في النظام</button>` : ""}${S.admin ? `<button class="btn btn-ghost" type="button" data-wqtask="${esc(w.id)}">إسناد متابعة</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
-}
 async function wqAdd(id){
   const w = S.wq.find(x => x.id === id); if (!w) return; const no = w.no; if (!no) return toast("لا يوجد رقم للكتاب");
   if (docBy[no]) return toast("الوثيقة مسجلة مسبقاً");
