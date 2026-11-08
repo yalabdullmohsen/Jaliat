@@ -95,7 +95,7 @@ answer = function(q){ const t = norm(q);
         items:(m ? r.mos : r.same).slice(0, 15).map(e => ({ t:`#${e.n} · ${e.comm || ""} · ${e.mosName || ""}`, s:[e.time, e.lect].filter(Boolean).join(" · "), open:`act:${e.id}` })), extra:"للتفاصيل والبدائل افتح «هل الوقت متاح؟»." }; }
   }
   return _answer27(q); };
-SUGG.splice(1, 0, ["هل الوقت متاح؟", "i-cal", "هل مسجد متاح اليوم بعد المغرب"]);
+SUGG.splice(1, 0, ["استعلام", "i-cal", "هل مسجد متاح اليوم بعد المغرب"]);
 const _palAll27 = palAll;
-palAll = function(){ const A = _palAll27(); A.unshift({ g:"إجراءات", t:"هل الوقت متاح؟ (فحص مسجد/محاضر/موعد)", s:"", ic:"i-cal", run:() => go("avail"), txt:"متاح تعارض فاضي مشغول موعد وقت مسجد" }); return A; };
+palAll = function(){ const A = _palAll27(); A.unshift({ g:"إجراءات", t:"استعلام (فحص كتاب أو مسجد أو موعد)", s:"", ic:"i-cal", run:() => go("avail"), txt:"متاح تعارض فاضي مشغول موعد وقت مسجد" }); return A; };
 NEWF.splice(1, 0, ["v27-avail", "nav:avail", "هل الوقت متاح؟", "اختر التاريخ والوقت (مثلاً اليوم بعد المغرب) والمسجد أو المحاضر، يطلع لك فوراً متاح أو مشغول مع السبب والبدائل.", false, "2026-10-20"]);

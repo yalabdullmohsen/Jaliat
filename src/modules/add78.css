@@ -1,0 +1,9 @@
+.inq{display:grid;gap:12px}.inq-top{background:var(--panel,#fff);border:1px solid var(--line,#e3dccb);border-radius:14px;padding:14px;display:grid;gap:10px}
+.inq-top>b{font-size:1.05rem}.inq-top>span{color:var(--mut,#6b6558);font-size:.88rem;line-height:1.7}.inq-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.inq-row select{flex:1;min-width:200px}
+.inq-top textarea{width:100%;resize:vertical}.inq-out{display:grid;gap:10px}.inq-st{padding:10px 12px;border-radius:10px;background:var(--panel,#fff);border:1px dashed var(--line,#e3dccb)}
+.inq-sum{padding:12px 14px;border-radius:12px;display:grid;gap:2px;border:1px solid}.inq-sum span{font-size:.82rem;opacity:.8}
+.inq-sum.ok,.inq-c.ok{background:#eef7f1;border-color:#9cc9ab}.inq-sum.warn,.inq-c.warn{background:#fdf6e6;border-color:#e0c37a}.inq-sum.bad,.inq-c.bad{background:#fbeeee;border-color:#d99a9a}
+.inq-c{border:1px solid;border-radius:12px;padding:10px 12px}.inq-h{display:flex;gap:10px;align-items:center}.inq-h div{display:grid}.inq-h span:not(.inq-ic){font-size:.82rem;opacity:.8}
+.inq-ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:#fff;flex:none}
+.inq-c ul{margin:8px 0 0;padding:0 18px 0 0;display:grid;gap:5px;font-size:.88rem}.inq-c li.b{color:#8a1f1f}.inq-c li.w{color:#7a5a00}.inq-c li.o{color:#2b6b43}
+.inq-lk{all:unset;cursor:pointer;text-decoration:underline;text-underline-offset:3px}.inq-sub{margin:10px 2px 0;font-size:.95rem;color:var(--mut,#6b6558)}
