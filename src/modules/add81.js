@@ -227,7 +227,7 @@ render = function(){
 };
 function dpMountNav(){
   const nav = $("#nav"); if (!nav || nav.querySelector(".dp-n")) return;
-  const h = `<div class="sep dp-n">الإدارة والأقسام</div><button class="dp-n" data-nav="dept">${icon("i-people")}${dpMe() === "all" || /^ctl_/.test(dpMe()) ? "أقسام الإدارة" : esc("قسمي")}</button><button class="dp-n" data-nav="freq">${icon("i-spark")}طلبات الإضافة</button>`;
+  const h = `<div class="sep dp-n">الإدارة والأقسام</div>${dpMe() === DP_LEGACY ? "" : `<button class="dp-n" data-nav="dept">${icon("i-people")}${dpMe() === "all" || /^ctl_/.test(dpMe()) ? "أقسام الإدارة" : "قسمي"}</button>`}<button class="dp-n" data-nav="freq">${icon("i-spark")}طلبات الإضافة</button>`;
   nav.insertAdjacentHTML("afterbegin", h);
   dpNavBadge();
 }
