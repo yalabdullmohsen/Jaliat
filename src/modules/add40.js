@@ -51,7 +51,8 @@ afterRender = function(v){ _afterRender43(v); backBtn(); };
   async function check(){ if (busy || document.hidden) return; busy = true; const v = await ver(); busy = false; if (!v) return; if (!mine) { mine = v; return; } if (v === mine) return;
     const idle = $("#drawer")?.hidden !== false && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName) && !S.waPop;
     try { const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); } catch (_) {}
-    if (idle) return location.reload();
+    /* مع عامل الخدمة: التحديث يصل بـcontrollerchange (add17) ويعيد التحميل مرة واحدة؛ وهذه احتياط */
+    if (idle) return setTimeout(() => location.reload(), navigator.serviceWorker?.controller ? 8000 : 0);
     if (!$("#upd-bar")) document.body.insertAdjacentHTML("beforeend", `<button type="button" id="upd-bar" class="upd-bar" onclick="location.reload()">⟳ يوجد تحديث جديد لـ«إنجاز»، اضغط للتحديث</button>`); }
   const badge = v => { if (!v) return; let e = $("#app-ver"); if (!e) { const a = $("#sugg-btn") || $("#side .side-foot"); if (!a) return; a.insertAdjacentHTML("afterend", `<div id="app-ver" class="app-ver"></div>`); e = $("#app-ver"); } e.textContent = `الإصدار ${v.replace("jaliyat-v", "")} · محدَّث ✓`; };
   ver().then(v => { mine = v; badge(v); });
