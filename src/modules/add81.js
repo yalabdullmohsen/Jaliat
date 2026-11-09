@@ -2,8 +2,8 @@
 /* الأقسام والمراقبات من جدول depts، وسجلات كل قسم في dept_items، وطلبات الإضافة في feature_requests.
    الفصل الحقيقي في قاعدة البيانات (dept_ok): المدير يرى الكل، المراقب أقسام مراقبته، الموظف قسمه. */
 Object.assign(TITLES, { dept:"أقسام الإدارة", freq:"طلبات الإضافة" });
-const DP_ST = ["جديد", "قيد التنفيذ", "بانتظار رد", "منجز", "ملغى"];
-const DP_STC = { "جديد":"var(--t1)", "قيد التنفيذ":"var(--primary)", "بانتظار رد":"var(--warn)", "منجز":"var(--ok)", "ملغى":"var(--muted)" };
+const DP_ST = ["جديد", "قيد التنفيذ", "بانتظار رد", "بانتظار التوقيع", "منجز", "ملغى"];
+const DP_STC = { "جديد":"var(--t1)", "قيد التنفيذ":"var(--primary)", "بانتظار رد":"var(--warn)", "بانتظار التوقيع":"var(--gold)", "منجز":"var(--ok)", "ملغى":"var(--muted)" };
 const DP_LEGACY = "com_m"; /* قسم الجاليات - رجال: صفحاته الأصلية في النظام */
 const DP = { depts:[], items:[], freq:[], loaded:false, loading:null, cur:"", kind:"", st:"open", q:"", ch:null };
 const dpMe = () => S.me?.dept || DP_LEGACY;
