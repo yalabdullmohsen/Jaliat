@@ -43,7 +43,7 @@ async function hardRefresh(btn){
 function addRefreshBtn(){ if ($("#refresh-btn")) return; const anchor = $("#bell") || $("#ocr-top"); if (!anchor) return;
   anchor.insertAdjacentHTML("beforebegin", `<button class="btn refresh-btn" id="refresh-btn" type="button" title="تحديث الصفحة" aria-label="تحديث الصفحة"><svg><use href="#i-refresh"/></svg></button>`); }
 const _afterRender21 = afterRender;
-afterRender = function(){ _afterRender21(); addRefreshBtn(); };
+afterRender = function(v){ _afterRender21(v); addRefreshBtn(); };
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
   if (t.id === "refresh-btn") return hardRefresh(t);
   if (D.ncx !== undefined) { $("#bell-pop")?.remove(); $("#nc-scrim")?.remove(); return; }

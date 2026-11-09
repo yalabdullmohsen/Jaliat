@@ -55,6 +55,6 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 const _vHome24 = vHome;
 vHome = function(){ return nfCard() + _vHome24(); };
 const _afterRender24 = afterRender;
-afterRender = function(){ _afterRender24(); nfPaint(); };
+afterRender = function(v){ _afterRender24(v); nfPaint(); };
 const _boot9nf24 = boot9;
 boot9 = function(){ _boot9nf24(); loadSeen().catch(() => {}); };

@@ -54,7 +54,7 @@ const _boot9wa = boot9;
 boot9 = function(){ _boot9wa(); loadWa().then(() => { liveWa(); waBadge(); if (S.view === "whatsapp" && $("#drawer").hidden) { render(); waScroll(); } }); if (false) sb.rpc("wa_config_get").then(r => { if (!r.error) { S.waAdmin = r.data; if (S.view === "whatsapp" && $("#drawer").hidden) render(); } }); };
 function waBadge(){ const b = $('#nav [data-nav="whatsapp"]'); if (!b) return; let i = b.querySelector(".nb"); const n = waUnread(); if (!n) { i?.remove(); return; } if (!i) { i = document.createElement("i"); i.className = "nb"; b.appendChild(i); } i.textContent = n; }
 const _afterRender19 = afterRender;
-afterRender = function(){ _afterRender19(); waBadge(); if (S.view === "whatsapp") waScroll(); };
+afterRender = function(v){ _afterRender19(v); waBadge(); if (S.view === "whatsapp") waScroll(); };
 const _prio19 = priorities;
 priorities = function(){ const P = _prio19(); const n = waUnread(); if (n) P.push({ w:88, k:"t1", t:`${n} محادثة واتساب بانتظار الرد`, s:"رسائل المنسقين على رقم القسم", act:{ go:"whatsapp", l:"واتساب" } }); return P.sort((a, b) => b.w - a.w); };
 document.addEventListener("click", async ev => {
@@ -105,7 +105,7 @@ vWhatsApp = function(){
     <div class="br-acts"><button type="button" class="btn btn-ghost" data-waopen>افتح واتساب ويب مؤقتاً</button></div></div></div>`;
 };
 const _afterRender20 = afterRender;
-afterRender = function(){ _afterRender20(); waEmbed(S.view === "whatsapp" && !S.waCfg.on && waEmbedOk()); };
+afterRender = function(v){ _afterRender20(v); waEmbed(S.view === "whatsapp" && !S.waCfg.on && waEmbedOk()); };
 // preload in the background once the system is ready, so opening it later is instant
 const _boot9w20 = boot9;
 boot9 = function(){ _boot9w20(); setTimeout(() => { if (waEmbedOk() && !isTouchDev() && !$("#wa-embed")) { waEmbed(true); waEmbed(S.view === "whatsapp"); } }, 4000); };

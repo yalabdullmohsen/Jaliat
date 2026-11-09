@@ -77,7 +77,7 @@ function lmapLoad(){ if (window.L) return lmapDraw();
   if (!document.querySelector("#lf-css")) { const l = document.createElement("link"); l.id = "lf-css"; l.rel = "stylesheet"; l.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.appendChild(l); }
   const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; sc.onload = lmapDraw; document.head.appendChild(sc); }
 const _afterRender54 = afterRender;
-afterRender = function(){ _afterRender54(); if (S.view === "lmap") setTimeout(lmapLoad, 30); else if (LMAP) { LMAP.remove(); LMAP = null; } };
+afterRender = function(v){ _afterRender54(v); if (S.view === "lmap") setTimeout(lmapLoad, 30); else if (LMAP) { LMAP.remove(); LMAP = null; } };
 
 /* ---------- (6) certificates of appreciation ---------- */
 function certHTML(a){ const mName = new Date(a.month + "-01T00:00").toLocaleDateString("ar-KW-u-nu-latn", { month:"long", year:"numeric" });

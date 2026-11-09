@@ -117,3 +117,6 @@ Playwright مثبّت. المنهج: خادم محلي (`python3 -m http.server`
 
 ### إرفاق ملف في Copilot
 `src/modules/add80.js`: زر «ملف» في صفحة Copilot (يظهر مع الجسر 1.1 فأعلى) يرفع PDF أو صورة أو نصاً حتى 10 ميغابايت مع السؤال عبر `jaliyat-ask` (الجسر يدعم `file` أصلاً). لم يُجرَّب على Copilot الحي بعد.
+
+### حارس afterRender
+عند إضافة طبقة تغلّف `afterRender` يجب أن تأخذ المعامل `v` وتمرّره للسابقة، وإلا لا يعمل الجسر تلقائياً. `src/build.py` يفشل إذا وجد `afterRender = function()` بلا معامل.
