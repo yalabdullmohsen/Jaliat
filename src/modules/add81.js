@@ -249,5 +249,5 @@ start = async function(session){
   $("#me-role").textContent = [prof.title, dpShort(d)].filter(Boolean).join(" · "); const bs = $(".brand span"); if (bs) bs.textContent = dpName(d);
   render();
 };
-/* زر «طلب إضافة» دائم في أسفل القائمة لكل الموظفين */
-(function dpFootBtn(){ const f = document.querySelector(".side-foot"); if (f && !f.querySelector("[data-dpfreq]")) f.insertAdjacentHTML("afterbegin", `<button class="btn" data-dpfreq>${icon("i-spark")} طلب إضافة للنظام</button>`); })();
+/* زر «طلب إضافة» دائم في أسفل القائمة تحت «الاقتراحات» لكل الموظفين */
+(function dpFootBtn(){ const f = document.querySelector(".side-foot"); if (!f || f.querySelector("[data-dpfreq]")) return; const h = `<button class="btn sugg-btn" type="button" data-dpfreq>${icon("i-spark")} طلب إضافة للنظام</button>`; const sg = $("#sugg-btn"); if (sg) sg.insertAdjacentHTML("afterend", h); else f.insertAdjacentHTML("beforeend", h); })();
