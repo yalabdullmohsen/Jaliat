@@ -1,0 +1,50 @@
+/* v81: أقسام الإدارة وطلبات الإضافة */
+.dp{display:grid;gap:16px}
+.dp-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.dp-tab,.dp-k{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 16px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.dp-tab.on,.dp-k.on{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.dp-k small{opacity:.75;margin-inline-start:4px}
+.dp-kinds{display:flex;gap:6px;flex-wrap:wrap}
+.dp-h{margin:6px 0 0;font-size:16px;color:var(--muted)}
+.dp-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.dp-card{display:grid;gap:10px;text-align:right;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,14px);padding:16px;font:inherit;color:var(--ink);cursor:pointer;transition:border-color .15s,transform .15s}
+.dp-card:hover{border-color:var(--primary);transform:translateY(-1px)}
+.dp-card b{font-size:15.5px;line-height:1.5}
+.dp-n{display:flex;gap:8px}
+.dp-n i{flex:1;font-style:normal;font-weight:800;font-size:22px;display:grid;background:var(--surface-2);border-radius:10px;padding:8px;text-align:center}
+.dp-n i small{font-size:11.5px;font-weight:600;color:var(--muted)}
+.dp-n i.bad{color:var(--bad);background:var(--bads)}
+.dp-go{color:var(--primary);font-weight:700;font-size:14px}
+.dp-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.dp-head h3{margin:0;font-size:19px}
+.dp-acts{display:flex;gap:8px;flex-wrap:wrap}
+.dp-tb{display:flex;gap:8px;flex-wrap:wrap}
+.dp-tb #dp-q{flex:1 1 260px}.dp-tb #dp-st{flex:0 0 170px}
+.dp-list{display:grid;gap:8px}
+.dp-row,.dp-fq{display:grid;gap:6px;text-align:right;background:var(--surface);border:1px solid var(--line);border-inline-start:4px solid var(--primary);border-radius:12px;padding:12px 14px;font:inherit;color:var(--ink);cursor:pointer}
+.dp-fq{cursor:default;border-inline-start-color:var(--gold)}
+.dp-fq p{margin:0;line-height:1.7;white-space:pre-wrap}
+.dp-rep{color:var(--primary);font-weight:600}
+.dp-row.late{border-inline-start-color:var(--bad)}
+.dp-r1{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.dp-r1 b{font-size:15px;line-height:1.5}
+.dp-st{flex:none;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.bad-t{color:var(--bad);font-weight:700}
+.dp-people{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.dp-people summary{cursor:pointer;font-weight:700;display:flex;gap:8px;align-items:center}
+.dp-pr{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);margin-top:8px}
+.dp-pr select{max-width:60%}
+.dp-dlg{width:min(680px,94vw);max-height:90vh;border:0;border-radius:16px;padding:22px;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.dp-dlg::backdrop{background:rgba(8,20,15,.45)}
+.dp-dlg h3{margin:0 0 12px;padding-inline-end:36px}
+.dp-x{position:absolute;inset-inline-end:14px;top:14px;border:0;background:var(--surface-2);color:var(--ink);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px}
+.dp-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dp-form label{display:grid;gap:5px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.dp-form .w{grid-column:1/-1}
+.dp-fb{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dp-fb .f{flex:1 1 200px}
+.dp-del{color:var(--bad);margin-inline-start:auto}
+.dp-log{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;display:grid;gap:10px}
+.dp-log p{margin:2px 0 0;line-height:1.6}
+body.dp-only #nav > :not(.dp-n),body.dp-only #tabbar,body.dp-only #add-act,body.dp-only #export,body.dp-only .top > :not(#title):not(.menu-btn){display:none!important}
+@media (max-width:640px){.dp-form{grid-template-columns:1fr}.dp-tb #dp-st{flex:1 1 100%}.dp-pr{flex-wrap:wrap}.dp-pr select{max-width:100%;width:100%}}
