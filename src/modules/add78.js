@@ -66,7 +66,7 @@ async function inqRun(bodies, name){ if (INQ.busy) return; INQ.busy = true; INQ.
   try { const t0 = Date.now(), msg = () => `<span class="spin"></span> يقرأ الذكاء الاصطناعي الكتاب${bodies.length > 1 ? ` (${bodies.length} ملفات معاً)` : ""}… ${Math.round((Date.now() - t0) / 1000)} ثانية`; INQ.st = msg(); inqPaint();
     const tick = setInterval(() => { INQ.st = msg(); inqPaint(); }, 1000);
     try { const R = await Promise.all(bodies.map(b => Promise.race([sb.functions.invoke("doc-read", { body:b }), new Promise((_, no) => setTimeout(() => no(new Error("تأخرت القراءة، أعد المحاولة")), 110000))])));
-      for (const { data, error } of R) { if (error || data?.error) throw new Error(data?.error || error?.message || "تعذّرت القراءة"); all.push(...(data.items || []).filter(x => x && (x.sheikh || x.mosque))); } }
+      for (const { data, error } of R) { if (error || data?.error) { let m = data?.error || ""; if (!m && error?.context?.json) { try { m = (await error.context.json())?.error || ""; } catch (_) {} } throw new Error(m || error?.message || "تعذّرت القراءة"); } all.push(...(data.items || []).filter(x => x && (x.sheikh || x.mosque))); } }
     finally { clearInterval(tick); }
     if (!all.length) { INQ.st = "لم أجد في الكتاب دروساً (شيخ أو مسجد). جرّب صورة أوضح أو ألصق النص."; return; }
     INQ.st = ""; INQ.res = inqCheck(all);
