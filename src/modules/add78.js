@@ -60,7 +60,7 @@ function inqCard(R){ const c = R.c, x = c.x, k = R.bad.length ? "bad" : R.warn.l
   return `<div class="inq-c ${k}"><div class="inq-h"><span class="inq-ic">${ic}</span><div><b>${esc(x.sheikh || "—")}</b><span>${esc([x.mosque ? "مسجد " + x.mosque.replace(/^مسجد\s*/, "") : "", x.area, inqWhen(c)].filter(Boolean).join(" · "))}</span></div></div>
     <ul>${R.bad.map(z => row(z, "b")).join("")}${R.warn.map(z => row(z, "w")).join("")}${R.ok.map(z => row(z, "o")).join("")}${!R.bad.length && !R.warn.length && !R.ok.length ? `<li class="o">لا تعارض مع أي نشاط أو كتاب</li>` : ""}</ul></div>`; }
 function inqPaint(){ const o = $("#inq-out"); if (!o) return; const b = INQ.res.reduce((n, R) => n + (R.bad.length ? 1 : 0), 0), w = INQ.res.reduce((n, R) => n + (!R.bad.length && R.warn.length ? 1 : 0), 0);
-  o.innerHTML = INQ.st ? `<div class="inq-st">${INQ.st}</div>` : "";
+  o.innerHTML = (INQ.name ? `<div class="inq-nm">📄 <b>${esc(INQ.name)}</b></div>` : "") + (INQ.st ? `<div class="inq-st">${INQ.st}</div>` : "");
   if (INQ.res.length) o.innerHTML += `<div class="inq-sum ${b ? "bad" : w ? "warn" : "ok"}"><b>${b ? `${b} من ${INQ.res.length} فيها تعارض` : w ? `لا تعارض حقيقي، و${w} فيها تنبيه` : `سليم: لا تعارض في الـ${INQ.res.length}`}</b><span>${esc(INQ.name)}</span></div>` + INQ.res.map(inqCard).join(""); }
 async function inqRun(bodies, name){ if (INQ.busy) return; INQ.busy = true; INQ.res = []; INQ.name = name || ""; const all = [];
   try { for (let i = 0; i < bodies.length; i++) { INQ.st = `<span class="spin"></span> يقرأ الذكاء الاصطناعي الكتاب${bodies.length > 1 ? ` (${i + 1} من ${bodies.length})` : ""}… قد يستغرق حتى دقيقتين`; inqPaint();
@@ -80,7 +80,7 @@ vAvail = function(){ const L = (S.wq || []).filter(w => w.dir === "out" && w.bod
 const _afterRender78 = afterRender;
 afterRender = function(v){ _afterRender78(v); if (v === "avail") inqPaint(); };
 document.addEventListener("change", async ev => { const t = ev.target;
-  if (t.id === "inq-file") { const fs = [...t.files].filter(f => f.size <= 10e6); if (!fs.length) return toast("الملف أكبر من 10 ميغا"); const B = []; for (const f of fs) { const g = await prSmall(f); B.push({ b64:await b64of(g), mime:g.type || "application/pdf" }); } t.value = ""; inqRun(B, fs.map(f => f.name).join("، ")); }
+  if (t.id === "inq-file") { const all = [...t.files], fs = all.filter(f => f.size <= 10e6); if (!fs.length) { t.value = ""; return toast("الملف أكبر من 10 ميغا"); } if (fs.length < all.length) toast(`تجاوزت ${all.length - fs.length} ملف لأنه أكبر من 10 ميغا`); const B = []; for (const f of fs) { const g = await prSmall(f); B.push({ b64:await b64of(g), mime:g.type || "application/pdf" }); } t.value = ""; inqRun(B, fs.map(f => f.name).join("، ")); }
   if (t.id === "inq-wq" && t.value) { const w = S.wq.find(x => x.id === t.value); if (w) inqRun([{ text:`رقم الكتاب: ${w.no}\nالتاريخ: ${w.doc_date}\nالموضوع: ${w.subj}\nمن: ${w.signer}\n\n${w.body}` }], `${w.no || ""} ${w.subj || ""}`); } });
 document.addEventListener("click", ev => { if (ev.target.id !== "inq-go") return; const v = ($("#inq-text")?.value || "").trim(); if (v.length < 20) return toast("ألصق نص الكتاب أولاً"); inqRun([{ text:v }], "نص ملصوق"); });
 GUIDES.avail = { g:"الأنشطة والجدولة", d:"ارفع كتاباً وأعرف قبل الإرسال إن كان فيه تعارض مع أي نشاط أو تصريح أو كتاب في وثيقة.", s:[

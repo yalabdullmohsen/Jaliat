@@ -7,3 +7,5 @@
 .inq-ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:#fff;flex:none}
 .inq-c ul{margin:8px 0 0;padding:0 18px 0 0;display:grid;gap:5px;font-size:.88rem}.inq-c li.b{color:#8a1f1f}.inq-c li.w{color:#7a5a00}.inq-c li.o{color:#2b6b43}
 .inq-lk{all:unset;cursor:pointer;text-decoration:underline;text-underline-offset:3px}.inq-sub{margin:10px 2px 0;font-size:.95rem;color:var(--mut,#6b6558)}
+
+.inq-nm{padding:8px 12px;border-radius:10px;background:#f4efe2;border:1px solid var(--line,#e3dccb);overflow-wrap:anywhere;font-size:.9rem}
