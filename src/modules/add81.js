@@ -218,17 +218,29 @@ document.addEventListener("change", async ev => {
 
 /* ---------- التوجيه والقائمة والدخول ---------- */
 const _render81 = render;
+/* صفحات مساحة القسم: dept/freq هنا، والبقية في add82 (DP_OWN) أو من صفحات النظام نفسها مفصولةً بالبيانات */
+const DP_VIEWS = new Set(["dept", "freq", "odsave", "report", "stats", "notes", "mine", "changes", "staffday", "users", "backups", "audit"]);
+const DP_OWN = {};
 render = function(){
-  if (document.body.classList.contains("dp-only") && S.view !== "freq") S.view = "dept";
+  const only = document.body.classList.contains("dp-only");
+  if (only && !DP_VIEWS.has(S.view)) S.view = "dept";
+  if (only && DP_OWN[S.view]) { $("#title").textContent = TITLES[S.view] || ""; $("#add-act").hidden = true; $("#view").innerHTML = DP_OWN[S.view](); if (typeof afterRender === "function") afterRender(S.view); return; }
   if (S.view === "dept" || S.view === "freq") {
     $("#title").textContent = S.view === "dept" && DP.loaded && dpVisible().length === 1 ? dpShort(dpVisible()[0].code) : TITLES[S.view]; $("#add-act").hidden = true;
     $("#view").innerHTML = S.view === "dept" ? vDept() : vFreq(); return;
   }
   _render81();
 };
+/* أساسيات كل قسم بنفس أسماء وترتيب قائمة الجاليات: «التقارير والسجلات» ثم «الإدارة» (للمدير) */
+function dpBaseNav(){
+  if (dpMe() === DP_LEGACY || dpMe() === "all" || dpMe() === "ctl_com") return "";
+  const b = (v, ic) => `<button class="dp-n" data-nav="${v}">${icon(ic)}${esc(TITLES[v])}</button>`;
+  return `<div class="sep dp-n">التقارير والسجلات</div>${b("odsave", "i-down")}${b("report", "i-doc")}${b("stats", "i-chart")}${b("notes", "i-note")}${b("mine", "i-note")}${b("changes", "i-log")}`
+    + (S.admin ? `<div class="sep dp-n">الإدارة</div>${b("staffday", "i-users")}${b("users", "i-users")}${b("backups", "i-down")}${b("audit", "i-log")}` : "");
+}
 function dpMountNav(){
   const nav = $("#nav"); if (!nav || nav.querySelector(".dp-n")) return;
-  const h = `<div class="sep dp-n">الإدارة والأقسام</div>${dpMe() === DP_LEGACY ? "" : `<button class="dp-n" data-nav="dept">${icon("i-people")}${dpMe() === "all" || /^ctl_/.test(dpMe()) ? "أقسام الإدارة" : "قسمي"}</button>`}<button class="dp-n" data-nav="freq">${icon("i-spark")}طلبات الإضافة</button>`;
+  const h = `<div class="sep dp-n">الإدارة والأقسام</div>${dpMe() === DP_LEGACY ? "" : `<button class="dp-n" data-nav="dept">${icon("i-people")}${dpMe() === "all" || /^ctl_/.test(dpMe()) ? "أقسام الإدارة" : "قسمي"}</button>`}<button class="dp-n" data-nav="freq">${icon("i-spark")}طلبات الإضافة</button>${dpBaseNav()}`;
   nav.insertAdjacentHTML("afterbegin", h);
   dpNavBadge();
 }
@@ -245,7 +257,7 @@ start = async function(session){
   $("#login").hidden = true; $("#app").hidden = false; $("#tabbar").hidden = true;
   S.view = (location.hash || "").slice(1) === "freq" ? "freq" : "dept"; render();
   const { data } = await sb.from("profiles").select("*").order("created_at"); S.profiles = data || [prof];
-  await dpLoad();
+  await dpLoad(); dpBoot();
   $("#me-role").textContent = [prof.title, dpShort(d)].filter(Boolean).join(" · "); const bs = $(".brand span"); if (bs) bs.textContent = dpName(d);
   render();
 };

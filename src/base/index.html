@@ -1031,7 +1031,7 @@ let dirty = false;
 function schedule(){ if (dirty) return; dirty = true; requestAnimationFrame(() => { dirty = false; derive(); if (!$("#app").hidden && !(S.form && !$("#drawer").hidden && document.activeElement && $("#drawer").contains(document.activeElement))) render(); }); }
 function putRow(tbl, row){
   if (tbl === "refs") { S[row.id] = row.data?.list || []; S.got.add(row.id); return; }
-  S[tbl].set(row.id, row.data); S.meta.set(tbl + ":" + row.id, { by: row.updated_by, at: row.updated_at });
+  S[tbl].set(row.id, row.data); S.meta.set(tbl + ":" + row.id, { by: row.updated_by, at: row.updated_at, dept: row.dept });
 }
 async function loadAll(){
   const tabs = ["acts","khatibs","notes","refs"];

@@ -38,7 +38,7 @@ async function odxWriteAll(put, who){ const B = await odxBundle(), day = TODAY;
   return B; }
 async function odxDone(files, bytes, place){ ODX.last = new Date().toISOString(); await odxSet("last", ODX.last); ODX.place = place; await odxSet("place", place);
   try { await odCfgSave({ last:ODX.last, files, acct:MS.account?.username || OD.cfg?.acct || "", by:S.me?.name || "", freq:"d1" }); } catch (_) {}
-  const { data } = await sb.from("od_saves").insert({ files, bytes, place }).select().single(); if (data) ODX.saves = [data, ...ODX.saves.filter(s => s.id !== data.id)]; }
+  const { data } = await sb.from("od_saves").insert({ files, bytes, place, dept:S.me?.dept || "com_m" }).select().single(); if (data) ODX.saves = [data, ...ODX.saves.filter(s => s.id !== data.id)]; }
 /* 1) the ministry OneDrive account (Microsoft sign-in once; silent afterwards) */
 async function odxGraph(interactive){ if (typeof msReady !== "function" || !msReady()) throw new Error("signin");
   await msInit(); await msToken(interactive, OD.scope);

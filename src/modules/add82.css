@@ -1,0 +1,6 @@
+.dpx-ph{display:none}
+.dpx-bar{display:grid;grid-template-columns:120px 1fr 36px;gap:10px;align-items:center;margin:6px 0;font-size:13.5px}
+.dpx-bar i{display:block;height:10px;border-radius:6px;background:linear-gradient(to left,var(--c,var(--primary)) var(--w),var(--surface-2) var(--w))}
+.dpx-m{margin-bottom:14px}.dpx-m>b{display:block;margin-bottom:4px}
+@media print{body.dp-only .side,body.dp-only .top,body.dp-only #tabbar,body.dp-only .dpx-noprint{display:none!important}
+ body.dp-only .main{margin:0!important;padding:0!important}.dpx-ph{display:block;margin-bottom:12px}.dpx-ph b{display:block;font-size:20px}}
