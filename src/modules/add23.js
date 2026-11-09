@@ -7,10 +7,14 @@ const arGet = () => { try { return JSON.parse(localStorage.getItem(ARK) || "null
 const arSet = v => { try { v ? localStorage.setItem(ARK, JSON.stringify(v)) : localStorage.removeItem(ARK); } catch (_) {} };
 
 /* ---------- login screen: «طلب إنشاء حساب» ---------- */
+/* أقسام الإدارة (نسخة ثابتة لشاشة الدخول؛ المرجع جدول depts) */
+const DEPT_LIST = [["ext_research", "قسم البحوث والمنظمات الدولية"], ["ext_aid", "قسم المعونات والمنح الدراسية"], ["ext_deleg", "قسم الوفود والدعم الثقافي"], ["ext_envoys", "قسم المبعوثين"],
+  ["com_m", "قسم الجاليات ورعاية المهتدين وطلبة البعوث - رجال"], ["com_w", "قسم الجاليات ورعاية المهتدين وطلبة البعوث - نساء"], ["daw_m", "قسم التعريف بالإسلام - رجال"], ["daw_w", "قسم التعريف بالإسلام - نساء"]];
+const deptOfTitle = t => (DEPT_LIST.find(([, n]) => String(t || "").includes("— " + n)) || [])[0] || "";
 function lgFine(){ return $("#login .fine"); }
 async function arStatusLine(){
   const r = arGet(), f = lgFine(); if (!f) return;
-  f.innerHTML = `النظام خاص بموظفي القسم. <button type="button" class="lnk" data-arnew>طلب إنشاء حساب</button>`;
+  f.innerHTML = `النظام خاص بموظفي الإدارة. <button type="button" class="lnk" data-arnew>طلب إنشاء حساب</button>`;
   if (!r) return;
   const { data } = await sb.rpc("account_request_status", { p_id:r.id, p_username:r.u }).catch(() => ({}));
   const m = { pending:["warn", "طلبك بانتظار موافقة مدير النظام"], approved:["ok", `تمت الموافقة على حسابك ✓، ادخل باسم المستخدم «${r.u}» وكلمة المرور التي اخترتها`], rejected:["bad", "لم تتم الموافقة على طلب الحساب"] }[data];
@@ -24,6 +28,7 @@ function arForm(){
   card.insertAdjacentHTML("beforeend", `<form class="lg-form" id="ar-form" novalidate>
     <h2 class="ar-h">طلب إنشاء حساب</h2><p class="ar-s">يصل طلبك لمدير النظام، ولا يُفعَّل الحساب إلا بعد موافقته.</p>
     <div class="fld"><label for="ar-name">الاسم الكامل</label><input class="f" id="ar-name" autocomplete="name"></div>
+    <div class="fld"><label for="ar-dept">القسم</label><select class="f" id="ar-dept"><option value="">اختر قسمك</option>${DEPT_LIST.map(([c, n]) => `<option value="${c}">${esc(n)}</option>`).join("")}</select></div>
     <div class="fld"><label for="ar-title">المسمى الوظيفي</label><input class="f" id="ar-title"></div>
     <div class="fld"><label for="ar-phone">رقم الهاتف</label><input class="f" id="ar-phone" inputmode="tel" dir="ltr"></div>
     <div class="fld"><label for="ar-user">اسم المستخدم (بالإنجليزي)</label><input class="f" id="ar-user" dir="ltr" autocapitalize="none" spellcheck="false" autocomplete="username" placeholder="مثال: ahmad"></div>
@@ -38,10 +43,11 @@ document.addEventListener("submit", async ev => {
   if (ev.target.id !== "ar-form") return; ev.preventDefault();
   const v = id => $("#" + id).value.trim(), err = m => { const e = $("#ar-err"); e.textContent = m; e.hidden = !m; };
   if (!v("ar-name") || !v("ar-user")) return err("اكتب الاسم واسم المستخدم");
+  if (!v("ar-dept")) return err("اختر قسمك");
   if ($("#ar-pass").value.length < 6) return err("كلمة المرور 6 أحرف على الأقل");
   if ($("#ar-pass").value !== $("#ar-pass2").value) return err("كلمتا المرور غير متطابقتين");
   const b = $("#ar-go"); b.disabled = true; b.textContent = "جارٍ الإرسال…";
-  const { data, error } = await sb.rpc("request_account", { p_name:v("ar-name"), p_username:v("ar-user"), p_phone:v("ar-phone"), p_title:v("ar-title"), p_password:$("#ar-pass").value });
+  const { data, error } = await sb.rpc("request_account", { p_name:v("ar-name"), p_username:v("ar-user"), p_phone:v("ar-phone"), p_title:[v("ar-title"), DEPT_LIST.find(([c]) => c === v("ar-dept"))[1]].filter(Boolean).join(" — "), p_password:$("#ar-pass").value });
   b.disabled = false; b.textContent = "إرسال الطلب";
   if (error) return err(/fetch|network/i.test(error.message) ? "لا يوجد اتصال بالإنترنت" : error.message);
   arSet({ id:data.id, u:v("ar-user").toLowerCase() }); arBack();
@@ -58,7 +64,8 @@ function arView(id){
   S.form = { kind:"acctreq", id };
   openDrawer("طلب إنشاء حساب", `<div class="q-meta"><b>${esc(r.name)}</b><span class="s">${esc(r.title || "")}</span><span class="s" dir="ltr">${esc(r.username)}${r.phone ? " · " + esc(r.phone) : ""}</span><span class="s">أُرسل ${ago(r.created_at)}</span></div>
     ${r.status !== "pending" ? `<div class="check ${r.status === "approved" ? "ok" : "warn"}"><b>${r.status === "approved" ? "تمت الموافقة" : "مرفوض"}</b>${r.decided_by ? `<span>بواسطة ${esc(pname(r.decided_by))}</span>` : ""}</div>` :
-    `${fld("ar-role", "الصلاحية عند الموافقة", `<select class="f" id="ar-role"><option value="editor" selected>محرر، يضيف ويعدّل</option><option value="viewer">مشاهد، عرض فقط</option><option value="admin">مدير</option></select>`)}
+    `${fld("ar-dept2", "القسم", `<select class="f" id="ar-dept2">${DEPT_LIST.map(([c, n]) => `<option value="${c}"${(deptOfTitle(r.title) || "com_m") === c ? " selected" : ""}>${esc(n)}</option>`).join("")}<option value="all">كل الإدارة (مدير الإدارة)</option></select>`)}
+    ${fld("ar-role", "الصلاحية عند الموافقة", `<select class="f" id="ar-role"><option value="editor" selected>محرر، يضيف ويعدّل</option><option value="viewer">مشاهد، عرض فقط</option><option value="admin">مدير</option></select>`)}
     <span class="hint">كلمة المرور اختارها صاحب الطلب ومحفوظة مشفّرة، لا يطّلع عليها أحد.</span>`}`,
     r.status === "pending" ? `<button class="btn btn-ok" data-arok="${r.id}">موافق</button><button class="btn btn-ghost bad-t" data-arno="${r.id}">غير موافق</button><button class="btn btn-ghost" data-close>لاحقاً</button>` : `<button class="btn btn-ghost" data-close>إغلاق</button>`);
 }
@@ -68,6 +75,10 @@ async function arDecide(id, ok, btn){
   btn.disabled = false;
   if (error || data?.error) { let m = data?.error; if (!m) { try { m = (await error.context.json()).error; } catch (_) { m = "تعذّر التنفيذ"; } } return toast(m); }
   const r = S.acctReqs.find(x => x.id === id); if (r) r.status = ok ? "approved" : "rejected";
+  const dept = $("#ar-dept2")?.value;
+  if (ok && r && dept) { const { data:pr } = await sb.from("profiles").select("id").eq("username", r.username.toLowerCase()).maybeSingle();
+    const e2 = pr ? (await sb.rpc("set_user_dept", { p_uid:pr.id, p_dept:dept })).error : { message:"لم يُعثر على الحساب" };
+    if (e2) toast("أُنشئ الحساب، لكن تعذّر تحديد قسمه: " + e2.message + "، حدّده من «أقسام الإدارة»"); }
   closeDrawer(); toast(ok ? "أُنشئ الحساب ✓، يقدر صاحبه يدخل الآن" : "رُفض الطلب"); if (/مسبقاً/.test("")) {}; if (ok) loadProfiles?.(); render();
 }
 let arCh = null;

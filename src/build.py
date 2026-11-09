@@ -111,7 +111,7 @@ s = s.replace('</style>\n\n</head>', '.brand svg{color:#fff;width:38px;height:38
 # --- system name: «إنجاز» ---
 R('<title>نظام أنشطة الجاليات</title>', '<title>إنجاز — قسم الجاليات</title>')
 R('<meta name="apple-mobile-web-app-title" content="أنشطة الجاليات">', '<meta name="apple-mobile-web-app-title" content="إنجاز">')
-R('<h1>نظام أنشطة الجاليات</h1>', '<h1>إنجاز</h1><p class="sys-tag">منصة أنشطة الجاليات والمهام والإنجاز</p>')
+R('<h1>نظام أنشطة الجاليات</h1>', '<h1>إنجاز</h1><p class="sys-tag">منصة إدارة العلاقات الخارجية: الأقسام والمهام والإنجاز</p>')
 R('<b>أنشطة الجاليات</b><span>قسم الجاليات ورعاية المهتدين</span>', '<b>إنجاز</b><span>قسم الجاليات ورعاية المهتدين</span>')
 s = s.replace("نظام أنشطة الجاليات", "نظام «إنجاز» لأنشطة الجاليات").replace("نظام الجاليات", "إنجاز")
 s = s.replace('</style>\n\n</head>', '.sys-tag{margin:-6px 0 8px;color:var(--muted);font-size:14px;text-align:center}</style>\n\n</head>')

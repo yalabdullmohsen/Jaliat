@@ -105,7 +105,8 @@ function dpRow(x){
 /* توزيع الموظفين على الأقسام: للمدير ومالك النظام */
 function dpPeople(){
   if (dpMe() !== "all") return "";
-  const opts = DP.depts.map(d => [d.code, d.parent ? (d.parent === "all" ? "كل " + d.name : d.name) : "كل الإدارة (المدير)"]);
+  /* حسابان فقط يدخلان كل الأقسام: مدير النظام ومدير الإدارة؛ وكل حساب آخر يدخل قسمه فقط */
+  const opts = [...DP.depts.filter(d => d.parent && d.parent !== "all").map(d => [d.code, d.name]), ["all", "كل الإدارة (مدير النظام / مدير الإدارة)"]];
   return `<details class="dp-people"><summary>${icon("i-users")} توزيع الموظفين على الأقسام</summary>
     ${(S.profiles || []).filter(p => p.active).map(p => `<div class="dp-pr"><span>${esc(p.name || p.username)} <small class="s">${esc(p.title || "")}</small></span>
       <select class="f" data-dpuser="${p.id}">${opts.map(([c, n]) => `<option value="${c}"${(p.dept || DP_LEGACY) === c ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></div>`).join("")}</details>`;
@@ -235,7 +236,7 @@ const _start81 = start;
 start = async function(session){
   const { data: prof } = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
   const d = prof?.dept || DP_LEGACY;
-  if (!prof || !prof.active || d === DP_LEGACY || d === "all" || d === "ctl_com") { await _start81(session); dpMountNav(); if (S.me) dpLoad(); return; }
+  if (!prof || !prof.active || d === DP_LEGACY || d === "all" || d === "ctl_com") { await _start81(session); dpMountNav(); if (S.me) { dpLoad(); if (d === "all") { const bs = $(".brand span"); if (bs) bs.textContent = "إدارة العلاقات الخارجية"; } } return; }
   /* أقسام بلا صفحات الجاليات: مساحة القسم فقط */
   S.me = prof; S.admin = prof.role === "admin"; S.canWrite = prof.role !== "viewer"; S.profiles = [prof];
   document.body.classList.add("dp-only");
