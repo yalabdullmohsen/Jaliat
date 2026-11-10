@@ -94,7 +94,9 @@ button,[data-open],[data-go],a,label,summary{-webkit-tap-highlight-color:transpa
 .pm-bottom .pm-qr{flex:0 0 144px;margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:#555}
 .pm-qr .pm-qrsvg{width:144px;height:144px;border:0}
 .pm-qr b{font-family:monospace;font-size:12px;color:#1F1F1F;letter-spacing:.08em}
-@media print{@page{size:A4;margin:0}body.print-any #permit-print .permit{zoom:1!important;width:794px;height:1122px;min-height:0;margin:0}}
+@media print{@page{size:A4;margin:0}body.print-any #permit-print .permit{zoom:var(--pmz,1)!important;width:calc(794px / var(--pmz,1));height:calc(1120px / var(--pmz,1));min-height:0;margin:0;overflow:hidden;break-after:page}body.print-any #permit-print .permit:last-child{break-after:auto}
+/* بقية الصفحة مخفية بـvisibility فقط فكانت تحجز طولها وتضيف صفحات بيضاء بعد التصريح؛ عند طباعة التصريح تُزال من التخطيط */
+body.print-any:has(> #permit-print.on)>:not(#permit-print){display:none!important}body.print-any #permit-print.on{position:static}}
 .permit-wrap{min-width:0;max-width:100%;overflow:visible;overflow-x:clip}
 .drawer-b:has(.permit-wrap){grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;min-height:0}
 .pm-bar{flex:none;height:4px;border-radius:2px;background:linear-gradient(270deg,#A87800,#DDAE00,#A87800)}
