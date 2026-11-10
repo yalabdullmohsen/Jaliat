@@ -1,6 +1,6 @@
-/* ================= v83: لوحة المدير الصباحية (لحسابي الإدارة all فقط) ================= */
+/* ================= v83: لوحة المدير (لحسابي الإدارة all فقط) ================= */
 /* ما تأخر في كل قسم، ومن ينتظر رد من، وما يحتاج التوقيع اليوم — من سجلات الأقسام (dept_items) ومهام الجاليات وكتب وثيقة المحفوظة مسودة. */
-Object.assign(TITLES, { morning:"لوحة المدير الصباحية" });
+Object.assign(TITLES, { morning:"لوحة المدير" });
 DP_VIEWS.add("morning");
 const MB = { tasks:null, drafts:null, busy:false };
 async function mbLoad(){
@@ -14,7 +14,7 @@ const mbAgo = d => { const n = dpDays(d, TODAY); return n ? `منذ ${n} يوم`
 function mbItem(title, sub, attrs, bad){ return `<button type="button" class="mb-i${bad ? " bad" : ""}" ${attrs}><b>${esc(title)}</b><span class="s">${sub}</span></button>`; }
 function vMorning(){
   if (dpMe() !== "all") return `<div class="empty">هذه اللوحة لمدير الإدارة ومدير النظام.</div>`;
-  if (!DP.loaded || !MB.tasks) { dpLoad().then(() => S.view === "morning" && render()); mbLoad(); return `<div class="loading">جارٍ تجهيز لوحة الصباح…</div>`; }
+  if (!DP.loaded || !MB.tasks) { dpLoad().then(() => S.view === "morning" && render()); mbLoad(); return `<div class="loading">جارٍ تجهيز لوحة المدير…</div>`; }
   const vis = dpVisible();
   /* 1) المتأخر في كل قسم */
   const lateBy = vis.map(d => {
@@ -51,4 +51,4 @@ render = function(){
   _render83();
 };
 const _mount83 = dpMountNav;
-dpMountNav = function(){ _mount83(); if (dpMe() !== "all" || $('#nav [data-nav="morning"]')) return; $('#nav .sep.dp-n')?.insertAdjacentHTML("afterend", `<button class="dp-n" data-nav="morning">${icon("i-home")}لوحة المدير الصباحية</button>`); };
+dpMountNav = function(){ _mount83(); if (dpMe() !== "all" || $('#nav [data-nav="morning"]')) return; $('#nav .sep.dp-n')?.insertAdjacentHTML("afterend", `<button class="dp-n" data-nav="morning">${icon("i-home")}لوحة المدير</button>`); };
