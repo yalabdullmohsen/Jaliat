@@ -54,7 +54,7 @@ vSermRec = function(){ if (!S.f.srtab) S.f.srtab = "co"; const t = S.f.srtab, FL
   if (t === "co") { const tabs = [["co", "حسب المنسق"], ["rec", "التسجيلات"], ["kh", "سجل الخطباء"], ["les", "طلبات تسجيل الدروس"]];
     return `<div class="toolbar"><div class="seg">${tabs.map(([k, l]) => `<button type="button" class="${t === k ? "on" : ""}" data-srtab="${k}">${l}</button>`).join("")}</div></div>` + srBar(FL.length) + (srActive() && !FL.length ? `<div class="empty">لا توجد نتائج مطابقة</div>` : vSrCo(FL)); }
   let h; if (t === "rec" && srActive()) { const keep = S.srecs; S.srecs = FL; try { h = _vSermRec70(); } finally { S.srecs = keep; } } else h = _vSermRec70();
-  h = h.replace('<div class="seg">', `<div class="seg"><button type="button" data-srtab="co">حسب المنسق</button>`).replace('<details class="sr-d"><summary>الترجمة', '<details class="sr-d" open><summary>الترجمة');
+  h = h.replace('<div class="seg">', `<div class="seg"><button type="button" data-srtab="co">حسب المنسق</button>`);
   return t === "rec" ? h.replace("</div></div>", "</div></div>" + srBar(FL.length)) : h; };
 
 /* ---- كشف المساجد: عمود المنسق، من الأنشطة المسجّلة في كل مسجد (والمتوفر فقط، والباقي يُترك فارغاً) ---- */

@@ -449,3 +449,5 @@ body:not([data-view="odsave"]) #odx-bar{display:none!important}
 #side .nav-q{margin-inline:0!important}
 #side .nav button>span:not(.nf-b):not(.nb):not(.ng-n){min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.35;flex:1 1 auto}
 #side .nav .nf-b{font-size:10px!important;padding:1px 6px!important;flex:none}
+
+.sr-q{width:100%;margin-top:10px}.sr-i[hidden]{display:none}.sr-i.sr-new{border-inline-start:4px solid var(--danger,#b3412f)}.sr-i .sr-h .s{display:block}.sr-al{display:flex;flex-wrap:wrap;gap:6px}.sr-i>.sr-d>summary.btn{display:inline-flex;list-style:none;cursor:pointer}.sr-i>.sr-d>summary.btn::-webkit-details-marker{display:none}.sr-i>.sr-d[open]{display:grid;gap:8px}
