@@ -248,7 +248,7 @@ const _start81 = start;
 start = async function(session){
   const { data: prof } = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
   const d = prof?.dept || DP_LEGACY;
-  if (!prof || !prof.active || d === DP_LEGACY || d === "all" || d === "ctl_com") { await _start81(session); dpMountNav(); if (S.me) { dpLoad(); if (d === "all") { const bs = $(".brand span"); if (bs) bs.textContent = "إدارة العلاقات الخارجية"; } } return; }
+  if (!prof || !prof.active || d === DP_LEGACY || d === "all" || d === "ctl_com") { await _start81(session); dpMountNav(); if (S.me) { dpLoad(); if (d === "all") { setTimeout(() => { try { typeof mbLoad === "function" && mbLoad(); } catch {} }, 1500); const bs = $(".brand span"); if (bs) bs.textContent = "إدارة العلاقات الخارجية"; } } return; }
   /* أقسام بلا صفحات الجاليات: مساحة القسم فقط */
   S.me = prof; S.admin = prof.role === "admin"; S.canWrite = prof.role !== "viewer"; S.profiles = [prof];
   document.body.classList.add("dp-only");

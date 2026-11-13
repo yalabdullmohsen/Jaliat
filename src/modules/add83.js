@@ -3,18 +3,29 @@
 Object.assign(TITLES, { morning:"لوحة المدير" });
 DP_VIEWS.add("morning");
 const MB = { tasks:null, drafts:null, busy:false };
-async function mbLoad(){
-  if (MB.busy) return; MB.busy = true;
-  const [t, w] = await Promise.all([
-    sb.from("tasks").select("id,title,assignee,assigner,due,status,waiting,created_at").neq("status", "منجزة").limit(2000),
-    sb.from("watheqa_outbox").select("id,subj,to_whom,status,created_by,created_at").eq("status", "drafted").limit(300)]);
-  MB.tasks = t.data || []; MB.drafts = w.data || []; MB.busy = false; if (S.view === "morning") render();
+async function mbLoad(force){
+  if (MB.busy) return MB.busy; if (MB.tasks && !force) return;
+  const race = (q) => Promise.race([q, new Promise((_, rj) => setTimeout(() => rj(new Error("timeout")), 15000))]);
+  MB.err = false;
+  MB.busy = (async () => {
+    try {
+      const [t, w] = await Promise.all([
+        race(sb.from("tasks").select("id,title,assignee,assigner,due,status,waiting,created_at").neq("status", "منجزة").limit(2000)),
+        race(sb.from("watheqa_outbox").select("id,subj,to_whom,status,created_by,created_at").eq("status", "drafted").limit(300))]);
+      if (t.error) throw t.error;
+      MB.tasks = t.data || []; MB.drafts = w.data || [];
+    } catch (e) { MB.err = true; }
+    MB.busy = false; if (S.view === "morning") render();
+  })();
+  return MB.busy;
 }
+document.addEventListener("click", e => { if (e.target.closest("[data-mbretry]")) { MB.err = false; DP.err = false; DP.loading = null; Promise.all([dpLoad(true).catch(() => {}), mbLoad(true)]); render(); } });
 const mbAgo = d => { const n = dpDays(d, TODAY); return n ? `منذ ${n} يوم` : "اليوم"; };
 function mbItem(title, sub, attrs, bad){ return `<button type="button" class="mb-i${bad ? " bad" : ""}" ${attrs}><b>${esc(title)}</b><span class="s">${sub}</span></button>`; }
 function vMorning(){
   if (dpMe() !== "all") return `<div class="empty">هذه اللوحة لمدير الإدارة ومدير النظام.</div>`;
-  if (!DP.loaded || !MB.tasks) { dpLoad().then(() => S.view === "morning" && render()); mbLoad(); return `<div class="loading">جارٍ تجهيز لوحة المدير…</div>`; }
+  if (MB.err || DP.err) return `<div class="empty">تعذّر تحميل لوحة المدير.<br><button class="btn btn-primary" type="button" data-mbretry>إعادة المحاولة</button></div>`;
+  if (!DP.loaded || !MB.tasks) { if (!DP.loaded) dpLoad().then(() => S.view === "morning" && render()).catch(() => { DP.err = true; DP.loading = null; S.view === "morning" && render(); }); mbLoad(); return `<div class="loading">جارٍ تجهيز لوحة المدير…</div>`; }
   const vis = dpVisible();
   /* 1) المتأخر في كل قسم */
   const lateBy = vis.map(d => {
