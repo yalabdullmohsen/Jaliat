@@ -219,7 +219,7 @@ let LG="ar",DICT={};const LGI=()=>UI_LANGS.find(x=>x[0]===LG)||UI_LANGS[0];
 const LOC=()=>LGI()[4]+"-u-nu-latn";
 function _t(s,...a){s=String(s??"");let r=(LG!=="ar"&&DICT[s])||s;a.forEach((v,i)=>{r=r.split("{"+i+"}").join(v)});return r}
 const SEP=()=>LGI()[3]?"، ":", ";
-async function langLoad(c){if(c==="ar"){DICT={};return true}try{const r=await fetch("portal-i18n/"+c+".json?v=9");if(!r.ok)throw 0;DICT=await r.json();return true}catch(_){DICT={};return false}}
+async function langLoad(c){if(c==="ar"){DICT={};return true}try{const r=await fetch("portal-i18n/"+c+".json?v=10");if(!r.ok)throw 0;DICT=await r.json();return true}catch(_){DICT={};return false}}
 function langApply(){const L=LGI(),h=document.documentElement;h.lang=L[0];h.dir=L[3]?"rtl":"ltr";const bt=document.querySelector(".bar-t b");if(bt)bt.textContent=_t("بوابة إنجاز");document.title=_t("بوابة إنجاز")+" · "+_t("قسم الجاليات");const lb=$("lgb");if(lb){let n=lb.querySelector("span");if(!n){n=document.createElement("span");n.setAttribute("data-notr","");lb.appendChild(n)}n.textContent=L[1];lb.classList.add("named")}if(!S_){const cm=$("cm");if(cm)cm.textContent=_t("قسم الجاليات ورعاية المهتدين وطلبة البعوث")}}
 async function langInit(){const c=LS.g("lang");if(c&&c!=="ar"&&UI_LANGS.some(x=>x[0]===c)){if(await langLoad(c))LG=c}langApply();trObserve()}
 async function setLang(c){const sh0=$("lg-sh");if(sh0)sh0.remove();if(c===LG)return;document.body.style.cursor="progress";const ok=await langLoad(c);LG=ok?c:"ar";LS.s("lang",LG==="ar"?"":LG);document.body.style.cursor="";langApply();if(S_&&I){draw()}else if(S_){}else login()}

@@ -451,3 +451,7 @@ body:not([data-view="odsave"]) #odx-bar{display:none!important}
 #side .nav .nf-b{font-size:10px!important;padding:1px 6px!important;flex:none}
 
 .sr-q{width:100%;margin-top:10px}.sr-i[hidden]{display:none}.sr-i.sr-new{border-inline-start:4px solid var(--danger,#b3412f)}.sr-i .sr-h .s{display:block}.sr-al{display:flex;flex-wrap:wrap;gap:6px}.sr-i>.sr-d>summary.btn{display:inline-flex;list-style:none;cursor:pointer}.sr-i>.sr-d>summary.btn::-webkit-details-marker{display:none}.sr-i>.sr-d[open]{display:grid;gap:8px}
+/* v248: مساحة لمس كافية لزر «؟» دون تغيير حجمه، ومنع تكبير iOS عند التركيز على الحقول، وعرض كافٍ لحقل التاريخ */
+.g-pin::after{content:"";position:absolute;inset:-11px}
+input[type=date],input[type=time]{min-width:128px}
+@media (max-width:700px){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea{font-size:16px!important}}
