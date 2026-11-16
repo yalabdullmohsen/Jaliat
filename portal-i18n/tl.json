@@ -627,5 +627,7 @@
 "يُرسل تلقائياً عند عودة الاتصال. لا تمسحوا بيانات المتصفح.": "Awtomatikong ipapadala kapag bumalik ang koneksyon. Huwag burahin ang data ng browser.",
 "حُفظ التسجيل على جوالكم دون إنترنت، وسيُرسل تلقائياً عند عودة الاتصال": "Na-save ang recording sa telepono nang walang internet at awtomatikong ipapadala kapag bumalik ang koneksyon",
 "وصل التسجيل المحفوظ للقسم": "Nakarating sa seksyon ang naka-save na recording",
-"تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Hindi ma-save ang recording sa telepono. Subukan muli kapag may internet na"
+"تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Hindi ma-save ang recording sa telepono. Subukan muli kapag may internet na",
+"أنتم دون اتصال بالإنترنت": "Offline kayo",
+"يمكنكم التسجيل، ويُحفظ مع وقته ويُرسل تلقائياً عند عودة الاتصال. لا يمكن إرفاق ملفات.": "Maaari kayong mag-record. Mase-save ito kasama ang oras at awtomatikong ipapadala kapag bumalik ang koneksyon. Hindi maaaring mag-attach ng file."
 }
