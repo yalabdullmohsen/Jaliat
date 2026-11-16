@@ -24,7 +24,7 @@ vRewards = function(){ const h = _vRewards54(), W = khWarned(); if (!W.length) r
 /* sermons page: tabs (recordings · khatib record · lesson requests) */
 const _vSermRec54 = vSermRec;
 vSermRec = function(){ const t = S.f.srtab || "rec", open = S.rreqs.filter(r => r.status === "open").length;
-  const tabs = `<div class="toolbar"><div class="seg">${[["rec", "التسجيلات", S.srecs.length], ["kh", "سجل الخطباء", khRecord().length], ["les", "طلبات تسجيل الدروس", open]].map(([k, l, n]) => `<button type="button" class="${t === k ? "on" : ""}" data-srtab="${k}">${l} <span class="num">${n}</span></button>`).join("")}</div></div>`;
+  const tabs = `<div class="toolbar"><div class="seg">${[["rec", "كل التسجيلات", S.srecs.length], ["kh", "سجل الخطباء", khRecord().length], ["les", "طلبات تسجيل الدروس", open]].map(([k, l, n]) => `<button type="button" class="${t === k ? "on" : ""}" data-srtab="${k}">${l} <span class="num">${n}</span></button>`).join("")}</div></div>`;
   if (t === "kh") return tabs + vKhRecord();
   if (t === "les") return tabs + vLessonReqs();
   return tabs + _vSermRec54(); };

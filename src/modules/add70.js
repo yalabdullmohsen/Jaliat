@@ -50,11 +50,11 @@ document.addEventListener("change", ev => { const m = { "sr-k":"srk", "sr-cm":"s
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-srclr]")) return; ["srq", "srk", "srcm", "srst", "srpd"].forEach(k => delete S.f[k]); render(); });
 
 const _vSermRec70 = vSermRec;
-vSermRec = function(){ if (!S.f.srtab) S.f.srtab = "co"; const t = S.f.srtab, FL = srFiltered();
-  if (t === "co") { const tabs = [["co", "حسب المنسق"], ["rec", "التسجيلات"], ["kh", "سجل الخطباء"], ["les", "طلبات تسجيل الدروس"]];
+vSermRec = function(){ if (!S.f.srtab) S.f.srtab = "rec"; const t = S.f.srtab, FL = srFiltered();
+  if (t === "co") { const tabs = [["rec", "كل التسجيلات"], ["co", "حسب المنسق"], ["kh", "سجل الخطباء"], ["les", "طلبات تسجيل الدروس"]];
     return `<div class="toolbar"><div class="seg">${tabs.map(([k, l]) => `<button type="button" class="${t === k ? "on" : ""}" data-srtab="${k}">${l}</button>`).join("")}</div></div>` + srBar(FL.length) + (srActive() && !FL.length ? `<div class="empty">لا توجد نتائج مطابقة</div>` : vSrCo(FL)); }
   let h; if (t === "rec" && srActive()) { const keep = S.srecs; S.srecs = FL; try { h = _vSermRec70(); } finally { S.srecs = keep; } } else h = _vSermRec70();
-  h = h.replace('<div class="seg">', `<div class="seg"><button type="button" data-srtab="co">حسب المنسق</button>`);
+  h = h.replace(/(data-srtab="rec"[^>]*>[\s\S]*?<\/button>)/, `$1<button type="button" data-srtab="co">حسب المنسق</button>`);
   return t === "rec" ? h.replace("</div></div>", "</div></div>" + srBar(FL.length)) : h; };
 
 /* ---- كشف المساجد: عمود المنسق، من الأنشطة المسجّلة في كل مسجد (والمتوفر فقط، والباقي يُترك فارغاً) ---- */

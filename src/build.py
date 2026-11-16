@@ -125,8 +125,8 @@ for _k in ("decisions", "recs", "visits"): _btn.pop(_k, None)
 _btn["guide"] = '<button data-nav="guide"><svg><use href="#i-doc"/></svg><span>الدليل</span></button>'
 _btn["staffday"] = '<button data-nav="staffday"><svg><use href="#i-users"/></svg><span>نشاط الموظفين</span></button>'
 _btn["odsave"] = '<button data-nav="odsave"><svg><use href="#i-down"/></svg><span>الحفظ في OneDrive</span></button>'
-_groups = [("", ["home", "guide", "copilot"]), ("العمل اليومي", ["tasks", "fix", "questions", "inbox", "watheqa", "permits"]), ("التواصل", ["whatsapp", "chat", "renew"]), ("الأنشطة والجدولة", ["avail", "docs", "acts", "cal", "lmap", "weekly", "halls"]),
-           ("الجاليات والمساجد", ["portal", "comms", "coords", "coordeval", "mosques"]), ("خطب الجمعة", ["khatibs", "rewards", "sermrec"]), ("التقارير والسجلات", ["odsave", "report", "stats", "notes", "mine", "changes"]), ("الإدارة", ["staffday", "users", "backups", "audit"])]
+_groups = [("", ["home", "sermrec", "guide", "copilot"]), ("العمل اليومي", ["tasks", "fix", "questions", "inbox", "watheqa", "permits"]), ("التواصل", ["whatsapp", "chat", "renew"]), ("الأنشطة والجدولة", ["avail", "docs", "acts", "cal", "lmap", "weekly", "halls"]),
+           ("الجاليات والمساجد", ["portal", "comms", "coords", "coordeval", "mosques"]), ("خطب الجمعة", ["khatibs", "rewards"]), ("التقارير والسجلات", ["odsave", "report", "stats", "notes", "mine", "changes"]), ("الإدارة", ["staffday", "users", "backups", "audit"])]
 _out = ['<nav class="nav" id="nav">']
 _used = set()
 _rest = [v for k, v in _btn.items() if k not in sum([g[1] for g in _groups], [])]
