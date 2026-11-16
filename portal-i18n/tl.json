@@ -55,7 +55,7 @@
 "يصلكم إشعار عند ردّ القسم أو اعتماد الطلب أو قرب انتهاء الموافقة.": "Makakatanggap kayo ng abiso kapag sumagot ang Seksyon, naaprubahan ang kahilingan, o malapit nang mag-expire ang pag-apruba.",
 "تفعيل": "I-enable",
 "للاستفسار": "Para sa mga katanungan",
-"حذف": "Tanggalin",
+"حذف": "Burahin",
 "إرفاق صور أو ملفات PDF": "Mag-attach ng mga larawan o PDF",
 "الحد 10 مرفقات": "Hanggang 10 attachment lamang",
 "المسموح صور أو ملفات PDF فقط": "Mga larawan o PDF file lamang ang pinapayagan",
@@ -619,5 +619,13 @@
 "اختاروا المسجد من القائمة": "Pumili ng moske mula sa listahan",
 "ابحث عن الجالية (اختياري)": "Hanapin ang komunidad (opsyonal)",
 "اختاروا الجالية من القائمة": "Pumili ng komunidad mula sa listahan",
-"ابحثوا عن المسجد أو اكتبوا اسمه ومنطقته إن لم يظهر": "Hanapin ang moske, o isulat ang pangalan at lugar nito kung hindi ito lumabas"
+"ابحثوا عن المسجد أو اكتبوا اسمه ومنطقته إن لم يظهر": "Hanapin ang moske, o isulat ang pangalan at lugar nito kung hindi ito lumabas",
+"{0} تسجيل محفوظ على جوالكم بانتظار الإنترنت": "{0} recording ang naka-save sa telepono ninyo, naghihintay ng internet",
+"إرسال الآن": "Ipadala ngayon",
+"لا إنترنت؟ سجّلوا عادي، يُحفظ التسجيل على جوالكم ويُرسل تلقائياً عند عودة الاتصال.": "Walang internet? Mag-record gaya ng dati. Mase-save ang recording sa telepono at awtomatikong ipapadala kapag may internet na.",
+"وصلت {0} تسجيلات محفوظة للقسم": "{0} naka-save na recording ang nakarating sa seksyon",
+"يُرسل تلقائياً عند عودة الاتصال. لا تمسحوا بيانات المتصفح.": "Awtomatikong ipapadala kapag bumalik ang koneksyon. Huwag burahin ang data ng browser.",
+"حُفظ التسجيل على جوالكم دون إنترنت، وسيُرسل تلقائياً عند عودة الاتصال": "Na-save ang recording sa telepono nang walang internet at awtomatikong ipapadala kapag bumalik ang koneksyon",
+"وصل التسجيل المحفوظ للقسم": "Nakarating sa seksyon ang naka-save na recording",
+"تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Hindi ma-save ang recording sa telepono. Subukan muli kapag may internet na"
 }

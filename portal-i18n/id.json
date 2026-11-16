@@ -619,5 +619,13 @@
 "اختاروا المسجد من القائمة": "Pilih masjid dari daftar",
 "ابحث عن الجالية (اختياري)": "Cari komunitas (opsional)",
 "اختاروا الجالية من القائمة": "Pilih komunitas dari daftar",
-"ابحثوا عن المسجد أو اكتبوا اسمه ومنطقته إن لم يظهر": "Cari masjid, atau tulis nama dan wilayahnya jika tidak muncul"
+"ابحثوا عن المسجد أو اكتبوا اسمه ومنطقته إن لم يظهر": "Cari masjid, atau tulis nama dan wilayahnya jika tidak muncul",
+"{0} تسجيل محفوظ على جوالكم بانتظار الإنترنت": "{0} rekaman tersimpan di ponsel Anda, menunggu internet",
+"إرسال الآن": "Kirim sekarang",
+"لا إنترنت؟ سجّلوا عادي، يُحفظ التسجيل على جوالكم ويُرسل تلقائياً عند عودة الاتصال.": "Tidak ada internet? Rekam seperti biasa. Rekaman disimpan di ponsel dan dikirim otomatis saat internet kembali.",
+"وصلت {0} تسجيلات محفوظة للقسم": "{0} rekaman tersimpan telah sampai ke bagian",
+"يُرسل تلقائياً عند عودة الاتصال. لا تمسحوا بيانات المتصفح.": "Dikirim otomatis saat koneksi kembali. Jangan hapus data peramban.",
+"حُفظ التسجيل على جوالكم دون إنترنت، وسيُرسل تلقائياً عند عودة الاتصال": "Rekaman tersimpan di ponsel tanpa internet dan akan dikirim otomatis saat koneksi kembali",
+"وصل التسجيل المحفوظ للقسم": "Rekaman tersimpan telah sampai ke bagian",
+"تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Rekaman tidak dapat disimpan di ponsel. Coba lagi saat internet kembali"
 }

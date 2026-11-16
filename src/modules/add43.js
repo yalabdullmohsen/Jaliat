@@ -73,8 +73,9 @@ async function srPlay(url, r, box){
   a.addEventListener("loadedmetadata", async () => { await fixDur(); setTotal(); a.currentTime = 0; a.play().catch(() => {}); ui(); }, { once:true }); ui(); }
 function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, en = p.ended || (st && r.secs ? new Date(+new Date(st) + r.secs * 1000).toISOString() : null);
   const ok = p.rule ? p.in_rule !== false : null, hm = d => kwT(d).replace(/:\d\d (?=[صم])/, " ");
-  const msg = ok === null ? "" : ok === false ? `⚠ سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
-  return `<div class="sr-pf${ok === false ? " bad" : ok ? " ok" : ""}">
+  const off = p.offline ? "سُجّل دون اتصال بالإنترنت وأُرسل لاحقاً؛ الوقت من ساعة الجوال" : "";
+  const msg = off ? (ok === false ? `⚠ ${off}، وخارج وقت الخطبة/يوم الدرس` : `${off}`) : ok === null ? "" : ok === false ? `⚠ سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
+  return `<div class="sr-pf${ok === false ? " bad" : ok && !off ? " ok" : ""}">
     <div><span>التاريخ</span><b>${kwD(st)}</b></div><div><span>الوقت</span><b class="num">${kwT(st)} إلى ${kwT(en)}</b></div><div><span>المدة</span><b class="num">${mmss2(r.secs)}</b></div>${r.mosque ? `<div><span>المسجد</span><b>${esc(r.mosque)}</b></div>` : ""}
     ${msg ? `<p>${msg}</p>` : ""}
     <details class="sr-who"><summary>بيانات من سجّل</summary><div class="sr-who-g"><div><span>سجّله</span><b>${esc(p.by || "—")}</b></div>${p.civil ? `<div><span>الرقم المدني</span><b class="num">${esc(p.civil)}</b></div>` : ""}${p.phone ? `<div><span>الهاتف</span><b class="num"><a href="tel:${esc(p.phone)}">${esc(p.phone)}</a></b></div>` : ""}<div><span>وصل للقسم</span><b class="num">${kwT(p.sent || r.created_at)}</b></div></div></details></div>`; }

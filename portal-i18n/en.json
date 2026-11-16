@@ -619,5 +619,13 @@
 "اختاروا المسجد من القائمة": "Choose the mosque from the list",
 "ابحث عن الجالية (اختياري)": "Search for the community (optional)",
 "اختاروا الجالية من القائمة": "Choose the community from the list",
-"ابحثوا عن المسجد أو اكتبوا اسمه ومنطقته إن لم يظهر": "Search for the mosque, or type its name and area if it does not appear"
+"ابحثوا عن المسجد أو اكتبوا اسمه ومنطقته إن لم يظهر": "Search for the mosque, or type its name and area if it does not appear",
+"{0} تسجيل محفوظ على جوالكم بانتظار الإنترنت": "{0} recording saved on your phone, waiting for internet",
+"إرسال الآن": "Send now",
+"لا إنترنت؟ سجّلوا عادي، يُحفظ التسجيل على جوالكم ويُرسل تلقائياً عند عودة الاتصال.": "No internet? Record as usual. The recording is saved on your phone and sent automatically when you are back online.",
+"وصلت {0} تسجيلات محفوظة للقسم": "{0} saved recordings reached the section",
+"يُرسل تلقائياً عند عودة الاتصال. لا تمسحوا بيانات المتصفح.": "Sent automatically when the connection returns. Do not clear browser data.",
+"حُفظ التسجيل على جوالكم دون إنترنت، وسيُرسل تلقائياً عند عودة الاتصال": "Recording saved on your phone without internet. It will be sent automatically when you are back online.",
+"وصل التسجيل المحفوظ للقسم": "The saved recording reached the section",
+"تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Could not save the recording on the phone. Try again when the internet is back"
 }
