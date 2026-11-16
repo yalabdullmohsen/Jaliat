@@ -25,7 +25,7 @@ rqRead = function(){ const f = _rqRead50(); const v = $("#rq-reply"); if (v) f.r
 
 /* portal page: monthly reports from coordinators */
 const PT_ONE = () => `${location.origin}${location.pathname.replace(/[^/]*$/, "")}portal.html`;
-document.addEventListener("click", ev => { if (!ev.target.closest("[data-ptone]")) return; navigator.clipboard?.writeText(PT_ONE()).then(() => toast("نُسخ الرابط الموحّد")); });
+document.addEventListener("click", ev => { if (!ev.target.closest("[data-ptone]")) return; const v = PT_ONE(), done = () => toast("نُسخ الرابط الموحّد"); if (navigator.clipboard?.writeText) navigator.clipboard.writeText(v).then(done, () => cpFallback(v, done)); else cpFallback(v, done); });
 const _prio50 = priorities;
 priorities = function(){ const P = _prio50(); const n = S.creps.filter(r => !r.seen_at).length;
   if (n) P.push({ w:70, k:"gold", t:`${n} تقرير شهري جديد من المنسقين`, s:"وصل من بوابة إنجاز", act:{ go:"portal", l:"عرضها" } }); return P.sort((a, b) => b.w - a.w); };
