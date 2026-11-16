@@ -629,5 +629,6 @@
 "وصل التسجيل المحفوظ للقسم": "The saved recording reached the section",
 "تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Could not save the recording on the phone. Try again when the internet is back",
 "أنتم دون اتصال بالإنترنت": "You are offline",
-"يمكنكم التسجيل، ويُحفظ مع وقته ويُرسل تلقائياً عند عودة الاتصال. لا يمكن إرفاق ملفات.": "You can record. It is saved with its time and sent automatically when you are back online. Files cannot be attached."
+"يمكنكم التسجيل، ويُحفظ مع وقته ويُرسل تلقائياً عند عودة الاتصال. لا يمكن إرفاق ملفات.": "You can record. It is saved with its time and sent automatically when you are back online. Files cannot be attached.",
+"الآن خارج وقت الخطبة، ويمكنكم التسجيل ويظهر وقته للقسم": "It is outside the sermon time now. You can still record; the time is shown to the section"
 }
