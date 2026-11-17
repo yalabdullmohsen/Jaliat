@@ -36,4 +36,3 @@ const _taskCard30 = taskCard;
 taskCard = function(t, mgr){ const h = _taskCard30(t, mgr); return t.waiting === "mgr" && t.status !== "منجزة" ? h.replace('</div>\n    <b>', `<span class="chip warn">🙋 ${mgr ? "يحتاج ردك" : "بانتظار رد الرئيس"}</span></div>\n    <b>`) : h; };
 const _prio30 = priorities;
 priorities = function(){ const P = _prio30(); if (S.admin) { const L = (S.tasks || []).filter(t => t.waiting === "mgr" && t.status !== "منجزة"); if (L.length) P.push({ w:96, k:"warn", t:`${L.length} مهمة يحتاج فيها الموظف ردك لإكمالها`, s:L.slice(0, 3).map(t => `${pname(t.assignee)}: ${t.title}`).join("، "), act:{ go:"tasks", l:"افتح المهام" } }); } return P.sort((a, b) => b.w - a.w); };
-NEWF.splice(1, 0, ["v30-tkr", "nav:tasks", "الرد على المهمة", "داخل كل مهمة: الموظف يرد أو يطلب من رئيس القسم ما يحتاجه لإكمالها («أحتاج موافقة / معلومات / كتاب»)، ويصل إشعار فوري والرد يرجع له.", false, "2026-10-20"]);

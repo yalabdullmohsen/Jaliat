@@ -112,4 +112,3 @@ document.addEventListener("change", ev => { if (ev.target.id === "lr-c") { S.f.l
 const _prio54 = priorities;
 priorities = function(){ const P = _prio54(), W = khWarned(); if (W.length) P.push({ w:72, k:"bad", t:`${W.length} خطيب خرج عن موضوع الخطبة أكثر من مرة`, s:W.slice(0, 2).map(x => x.name).join(" · "), act:{ go:"sermrec", l:"السجل" } }); return P.sort((a, b) => b.w - a.w); };
 
-NEWF.splice(1, 0, ["v54-sermons", "nav:sermrec", "الخطب: سجل الخطباء، الموضوع بلغات الجاليات، تسجيل الدروس، الخريطة، الشهادات", "سجل التزام كل خطيب مع تنبيه في المكافآت، وموضوع الجمعة يُترجم ويصل للمنسقين، وطلب تسجيل درس من أي منسق، وخريطة الدروس، وشهادات الشكر، وتقرير الخطب في التقرير الشهري.", false, "2026-10-20"]);

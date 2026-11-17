@@ -44,7 +44,6 @@ document.addEventListener("click", ev => {
   if (ev.target.closest("[data-cppfull]")) { cpPanelOpen(false); go("copilot"); render(); }
 });
 document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $("#cppanel") && !$("#cppanel").hidden && !ev.target.closest?.("#drawer")) cpPanelOpen(false); });
-NEWF.splice(0, 0, ["v72-copilot", "nav:copilot", "Copilot داخل إنجاز في كل صفحة", "زر «Copilot» أسفل الشاشة في كل صفحة: اسأله عن الصفحة المفتوحة مباشرة، فهو يستلم ما على الشاشة وبيانات النظام تلقائياً مع كل سؤال، بحساب الوزارة وبلا إضافة."]);
 
 /* بدون موافقة مدير تقنية المعلومات: لا نتوقف ولا نطلب منه شيئاً. السؤال يُجهَّز كاملاً (سؤالك + الشاشة + بيانات النظام) ويُنسخ، وزر واحد يفتح Copilot للصقه. مع الجسر يُرسَل تلقائياً. */
 function msFallbackRes(q){

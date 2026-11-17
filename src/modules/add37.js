@@ -60,7 +60,6 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 });
 document.addEventListener("change", ev => { if (ev.target.id === "wn-c") wnRefresh(); });
 document.addEventListener("input", ev => { if (ev.target.id === "wn-why") wnRefresh(); });
-NEWF.splice(1, 0, ["v37-wn", "nav:watheqa", "إبلاغ المنسق برد وثيقة", "كل رد يصل من وثيقة (موافقة أو اعتذار) يظهر مساره خطوة بخطوة، وزر «إبلاغ المنسق» يرسل له الرسالة الرسمية بالواتساب ويُسجَّل.", false, "2026-10-20"]);
 
 /* v44: one-tap «أبلغ المنسق» from the list, and opening a reply from its notification jumps straight to the ready message */
 async function wnQuick(id){ const w = S.wq.find(x => x.id === id); if (!w) return; const c = wqCoords(w)[0]; if (!c) return wqForm(id);

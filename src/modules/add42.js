@@ -34,7 +34,6 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
   const id = t.dataset.crseen; const { error } = await sb.from("coord_reports").update({ seen_by:S.me?.id, seen_at:new Date().toISOString() }).eq("id", id); if (error) return writeFail(error);
   const r = S.creps.find(x => String(x.id) === id); if (r) r.seen_at = new Date().toISOString(); render(); });
 
-NEWF.splice(1, 0, ["v50-portal", "nav:portal", "بوابة إنجاز الكاملة", "المنسق من رابطه: يتابع طلباته وردودكم، يطلب نشاطاً جديداً أو تجديداً أو تعديلاً أو إيقافاً، يحدّث بيانات منسقيه، يقرأ التعاميم، يراسل القسم، ويرسل تقريره الشهري. اكتب ردّك في الطلب الوارد فيظهر له.", false, "2026-10-20"]);
 
 /* ---------- coordinator accounts (civil id + PIN) on the portal page ---------- */
 S.pacc = [];
@@ -110,4 +109,3 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
 const _prio50s = priorities;
 priorities = function(){ const P = _prio50s(); const n = (S.psign || []).filter(g => g.status === "pending").length;
   if (n && S.canWrite) P.push({ w:88, k:"gold", t:`${n} طلب حساب جديد في بوابة إنجاز`, s:"منسق أو شيخ/خطيب بانتظار موافقتك", act:{ go:"portal", l:"مراجعة" } }); return P.sort((a, b) => b.w - a.w); };
-NEWF.splice(1, 0, ["v52-id", "nav:home", "هوية «إنجاز» الجديدة", "ألوان أعمق وأهدأ، وأرقام أوضح، وبطاقات نظيفة بلا خطوط ملوّنة، وشريط علوي ثابت، وعبارات مرتبة بلا شَخطات.", false, "2026-10-20"]);

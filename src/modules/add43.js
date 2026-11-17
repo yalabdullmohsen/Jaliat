@@ -113,8 +113,6 @@ const _prio53s = priorities;
 priorities = function(){ const P = _prio53s(); const n = S.srecs.filter(r => !r.reviewed_at).length;
   if (n) P.push({ w:60, k:"gold", t:`${n} تسجيل خطبة لم يُطّلع عليه`, s:"من بوابة إنجاز، مع الترجمة العربية", act:{ go:"sermrec", l:"استماع" } }); return P.sort((a, b) => b.w - a.w); };
 
-NEWF.splice(1, 0, ["v213-sermrec", "nav:inbox", "تسجيلات الخطب أوضح", "زر الاستماع بعلامة تشغيل، والبيانات مختصرة، وبيانات من سجّل تُفتح عند الحاجة، والترجمة تُعاد تلقائياً إذا تأخرت.", false, "2026-11-05"]);
-NEWF.splice(1, 0, ["v53-journey", "nav:inbox", "رحلة الطلب وتسجيلات الخطب", "داخل كل طلب: خريطة رحلته وأين وصل ومتى يكتمل عادةً، ومدة انتظار كل طلب على بطاقته. وصفحة «تسجيلات الخطب» لسماع خطب الجاليات مع ترجمتها، و«التحليل» في بوابة إنجاز لتقاريرهم الشهرية.", false, "2026-10-20"]);
 
 /* the week's official sermon topic: sermons are compared against it automatically */
 function lastFri(off = 0){ const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 2) % 7) - 7 * off); return isoOf(d); }

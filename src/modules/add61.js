@@ -10,4 +10,3 @@ actForm = function(id){ const r = _actForm76.apply(this, arguments); const a = i
   setTimeout(() => { fLangSync(a.lang); $("#f-comm")?.addEventListener("change", () => fLangSync()); }, 0); return r; };
 const _readAct76 = readAct;
 readAct = function(){ const v = _readAct76.apply(this, arguments); if (v && isMulti(v.comm)) v.lang = $("#f-lang")?.value || ""; return v; };
-NEWF.splice(1, 0, ["v78-lajna", "nav:comms", "لجنة التعريف بالإسلام منسق لكل اللغات", "أنشطة اللجنة تُسجَّل باسمها مهما كانت لغتها، وتختار لغة النشاط من قائمة. وتظهر اللجنة خياراً في توزيع الجاليات المشتركة.", true, "2026-10-25"]);

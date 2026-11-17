@@ -13,7 +13,6 @@ function heroCard(){ if (!S.me) return "";
 const _vHome70 = vHome;
 vHome = function(){ return heroCard() + _vHome70(); };
 document.addEventListener("click", ev => { const b = ev.target.closest("[data-hxgo]"); if (!b) return; document.querySelector(".prio")?.scrollIntoView({ behavior:"smooth", block:"start" }); });
-NEWF.splice(1, 0, ["v70-theme", "nav:home", "التصميم الجديد «عاجي ملكي»", "ألوان عاجية هادئة مع أخضر ملكي وذهبي، وبطاقة ترحيب في الرئيسية تلخّص ما يحتاجك اليوم ونسبة إنجاز الشهر.", false, "2026-10-21"]);
 /* ===== v72: smarter «أولويات اليوم» — IBAN problems and the Friday sermon window are linked in ===== */
 S.ibIss = []; S.fwin = null;
 async function smartLoad72(){ try { const [a, b] = await Promise.all([sb.from("khatib_bank").select("cid,name,issue").not("issue", "is", null), sb.rpc("sermon_window_now")]);

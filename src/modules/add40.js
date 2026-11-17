@@ -14,7 +14,7 @@ function myWork(){ const me = S.me?.id; if (!me) return null;
     ...waitMgr.map(t => ({ t:`بانتظار رئيس القسم: ${t.title}`, s:`م-${t.no}`, a:`data-task="${t.id}"` }))];
   const done = doneM.sort((a, b) => (b.done_at || "").localeCompare(a.done_at || "")).map(t => ({ t:t.title, s:`م-${t.no} · ${fmt(t.done_at.slice(0, 10))}`, a:`data-task="${t.id}"` }));
   return { now, rest, done, openN:open.length, doneN:doneM.length, totalM:T.filter(t => (t.created_at || "").startsWith(monthNow())).length }; }
-function myWorkCard(){ const W = myWork(); if (!W) return "";
+function myWorkCard(){ const W = myWork(); if (!W || !(W.now.length + W.rest.length + W.done.length)) return "";
   const col = (cls, title, sub, L, empty) => `<div class="mw-c ${cls}"><div class="mw-h"><b>${title}</b><span class="num">${L.length}</span></div><small>${sub}</small>
     <div class="mw-l">${L.slice(0, 6).map(x => `<button type="button" class="mw-i ${x.k || ""}" ${x.a}><b>${esc(x.t)}</b><span>${esc(x.s)}</span></button>`).join("") || `<div class="mw-e">${empty}</div>`}${L.length > 6 ? `<button type="button" class="lnk" data-go="tasks">+ ${L.length - 6} أخرى</button>` : ""}</div></div>`;
   const pct = W.doneN + W.openN ? Math.round(W.doneN / (W.doneN + W.openN) * 100) : 100;
@@ -30,7 +30,6 @@ vHome = function(){ return bridgeCard() + myWorkCard() + _vHome42(); };
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return;
   if (t.dataset.brlater !== undefined) { try { localStorage.setItem("br-later", Date.now() + 3 * 864e5); } catch (_) {} return render(); }
 });
-NEWF.splice(1, 0, ["v42-mw", "nav:home", "لوحتي", "في أول الرئيسية: المطلوب منك الآن، والمتبقي، وما أنجزته هذا الشهر مع نسبة إنجازك، كل بند يفتح بضغطة.", false, "2026-10-20"]);
 
 /* ================= v43: «رجوع»، back to the previous page (works in the installed app window too) ================= */
 S.backStack = [];

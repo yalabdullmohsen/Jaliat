@@ -127,4 +127,3 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("bu
   if (t.dataset.lrnadd !== undefined) { const i = $("#lrn-in"); const v = i?.value.trim(); if (!v) return; const m = v.match(/«([^»]+)»[^«]*«([^»]+)»/);
     const n = await lrnAdd([{ t:v, from:m?.[1] || "", to:m?.[2] || "" }]); if (n) { i.value = ""; lrnPaint(); toast("تعلّمها Copilot ✓"); } return; }
   if (t.dataset.lrndel !== undefined) { await lrnDel(+t.dataset.lrndel); lrnPaint(); } });
-NEWF.splice(1, 0, ["v78-attach", "id:ocr-top", "إرفاق أي ملف ويقرؤه Copilot", "زر «إرفاق» أعلى الشاشة (مكان الكاميرا): أرفق صورة أو PDF أو إكسل أو وورد أو نص، فيقرؤه Copilot ويضع كل معلومة في مكانها (نشاط، طلب، وثيقة، خطيب، حضور، ملاحظة). ويتعلّم من كل تصحيح تعمله.", true, "2026-10-25"]);

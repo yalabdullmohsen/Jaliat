@@ -26,4 +26,3 @@ const permitActSweep = (() => { let busy = false; const failed = new Set();
     if (n) { toast(n === 1 ? "دخل نشاط التصريح في «إنجاز» تلقائياً" : `دخلت أنشطة ${n} تصاريح في «إنجاز» تلقائياً`); if ($("#drawer").hidden) render(); } };
 })();
 setInterval(() => { try { permitActSweep(); } catch (_) {} }, 10000); setTimeout(() => { try { permitActSweep(); } catch (_) {} }, 6000);
-NEWF.splice(0, 0, ["v77-pact", "nav:permits", "كل تصريح يدخل نشاطه تلقائياً", "أي تصريح يصدر يُربط بنشاطه، وإذا ما له نشاط يُنشأ له نشاط تلقائياً ويظهر في الأنشطة والتقويم والجدول الأسبوعي والمساجد والتقارير."]);

@@ -14,7 +14,6 @@ document.addEventListener("click", ev => { const t = ev.target.closest("[data-pe
     const h = $(".drawer-h h3"); if (h) h.textContent = `تعديل التصريح \u2066${p.no}\u2069`;
     const b = $("[data-pissue]"); if (b) b.textContent = "حفظ التعديل";
     $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<span class="hint">يبقى نفس الرقم والباركود، ويظهر للإمام بالبيانات الجديدة عند المسح.</span>`); }, 60); });
-NEWF.splice(1, 0, ["v87-pedit", "nav:permits", "تعديل التصريح", "افتح أي تصريح صادر واضغط «تعديل التصريح» لتغيير الشيخ أو المسجد أو الموعد أو المدة. يبقى نفس رقم التصريح والباركود، ويتحدّث للإمام عند المسح. لرئيس القسم ومدير النظام.", true, "2026-10-27"]);
 
 /* v88 — كتاب موافقة فيه أكثر من مسجد/شيخ/موعد: تصريح مستقل لكل نشاط بضغطة وحدة (ملف PDF لكل تصريح) */
 function pWqItems(w){ const par = wqParent(w), nos = new Set([w.no, par?.no, ...wqKids(w).map(k => k.no)].filter(Boolean));
@@ -42,7 +41,6 @@ document.addEventListener("click", async ev => { const a = ev.target.closest("[d
   if (navigator.canShare && navigator.canShare({ files })) { try { await navigator.share({ files, title:"تصاريح إلقاء دروس", text:`${files.length} تصريح إلقاء درس` }); } catch (_) {} return; }
   files.forEach((f, i) => setTimeout(() => { const l = document.createElement("a"); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); }, i * 400));
   toast("نزلت ملفات PDF، أرفقها في واتساب القسم"); }, true);
-NEWF.splice(1, 0, ["v88-pbulk", "nav:watheqa", "تصريح لكل نشاط بضغطة وحدة", "في كتاب الموافقة اللي فيه أكثر من مسجد أو شيخ أو موعد: اضغط «إصدار كل التصاريح» فيصدر تصريح مستقل لكل نشاط، وكل واحد بملف PDF خاص، ثم «إرسال الكل». يشتغل على الكتب السابقة والجديدة.", true, "2026-10-27"]);
 
 /* v89 — جولة إصدار التصاريح: تفتح تلقائياً مرة واحدة لرئيس القسم وتمشي معه على الشاشة خطوة بخطوة، وزرها يبقى في صفحة التصاريح */
 if (typeof GUIDES === "object" && GUIDES.permits && typeof TOURS === "object") {
@@ -106,4 +104,3 @@ document.addEventListener("click", ev => { const c = ev.target.closest?.("#permi
     if (save && v && v !== cur) { if (k === "date") { const until = p.until && p.until < v ? v : null; await pfSave(id, { date:v }, until); } else { if (v < (p.data?.date || "")) { toast("تاريخ الانتهاء قبل تاريخ الدرس"); } else await pfSave(id, {}, v); } }
     permitView(id); };
   i.addEventListener("change", () => fin(true)); i.addEventListener("blur", () => setTimeout(() => fin(false), 150)); });
-NEWF.splice(1, 0, ["v90-pinline", "nav:permits", "تعديل التصريح على الصورة نفسها", "افتح أي تصريح صادر واضغط على المعلومة اللي تبي تغيّرها (الشيخ، المسجد، الموضوع، الوقت، الملاحظات، التاريخ…) وعدّل مباشرة على التصريح. تنحفظ تلقائياً وتتحدث القائمة وملف PDF.", true, "2026-10-27"]);

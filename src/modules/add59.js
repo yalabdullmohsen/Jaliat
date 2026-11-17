@@ -36,7 +36,6 @@ async function sdSave(btn){ const F = S.form; const t = $("#sa-t").value.trim();
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
   if (D.sdday) return sdLoad(D.sdday); if (D.sdach) return sdAch(D.sdach); if (D.sdsave !== undefined) return sdSave(t); });
 document.addEventListener("change", ev => { if (ev.target.id === "sd-d" && ev.target.value) sdLoad(ev.target.value); });
-NEWF.splice(1, 0, ["v75-staff", "nav:staffday", "نشاط الموظفين اليومي", "ما عمله كل موظف في اليوم: من أي ساعة إلى أي ساعة، وكم تعديل وعلى ماذا، مع زر «سجّل إنجازاً له» في سجل الإنجاز.", true, "2026-10-22"]);
 
 /* ===== ترتيب الرئيسية وتنظيفها (عام لكل الموظفين) ===== */
 function homeTidy(){
@@ -75,8 +74,6 @@ function htCut(box, sel, n, key, lbl){ if (!box) return; const it = [...box.quer
   const b = document.createElement("button"); b.type = "button"; b.className = "btn btn-ghost ht-more"; b.dataset.httog = key; b.dataset.lbl = `${lbl} (${it.length})`; box.appendChild(b); htSet(box, b, HT_OPEN[key]); }
 function htSet(p, b, open){ p.classList.toggle("ht-cut", !open); b.textContent = open ? "عرض أقل" : b.dataset.lbl; }
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-httog]"); if (!t) return; const k = t.dataset.httog; HT_OPEN[k] = !HT_OPEN[k]; htSet(t.parentElement, t, HT_OPEN[k]); });
-NEWF.splice(1, 0, ["v76-tidy", "nav:home", "رئيسية أنظف وأوضح", "الأرقام في شبكة واحدة بلا تكرار، وأهم 5 أولويات أولاً، و«ما الجديد» مختصر، وتنبيهات الإعداد في شريط واحد، واختفاء اللوحات الفارغة.", true, "2026-10-25"]);
 /* زر OneDrive العائم يظهر في صفحة «الحفظ في OneDrive» فقط */
 const _afterRender61 = afterRender;
 afterRender = function(v){ _afterRender61(v); document.body.dataset.view = v; };
-NEWF.splice(1, 0, ["v77-odx-quiet", "nav:odsave", "زر OneDrive في صفحته فقط", "زر «احفظ نسخة اليوم في OneDrive» العائم لم يعد يظهر في كل الصفحات؛ تجده في صفحة «الحفظ في OneDrive» فقط، والحفظ اليومي التلقائي مستمر كما هو.", true, "2026-10-25"]);

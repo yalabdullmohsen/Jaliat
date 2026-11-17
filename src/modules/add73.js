@@ -19,7 +19,6 @@ vActs = function(){ let h = _vActs73(); const c = apprCtx(), cnt = { ap_need:0, 
   const bar = `<div class="ap-bar" role="group" aria-label="حالة الموافقة">${chip("ap_need", "تمت الموافقة · متبقي إصدار تصريح", cnt.ap_need, "gold")}${chip("ap_no", "لم تتم الموافقة · يرجى إبلاغ المنسق", cnt.ap_no, "bad")}${chip("ap_issued", "صدر التصريح", cnt.ap_done, "ok")}${cur.startsWith("ap_") ? `<button type="button" class="ap-f" data-apf="">إظهار الكل</button>` : ""}</div>`;
   return bar + h.replace(/(<select class="f" data-fk="st">[\s\S]*?)(<\/select>)/, `$1<option value="ap_need"${cur === "ap_need" ? " selected" : ""}>تمت الموافقة · متبقي تصريح</option><option value="ap_no"${cur === "ap_no" ? " selected" : ""}>لم تتم الموافقة</option><option value="ap_issued"${cur === "ap_issued" ? " selected" : ""}>صدر / أُرسل التصريح</option>$2`); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-apf]"); if (!t) return; S.f.st = t.dataset.apf; render(); });
-NEWF.splice(0, 0, ["v73-appr", "nav:acts", "حالة الموافقة في الأنشطة", "كل نشاط يظهر معه الآن: «✓ تمت الموافقة · متبقي إصدار تصريح»، أو «لم تتم الموافقة، يرجى إبلاغ المنسق». وفوق الجدول أزرار تصفية بنقرة، وموافقات وثيقة التي وصلت تظهر في «تصاريح الدروس» دون اعتماد يدوي."]);
 
 /* إصدار تصريح: أرقام منسق الجالية تظهر في النموذج نفسه للتواصل المباشر (تتبع الشيخ/اللغة أو النشاط المحدد) */
 const _permitForm73 = permitForm;

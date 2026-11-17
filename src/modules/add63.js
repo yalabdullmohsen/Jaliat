@@ -32,7 +32,6 @@ permitIssue = async function(){ const v = id => $("#" + id)?.value.trim() || "",
     if (dup) { if (!window.PBULK) { toast(`يوجد تصريح مطابق تماماً (${dup.no})، ما يتكرر`); render(); } return null; } }
   const { data:row, error } = await sb.from("permits").insert({ data, until, act_id:S.form?.act || "", ...(S.form?.grant ? { grant_id:S.form.grant } : {}) }).select().single(); if (error) return writeFail(error);
   S.permits = [row, ...S.permits]; if (row.grant_id) { const g = S.grants.find(x => x.id === row.grant_id); if (g) g.permit_id = row.id; } if (window.PBULK) { window.PBULK.push(row); return row; } closeDrawer(); toast(`صدر التصريح ${row.no}`); render(); permitView(row.id); };
-NEWF.splice(1, 0, ["v84-pflex", "nav:permits", "إصدار التصريح والتفويض بمرونة", "في «إصدار تصريح» و«تفويض موظف»: الوقت صار اختياري: بعد صلاة معيّنة، أو بالساعة، أو بدون وقت. والتكرار: كل أسبوع، أو ثاني جمعة من كل شهر، أو بداية كل شهر، أو مرة واحدة. ومع خانة ملاحظات تظهر على التصريح.", true, "2026-10-26"]);
 /* the delegation form (head of section) gets the same flexible schedule; the employee's permit inherits it */
 const _grantForm83 = grantForm;
 grantForm = function(preset){ _grantForm83(preset); const fw = $("#p-from")?.closest(".fld"); if (!fw || $("#p-pray")) return;
@@ -110,7 +109,6 @@ permitForm = function(preset, grant){ _permitForm84(preset, grant); if (S.form?.
 const _grantForm84 = grantForm;
 grantForm = function(preset){ _grantForm84(preset); if ($("#p-act")) return; const at = $("#p-sheikh")?.closest(".fld"); at?.insertAdjacentHTML("beforebegin", pActBox());
   const e = preset?.act_id ? S.E.find(x => x.id === preset.act_id) : null; if (e) { $("#p-act").value = pActLabel(e); pFill(e); } };
-NEWF.splice(1, 0, ["v85-pauto", "nav:permits", "تعبئة التصريح تلقائياً", "في «إصدار تصريح» و«تفويض موظف»: اختر النشاط (بالشيخ أو المسجد أو رقم الموافقة) فتتعبّأ كل البيانات: الشيخ، المسجد، اللغة، الأيام، الوقت، أقرب موعد، مدة الموافقة، والملاحظات. أنت فقط تراجع وترسل.", true, "2026-10-26"]);
 
 /* approvals → permits: the head sees every approved activity without a permit, and issues it himself or delegates it in one tap (all data prefilled) */
 /* حالة الموافقة لكل نشاط، من كتابه في وثيقة: تمت الموافقة (مسجّلة في الوثائق، أو وصل كتاب موافقة، أو مكتوبة في الإجراءات) / لم تتم الموافقة (رفض) / لم تصل بعد */

@@ -31,9 +31,7 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
 });
 document.addEventListener("input", ev => { if (ev.target.id === "iz-text") izBtn(); });
 document.addEventListener("paste", ev => { if (S.form?.kind === "intake" && S.form.mode !== "paste" && !ev.clipboardData?.files?.length) { const t = ev.clipboardData?.getData("text"); if (t && t.trim().length > 5) { izMode("paste"); const a = $("#iz-text"); if (a && !a.value) { a.value = t; izBtn(); ev.preventDefault(); } } } });
-NEWF.splice(1, 0, ["v32-paste", "nav:inbox", "لصق نص الطلب", "في «استقبال طلب»: خيار جديد «لصق نص»، الصق الطلب من الواتساب أو الإيميل واضغط «إدخال تلقائي»، فيُسجَّل الطلب وأنشطته ويظهر لك تأكيد.", false, "2026-10-20"]);
 /* «الاقتراحات»، أسفل القائمة تحت «خروج»: اقتراح سريع يصل لرئيس القسم */
 (function(){ const lo = document.getElementById("logout"); if (!lo || document.getElementById("sugg-btn")) return;
   lo.parentElement.insertAdjacentHTML("afterend", `<button class="btn sugg-btn" id="sugg-btn" type="button"><span>الاقتراحات</span></button>`); })();
 document.addEventListener("click", ev => { if (ev.target.closest("#sugg-btn")) { $("#side")?.classList.remove("open"); const hd = S.profiles.find(p => p.username === "fayez") || S.profiles.find(p => p.role === "مدير"); qForm(null, { to:hd?.id, body:"💡 اقتراح: " }); } });
-NEWF.splice(1, 0, ["v32-sugg", "id:sugg-btn", "الاقتراحات", "أسفل القائمة: اكتب اقتراحك لتطوير العمل أو النظام، ويصل لرئيس القسم مباشرة ويتابعه في «التوصيات».", false, "2026-10-20"]);

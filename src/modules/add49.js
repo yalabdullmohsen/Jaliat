@@ -92,4 +92,3 @@ document.addEventListener("click", ev => { if (ev.target.closest("#odx-bar")) se
 odAuto = async function(){}; odRun = function(manual){ return odxSave(!!manual); };
 const _boot959 = boot9; boot9 = function(){ _boot959(); setTimeout(() => odxAuto().catch(e => console.warn("odx auto", e)), 5000); };
 const _afterRender59 = afterRender; afterRender = function(v){ _afterRender59(v); odxBadge(); if (v === "odsave" && !ODX._l) { ODX._l = 1; Promise.all([odxLoad(), odxGet("place").then(p => ODX.place = p), odCfgLoad().catch(() => {})]).then(() => { if (!ODX.last && OD.cfg?.last) ODX.last = OD.cfg.last; if (S.view === "odsave") render(); }); } };
-NEWF.splice(1, 0, ["v59-odx", "nav:odsave", "الحفظ في OneDrive لكل موظف", "كل موظف يحفظ نسخة كاملة من النظام في OneDrive حسابه بالوزارة، وتتحدّث وحدها كل يوم عند فتح إنجاز. ويظهر آخر حفظ لكل موظف.", false, "2026-10-21"]);

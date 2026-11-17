@@ -62,4 +62,3 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
   if (D.rhprint !== undefined) { document.body.classList.add("print-sheet"); setTimeout(() => { window.print(); setTimeout(() => document.body.classList.remove("print-sheet"), 500); }, 50); }
 });
 document.addEventListener("input", ev => { if (ev.target.id === "rhq") { RH.q = ev.target.value; const p = ev.target.selectionStart; render(); const i = $("#rhq"); if (i) { i.focus(); i.setSelectionRange(p, p); } } });
-NEWF.splice(1, 0, ["v38-rh", "nav:rewards", "كشوف البنوك في مكافآت الخطباء", "كشوف أبريل–يوليو 2026 أُدخلت (107 خطيب بالآيبان)، تظهر لجميع الموظفين، مقسّمة حسب البنك بنفس نموذج الإدارة: طباعة وإكسل لكل بنك، وسجل كل خطيب، واعتماد كشف الشهر الحالي بضغطة.", false, "2026-10-20"]);

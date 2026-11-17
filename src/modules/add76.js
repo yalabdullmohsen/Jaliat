@@ -33,4 +33,3 @@ actForm = function(id){ const r = _actFormAud.apply(this, arguments); if (S.form
   $("#f-aud")?.addEventListener("change", liveCheck); liveCheck(); return r; };
 const _readActAud = readAct;
 readAct = function(){ const v = _readActAud.apply(this, arguments); if (!v) return v; const s = $("#f-aud")?.value; v.aud = s ? (s === "رجال" ? "" : s) : (S.acts.get(S.form?.id)?.aud || ""); return v; };
-NEWF.splice(0, 0, ["v76-cf", "nav:acts", "التعارضات صارت أدق", "التعارض الآن فقط إذا كان نفس المسجد ونفس الوقت ونفس الفئة (رجال أو نساء). والمحاضر في مسجد آخر يظهر كملاحظة لأن المنسق قد يرسل بديلاً. وأضفنا خانة «الفئة» في النشاط."]);

@@ -98,4 +98,3 @@ answer = function(q){ const t = norm(q);
 SUGG.splice(1, 0, ["استعلام", "i-cal", "هل مسجد متاح اليوم بعد المغرب"]);
 const _palAll27 = palAll;
 palAll = function(){ const A = _palAll27(); A.unshift({ g:"إجراءات", t:"استعلام (فحص كتاب أو مسجد أو موعد)", s:"", ic:"i-cal", run:() => go("avail"), txt:"متاح تعارض فاضي مشغول موعد وقت مسجد" }); return A; };
-NEWF.splice(1, 0, ["v27-avail", "nav:avail", "هل الوقت متاح؟", "اختر التاريخ والوقت (مثلاً اليوم بعد المغرب) والمسجد أو المحاضر، يطلع لك فوراً متاح أو مشغول مع السبب والبدائل.", false, "2026-10-20"]);

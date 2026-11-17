@@ -50,4 +50,3 @@ srXls = async function(){ toast("جارٍ تجهيز ملف الإكسل…");
   const wb = XLSX.utils.book_new(); wb.Workbook = { Views:[{ RTL:true }] }; XLSX.utils.book_append_sheet(wb, ws, "كشف المكافآت");
   XLSX.writeFile(wb, `كشف مكافآت الخطباء ${MONTHS[m]} ${y}.xlsx`); };
 /* the printed html sheet: same columns */
-NEWF.splice(1, 0, ["v67-rewards", "nav:rewards", "كشف المكافآت الجديد", "الكشف صار: الاسم، الرقم المدني، الآيبان، عدد الخطب، المبلغ، مع خانات «اعتماد الموظف» و«اعتماد رئيس القسم» و«اعتماد مدير الإدارة»، وتصدير إكسل منسّق.", false, "2026-10-21"]);

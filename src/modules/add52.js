@@ -40,4 +40,3 @@ document.addEventListener("drop", async ev => { const z = ev.target.closest?.(".
 /* the guide mentions it */
 if (typeof GUIDES === "object" && GUIDES.permits) GUIDES.permits.s.splice(1, 0, { sel:"[data-pnew]", t:"التعبئة من الكتاب", x:"داخل «إصدار تصريح»: <b>«📎 أرفق الكتاب»</b> (PDF أو صورة، أو اسحبه للنافذة) أو اختر كتاب الموافقة من وثيقة، فيقرؤه الذكاء الاصطناعي ويعبّئ الشيخ والمسجد والتاريخ والوقت والمدة. إن كان فيه أكثر من درس تختار الدرس بضغطة. بعدها <b>«إصدار التصريح»</b>." });
 if (typeof TOURS === "object" && TOURS["g-permits"] && GUIDES?.permits) TOURS["g-permits"].steps = [TOURS["g-permits"].steps[0], ...GUIDES.permits.s.map(s => ({ go:"permits", ...s }))];
-NEWF.splice(1, 0, ["v63-permit-ai", "nav:permits", "التصريح من الكتاب مباشرة", "عند «إصدار تصريح»: أرفق الكتاب أو اختره من وثيقة، فيعبّئ الذكاء الاصطناعي بيانات التصريح، ثم ضغطة «إصدار التصريح».", false, "2026-10-21"]);

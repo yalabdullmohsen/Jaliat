@@ -42,4 +42,3 @@ window.addEventListener("message", async e => { if (e.source !== window || e.ori
 setInterval(() => { try { wqTick(); } catch (_) {} }, 15000);
 document.addEventListener("click", async ev => { const t = ev.target.closest("button[data-woretry]"); if (!t) return; t.disabled = true;
   const { error } = await sb.from("watheqa_outbox").update({ status:"pending", step:null, result:null }).eq("id", t.dataset.woretry); if (error) { t.disabled = false; return writeFail(error); } woLoad(); toast("أُعيد للانتظار"); });
-NEWF.splice(1, 0, ["v98-wq", "nav:watheqa", "الكتب تُنفَّذ في وثيقة بنفسها مع حالة حقيقية", "كل كتاب يُرسل من «إنجاز» يُنفَّذ في متصفحك وبحسابك في وثيقة: يُحفظ مسودة (أو يُرسل مباشرة لمن حدّده النظام)، ولا تظهر «حُفظ» أو «أُرسل» إلا بعد التحقق منه. يلزم تحديث إضافة الجسر إلى 2.5.", false, "2026-10-28"]);

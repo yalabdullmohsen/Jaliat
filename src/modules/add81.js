@@ -241,7 +241,7 @@ function dpBaseNav(){
 function dpMountNav(){
   const nav = $("#nav"); if (!nav || nav.querySelector(".dp-n")) return;
   const h = `<div class="sep dp-n">الإدارة والأقسام</div>${dpMe() === DP_LEGACY ? "" : `<button class="dp-n" data-nav="dept">${icon("i-people")}${dpMe() === "all" || /^ctl_/.test(dpMe()) ? "أقسام الإدارة" : "قسمي"}</button>`}<button class="dp-n" data-nav="freq">${icon("i-spark")}طلبات الإضافة</button>${dpBaseNav()}`;
-  nav.insertAdjacentHTML("afterbegin", h);
+  nav.insertAdjacentHTML(dpMe() === DP_LEGACY || dpMe() === "all" || dpMe() === "ctl_com" ? "beforeend" : "afterbegin", h);
   dpNavBadge();
 }
 const _start81 = start;

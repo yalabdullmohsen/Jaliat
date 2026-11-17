@@ -51,7 +51,6 @@ async function rtSend(spec, copyOnly, markOnly){ const [kind, key, i] = spec.spl
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t || S.view !== "renew") return; const D = t.dataset;
   if (D.rttab) { S.rtTab = D.rttab; return render(); } if (D.rtdays) { S.renewDays = +D.rtdays; return render(); }
   if (D.rtsend) return rtSend(D.rtsend); if (D.rtdone) return rtSend(D.rtdone, false, true); if (D.rtcopy) return rtSend(D.rtcopy, true); });
-NEWF.splice(1, 0, ["v91-rt", "nav:renew", "تذكيرات المنسقين: ثلاثة أنواع واضحة", "صفحة التذكير صارت ثلاثة أقسام: «تنتهي قريباً» (تذكير تجديد)، «انتهت» (إشعار انتهاء)، «تحديث البيانات». كل بطاقة عليها نوعها، والرسالة مرتبة بلا تكرار أسماء وبلا رابط، تُرسل بالواتساب فقط.", true, "2026-10-27"]);
 
 /* v91 — التفويض بضغطة: أول ما يفتح الموظف النظام وعنده تفويض يطلع له نموذج التصريح معبّأ مباشرة، يراجع ويضغط إصدار */
 (() => { const seen = (id) => { try { return sessionStorage.getItem("pg-auto-" + id); } catch (_) { return "1"; } }, mark = (id) => { try { sessionStorage.setItem("pg-auto-" + id, "1"); } catch (_) {} };

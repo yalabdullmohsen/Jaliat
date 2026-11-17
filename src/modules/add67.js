@@ -26,4 +26,3 @@ afterRender = function(v){ _after97(v); if (v !== "inbox") return; document.quer
 /* الرئيسية: موافقات قريبة بلا طلب تجديد */
 const _prio97 = priorities;
 priorities = function(){ const P = _prio97(); const L = S.docs.filter(d => d.end && diffDays(TODAY, d.end) >= 0 && diffDays(TODAY, d.end) <= 14 && !rnReq(d.no)); if (S.admin && L.length) P.push({ w:78, k:"warn", t:`${L.length} موافقة تنتهي خلال 14 يوماً ولم يصل لها طلب تجديد`, s:L.slice(0, 3).map(d => `${d.no} (${esc(d.comm || "")})`).join("، "), act:{ go:"renew", l:"تذكير المنسق" } }); return P.sort((a, b) => b.w - a.w); };
-NEWF.splice(1, 0, ["v97-rnpath", "nav:renew", "مسار التجديد المترابط", "كل موافقة قاربت الانتهاء تظهر بمسار واضح: تذكير المنسق ← طلبه الوارد ← كتاب وثيقة. ويظهر نفس الوضع في صفحة الوثائق وفي طلبات المنسقين وفي الرئيسية.", true, "2026-10-28"]);

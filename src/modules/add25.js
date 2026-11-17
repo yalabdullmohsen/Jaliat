@@ -190,7 +190,6 @@ const _prio25 = priorities;
 priorities = function(){ const P = _prio25(); const n = chatUnreadAll(); if (n) P.push({ w:90, k:"t1", t:`${n} رسالة غير مقروءة في المحادثات`, s:"من زملائك في القسم", act:{ go:"chat", l:"المحادثات" } }); return P.sort((a, b) => b.w - a.w); };
 const _palAll25 = palAll;
 palAll = function(){ const A = _palAll25(); for (const p of S.profiles.filter(p => p.active && p.id !== S.me.id)) A.push({ g:"المحادثات", t:`مراسلة ${p.name || p.username}`, s:p.title || "", ic:"i-chat", run:() => openChat(p.id), txt:"محادثة رسالة مراسلة " + (p.name || "") + " " + p.username }); return A; };
-NEWF.splice(2, 0, ["v25-chat", "nav:chat", "المحادثات الداخلية", "راسل أي زميل برسالة خاصة، أو اكتب في «محادثة القسم» للجميع، مع إشعار فوري وعلامة القراءة ✓✓."]);
 document.addEventListener("submit", ev => { if (ev.target.id === "ch-form") { ev.preventDefault(); chatSend(); } });
 document.addEventListener("keydown", ev => { if (ev.target.id === "ch-in" && ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && !matchMedia("(pointer:coarse)").matches) { ev.preventDefault(); chatSend(); } if (ev.key === "Escape" && S.view === "chat" && S.chatPeer && innerWidth < 820) { S.chatPeer = null; chMain(); chList(); chSize(); } });
 document.addEventListener("input", ev => { if (ev.target.id === "ch-in") { chFit(); chTyping(); } if (ev.target.id === "ch-q") chList(); });

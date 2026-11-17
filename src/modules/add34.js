@@ -43,4 +43,3 @@ document.addEventListener("click", ev => { const t = ev.target.closest("button")
   if (D.spGo !== undefined) { S.f.fixt = "split"; return go("fix"); } });
 const _prio34 = priorities;
 priorities = function(){ const P = _prio34(); const n = splitItems().length; if (n && S.canWrite) P.push({ w:95, k:"warn", t:`${n} موافقة من الجاليات المشتركة تحتاج تحديد منسقها`, s:"كل منسق صار جالية مستقلة", act:{ go:"fix", l:"وزّعها" } }); return P.sort((a, b) => b.w - a.w); };
-NEWF.splice(1, 0, ["v34-split", "nav:comms", "جالية لكل منسق", "اعتُمد كشف المنسقين الجديد: كل منسق جالية مستقلة باسم «اللغة - المنسق» مع رقمه ونائبه. والموافقات القديمة تُوزَّع بضغطة من «إكمال البيانات».", false, "2026-10-20"]);

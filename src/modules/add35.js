@@ -57,4 +57,3 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("bu
   if (t.dataset.ltq !== undefined) return woQueue(t);
   if (t.dataset.wocancel) { const { error } = await sb.from("watheqa_outbox").update({ status:"cancelled" }).eq("id", t.dataset.wocancel).eq("status", "pending"); if (error) return writeFail(error); woLoad(); toast("أُلغي الكتاب"); }
 });
-NEWF.splice(1, 0, ["v36-wo", "nav:watheqa", "إرسال الكتب إلى وثيقة من «إنجاز»", "في «مسودة كتاب وثيقة» زر «إرسال إلى وثيقة تلقائياً»: يُحفظ الكتاب مسودة في السكرتارية (كتاب لكل محافظة) بعد التدقيق، وتتابع حالته في صفحة «وثيقة».", false, "2026-10-20"]);

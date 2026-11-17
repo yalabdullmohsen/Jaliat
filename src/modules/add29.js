@@ -70,9 +70,6 @@ const _prio29 = priorities;
 priorities = function(){ return _prio29().map(p => /بياناته ناقصة/.test(p.t) ? { ...p, act:{ go:"fix", l:"إكمالها" } } : p); };
 const _palAll29 = palAll;
 palAll = function(){ const A = _palAll29(); A.unshift({ g:"إجراءات", t:"التقرير الشهري (PDF)", s:"", ic:"i-doc", run:() => go("report"), txt:"تقرير شهري pdf الإدارة" }, { g:"إجراءات", t:"إكمال البيانات الناقصة", s:"", ic:"i-list", run:() => go("fix"), txt:"ناقص إكمال بيانات" }, { g:"إجراءات", t:"بوابة إنجاز (روابط الجاليات)", s:"", ic:"i-link", run:() => go("portal"), txt:"بوابة منسق رابط طلب" }); return A; };
-NEWF.splice(1, 0, ["v29-fix", "nav:fix", "إكمال البيانات", "كل نشاط أو جالية أو منسق بياناته ناقصة في مكان واحد، اضغط وأكمل.", false, "2026-10-20"],
-  ["v29-report", "nav:report", "التقرير الشهري PDF", "تقرير رسمي لكل شهر جاهز للطباعة أو الحفظ PDF، ويصل إشعار للمدراء أول كل شهر.", false, "2026-10-20"],
-  ["v29-portal", "nav:portal", "بوابة إنجاز", "رابط خاص لكل جالية يرسله المنسق منه طلب درس جديد أو تجديد، ويصل مرتباً للطلبات الواردة.", false, "2026-10-20"]);
 document.addEventListener("change", ev => { if (ev.target.id === "rp-m") { S.repMonth = ev.target.value; rpFill(); } });
 document.addEventListener("click", async ev => { const t = ev.target.closest("button"); if (!t) return; const D = t.dataset;
   if (D.fixt) { S.f.fixt = D.fixt; return render(); }

@@ -15,7 +15,6 @@ const _prio39 = priorities;
 priorities = function(){ const P = _prio39(); if (!S.wq?.length) return P; const reply = wqIndex(); const old = S.wq.filter(w => wqDir(w) === "out" && wqIsJal(w) && !reply.has(w.id) && !S.wqt.get(w.id) && wqDate(w) >= addDays(TODAY, -60) && wqDate(w) <= addDays(TODAY, -14));
   if (old.length && S.canWrite) P.push({ w:70, k:"warn", t:`${old.length} كتاب أرسلناه قبل أكثر من أسبوعين ولم يصل رده`, s:"تابعها مع الجهة أو سجّلها منجزة", act:{ go:"watheqa", l:"تابعها" } }); return P.sort((a, b) => b.w - a.w); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wqts]"); if (!t) return; const [st, id] = t.dataset.wqts.split(":"); wqtSet(id, st); });
-NEWF.splice(1, 0, ["v39-wqt", "nav:watheqa", "متابعة الكتب: مرسلة · قيد المتابعة · منجزة", "كل كتاب نرسله يُتابَع حتى يصل رده ويُبلَّغ المنسق فيصير «منجزاً»، ويمكنك تسجيله منجزاً يدوياً بملاحظة. وكتب حجز القاعات تظهر في صفحة القاعات بحالتها.", false, "2026-10-20"]);
 
 /* ================= v40: sidebar search، type to find any page ================= */
 const NAV_KW = { docs:"موافقات وثائق تصاريح", fix:"ناقص بيانات توزيع", rewards:"مكافآت رواتب بنوك ايبان", khatibs:"خطباء جمعة", watheqa:"كتب مراسلات", halls:"قاعات حجز مسرح", renew:"تجديد انتهاء", avail:"تعارض وقت متاح", portal:"بوابة منسقين رابط", whatsapp:"واتساب", decisions:"قرارات تعميم", recs:"توصيات اقتراح", report:"تقرير شهري", stats:"إحصائيات", backups:"نسخ احتياطي", users:"مستخدمين صلاحيات حسابات" };

@@ -1,17 +1,8 @@
 /* ================= v26: every release becomes «جديد» automatically + «سجل التحديثات» ================= */
 /* CHANGELOG is injected at build time from the release history: [id, iso date, title] */
 Object.assign(TITLES, { changes:"سجل التحديثات" });
-const CH_PLACE = [[/محادث|تراسل|رسائل/, "nav:chat"], [/وثيقة/, "nav:watheqa"], [/تصريح|تصاريح|باركود/, "nav:permits"], [/واتساب/, "nav:whatsapp"], [/مهام|مهمة|إنجاز سجل/, "nav:tasks"],
-  [/سؤال|أسئلة/, "nav:questions"], [/قاعة|قاعات|حجز/, "nav:halls"], [/طلب وارد|الطلبات/, "nav:inbox"], [/إشعار/, "id:bell"], [/حساب|كلمة المرور/, "id:mypass"], [/خطب|خطيب/, "nav:khatibs"],
-  [/نشاط|أنشطة|تعارض/, "nav:acts"], [/جالية|جاليات/, "nav:comms"], [/مساعد|copilot/i, "nav:copilot"], [/الرئيسية|أولويات/, "nav:home"]];
-const placeOf = t => (CH_PLACE.find(([re]) => re.test(t)) || [, "nav:changes"])[1];
 const chDate = iso => String(iso).slice(0, 10);
-for (const [id, iso, title] of (typeof CHANGELOG !== "undefined" ? CHANGELOG : [])) {
-  if (chDate(iso) < "2026-10-20") continue; // earlier releases are covered by the hand-written entries above
-  if (NEWF.some(f => f[0] === "c-" + id)) continue;
-  NEWF.push(["c-" + id, placeOf(title), title, `تحديث بتاريخ ${fmt(chDate(iso))}`, false, chDate(iso)]);
-}
-NEWF.forEach(f => { if (!f[5]) f[5] = "2026-10-20"; });
+/* v258: لا تُعلَّم أزرار القائمة بـ«جديد» عند كل تحديث؛ التحديثات في «سجل التحديثات» فقط */
 function vChanges(){
   const L = (typeof CHANGELOG !== "undefined" ? CHANGELOG : []).filter(c => !/^(Merge|wip)/i.test(c[2]));
   const days = []; for (const c of L) { const d = chDate(c[1]); let g = days.find(x => x.d === d); if (!g) days.push(g = { d, items:[] }); g.items.push(c); }

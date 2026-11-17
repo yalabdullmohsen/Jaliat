@@ -45,4 +45,3 @@ const _openLink61 = openLink; openLink = function(h){ const s = String(h || "").
 const _vSermRec61 = vSermRec; vSermRec = function(){ return `<div class="tr-start"><span>جديد في الصفحة؟ جولة تشرح كل جزء على الشاشة نفسها.</span><button type="button" class="btn" data-tour="serm">▶ ابدأ الجولة التعليمية</button></div>` + _vSermRec61(); };
 /* opened from a link like …/#tour:serm */
 const _boot961 = boot9; boot9 = function(){ _boot961(); const m = location.hash.match(/^#tour:(\w+)/); if (m) setTimeout(() => tourStart(m[1]), 1500); };
-NEWF.splice(1, 0, ["v61-tour", "nav:sermrec", "جولة تعليمية: تسجيل خطب الجمعة", "زر «ابدأ الجولة التعليمية» في صفحة تسجيلات الخطب يقف عند كل جزء من الشاشة ويشرحه، مع الإجراء الأسبوعي المعتمد.", false, "2026-10-21"]);

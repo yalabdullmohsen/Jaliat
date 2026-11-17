@@ -125,8 +125,12 @@ for _k in ("decisions", "recs", "visits"): _btn.pop(_k, None)
 _btn["guide"] = '<button data-nav="guide"><svg><use href="#i-doc"/></svg><span>الدليل</span></button>'
 _btn["staffday"] = '<button data-nav="staffday"><svg><use href="#i-users"/></svg><span>نشاط الموظفين</span></button>'
 _btn["odsave"] = '<button data-nav="odsave"><svg><use href="#i-down"/></svg><span>الحفظ في OneDrive</span></button>'
-_groups = [("", ["home", "sermrec", "guide", "copilot"]), ("العمل اليومي", ["tasks", "fix", "questions", "inbox", "watheqa", "permits"]), ("التواصل", ["whatsapp", "chat", "renew"]), ("الأنشطة والجدولة", ["avail", "docs", "acts", "cal", "lmap", "weekly", "halls"]),
-           ("الجاليات والمساجد", ["portal", "comms", "coords", "coordeval", "mosques"]), ("خطب الجمعة", ["khatibs", "rewards"]), ("التقارير والسجلات", ["odsave", "report", "stats", "notes", "mine", "changes"]), ("الإدارة", ["staffday", "users", "backups", "audit"])]
+# v258 تبسيط: الأكثر استعمالاً ظاهر دائماً، والباقي في مجموعات بأسماء واضحة
+for _k, _o, _n in [("fix", "إكمال البيانات", "بيانات ناقصة"), ("avail", "استعلام", "هل المسجد متاح؟"), ("tasks", "المهام والإنجاز", "المهام"), ("portal", "بوابة إنجاز", "بوابة المنسقين"), ("odsave", "الحفظ في OneDrive", "حفظ في OneDrive"), ("permits", "تصاريح الدروس", "التصاريح")]:
+    if _k in _btn: _btn[_k] = _btn[_k].replace(f"<span>{_o}</span>", f"<span>{_n}</span>")
+if "copilot" in _btn: _btn["copilot"] = _btn["copilot"].replace('<span class="kbd">ذكاء</span>', '')
+_groups = [("", ["home", "inbox", "acts", "permits", "sermrec", "watheqa"]), ("المتابعة اليومية", ["tasks", "fix", "avail", "halls", "questions"]), ("الجدول", ["cal", "weekly", "lmap", "docs"]),
+           ("الجاليات والخطباء", ["comms", "coords", "mosques", "khatibs", "rewards", "coordeval", "portal"]), ("التواصل", ["whatsapp", "chat", "renew"]), ("التقارير", ["report", "stats", "notes", "mine", "odsave"]), ("المساعدة", ["guide", "copilot", "changes"]), ("الإدارة", ["staffday", "users", "backups", "audit"])]
 _out = ['<nav class="nav" id="nav">']
 _used = set()
 _rest = [v for k, v in _btn.items() if k not in sum([g[1] for g in _groups], [])]
@@ -135,7 +139,7 @@ for gi, (title, keys) in enumerate(_groups):
     if title: _out.append(f'<div class="ng{" admin-only" if adm else ""}" data-g="{gi}"{" hidden" if adm else ""}><button type="button" class="sep" data-ng="{gi}" aria-expanded="true"><span>{title}</span><svg class="ng-ch"><use href="#i-chev"/></svg></button><div class="ng-b">')
     for k in keys:
         if k in _btn: _out.append(_btn[k]); _used.add(k)
-    if title == "الجاليات والمساجد": _out += _rest; print("REST", [k for k in _btn if k not in sum([g[1] for g in _groups], [])])
+    if title == "الجاليات والخطباء": _out += _rest; print("REST", [k for k in _btn if k not in sum([g[1] for g in _groups], [])])
     if title: _out.append('</div></div>')
 assert len(_used) >= 20, len(_used)
 s = s[:_na] + "\n      ".join(_out) + "\n    " + s[_nb:]

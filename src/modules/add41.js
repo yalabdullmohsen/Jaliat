@@ -96,4 +96,3 @@ document.addEventListener("click", ev => { const t = ev.target.closest("[data-wq
   if (D.wqap) { ev.stopPropagation(); return wqApprove(D.wqap); } if (D.apgo !== undefined) return wqApproveGo();
   if (D.khmake !== undefined) return khLinksMake(); if (D.khlinks !== undefined) return khLinksOpen(); if (D.khwa) return khWa(D.khwa);
   if (D.prioOpen === "nodoc") { ev.stopPropagation(); return noDocOpen(); } }, true);
-NEWF.splice(1, 0, ["v49-smart", "nav:watheqa", "حزمة ذكية جديدة", "اعتماد موافقة وثيقة مع أنشطتها بضغطة، ورد المنسق على التجديد من البوابة، وتأكيد الدرس من المسجد بالباركود، وتأكيد الخطيب لخطبته برابط، وتنبيه الأنشطة بلا موافقة، وملخص الإدارة الشهري، وتقييم المنسقين.", false, "2026-10-20"]);

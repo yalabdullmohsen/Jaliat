@@ -23,4 +23,3 @@ vWatheqa = function(){ const all = S.wq, base = S.f.wqall === "1" ? all : all.fi
   const i = h.indexOf('<div class="wq-tiles">'); return i < 0 ? pane + h : h.slice(0, i) + pane + h.slice(i); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wqk]"); if (!t) return; S.f.wqk = t.dataset.wqk; S.f.wqt = "all"; render(); });
 
-NEWF.splice(1, 0, ["v57-wqk", "nav:watheqa", "وثيقة: طلباتنا وردودهم منفصلة", "يفرّق النظام تلقائياً بين الطلبات التي أرسلناها لإدارات المساجد، والموافقات والرفض الواصلة منهم، مع ملخص «اليوم في وثيقة».", false, "2026-10-21"]);

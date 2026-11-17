@@ -46,4 +46,3 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("[d
       if (x.kind === "doc") { for (const [, a] of S.acts) if (a.doc === x.key) a.comm = c; const d = docBy[x.key]; if (d) d.comm = c; } else if (x.kind === "act") { const a = S.acts.get(x.key); if (a) a.comm = c; } else { const k = S.khatibs.get(x.key); if (k) k.comm = c; } }
     derive(); render(); toast(`نُقل ${n} عنصر لمنسقيه`); } });
 
-NEWF.splice(1, 0, ["v56-fix", "nav:fix", "إكمال البيانات أوضح وأسهل", "افتح الكتاب الأصلي لكل موافقة من مكانها، وشاهد أنشطتها وتواريخها، ويقترح النظام المنسق الصحيح من نص الكتاب، ويمكن اعتماد كل المقترحات بضغطة.", false, "2026-10-21"]);

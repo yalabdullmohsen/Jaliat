@@ -49,7 +49,6 @@ const _answer28 = answer;
 answer = function(q){ const t = norm(q); if (/تجديد|تنتهي|ينتهي|انتهاء/.test(t) && /تذكير|منسق|ارسل|رساله|رسالة|واتس/.test(t)) { const L = renewList(); return { title:`موافقات تنتهي قريباً (${L.length})`, items:L.map(x => ({ t:`${x.comm}، ${x.d.no}`, s:`تنتهي ${fmt(x.d.end)}${renewSent(x.d.no) ? " · ذُكِّر ✓" : " · لم يُذكَّر"}`, go:"renew" })), extra:"افتح «تذكير التجديد» وأرسل لكل منسق بضغطة." }; } return _answer28(q); };
 const _palAll28 = palAll;
 palAll = function(){ const A = _palAll28(); A.unshift({ g:"إجراءات", t:"تذكير المنسقين بانتهاء الموافقات (واتساب)", s:"", ic:"i-wa", run:() => go("renew"), txt:"تذكير تجديد انتهاء موافقة منسق واتساب" }); return A; };
-NEWF.splice(1, 0, ["v28-renew", "nav:renew", "تذكير التجديد", "الموافقات اللي تنتهي قريباً مع منسق كل جالية ورقمه، ورسالة تذكير رسمية جاهزة تُرسل بضغطة واتساب، ويُسجَّل من أرسل ومتى.", false, "2026-10-20"]);
 document.addEventListener("click", ev => { const t = ev.target.closest("button"); if (!t || S.view !== "renew") return; const D = t.dataset;
   if (D.rndays) { S.renewDays = +D.rndays; return render(); }
   if (D.rnsend) return renewSend(D.rnsend, D.rni);

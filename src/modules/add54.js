@@ -27,4 +27,3 @@ permitIssue = async function(){ const p = $("#p-pray")?.value; if (!p) return _p
 if (typeof prFill === "function") { const _prFill66 = prFill; prFill = function(i){ _prFill66(i); const x = PR.items[i]; const d = daysOfText(x?.days);
   if (d.length) document.querySelectorAll("#pd-days .pd-d").forEach(b => b.classList.toggle("on", d.includes(+b.dataset.pdd)));
   if (!(x?.end || PR.meta?.end)) { const s = $("#p-dur"); if (s && !s.disabled) s.value = "180"; } }; }
-NEWF.splice(1, 0, ["v66-pdays", "nav:permits", "التصريح يفتح في أيامه وأوقاته فقط", "تختار أيام الدرس (مثل الثلاثاء والخميس)، والتصريح يُظهر للإمام «ساري الآن» فقط في هذه الأيام وخلال وقت الصلاة المحدد. المدة الافتراضية 6 أشهر.", false, "2026-10-21"]);

@@ -39,4 +39,3 @@ actForm = function(id, preset){ const r = _actForm73(id, preset);
 /* sermon recordings page now also holds religious lessons recorded from the portal */
 TITLES.sermrec = "تسجيلات الخطب والدروس";
 (function(){ const s = document.querySelector('#nav [data-nav="sermrec"] span'); if (s) s.textContent = "تسجيلات الخطب والدروس"; })();
-NEWF.splice(1, 0, ["v74-lesson", "nav:sermrec", "تسجيل الدروس الدينية مع الترجمة", "المنسق يسجّل الدرس الديني من البوابة في يوم الدرس فقط (مرة واحدة لكل درس)، ويصل هنا مترجماً إلى العربية مع ملخص وملاحظات، بجانب خطب الجمعة.", false, "2026-10-22"]);
