@@ -32,9 +32,13 @@ async function pBulk(wid){ const w = wqById(wid); if (!w) return; const items = 
   pBulkSummary(w, rows, fail.length); }
 function pBulkSummary(w, rows, failed){ S.form = { kind:"pbulk", ids:rows.map(r => r.id) };
   openDrawer(`تصاريح الكتاب ${w.no}`, `<div class="check ${failed ? "warn" : "ok"}"><b>صدر ${rows.length} تصريح${failed ? ` · تعذّر ${failed}، أصدره من نفس الكتاب` : ""}</b><span>لكل نشاط تصريح مستقل برقمه وباركوده وملف PDF خاص.</span></div>
-    <div class="wq-list">${rows.map(p => `<button type="button" class="wq-i" data-permit="${p.id}"><span class="num wq-no">${esc(p.no)}</span><span class="wq-t"><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.time || "")}</span></span><span class="wq-m"><span class="s">حتى ${fmt(p.until)}</span></span></button>`).join("")}</div>`,
+    <div class="wq-list">${rows.map(p => `<div class="ps-row"><button type="button" class="btn btn-ok ps-one" data-pone="${p.id}">${icon("i-wa")} إرسال</button><button type="button" class="wq-i" data-permit="${p.id}"><span class="num wq-no">${esc(p.no)}</span><span class="wq-t"><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.time || "")}</span></span><span class="wq-m"><span class="s">حتى ${fmt(p.until)}</span></span></button></div>`).join("")}</div>`,
     `${rows.length ? `<button class="btn btn-primary" type="button" data-pball>${icon("i-wa")} إرسال الكل PDF</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`); }
-document.addEventListener("click", async ev => { const a = ev.target.closest("[data-pwball]"); if (a) { ev.preventDefault(); if (!canPermit()) return; return pBulk(a.dataset.pwball); }
+document.addEventListener("click", async ev => { const o = ev.target.closest("[data-pone]"); if (o) { ev.preventDefault(); ev.stopImmediatePropagation();
+    const f = await (PPDF.get(o.dataset.pone) || Promise.resolve(null)).catch(() => null); if (!f) return toast("ملف هذا التصريح ما جهز، افتحه من القائمة وأرسله");
+    if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:"تصريح إلقاء درس" }); } catch (_) {} return; }
+    const l = document.createElement("a"); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); return toast("نزل الملف، أرفقه في واتساب"); }
+  const a = ev.target.closest("[data-pwball]"); if (a) { ev.preventDefault(); if (!canPermit()) return; return pBulk(a.dataset.pwball); }
   const b = ev.target.closest("[data-pball]"); if (!b || S.form?.kind !== "pbulk") return; ev.preventDefault(); ev.stopImmediatePropagation();
   const ids = S.form.ids || []; const files = []; for (const id of ids) { const f = await (PPDF.get(id) || Promise.resolve(null)).catch(() => null); if (f) files.push(f); }
   if (!files.length) return toast("ملفات PDF ما جهزت، افتح كل تصريح وأرسله");
