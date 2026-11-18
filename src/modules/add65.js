@@ -38,8 +38,12 @@ document.addEventListener("click", async ev => { const a = ev.target.closest("[d
   const b = ev.target.closest("[data-pball]"); if (!b || S.form?.kind !== "pbulk") return; ev.preventDefault(); ev.stopImmediatePropagation();
   const ids = S.form.ids || []; const files = []; for (const id of ids) { const f = await (PPDF.get(id) || Promise.resolve(null)).catch(() => null); if (f) files.push(f); }
   if (!files.length) return toast("ملفات PDF ما جهزت، افتح كل تصريح وأرسله");
-  if (navigator.canShare && navigator.canShare({ files })) { try { await navigator.share({ files, title:"تصاريح إلقاء دروس", text:`${files.length} تصريح إلقاء درس` }); } catch (_) {} return; }
-  files.forEach((f, i) => setTimeout(() => { const l = document.createElement("a"); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); }, i * 400));
+  const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+  /* الجوال: مشاركة كل الملفات مرة واحدة. الكمبيوتر: نافذة المشاركة تمرّر ملفاً واحداً فقط، فتُحفظ كلها في مجلد واحد لتحدّدها كلها وترفقها دفعة واحدة */
+  if (mobile && navigator.canShare && navigator.canShare({ files })) { try { await navigator.share({ files, title:"تصاريح إلقاء دروس", text:`${files.length} تصريح إلقاء درس` }); } catch (_) {} return; }
+  if (window.showDirectoryPicker) { try { const dir = await showDirectoryPicker({ mode:"readwrite", id:"permits" }); for (const f of files) { const h = await dir.getFileHandle(f.name, { create:true }), w = await h.createWritable(); await w.write(f); await w.close(); }
+      return toast(`حُفظ ${files.length} ملف في المجلد «${dir.name}». حدّدها كلها (Ctrl+A) وأرفقها في واتساب دفعة واحدة`); } catch (e) { if (e?.name === "AbortError") return; } }
+  files.forEach((f, i) => setTimeout(() => { const l = document.createElement("a"); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); }, i * 700));
   toast("نزلت ملفات PDF، أرفقها في واتساب القسم"); }, true);
 
 /* v89 — جولة إصدار التصاريح: تفتح تلقائياً مرة واحدة لرئيس القسم وتمشي معه على الشاشة خطوة بخطوة، وزرها يبقى في صفحة التصاريح */
