@@ -26,4 +26,5 @@ document.addEventListener("click", async ev => {
   try { for (let i = 0; i < list.length; i++) { const p = list[i]; toast(`يجهّز ملف PDF ${i + 1} من ${list.length}…`);
       try { await permitView(p.id); await new Promise(r => setTimeout(r, 40)); const f = await permitPdf(p.id); if (f) done.push(p); else fail.push(p); } catch (_) { fail.push(p); } } }
   finally { closeDrawer(); b.disabled = false; }
-  const cm = [...new Set(done.map(psCommOf))]; pBulkSummary({ no:cm.length === 1 ? cm[0] : `${done.length} تصريح` }, done, fail.length); }, true);
+  const cm = [...new Set(done.map(psCommOf))]; pBulkSummary({ no:cm.length === 1 ? cm[0] : `${done.length} تصريح` }, done, fail.length);
+  const hb = $(".drawer-b .check b"); if (hb) hb.textContent = `جُهّز ${done.length} ملف PDF للإرسال${fail.length ? ` · تعذّر ${fail.length}` : ""}`; }, true);
