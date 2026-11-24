@@ -94,6 +94,12 @@ async function gemini(task: Task, prompt: string, schema: Record<string, unknown
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   let body: any; try { body = await req.json(); } catch (_) { return json({ ok: false, msg: "طلب غير صالح" }, 400); }
+  // فحص الجاهزية بلا هوية ولا بيانات: هل المفتاح موجود وصالح؟ (قائمة النماذج، بلا توليد ولا حصة). لا يُطبع المفتاح.
+  if (body?.kind === "ping") {
+    if (!KEY) return json({ ok: false, key: false });
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1", { headers: { "x-goog-api-key": KEY } });
+    return json({ ok: r.ok, key: true, status: r.status, models: MODELS });
+  }
   const task = TASKS[body?.kind];
   if (!task) return json({ ok: false, msg: "طلب غير صالح" }, 400);
   const me = await who(req, body);
