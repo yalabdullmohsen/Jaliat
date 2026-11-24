@@ -1,0 +1,6 @@
+/* v97 (JL-7): البحث الموحّد */
+.pal-rec{display:flex;flex-wrap:wrap;gap:6px;padding:4px 12px 8px}
+.pal-rec .chip{cursor:pointer;border:0}
+.pal-tier{font-size:11px;white-space:nowrap;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--muted);align-self:center}
+.pal-tier.t0{background:color-mix(in srgb,var(--ok) 14%,var(--surface));color:var(--ok)}
+.pal-l .empty .btn{margin-top:8px}
