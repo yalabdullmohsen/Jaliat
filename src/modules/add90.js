@@ -1,4 +1,4 @@
-/* ================= v88 (JL-AUDIT «نضيف 1»): القائمة حسب الدور ================= */
+/* ================= v90 (JL-AUDIT «نضيف 1»): القائمة حسب الدور ================= */
 /* كل دور يرى افتراضيًا الصفحات التي يحتاجها فعلًا (5 إلى 7) ثم «الدليل»، والباقي خلف «المزيد».
    لا تُحذف أي صفحة ولا يتغيّر مسارها: البحث في القائمة يعرض الكل، والصفحة المفتوحة من خارج الأساسية تفتح «المزيد» تلقائيًا. */
 const NAV_CORE = {
@@ -7,7 +7,7 @@ const NAV_CORE = {
   viewer: ["home", "acts", "cal", "permits", "stats"]
 };
 const navRole = () => S.admin ? "admin" : S.canWrite ? "editor" : "viewer";
-const navMoreKey = "navMore88";
+const navMoreKey = "navMore90";
 function navLean(){
   const nav = $("#nav"); if (!nav || !S.me) return;
   /* مساحة الأقسام الأخرى لها قائمة قصيرة خاصة بها */
@@ -54,12 +54,12 @@ document.addEventListener("click", ev => {
   try { localStorage.setItem(navMoreKey, open ? "1" : "0"); } catch (_) {}
   navMoreSync();
 });
-const _afterRender88 = afterRender;
-afterRender = function(v){ _afterRender88(v); navLean(); };
+const _afterRender90 = afterRender;
+afterRender = function(v){ _afterRender90(v); navLean(); };
 /* جولة تشير إلى زر خلف «المزيد»: يُفتح أولًا كي يظهر العنصر المشار إليه */
-const _tourShow88 = tourShow;
+const _tourShow90 = tourShow;
 tourShow = async function(){
   const s = TOURS[TR.k]?.steps[TR.i];
   if (s?.sel?.startsWith("#nav")) { const el = document.querySelector(s.sel); if (el && !el.closest("#nl-core")) $("#nav")?.classList.add("more"); }
-  return _tourShow88.apply(this, arguments);
+  return _tourShow90.apply(this, arguments);
 };

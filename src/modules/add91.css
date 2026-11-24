@@ -1,4 +1,4 @@
-/* v89: تسهيل إصدار التصاريح */
+/* v91: تسهيل إصدار التصاريح */
 .pi-prev{background:var(--surface-2,#f6f3ea);border:1px solid var(--line,#e7e1d2);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:14px;line-height:1.7}
 .pi-prev.pi-bad{border-color:var(--warn,#c9822b)}
 .fld.pi-err .f{border-color:var(--bad,#b3261e);box-shadow:0 0 0 2px rgba(179,38,30,.15)}
