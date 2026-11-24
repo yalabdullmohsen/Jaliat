@@ -1,0 +1,35 @@
+/* ================= v87 (JL-2): الصفحة الرئيسية على كل المقاسات ================= */
+/* «الأيام السبعة القادمة»: العنوان سطر واحد والمفتاح تحته على الشاشات الضيقة */
+.wk-h{white-space:nowrap}
+@media (max-width:700px){.panel-h:has(.wk-h){flex-direction:column;align-items:flex-start}.wk-lg{flex-direction:row!important;flex-wrap:wrap;gap:4px 12px;margin:0!important}}
+/* بطاقات الأيام كاملة بلا قص: 4 ثم 3 على الجوال، 7 في صف واحد من 768 فأعلى */
+.week{overflow:visible!important}
+@media (max-width:767px){.week{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media (min-width:768px){.week{grid-template-columns:repeat(7,minmax(0,1fr))!important}}
+.wd{min-width:0;padding:10px 8px!important}
+.wd .h{display:grid!important;gap:2px}
+.wd .h b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:767px){.wd .h b{font-size:13px;letter-spacing:-.2px}.wd{padding:10px 6px!important}}
+.wd-d{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.wd .c{line-height:1.1}
+.wd-u{font-size:11px;color:var(--muted);margin-top:-4px}
+/* «أنشطة اليوم»: المنطقة لا تنفصل عن اسم المسجد */
+.li-m{min-width:0}
+.li .nw{white-space:nowrap}
+/* «المطلوب منك الآن»: زر الإجراء داخل البند */
+.mw-i .mw-go{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:999px;background:var(--primary);color:#fff;font-size:12px;font-weight:600;justify-self:start}
+/* «تصاريحي» و«تصاريح غيري» */
+.mw-pm{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
+/* لوحة حل التعارض */
+.cf87 .cf-b{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;display:grid;gap:8px;background:var(--surface)}
+.cf87 .cf-t{color:var(--bad,#B4412F)}
+.cf87 .cf-g{display:grid;gap:4px}
+.cf87 .cf-r{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:13.5px;line-height:1.6}
+.cf87 .cf-r span{color:var(--muted)}
+.cf87 .cf-why{margin:0;padding-inline-start:18px;font-size:12.5px;color:var(--muted)}
+.cf87 .cf-steps{margin:0;padding-inline-start:20px;display:grid;gap:10px}
+.cf87 .cf-steps li{display:grid;gap:6px}
+.cf87 .cf-wa{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:420px){.cf87 .cf-r{grid-template-columns:1fr;gap:0}}
+/* عناوين بنود «لوحتي» حتى سطرين بدل قصّها في سطر واحد (الأعمدة الضيقة على الحاسوب) */
+.mw-i b{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
