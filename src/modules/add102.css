@@ -1,0 +1,138 @@
+/* ================= v102 (JL-9): لوحة ألوان موحّدة، وسلّم مسافات وخطوط وزوايا وظلال ================= */
+/* مصدر واحد للألوان: الأخضر للهوية، وذهبي هادئ، ورمادي محايد بثلاث درجات (--n1 نص ثانوي، --n2 أيقونات وتلميحات، --n3 حدود)، وحالات (نجاح، تحذير، خطر، معلومات).
+   كل لون نصّي ≥ 4.5:1 على السطح والخلفية في الوضعين (محسوب). يأتي بعد كل الوحدات فيغلب تعريفاتها المتفرقة (add62/add63).
+   لا تغيير في الوظائف ولا في مواضع الأزرار. */
+:root:not([data-theme="dark"]){
+  --bg:#F4F6F3; --surface:#FFFFFF; --surface-2:#EEF2EE; --ink:#11241D;
+  --n1:#56655E; --n2:#8A968F; --n3:#E3E8E3; --muted:var(--n1); --line:var(--n3); --line-2:#EEF2EE;
+  --primary:#0E6B4E; --primary-ink:#FFFFFF; --primary-soft:#E2F0E8; --gold:#8C6410; --gold-soft:#F6EDD5;
+  --ok:#1B7A4B; --oks:#E3F3EA; --warn:#8A5A00; --warns:#FBF0D4; --bad:#B02A1E; --bads:#FBE4E0; --info:#1F5FA8; --infos:#E3EEFA;
+  --sh-1:0 1px 2px rgba(17,36,29,.05),0 4px 16px rgba(17,36,29,.05); --sh-2:0 2px 4px rgba(17,36,29,.06),0 12px 32px rgba(17,36,29,.08);
+  --shadow:var(--sh-1);
+}
+:root[data-theme="dark"]{
+  --bg:#0C1411; --surface:#131E19; --surface-2:#18261F; --ink:#E5EEE9;
+  --n1:#A3B5AB; --n2:#7F938A; --n3:#24352C; --muted:var(--n1); --line:var(--n3); --line-2:#1C2B24;
+  --primary:#3DB487; --primary-ink:#06140E; --primary-soft:#163528; --gold:#E0B858; --gold-soft:#33290F;
+  --ok:#5CCB95; --oks:#14301F; --warn:#E8B84A; --warns:#33290F; --bad:#F28B7D; --bads:#3A1A16; --info:#8DB8F2; --infos:#132A40;
+  --sh-1:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.22); --sh-2:0 2px 4px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.35);
+  --shadow:var(--sh-1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){
+  --bg:#0C1411; --surface:#131E19; --surface-2:#18261F; --ink:#E5EEE9;
+  --n1:#A3B5AB; --n2:#7F938A; --n3:#24352C; --muted:var(--n1); --line:var(--n3); --line-2:#1C2B24;
+  --primary:#3DB487; --primary-ink:#06140E; --primary-soft:#163528; --gold:#E0B858; --gold-soft:#33290F;
+  --ok:#5CCB95; --oks:#14301F; --warn:#E8B84A; --warns:#33290F; --bad:#F28B7D; --bads:#3A1A16; --info:#8DB8F2; --infos:#132A40;
+  --sh-1:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.22); --sh-2:0 2px 4px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.35);
+  --shadow:var(--sh-1);
+}}
+/* سلّم المسافات والزوايا والخطوط */
+:root{ --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --r-s:8px; --r:12px; --r-l:16px;
+  --t-h1:22px; --t-h2:18px; --t-h3:16px; --t-body:14.5px; --t-label:12.5px; --ic:16px }
+
+/* البطاقات واللوحات: زاوية وظل واحد، وحدود أخف، ومسافة داخلية من السلّم */
+.panel,.card,.kpi,.check,.pv-r,.rq-card,.wq-i{border-radius:var(--r)}
+.panel{box-shadow:var(--sh-1);border-color:transparent}
+.panel-h{padding-bottom:var(--s3)}
+.panel-h h3{font-size:var(--t-h3);font-weight:700}
+.kpi{box-shadow:var(--sh-1);border-color:transparent;min-height:88px}
+.check{border-radius:var(--r);padding:var(--s3) var(--s4)}
+
+/* سلّم الخطوط */
+#title{font-size:var(--t-h1);font-weight:700}
+#view h2{font-size:var(--t-h2)} #view h3{font-size:var(--t-h3)} #view h4{font-size:15px}
+#view .s,#view small,.hint{font-size:var(--t-label);color:var(--n1)}
+
+/* الأزرار: أساسي مملوء، وثانوي بإطار خفيف، وشبحي بلا إطار؛ ارتفاع وزاوية ومقاس أيقونة واحد */
+.btn{min-height:40px;border-radius:10px;font-weight:600;gap:var(--s2)}
+.btn svg{width:var(--ic);height:var(--ic)}
+.btn-primary{box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.btn-ghost{border-color:transparent;background:var(--surface-2)}
+.btn-ghost:hover{background:var(--primary-soft)}
+header.top .btn{white-space:nowrap}
+
+/* الجداول: صفوف مريحة وخطوط فاصلة أخف */
+#view table th{font-size:var(--t-label);font-weight:600;color:var(--n1);padding:var(--s3) var(--s4);background:var(--surface-2)}
+#view table td{padding:var(--s3) var(--s4);border-color:var(--line-2)}
+#view table tr{border-color:var(--line-2)}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+
+/* الرقائق والوسوم بألوان الحالة الموحّدة */
+.chip.ok{background:var(--oks);color:var(--ok)} .chip.warn{background:var(--warns);color:var(--warn)} .chip.bad{background:var(--bads);color:var(--bad)} .chip.gold{background:var(--gold-soft);color:var(--gold)}
+
+/* أيقونات القائمة بمقاس واحد */
+#nav button svg{width:18px;height:18px}
+
+/* الجوال: لا شيء يتجاوز عرض الشاشة (كان زر 💡 والتبويبات وجدول الموافقات تدفع الصفحة 23 بكسل) */
+.seg,.vg-bar,.pt-tabs{flex-wrap:wrap}
+@media (max-width:700px){
+  header.top .idea-b{display:none}
+  :root header.top{gap:2px;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+  header.top .btn{padding-inline:8px;gap:4px;min-width:36px}
+  header.top #title{min-width:0;flex:1 1 0}
+  .panel{padding-inline:var(--s3)}
+}
+@media (min-width:701px){:root header.top #title{flex:0 0 auto;max-width:40%}}
+
+/* ===== تعديلات يوسف على JL-9: البطاقة الخضراء بلا زخرفة وبهندسة واضحة، وتوحيد الألوان الشاذة ===== */
+/* البطاقة الخضراء أعلى الرئيسية: خلفية مصمتة بتدرّج خفيف جدًا من الدرجة نفسها، بلا نقش ولا لمعة (كان :after نقشًا هندسيًا) */
+:root .hx{background:linear-gradient(160deg,#0F5E46 0%,#0B4D39 100%)!important;box-shadow:var(--sh-2)!important;border-radius:var(--r-l)!important;
+  padding:var(--s5) var(--s6);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s5);align-items:center}
+:root .hx:after{content:none;background:none}
+.hx-t{display:flex;flex-direction:column;gap:var(--s2)}
+.hx small{color:#F0D9A0;font-weight:600;font-size:13px;letter-spacing:0}
+:root .hx h2{font-size:26px;line-height:1.4;font-weight:800;margin:0;color:#fff}
+.hx p{opacity:1;color:#E6EFEB;font-size:14.5px;line-height:1.7;margin:0;max-width:620px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hx-a{gap:var(--s3);margin-top:var(--s2)}
+:root .hx-b{min-height:44px;padding:0 var(--s5);border-radius:10px!important;font-size:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#0B4D39;border:1px solid #fff}
+:root .hx-b.o{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55)}
+.hx-r{width:112px;height:112px;align-self:center}
+@media (max-width:700px){
+  :root .hx{padding:var(--s4);grid-template-columns:minmax(0,1fr) 64px;gap:var(--s3);align-items:start}
+  :root .hx h2{font-size:19px}
+  .hx p{font-size:13.5px}
+  .hx-r{width:64px;height:64px;grid-row:1;grid-column:2;align-self:start}
+  .hx-r b{font-size:16px} .hx-r span{display:none}
+  .hx-a{display:grid;grid-template-columns:1fr 1fr}
+  :root .hx-b{padding:0 var(--s3)}
+}
+
+/* ألوان أنواع الأنشطة (أشرطة الأيام، ووسوم الأنواع، وأرقام البطاقات): بدل الأزرق والبنفسجي والبني، ثلاث درجات هادئة من اللوحة */
+:root:not([data-theme="dark"]){ --t1:#1C6B5C; --t1s:#E1F0EC; --t2:#8C6410; --t2s:#F6EDD5; --t3:#4E5D57; --t3s:#ECEFEC }
+:root[data-theme="dark"]{ --t1:#6CC7B0; --t1s:#12302A; --t2:#E0B858; --t2s:#33290F; --t3:#B7C4BD; --t3s:#1E2A25 }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){ --t1:#6CC7B0; --t1s:#12302A; --t2:#E0B858; --t2s:#33290F; --t3:#B7C4BD; --t3s:#1E2A25 }}
+/* الشارات: أحمر اللوحة بدل الصارخ، ونص داكن على الأحمر الفاتح في الوضع الداكن (كان أبيض بتباين ضعيف) */
+:root .nb{background:var(--bad)!important;color:#fff}
+:root[data-theme="dark"] .nb{color:#2A0F0B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]) .nb{color:#2A0F0B}}
+/* البلاطات والمؤشرات بألوان الحالة الموحّدة بدل الأخضر والأصفر الزاهيين */
+.wq-tile.ok{border-inline-start-color:var(--ok)} .wq-tile.warn{border-inline-start-color:var(--warn)} .wq-tile.bad{border-inline-start-color:var(--bad)}
+/* التحية بلونها الذهبي الفاتح واضحة، والملخص سطران، وتسمية الحلقة تحتها لا داخلها (كانت تخرج من حدود البطاقة) */
+#view .hx small{color:#F0D9A0;opacity:1;font-size:13px}
+:root .hx p{-webkit-line-clamp:2;line-clamp:2}
+:root .hx-r{height:auto;display:flex;flex-direction:column;align-items:center;gap:var(--s2)}
+:root .hx-r svg{width:112px;height:112px}
+:root .hx-r b{inset:0 0 auto 0;height:112px}
+:root .hx-r span{position:static;opacity:1;color:#E6EFEB;font-size:12px;text-align:center;max-width:140px;line-height:1.4}
+@media (max-width:700px){ :root .hx-r svg{width:64px;height:64px} :root .hx-r b{height:64px} :root .hx-r span{display:none} :root .hx-b{white-space:nowrap;font-size:13px} }
+
+/* ===== القائمة السفلية على الجوال (طلب يوسف: «واضحة وليس مقصوصة… صغّرها… أوضح وأبعد شوي وأجمل») ===== */
+/* عائمة ومدمجة: هامش جانبي وسفلي فوق المنطقة الآمنة، زوايا مستديرة وظل خفيف، خلفية مصمتة فلا يظهر المحتوى خلفها،
+   وزر «+» كامل داخل القائمة لا بارزًا فوقها (كان يُقصّ من أعلاه لأن الأزرار overflow:hidden) */
+@media (max-width:900px){
+  :root .tabbar{inset:auto 12px calc(env(safe-area-inset-bottom,0px) + 10px) 12px;padding:4px;gap:2px;border-radius:20px;
+    background:var(--surface)!important;-webkit-backdrop-filter:none;backdrop-filter:none!important;border:1px solid var(--line)!important;
+    box-shadow:0 10px 30px -8px rgba(17,36,29,.28)!important;align-items:center}
+  :root[data-theme="dark"] .tabbar{box-shadow:0 10px 30px -8px rgba(0,0,0,.6)!important}
+  :root .tabbar button{padding:5px 2px 4px;gap:2px;font-size:10.5px;line-height:1.2;border-radius:14px;color:var(--n1);min-height:46px;align-content:center}
+  :root .tabbar button>svg{width:20px;height:20px;margin-block:5px}
+  :root .tabbar button[aria-current="page"]{color:var(--primary);background:var(--primary-soft);font-weight:700}
+  :root .tabbar .add{overflow:visible}
+  :root .tabbar .add span.plus{width:30px;height:30px;border-radius:10px;margin-top:0;box-shadow:0 4px 10px -4px rgba(14,107,78,.6)}
+  :root .tabbar .add span.plus svg{width:18px;height:18px}
+  /* آخر عنصر في الصفحة لا يختفي تحت القائمة: ارتفاعها (~56) + هامشها + المنطقة الآمنة + فسحة */
+  :root .view{padding-bottom:calc(64px + 10px + 16px + env(safe-area-inset-bottom,0px))}
+}
+
+/* ===== حذف «إرفاق ملف» (طلب يوسف «ما نحتاجه»): خيار التصوير في «إضافة نشاط» وزر «إرفاق» في الترويسة يؤديان الوظيفة نفسها (ocrPick)؛ تُخفى الواجهة فقط ===== */
+:root #ocr-top,.drawer .ocr-cta{display:none!important}
