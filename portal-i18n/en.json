@@ -644,5 +644,8 @@
 "يرسله القسم، 6 أرقام": "6 digits sent by the department",
 "اكتبوا رمز التفعيل الذي أرسله لكم القسم": "Enter the activation code the department sent you",
 "أُوقف التفعيل 15 دقيقة بسبب محاولات خاطئة": "Activation is paused for 15 minutes due to wrong attempts",
-"بيانات التفعيل أو رمز التفعيل غير صحيح. إن كنتم منسقاً جديداً فاختاروا «إنشاء حساب»": "The activation details or code are incorrect. If you are a new coordinator, choose “Create account”"
+"بيانات التفعيل أو رمز التفعيل غير صحيح. إن كنتم منسقاً جديداً فاختاروا «إنشاء حساب»": "The activation details or code are incorrect. If you are a new coordinator, choose “Create account”",
+"أدخل رقمك المدني ورقم هاتفك المسجّل لدى القسم، واختر رمزاً سرياً. يُفتح حسابك مباشرة.": "Enter your civil ID and the phone number registered with the department, and choose a PIN. Your account opens immediately.",
+"رقمك غير مسجّل لدى القسم؟ تواصل مع قسم الجاليات ليضيفك.": "Your number isn't registered with the department? Contact the Communities Section to add you.",
+"رقم الهاتف غير مسجّل لدى القسم لأي منسق، تواصلوا مع قسم الجاليات": "This phone number isn't registered with the department for any coordinator. Please contact the Communities Section"
 }
