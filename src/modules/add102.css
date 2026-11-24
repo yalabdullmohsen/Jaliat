@@ -73,3 +73,45 @@ header.top .btn{white-space:nowrap}
   .panel{padding-inline:var(--s3)}
 }
 @media (min-width:701px){:root header.top #title{flex:0 0 auto;max-width:40%}}
+
+/* ===== تعديلات يوسف على JL-9: البطاقة الخضراء بلا زخرفة وبهندسة واضحة، وتوحيد الألوان الشاذة ===== */
+/* البطاقة الخضراء أعلى الرئيسية: خلفية مصمتة بتدرّج خفيف جدًا من الدرجة نفسها، بلا نقش ولا لمعة (كان :after نقشًا هندسيًا) */
+:root .hx{background:linear-gradient(160deg,#0F5E46 0%,#0B4D39 100%)!important;box-shadow:var(--sh-2)!important;border-radius:var(--r-l)!important;
+  padding:var(--s5) var(--s6);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s5);align-items:center}
+:root .hx:after{content:none;background:none}
+.hx-t{display:flex;flex-direction:column;gap:var(--s2)}
+.hx small{color:#F0D9A0;font-weight:600;font-size:13px;letter-spacing:0}
+:root .hx h2{font-size:26px;line-height:1.4;font-weight:800;margin:0;color:#fff}
+.hx p{opacity:1;color:#E6EFEB;font-size:14.5px;line-height:1.7;margin:0;max-width:620px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hx-a{gap:var(--s3);margin-top:var(--s2)}
+:root .hx-b{min-height:44px;padding:0 var(--s5);border-radius:10px!important;font-size:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#0B4D39;border:1px solid #fff}
+:root .hx-b.o{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55)}
+.hx-r{width:112px;height:112px;align-self:center}
+@media (max-width:700px){
+  :root .hx{padding:var(--s4);grid-template-columns:minmax(0,1fr) 64px;gap:var(--s3);align-items:start}
+  :root .hx h2{font-size:19px}
+  .hx p{font-size:13.5px}
+  .hx-r{width:64px;height:64px;grid-row:1;grid-column:2;align-self:start}
+  .hx-r b{font-size:16px} .hx-r span{display:none}
+  .hx-a{display:grid;grid-template-columns:1fr 1fr}
+  :root .hx-b{padding:0 var(--s3)}
+}
+
+/* ألوان أنواع الأنشطة (أشرطة الأيام، ووسوم الأنواع، وأرقام البطاقات): بدل الأزرق والبنفسجي والبني، ثلاث درجات هادئة من اللوحة */
+:root:not([data-theme="dark"]){ --t1:#1C6B5C; --t1s:#E1F0EC; --t2:#8C6410; --t2s:#F6EDD5; --t3:#4E5D57; --t3s:#ECEFEC }
+:root[data-theme="dark"]{ --t1:#6CC7B0; --t1s:#12302A; --t2:#E0B858; --t2s:#33290F; --t3:#B7C4BD; --t3s:#1E2A25 }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){ --t1:#6CC7B0; --t1s:#12302A; --t2:#E0B858; --t2s:#33290F; --t3:#B7C4BD; --t3s:#1E2A25 }}
+/* الشارات: أحمر اللوحة بدل الصارخ، ونص داكن على الأحمر الفاتح في الوضع الداكن (كان أبيض بتباين ضعيف) */
+:root .nb{background:var(--bad)!important;color:#fff}
+:root[data-theme="dark"] .nb{color:#2A0F0B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]) .nb{color:#2A0F0B}}
+/* البلاطات والمؤشرات بألوان الحالة الموحّدة بدل الأخضر والأصفر الزاهيين */
+.wq-tile.ok{border-inline-start-color:var(--ok)} .wq-tile.warn{border-inline-start-color:var(--warn)} .wq-tile.bad{border-inline-start-color:var(--bad)}
+/* التحية بلونها الذهبي الفاتح واضحة، والملخص سطران، وتسمية الحلقة تحتها لا داخلها (كانت تخرج من حدود البطاقة) */
+#view .hx small{color:#F0D9A0;opacity:1;font-size:13px}
+:root .hx p{-webkit-line-clamp:2;line-clamp:2}
+:root .hx-r{height:auto;display:flex;flex-direction:column;align-items:center;gap:var(--s2)}
+:root .hx-r svg{width:112px;height:112px}
+:root .hx-r b{inset:0 0 auto 0;height:112px}
+:root .hx-r span{position:static;opacity:1;color:#E6EFEB;font-size:12px;text-align:center;max-width:140px;line-height:1.4}
+@media (max-width:700px){ :root .hx-r svg{width:64px;height:64px} :root .hx-r b{height:64px} :root .hx-r span{display:none} :root .hx-b{white-space:nowrap;font-size:13px} }
