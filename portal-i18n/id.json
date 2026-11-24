@@ -630,5 +630,14 @@
 "تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Rekaman tidak dapat disimpan di ponsel. Coba lagi saat internet kembali",
 "أنتم دون اتصال بالإنترنت": "Anda sedang offline",
 "يمكنكم التسجيل، ويُحفظ مع وقته ويُرسل تلقائياً عند عودة الاتصال. لا يمكن إرفاق ملفات.": "Anda dapat merekam. Rekaman disimpan beserta waktunya dan dikirim otomatis saat koneksi kembali. File tidak dapat dilampirkan.",
-"الآن خارج وقت الخطبة، ويمكنكم التسجيل ويظهر وقته للقسم": "Sekarang di luar waktu khotbah. Anda tetap dapat merekam, waktunya ditampilkan kepada bagian"
+"الآن خارج وقت الخطبة، ويمكنكم التسجيل ويظهر وقته للقسم": "Sekarang di luar waktu khotbah. Anda tetap dapat merekam, waktunya ditampilkan kepada bagian",
+"تسجيل نشاط غير مسجل": "Daftarkan kegiatan yang belum terdaftar",
+"نشاط غير مسجل": "Kegiatan belum terdaftar",
+"رقم الموافقة إن وُجد": "Nomor persetujuan (jika ada)",
+"اتركوه فارغًا إن لم تكن للنشاط موافقة": "Kosongkan jika kegiatan tidak memiliki persetujuan",
+"تاريخ بداية النشاط": "Tanggal mulai kegiatan",
+"تاريخ نهاية النشاط": "Tanggal selesai kegiatan",
+"اكتبوا تاريخ بداية النشاط {0}": "Tulis tanggal mulai kegiatan {0}",
+"تاريخ النهاية قبل البداية في النشاط {0}": "Tanggal selesai sebelum tanggal mulai pada kegiatan {0}",
+"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "Untuk kegiatan yang sudah berjalan di masjid tetapi belum terdaftar di sistem: tulis datanya apa adanya, nomor persetujuan jika ada, dan tanggal mulainya."
 }

@@ -630,5 +630,14 @@
 "تعذّر حفظ التسجيل على الجوال. أعيدوا المحاولة بعد عودة الإنترنت": "Could not save the recording on the phone. Try again when the internet is back",
 "أنتم دون اتصال بالإنترنت": "You are offline",
 "يمكنكم التسجيل، ويُحفظ مع وقته ويُرسل تلقائياً عند عودة الاتصال. لا يمكن إرفاق ملفات.": "You can record. It is saved with its time and sent automatically when you are back online. Files cannot be attached.",
-"الآن خارج وقت الخطبة، ويمكنكم التسجيل ويظهر وقته للقسم": "It is outside the sermon time now. You can still record; the time is shown to the section"
+"الآن خارج وقت الخطبة، ويمكنكم التسجيل ويظهر وقته للقسم": "It is outside the sermon time now. You can still record; the time is shown to the section",
+"تسجيل نشاط غير مسجل": "Register an unregistered activity",
+"نشاط غير مسجل": "Unregistered activity",
+"رقم الموافقة إن وُجد": "Approval number (if any)",
+"اتركوه فارغًا إن لم تكن للنشاط موافقة": "Leave empty if the activity has no approval",
+"تاريخ بداية النشاط": "Activity start date",
+"تاريخ نهاية النشاط": "Activity end date",
+"اكتبوا تاريخ بداية النشاط {0}": "Enter the start date of activity {0}",
+"تاريخ النهاية قبل البداية في النشاط {0}": "End date is before the start date in activity {0}",
+"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "For an activity already running in the mosque but not registered in the system: enter its details as they are, the approval number if any, and its start date."
 }
