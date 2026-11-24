@@ -1,0 +1,5 @@
+/* v98: مجموعات الصفحات بتبويبات */
+#nav button.vg-off{display:none!important}
+.vg-bar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:4px;background:var(--surface-2,#f4f1e8);border-radius:12px;width:fit-content;max-width:100%}
+.vg-bar button{border:0;background:none;padding:8px 14px;border-radius:9px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;min-height:36px}
+.vg-bar button.on{background:var(--card,#fff);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
