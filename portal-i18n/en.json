@@ -639,5 +639,10 @@
 "تاريخ نهاية النشاط": "Activity end date",
 "اكتبوا تاريخ بداية النشاط {0}": "Enter the start date of activity {0}",
 "تاريخ النهاية قبل البداية في النشاط {0}": "End date is before the start date in activity {0}",
-"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "For an activity already running in the mosque but not registered in the system: enter its details as they are, the approval number if any, and its start date."
+"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "For an activity already running in the mosque but not registered in the system: enter its details as they are, the approval number if any, and its start date.",
+"رمز التفعيل": "Activation code",
+"يرسله القسم، 6 أرقام": "6 digits sent by the department",
+"اكتبوا رمز التفعيل الذي أرسله لكم القسم": "Enter the activation code the department sent you",
+"أُوقف التفعيل 15 دقيقة بسبب محاولات خاطئة": "Activation is paused for 15 minutes due to wrong attempts",
+"بيانات التفعيل أو رمز التفعيل غير صحيح. إن كنتم منسقاً جديداً فاختاروا «إنشاء حساب»": "The activation details or code are incorrect. If you are a new coordinator, choose “Create account”"
 }

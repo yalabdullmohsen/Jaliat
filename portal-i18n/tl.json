@@ -639,5 +639,10 @@
 "تاريخ نهاية النشاط": "Petsa ng pagtatapos ng aktibidad",
 "اكتبوا تاريخ بداية النشاط {0}": "Isulat ang petsa ng simula ng aktibidad {0}",
 "تاريخ النهاية قبل البداية في النشاط {0}": "Ang petsa ng pagtatapos ay bago ang simula sa aktibidad {0}",
-"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "Para sa aktibidad na kasalukuyang ginagawa sa masjid ngunit hindi nakarehistro sa sistema: isulat ang mga detalye nito, ang numero ng pag-apruba kung mayroon, at ang petsa ng simula."
+"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "Para sa aktibidad na kasalukuyang ginagawa sa masjid ngunit hindi nakarehistro sa sistema: isulat ang mga detalye nito, ang numero ng pag-apruba kung mayroon, at ang petsa ng simula.",
+"رمز التفعيل": "Activation code",
+"يرسله القسم، 6 أرقام": "6 na numerong ipinadala ng departamento",
+"اكتبوا رمز التفعيل الذي أرسله لكم القسم": "Ilagay ang activation code na ipinadala sa inyo ng departamento",
+"أُوقف التفعيل 15 دقيقة بسبب محاولات خاطئة": "Itinigil ang activation nang 15 minuto dahil sa maling pagsubok",
+"بيانات التفعيل أو رمز التفعيل غير صحيح. إن كنتم منسقاً جديداً فاختاروا «إنشاء حساب»": "Mali ang detalye o code ng activation. Kung bago kayong coordinator, piliin ang “Gumawa ng account”"
 }
