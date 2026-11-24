@@ -1,0 +1,75 @@
+/* ================= v102 (JL-9): لوحة ألوان موحّدة، وسلّم مسافات وخطوط وزوايا وظلال ================= */
+/* مصدر واحد للألوان: الأخضر للهوية، وذهبي هادئ، ورمادي محايد بثلاث درجات (--n1 نص ثانوي، --n2 أيقونات وتلميحات، --n3 حدود)، وحالات (نجاح، تحذير، خطر، معلومات).
+   كل لون نصّي ≥ 4.5:1 على السطح والخلفية في الوضعين (محسوب). يأتي بعد كل الوحدات فيغلب تعريفاتها المتفرقة (add62/add63).
+   لا تغيير في الوظائف ولا في مواضع الأزرار. */
+:root:not([data-theme="dark"]){
+  --bg:#F4F6F3; --surface:#FFFFFF; --surface-2:#EEF2EE; --ink:#11241D;
+  --n1:#56655E; --n2:#8A968F; --n3:#E3E8E3; --muted:var(--n1); --line:var(--n3); --line-2:#EEF2EE;
+  --primary:#0E6B4E; --primary-ink:#FFFFFF; --primary-soft:#E2F0E8; --gold:#8C6410; --gold-soft:#F6EDD5;
+  --ok:#1B7A4B; --oks:#E3F3EA; --warn:#8A5A00; --warns:#FBF0D4; --bad:#B02A1E; --bads:#FBE4E0; --info:#1F5FA8; --infos:#E3EEFA;
+  --sh-1:0 1px 2px rgba(17,36,29,.05),0 4px 16px rgba(17,36,29,.05); --sh-2:0 2px 4px rgba(17,36,29,.06),0 12px 32px rgba(17,36,29,.08);
+  --shadow:var(--sh-1);
+}
+:root[data-theme="dark"]{
+  --bg:#0C1411; --surface:#131E19; --surface-2:#18261F; --ink:#E5EEE9;
+  --n1:#A3B5AB; --n2:#7F938A; --n3:#24352C; --muted:var(--n1); --line:var(--n3); --line-2:#1C2B24;
+  --primary:#3DB487; --primary-ink:#06140E; --primary-soft:#163528; --gold:#E0B858; --gold-soft:#33290F;
+  --ok:#5CCB95; --oks:#14301F; --warn:#E8B84A; --warns:#33290F; --bad:#F28B7D; --bads:#3A1A16; --info:#8DB8F2; --infos:#132A40;
+  --sh-1:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.22); --sh-2:0 2px 4px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.35);
+  --shadow:var(--sh-1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-theme="dark"]){
+  --bg:#0C1411; --surface:#131E19; --surface-2:#18261F; --ink:#E5EEE9;
+  --n1:#A3B5AB; --n2:#7F938A; --n3:#24352C; --muted:var(--n1); --line:var(--n3); --line-2:#1C2B24;
+  --primary:#3DB487; --primary-ink:#06140E; --primary-soft:#163528; --gold:#E0B858; --gold-soft:#33290F;
+  --ok:#5CCB95; --oks:#14301F; --warn:#E8B84A; --warns:#33290F; --bad:#F28B7D; --bads:#3A1A16; --info:#8DB8F2; --infos:#132A40;
+  --sh-1:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.22); --sh-2:0 2px 4px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.35);
+  --shadow:var(--sh-1);
+}}
+/* سلّم المسافات والزوايا والخطوط */
+:root{ --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --r-s:8px; --r:12px; --r-l:16px;
+  --t-h1:22px; --t-h2:18px; --t-h3:16px; --t-body:14.5px; --t-label:12.5px; --ic:16px }
+
+/* البطاقات واللوحات: زاوية وظل واحد، وحدود أخف، ومسافة داخلية من السلّم */
+.panel,.card,.kpi,.check,.pv-r,.rq-card,.wq-i{border-radius:var(--r)}
+.panel{box-shadow:var(--sh-1);border-color:transparent}
+.panel-h{padding-bottom:var(--s3)}
+.panel-h h3{font-size:var(--t-h3);font-weight:700}
+.kpi{box-shadow:var(--sh-1);border-color:transparent;min-height:88px}
+.check{border-radius:var(--r);padding:var(--s3) var(--s4)}
+
+/* سلّم الخطوط */
+#title{font-size:var(--t-h1);font-weight:700}
+#view h2{font-size:var(--t-h2)} #view h3{font-size:var(--t-h3)} #view h4{font-size:15px}
+#view .s,#view small,.hint{font-size:var(--t-label);color:var(--n1)}
+
+/* الأزرار: أساسي مملوء، وثانوي بإطار خفيف، وشبحي بلا إطار؛ ارتفاع وزاوية ومقاس أيقونة واحد */
+.btn{min-height:40px;border-radius:10px;font-weight:600;gap:var(--s2)}
+.btn svg{width:var(--ic);height:var(--ic)}
+.btn-primary{box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.btn-ghost{border-color:transparent;background:var(--surface-2)}
+.btn-ghost:hover{background:var(--primary-soft)}
+header.top .btn{white-space:nowrap}
+
+/* الجداول: صفوف مريحة وخطوط فاصلة أخف */
+#view table th{font-size:var(--t-label);font-weight:600;color:var(--n1);padding:var(--s3) var(--s4);background:var(--surface-2)}
+#view table td{padding:var(--s3) var(--s4);border-color:var(--line-2)}
+#view table tr{border-color:var(--line-2)}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+
+/* الرقائق والوسوم بألوان الحالة الموحّدة */
+.chip.ok{background:var(--oks);color:var(--ok)} .chip.warn{background:var(--warns);color:var(--warn)} .chip.bad{background:var(--bads);color:var(--bad)} .chip.gold{background:var(--gold-soft);color:var(--gold)}
+
+/* أيقونات القائمة بمقاس واحد */
+#nav button svg{width:18px;height:18px}
+
+/* الجوال: لا شيء يتجاوز عرض الشاشة (كان زر 💡 والتبويبات وجدول الموافقات تدفع الصفحة 23 بكسل) */
+.seg,.vg-bar,.pt-tabs{flex-wrap:wrap}
+@media (max-width:700px){
+  header.top .idea-b{display:none}
+  :root header.top{gap:2px;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+  header.top .btn{padding-inline:8px;gap:4px;min-width:36px}
+  header.top #title{min-width:0;flex:1 1 0}
+  .panel{padding-inline:var(--s3)}
+}
+@media (min-width:701px){:root header.top #title{flex:0 0 auto;max-width:40%}}
