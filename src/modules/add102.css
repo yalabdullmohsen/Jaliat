@@ -115,3 +115,24 @@ header.top .btn{white-space:nowrap}
 :root .hx-r b{inset:0 0 auto 0;height:112px}
 :root .hx-r span{position:static;opacity:1;color:#E6EFEB;font-size:12px;text-align:center;max-width:140px;line-height:1.4}
 @media (max-width:700px){ :root .hx-r svg{width:64px;height:64px} :root .hx-r b{height:64px} :root .hx-r span{display:none} :root .hx-b{white-space:nowrap;font-size:13px} }
+
+/* ===== القائمة السفلية على الجوال (طلب يوسف: «واضحة وليس مقصوصة… صغّرها… أوضح وأبعد شوي وأجمل») ===== */
+/* عائمة ومدمجة: هامش جانبي وسفلي فوق المنطقة الآمنة، زوايا مستديرة وظل خفيف، خلفية مصمتة فلا يظهر المحتوى خلفها،
+   وزر «+» كامل داخل القائمة لا بارزًا فوقها (كان يُقصّ من أعلاه لأن الأزرار overflow:hidden) */
+@media (max-width:900px){
+  :root .tabbar{inset:auto 12px calc(env(safe-area-inset-bottom,0px) + 10px) 12px;padding:4px;gap:2px;border-radius:20px;
+    background:var(--surface)!important;-webkit-backdrop-filter:none;backdrop-filter:none!important;border:1px solid var(--line)!important;
+    box-shadow:0 10px 30px -8px rgba(17,36,29,.28)!important;align-items:center}
+  :root[data-theme="dark"] .tabbar{box-shadow:0 10px 30px -8px rgba(0,0,0,.6)!important}
+  :root .tabbar button{padding:5px 2px 4px;gap:2px;font-size:10.5px;line-height:1.2;border-radius:14px;color:var(--n1);min-height:46px;align-content:center}
+  :root .tabbar button>svg{width:20px;height:20px;margin-block:5px}
+  :root .tabbar button[aria-current="page"]{color:var(--primary);background:var(--primary-soft);font-weight:700}
+  :root .tabbar .add{overflow:visible}
+  :root .tabbar .add span.plus{width:30px;height:30px;border-radius:10px;margin-top:0;box-shadow:0 4px 10px -4px rgba(14,107,78,.6)}
+  :root .tabbar .add span.plus svg{width:18px;height:18px}
+  /* آخر عنصر في الصفحة لا يختفي تحت القائمة: ارتفاعها (~56) + هامشها + المنطقة الآمنة + فسحة */
+  :root .view{padding-bottom:calc(64px + 10px + 16px + env(safe-area-inset-bottom,0px))}
+}
+
+/* ===== حذف «إرفاق ملف» (طلب يوسف «ما نحتاجه»): خيار التصوير في «إضافة نشاط» وزر «إرفاق» في الترويسة يؤديان الوظيفة نفسها (ocrPick)؛ تُخفى الواجهة فقط ===== */
+:root #ocr-top,.drawer .ocr-cta{display:none!important}
