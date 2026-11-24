@@ -16,21 +16,23 @@ const VGROUPS = [
   { title:"المهام", tabs:[["tasks", "المهام"], ["questions", "الأسئلة"]] },
   { title:"الدليل", tabs:[["guide", "الدليل"], ["changes", "سجل التحديثات"]] }
 ];
-const VG_HIDDEN = { chat:"home", freq:"dept" };
+const VG_HIDDEN = { chat:"home" };
+/* «طلبات الميزات» زرها مخفي فقط؛ صفحتها تبقى مفتوحة من «الدليل» لقراءة الأفكار المقترحة (زر 💡 في add99) */
+const VG_NAV_OFF = ["chat", "freq"];
 const vgOf = v => VGROUPS.find(g => g.tabs.some(t => t[0] === v));
 /* المسموح من تبويبات المجموعة: صفحة لها زر في القائمة غير مخفي بالصلاحية (قبل إخفاء الدمج) */
 const vgAllowed = g => g.tabs.filter(([k]) => { const b = document.querySelector(`#nav button[data-nav="${k}"]`); return b && !b.hidden && !b.closest("[hidden]"); });
 function vgNav(){ const nav = $("#nav"); if (!nav) return;
-  for (const k of Object.keys(VG_HIDDEN)) nav.querySelectorAll(`button[data-nav="${k}"]`).forEach(b => b.classList.add("vg-off"));
+  for (const k of VG_NAV_OFF) nav.querySelectorAll(`button[data-nav="${k}"]`).forEach(b => b.classList.add("vg-off"));
   for (const g of VGROUPS) { const A = vgAllowed(g); nav.querySelectorAll(g.tabs.map(([k]) => `button[data-nav="${k}"]`).join(",")).forEach(b => b.classList.remove("vg-main"));
     g.tabs.forEach(([k]) => nav.querySelectorAll(`button[data-nav="${k}"]`).forEach(b => b.classList.toggle("vg-off", !A.length || k !== A[0][0])));
     if (!A.length) continue; const main = nav.querySelector(`button[data-nav="${A[0][0]}"]`); if (!main) continue; main.classList.add("vg-main");
     const sp = main.querySelector("span") || main; if (sp.textContent !== g.title) { if (!main.dataset.vgOld) main.dataset.vgOld = sp.textContent; if (main.querySelector("span")) sp.textContent = g.title; }
     if (vgOf(S.view) === g) main.setAttribute("aria-current", "page"); } }
 const _go98 = go;
-go = function(v, opt){ if (VG_HIDDEN[v]) v = VG_HIDDEN[v] === "dept" && !document.body.classList.contains("dp-only") ? "home" : VG_HIDDEN[v]; return _go98.call(this, v, opt); };
+go = function(v, opt){ if (VG_HIDDEN[v]) v = VG_HIDDEN[v]; return _go98.call(this, v, opt); };
 const _render98 = render;
-render = function(){ if (VG_HIDDEN[S.view]) S.view = VG_HIDDEN[S.view] === "dept" && !document.body.classList.contains("dp-only") ? "home" : VG_HIDDEN[S.view];
+render = function(){ if (VG_HIDDEN[S.view]) S.view = VG_HIDDEN[S.view];
   const r = _render98.apply(this, arguments), g = vgOf(S.view); if (!g) return r; const A = vgAllowed(g); if (A.length < 2) return r;
   const view = $("#view"); if (!view || view.querySelector(":scope > .vg-bar")) return r;
   view.insertAdjacentHTML("afterbegin", `<div class="vg-bar" role="tablist" aria-label="${esc(g.title)}">${A.map(([k, l]) => `<button type="button" role="tab" aria-selected="${k === S.view}" class="${k === S.view ? "on" : ""}" data-vgtab="${k}">${esc(l)}</button>`).join("")}</div>`);
