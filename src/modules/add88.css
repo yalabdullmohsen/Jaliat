@@ -1,0 +1,9 @@
+/* v88: القائمة حسب الدور: الأساسية ظاهرة، والباقي خلف «المزيد»؛ البحث في القائمة يعرض الكل */
+#nav .nl-core{display:flex;flex-direction:column;gap:2px}
+#nav .nl-more{display:flex;align-items:center;gap:8px;width:100%;margin-top:6px;background:none;border:0;color:var(--side-muted);font-weight:600;cursor:pointer;text-align:right}
+#nav .nl-more svg{width:14px;height:14px;transform:rotate(90deg);transition:transform .2s}
+#nav.more .nl-more svg{transform:rotate(-90deg)}
+#nav:not(.lean) .nl-more{display:none}
+#nav.lean:not(.more):not(.q-on) > button[data-nav],
+#nav.lean:not(.more):not(.q-on) > .ng{display:none}
+#nav.lean.q-on .nl-more{display:none}
