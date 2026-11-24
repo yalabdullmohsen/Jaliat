@@ -1,0 +1,6 @@
+/* v93: جدول خطباء الجمعة */
+.fs-bar .seg{flex-wrap:wrap}.fs-t{margin:10px 0}.fs-t .wq-tile.on{outline:2px solid var(--primary)}
+.fs-tb tr.fs-gap td,.fs-tb tr.fs-dup td,.fs-tb td.fs-gap,.fs-tb td.fs-dup,.fs-tb td.fs-none{background:rgba(179,38,30,.07)}
+.fs-tb td.fs-plan{color:var(--muted)}.fs-a{white-space:nowrap}.fs-a .btn{padding-inline:8px}
+.fs-hk{display:block;font-size:11px;color:var(--muted)}
+@media print{body.fs-printing *{visibility:hidden}body.fs-printing #fs-sheet,body.fs-printing #fs-sheet *{visibility:visible}body.fs-printing #fs-sheet{position:absolute;inset:0 0 auto 0}body.fs-printing .no-print{display:none}}
