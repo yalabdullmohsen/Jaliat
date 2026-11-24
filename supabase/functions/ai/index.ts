@@ -94,10 +94,49 @@ async function gemini(task: Task, prompt: string, schema: Record<string, unknown
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   let body: any; try { body = await req.json(); } catch (_) { return json({ ok: false, msg: "طلب غير صالح" }, 400); }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
   const task = TASKS[body?.kind];
   if (!task) return json({ ok: false, msg: "طلب غير صالح" }, 400);
   const me = await who(req, body);
   if (!me) return json({ ok: false, msg: "غير مصرّح" }, 401);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+  // الهوية قبل أي شيء: موظف نشط بجلسته (JWT مستخدم)، أو جلسة بوابة صالحة (pa_acc) للترجمة وحدها.
+  // تُنشر الدالة مع التحقق من JWT (verify_jwt = true): البوابة ترسل مفتاح anon في Authorization وجلستها في portal_s.
+  // فحص الجاهزية بعد بوابة JWT (يكفي مفتاح anon) وبلا أي بيانات: هل المفتاح موجود وصالح؟ (قائمة النماذج، بلا توليد ولا حصة). لا يُطبع المفتاح.
+  if (body?.kind === "ping") {
+    if (!KEY) return json({ ok: false, key: false });
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1", { headers: { "x-goog-api-key": KEY } });
+    return json({ ok: r.ok, key: true, status: r.status, models: MODELS });
+  }
+  const me = await who(req, body);
+  if (!me) return json({ ok: false, msg: "غير مصرّح" }, 401);
+  const task = TASKS[body?.kind];
+  if (!task) return json({ ok: false, msg: "طلب غير صالح" }, 400);
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
   if (me.portal && !task.portal) return json({ ok: false, msg: "غير مصرّح" }, 403);
   if (!KEY) return json({ ok: false, msg: QUIET });
 
