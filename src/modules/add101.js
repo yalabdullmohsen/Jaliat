@@ -15,6 +15,8 @@ FS_ST.swap = ["مُستبدَل", "gold"];
 function ksCandidates(fri, id){ const k = S.khatibs.get(id), busy = new Set(), out = [], seen = new Set();
   for (const [oid, ok] of S.khatibs) { if (oid === id) continue; const n = fsCell(fri, oid, ok).name; if (n) busy.add(fsName(n)); }
   const cur = fsName(fsCell(fri, id, k).name || k.pri);
+  /* من اعتذر أو استُبدل في الجمعة نفسها لا يُقترح بديلًا لمسجد آخر */
+  for (const sw of KS.swaps.values()) if (sw.fri === fri && sw.orig_name) busy.add(fsName(sw.orig_name));
   const add = (name, phone, why, rank) => { const n = fsName(name); if (!n || n === cur || busy.has(n) || seen.has(n)) return; seen.add(n); out.push({ name, phone:phone || "", why, rank }); };
   if (k.bak) add(k.bak, k.bph, "احتياط هذا المسجد", 0);
   KS.reserve.filter(r => r.comm === k.comm).forEach(r => add(r.name, r.phone, "احتياط الجالية", 1));
