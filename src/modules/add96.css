@@ -1,0 +1,11 @@
+/* v96 (JL-5): تعريف الأرقام والمقارنة الشهرية والتوزيعات القابلة للنقر */
+.kpi .kdef{display:block;font-size:11px;line-height:1.4;color:var(--muted);font-weight:400;margin-top:2px}
+button.kpi{cursor:pointer;text-align:start}
+.mc96{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:12px}
+.mc96-i{display:flex;flex-direction:column;gap:2px;align-items:flex-start;padding:12px;border-radius:12px;border:0;background:var(--surface-2);color:var(--ink);cursor:pointer;text-align:start}
+.mc96-i:hover{background:color-mix(in srgb,var(--primary) 8%,var(--surface))}
+.mc96-i>span{font-size:13px;color:var(--muted)}.mc96-i b{font-size:22px}
+.mc96-i small.ok{color:var(--ok)}.mc96-i small.bad{color:var(--bad)}
+.st96 .bar{display:grid;grid-template-columns:minmax(90px,30%) 1fr auto;gap:8px;align-items:center;width:100%;border:0;background:none;color:var(--ink);padding:6px 4px;border-radius:8px;cursor:pointer;text-align:start}
+.st96 .bar:hover{background:var(--surface-2)}
+.st96 .track{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}.st96 .track i{display:block;height:100%;background:var(--primary);border-radius:99px}
