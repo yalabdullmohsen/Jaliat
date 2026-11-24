@@ -26,12 +26,12 @@ function wqMsg(w, oc, c, why){
   return `${hi}نفيدكم بورود الرد على طلبكم ${sub}\nوقد تضمّن ملاحظات تحتاج إلى استكمال${why ? `:\n${why}` : ""}\n\nنرجو تزويدنا بها لاستكمال الإجراء، وجزاكم الله خيراً.${SIGN}`; }
 
 function wqNotifyBox(w){ const oc = wqOutcome(w) || "ملاحظات", L = wqCoords(w), n = S.wqn.get(w.id); S.wqF = { id:w.id, oc, ci:0 };
-  return `<div class="rq-sec wn" id="wn"><b>📲 إبلاغ المنسق${n ? " (أُبلغ سابقاً، يمكن الإعادة)" : ""}</b>
+  return `<div class="rq-sec wn" id="wn"><b>إبلاغ المنسق${n ? " (أُبلغ سابقاً، يمكن الإعادة)" : ""}</b>
     <div class="seg" id="wn-oc">${Object.keys(WQ_OC).map(k => `<button type="button" data-wnoc="${k}" class="${k === oc ? "on" : ""}">${WQ_OC[k][0]}</button>`).join("")}</div>
     ${fld("wn-c", "المنسق", `<select class="f" id="wn-c">${L.sure ? "" : `<option value="" selected>— اختر المنسق (لم يتضح من الكتاب) —</option>`}${L.map((c, i) => `<option value="${i}"${L.sure && !i ? " selected" : ""}>${i < L.hit ? "★ " : ""}${esc(c.name)}، ${esc(c.comm || c.lang || "")}${c.role && c.role !== "منسق" ? " (" + esc(c.role) + ")" : ""}</option>`).join("")}</select>`)}
     <div id="wn-why-w" ${oc === "موافقة" ? "hidden" : ""}>${fld("wn-why", "السبب / الملاحظات (اختياري)", `<textarea class="f" id="wn-why" rows="2"></textarea>`)}</div>
     ${fld("wn-t", "نص الرسالة", `<textarea class="f" id="wn-t" rows="9">${esc(wqMsg(w, oc, L.sure ? L[0] : null))}</textarea>`)}
-    <button type="button" class="btn btn-ok" data-wnsend>📲 إبلاغ المنسق بالواتساب</button>${n ? `<button type="button" class="btn btn-ghost" data-wnunmark="${esc(w.id)}">إلغاء علامة «أُبلغ»</button>` : `<button type="button" class="btn" data-wnmark="${esc(w.id)}">✓ تم الإبلاغ (أعلّمها أنا)</button>`}</div>`; }
+    <button type="button" class="btn btn-ok" data-wnsend>إبلاغ المنسق بالواتساب</button>${n ? `<button type="button" class="btn btn-ghost" data-wnunmark="${esc(w.id)}">إلغاء علامة «أُبلغ»</button>` : `<button type="button" class="btn" data-wnmark="${esc(w.id)}">✓ تم الإبلاغ (أعلّمها أنا)</button>`}</div>`; }
 function wnRefresh(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[wnIdx()]; $("#wn-t").value = wqMsg(w, S.wqF.oc, c, $("#wn-why")?.value.trim()); const ww = $("#wn-why-w"); if (ww) ww.hidden = S.wqF.oc === "موافقة"; }
 async function wnSend(){ const w = S.wq.find(x => x.id === S.wqF?.id); if (!w) return; const c = wqCoords(w)[wnIdx()]; if (!c) return toast("اختر المنسق أولاً");
   waGo(c.phone, $("#wn-t").value, null, c.name);

@@ -21,7 +21,7 @@ const GUIDES = {
     G("#view .seg", "التبويبات", "<b>مهام الفريق</b> (لرئيس القسم): كل المهام. <b>مهامي</b>: المسندة لك. <b>إنجازاتي</b>: ما أنجزته. <b>سجل الإنجاز</b>: إنجاز كل موظف."),
     G("[data-tknew]", "إسناد مهمة", "اكتب المهمة، اختر الموظف والموعد والأولوية، ثم «إسناد المهمة». يصله إشعار فوراً."),
     G("[data-tkcf]", "إسناد التعارضات بضغطة", "يحوّل كل تعارض في الجدول إلى مهمة لموظف دفعة واحدة."),
-    { t:"إنجاز المهمة (للموظف)", x:"افتح المهمة: <b>«تم الإنجاز ✅»</b> مباشرة بضغطة واحدة، أو «استلمت» و«بدأت» إن أردت إظهار التقدم. رئيس القسم يرى كل خطوة بوقتها." } ] },
+    { t:"إنجاز المهمة (للموظف)", x:"افتح المهمة: <b>«تم الإنجاز »</b> مباشرة بضغطة واحدة، أو «استلمت» و«بدأت» إن أردت إظهار التقدم. رئيس القسم يرى كل خطوة بوقتها." } ] },
   fix:{ g:"العمل اليومي", d:"كل ما ينقص النظام ليعمل بدقة، وكل ما تكمله يختفي من القائمة.", s:[
     G("#view .fx-tabs", "تبويبات النقص", "<b>توزيع على المنسقين</b>: موافقات قديمة مسجلة باسم جالية مشتركة. <b>أنشطة ناقصة</b>: بلا مسجد أو وقت. <b>جاليات بلا منسق</b>. <b>منسقون بلا رقم</b>."),
     G("[data-spall]", "اعتماد المقترحات بضغطة", "النظام يقرأ الكتاب ويقترح المنسق الصحيح؛ هذا الزر ينقل كل المقترحات دفعة واحدة.", { none:"عند وجود موافقات للتوزيع يظهر زر «اعتماد المقترحات» لنقلها كلها بضغطة." }),
@@ -109,7 +109,7 @@ const _tourEnd62 = tourEnd; tourEnd = function(d){ _tourEnd62(d); setTimeout(() 
 /* guide center: every page, what it is for and how to do the work, with a «show me on the screen» button */
 function vGuide(){ const groups = [...new Set(Object.values(GUIDES).map(x => x.g))], q = nkey(S.f.gq || "");
   const steps = k => { const T = TOURS[tourKey(k)]; return T ? T.steps.slice(GUIDES[k].tour ? 0 : 1) : []; };
-  return `<div class="gd-h panel"><div class="panel-b"><b>دليل استخدام إنجاز</b><span>لكل صفحة: ما فائدتها، وكيف تُنجز العمل فيها خطوة بخطوة. زر <b>«اشرح لي على الشاشة»</b> يفتح الصفحة ويقف عند كل جزء بأسهم ويشرحه. وفي أعلى كل صفحة زر <b>«📘 دليل الصفحة»</b>، وبجانب كل جزء علامة <b>«؟»</b> تشرحه وحده.</span>
+  return `<div class="gd-h panel"><div class="panel-b"><b>دليل استخدام إنجاز</b><span>لكل صفحة: ما فائدتها، وكيف تُنجز العمل فيها خطوة بخطوة. زر <b>«اشرح لي على الشاشة»</b> يفتح الصفحة ويقف عند كل جزء بأسهم ويشرحه. وفي أعلى كل صفحة زر <b>«دليل الصفحة»</b>، وبجانب كل جزء علامة <b>«؟»</b> تشرحه وحده.</span>
     <div class="search" style="margin-top:10px"><svg><use href="#i-search"/></svg><input class="f" data-fk="gq" placeholder="ابحث: تصريح، موافقة، مكافأة، تذكير…" value="${esc(S.f.gq || "")}"></div></div></div>
     ${groups.map(g => { const ks = Object.keys(GUIDES).filter(k => GUIDES[k].g === g && $(`#nav [data-nav="${k}"]`) && (!q || nkey(TITLES[k] + " " + GUIDES[k].d + " " + steps(k).map(s => s.t + " " + s.x).join(" ")).includes(q))); if (!ks.length) return "";
       return `<div class="gd-g"><h3>${esc(g)}</h3>${ks.map(k => `<details class="gd-i panel"${q ? " open" : ""}><summary><b>${esc(TITLES[k] || k)}</b><span>${esc(GUIDES[k].d)}</span></summary>

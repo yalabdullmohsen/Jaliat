@@ -4,7 +4,7 @@ const _vCopilot80 = vCopilot;
 vCopilot = function(){
   const h = _vCopilot80();
   if (!hasBridge() || brV() < 1.1) return h;
-  const nm = CPA.file ? `📎 ${esc(CPA.file.name)} <button type="button" class="btn btn-ghost" data-cpa-x title="إزالة المرفق">✕</button>` : "";
+  const nm = CPA.file ? `${esc(CPA.file.name)} <button type="button" class="btn btn-ghost" data-cpa-x title="إزالة المرفق">✕</button>` : "";
   return h.replace('<button class="btn" type="button" data-intake', `<label class="btn" title="أرفق ملفاً لـ Copilot (PDF أو صورة أو نص)">${icon("i-down")} ملف<input type="file" id="br-att" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.md,.csv,image/*" hidden></label><button class="btn" type="button" data-intake`)
     .replace('<span class="s" id="br-st">', `<span class="s" id="br-attn">${nm}</span><span class="s" id="br-st">`);
 };

@@ -34,4 +34,4 @@ if (typeof prFill === "function") { const _prFill64 = prFill; prFill = function(
 /* the signature & stamp on permits belong to the head of section: only he can change them (also enforced in the database) */
 const isHead = () => S.me?.username === "fayez";
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-passets],[data-pasave]"); if (!t || isHead()) return; ev.preventDefault(); ev.stopImmediatePropagation(); toast("التوقيع والختم يغيّرهما رئيس القسم فقط"); }, true);
-const _afterRender64 = afterRender; afterRender = function(v){ _afterRender64(v); if (v === "permits" && !isHead()) { const b = $("[data-passets]"); if (b) { b.disabled = true; b.title = "يغيّرهما رئيس القسم فقط"; b.textContent = "🔒 التوقيع والختم (رئيس القسم)"; } } };
+const _afterRender64 = afterRender; afterRender = function(v){ _afterRender64(v); if (v === "permits" && !isHead()) { const b = $("[data-passets]"); if (b) { b.disabled = true; b.title = "يغيّرهما رئيس القسم فقط"; b.textContent = "التوقيع والختم (رئيس القسم)"; } } };

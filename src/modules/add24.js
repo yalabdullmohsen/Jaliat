@@ -17,7 +17,7 @@ function nfPaint(){
   }
 }
 function nfCard(){ const L = nfUnseen(); if (!L.length) return "";
-  return `<div class="panel nf-card"><div class="panel-h"><h3>✨ ما الجديد في «إنجاز»</h3><span class="s">تحديثات ${L.length}</span><button type="button" class="btn btn-ghost" data-nfall>تم، إخفاء</button></div>
+  return `<div class="panel nf-card"><div class="panel-h"><h3>ما الجديد في «إنجاز»</h3><span class="s">تحديثات ${L.length}</span><button type="button" class="btn btn-ghost" data-nfall>تم، إخفاء</button></div>
     <div class="panel-b nf-list">${L.map(f => `<button type="button" class="nf-i" ${f[1].startsWith("nav:") ? `data-nfgo="${f[1].slice(4)}"` : ""} data-nfk="${f[0]}"><span class="nf-b">جديد</span><span class="nf-t"><b>${esc(f[2])}</b><span>${esc(f[3])}</span></span></button>`).join("")}</div></div>`; }
 function nfTip(f, el){
   document.querySelector(".nf-tip")?.remove(); const r = el.getBoundingClientRect();

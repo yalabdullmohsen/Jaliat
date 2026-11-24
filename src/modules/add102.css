@@ -141,3 +141,27 @@ header.top .btn{white-space:nowrap}
    يبقى خط Amiri للنصوص الشرعية حيث هو، وتبقى ورقتا التصريح وكتاب وثيقة المطبوعتان بخطهما لأن أبعادهما ثابتة لورق A4. */
 :root:root:root{ --f-body:"Noto Kufi Arabic","IBM Plex Sans Arabic",system-ui,sans-serif; --f-display:"Noto Kufi Arabic","IBM Plex Sans Arabic",system-ui,sans-serif }
 body,button,input,select,textarea,.btn,.tabbar button,#nav button{font-family:var(--f-body)}
+
+/* ===== لمسات ذهبية للهوية (طلب يوسف «زيد من اللون الذهبي حتى يكون هوية جميلة») =====
+   الذهبي للتمييز والزخرفة الخفيفة، والأخضر يبقى للأزرار والنص المهم؛ النص الذهبي بتباين ≥ 4.5 (#8C6410 فاتحًا و#E0B858 داكنًا). */
+:root{ --gold-line:#C9A35A }
+/* القائمة الجانبية: العنصر النشط بمؤشر ذهبي وأيقونة ذهبية */
+#nav button[aria-current="page"]{position:relative;box-shadow:inset -3px 0 0 var(--gold-line)}
+#nav button[aria-current="page"] svg{color:var(--gold-line)!important;opacity:1}
+#nav .sep span{color:var(--gold)}
+/* عناوين الأقسام والبطاقات: شريط ذهبي قصير قبل العنوان */
+.panel-h h3::before,#view h3.wk-h::before{content:"";display:inline-block;width:4px;height:1em;border-radius:2px;background:var(--gold-line);margin-inline-end:8px;vertical-align:-2px}
+/* البطاقة الخضراء: خط ذهبي رفيع في أعلاها، والتحية ذهبية */
+:root .hx{border-top:3px solid var(--gold-line)}
+/* بطاقات الأرقام: خط ذهبي خفيف في أعلى كل بطاقة */
+.kpi{border-top:2px solid color-mix(in srgb,var(--gold-line) 55%,transparent)!important}
+/* عنوان الصفحة: خط ذهبي قصير تحته على الحاسوب */
+@media (min-width:701px){ #title{position:relative} #title::after{content:"";position:absolute;inset-inline-start:0;bottom:-6px;width:28px;height:3px;border-radius:2px;background:var(--gold-line)} }
+/* القائمة السفلية: نقطة ذهبية تحت العنصر النشط */
+@media (max-width:900px){ :root .tabbar button[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--gold-line)} }
+/* الوسوم الذهبية والتبويبات النشطة */
+.vg-bar button.on,.seg button.on{box-shadow:inset 0 -2px 0 var(--gold-line),0 1px 3px rgba(0,0,0,.08)}
+/* التبويب النشط بسطح اللوحة في الوضعين (كان أبيض ثابتًا فلا يُقرأ نصه في الداكن) */
+.vg-bar button.on{background:var(--surface);color:var(--ink)}
+/* ذهبي أوضح في بطاقات الأرقام */
+.kpi{border-top:3px solid var(--gold-line)!important}

@@ -1,4 +1,4 @@
-/* ================= v98 (JL-AI 1): المساعد الذكي «✨» عبر دالة ai (Gemini) + ملخص الرئيسية ================= */
+/* ================= v98 (JL-AI 1): المساعد الذكي «» عبر دالة ai (Gemini) + ملخص الرئيسية ================= */
 /* كل نداء يمرّ بدالة ai على الخادم: المفتاح هناك، والحجب والصلاحية والحد اليومي والتخزين المؤقت هناك.
    المخرج اقتراح فقط يعتمده الموظف، والفشل رسالة هادئة ولا يوقف شيئًا. */
 const AI_QUIET = "المساعد الذكي غير متاح الآن، والمنصة تعمل كالمعتاد.";
@@ -7,7 +7,7 @@ async function aiCall(kind, input){
   if (error) { console.warn("ai", kind, error); return { ok:false, msg:AI_QUIET }; }
   return data && typeof data === "object" ? data : { ok:false, msg:AI_QUIET };
 }
-const aiBtn = (attrs, label = "✨", title = "اقتراح من المساعد الذكي") => `<button type="button" class="btn btn-ghost ai-btn" ${attrs} title="${esc(title)}" aria-label="${esc(title)}">${esc(label)}</button>`;
+const aiBtn = (attrs, label = "", title = "اقتراح من المساعد الذكي") => `<button type="button" class="btn btn-ghost ai-btn" ${attrs} title="${esc(title)}" aria-label="${esc(title)}">${esc(label)}</button>`;
 const aiNote = `<span class="ai-note">اقتراح من المساعد الذكي، راجعه قبل الاعتماد</span>`;
 const aiBusy = (btn, on) => { if (!btn) return; btn.disabled = on; btn.classList.toggle("spin", on); };
 
@@ -27,7 +27,7 @@ function aiBriefCard(){
   const body = !b ? `<span class="s">ثلاثة أسطر بأهم ما يحتاج انتباهك اليوم.</span>`
     : b.ok ? `<ol class="ai-lines">${(b.out?.lines || []).slice(0, 3).map(l => `<li>${esc(l)}</li>`).join("")}</ol>${aiNote}`
     : `<span class="s">${esc(b.msg || AI_QUIET)}</span>`;
-  return `<div class="panel ai-card"><div class="panel-b"><div class="ai-h"><b>✨ ملخص اليوم</b>${aiBtn("data-aibrief", b ? "تحديث" : "✨ لخّص يومي", "ملخص اليوم من المساعد الذكي")}</div>${body}</div></div>`; }
+  return `<div class="panel ai-card"><div class="panel-b"><div class="ai-h"><b>ملخص اليوم</b>${aiBtn("data-aibrief", b ? "تحديث" : "لخّص يومي", "ملخص اليوم من المساعد الذكي")}</div>${body}</div></div>`; }
 const _vHome98 = vHome;
 vHome = function(){ return aiBriefCard() + _vHome98(); };
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-aibrief]"); if (!t) return;

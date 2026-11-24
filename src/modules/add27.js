@@ -91,7 +91,7 @@ answer = function(q){ const t = norm(q);
     const d = /بعد غد/.test(t) ? addDays(TODAY, 2) : /(غدا|بكره|باكر)/.test(t) ? addDays(TODAY, 1) : TODAY;
     const m = S.mosques.find(x => nkey(x.name).length > 3 && t.includes(nkey(x.name))) || S.mosques.find(x => nkey(x.name).split(" ").filter(w => w.length > 3).some(w => t.includes(w)));
     if (tm) { Object.assign(S.av, { date:d, time:tm, mos:m ? mosLabel(m) : "", mosId:m?.id || "", lect:"" }); const r = avCheck(); const busy = r.mos.length || r.lect.length;
-      return { title:m ? (busy ? `⛔ مسجد ${m.name} مشغول ${DAYS[r.wd]} ${tm}` : `✅ مسجد ${m.name} متاح ${DAYS[r.wd]} ${tm}`) : `${r.same.length} نشاط ${DAYS[r.wd]} ${tm}`,
+      return { title:m ? (busy ? `مسجد ${m.name} مشغول ${DAYS[r.wd]} ${tm}` : `مسجد ${m.name} متاح ${DAYS[r.wd]} ${tm}`) : `${r.same.length} نشاط ${DAYS[r.wd]} ${tm}`,
         items:(m ? r.mos : r.same).slice(0, 15).map(e => ({ t:`#${e.n} · ${e.comm || ""} · ${e.mosName || ""}`, s:[e.time, e.lect].filter(Boolean).join(" · "), open:`act:${e.id}` })), extra:"للتفاصيل والبدائل افتح «هل الوقت متاح؟»." }; }
   }
   return _answer27(q); };

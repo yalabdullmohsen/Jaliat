@@ -386,7 +386,7 @@ function vWeekly(){
 }
 function weekText(){
   const W = weekRows();
-  return `📅 جدول أنشطة ${S.f.wkc || "الجاليات"}، من ${fmt(W[0].iso)} إلى ${fmt(W[6].iso)}\n` + W.filter(x => x.L.length).map(x => `\n*${DAYS[x.d.getDay()]} ${fmt(x.iso)}*\n` + x.L.map(a => `• ${a.time || ""}، ${a.mosName} (${a.area})، ${a.lect || ""}${S.f.wkc ? "" : "، " + a.comm}`).join("\n")).join("\n") + SIGN;
+  return `جدول أنشطة ${S.f.wkc || "الجاليات"}، من ${fmt(W[0].iso)} إلى ${fmt(W[6].iso)}\n` + W.filter(x => x.L.length).map(x => `\n*${DAYS[x.d.getDay()]} ${fmt(x.iso)}*\n` + x.L.map(a => `• ${a.time || ""}، ${a.mosName} (${a.area})، ${a.lect || ""}${S.f.wkc ? "" : "، " + a.comm}`).join("\n")).join("\n") + SIGN;
 }
 function printArea(sel2){ document.querySelectorAll(".print-area.on").forEach(x => x.classList.remove("on")); const el = $(sel2); if (!el) return; el.classList.add("on"); document.body.classList.add("print-any"); setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-any"); el.classList.remove("on"); }, 500); }, 50); }
 

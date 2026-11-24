@@ -1,4 +1,4 @@
-/* ================= v102 (JL-AI 5): «✨ اسأل عن البيانات» — المساعد يختار استعلامًا معرّفًا مسبقًا، والجواب يُحسب هنا ================= */
+/* ================= v102 (JL-AI 5): «اسأل عن البيانات» — المساعد يختار استعلامًا معرّفًا مسبقًا، والجواب يُحسب هنا ================= */
 /* لا SQL حر ولا وصول للقاعدة من المساعد: يرى أسماء الاستعلامات ومعاملاتها فقط، والحساب على بيانات الصفحة التي سمحت بها الصلاحيات. */
 const qaKey = s => (typeof sNorm === "function" ? sNorm(s) : norm(s).toLowerCase()).replace(/^(مسجد|جاليه|الجاليه|الشيخ)\s+/, "");
 const qaFind = (L, v) => { if (!v) return null; const k = qaKey(v); return L.find(x => qaKey(x) === k) || L.find(x => qaKey(x).includes(k)) || L.find(x => k.includes(qaKey(x))) || null; };
@@ -25,7 +25,7 @@ const QA = [
     run:p => { const m = /^\d{4}-\d{2}$/.test(p.month || "") ? p.month : monthNow(); const L = (S.permits || []).filter(x => !x.revoked && (x.issued_at || "").startsWith(m)); return { t:`${L.length} تصريح صدر في ${monLabel(m)}`, go:"permits" }; } },
   { id:"open_requests", d:"الطلبات الواردة المفتوحة", run:() => { const L = (S.reqs || []).filter(r => !["معتمد", "مرفوض", "مكتمل"].includes(r.status)); return { t:`${L.length} طلب مفتوح`, go:"inbox" }; } },
 ];
-function qaBox(){ return `<div class="panel ai-card"><div class="panel-b"><div class="ai-h"><b>✨ اسأل عن البيانات</b></div>
+function qaBox(){ return `<div class="panel ai-card"><div class="panel-b"><div class="ai-h"><b>اسأل عن البيانات</b></div>
   <div class="ai-qa"><input class="f" id="ai-q" placeholder="مثال: كم نشاط جارٍ للجالية الفلبينية في حولي؟"><button type="button" class="btn btn-primary ai-btn" data-aiqa>اسأل</button></div><div class="ai-host" id="ai-qa-out"></div>
   <span class="ai-note">يختار المساعد سؤالًا من قائمة محددة، والرقم يُحسب من بيانات المنصة مباشرة.</span></div></div>`; }
 const _vStats102 = vStats;
