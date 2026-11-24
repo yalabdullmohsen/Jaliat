@@ -1,11 +1,5 @@
-/* v98 (JL-AI): زر ✨ وبطاقة المساعد */
-.ai-btn{font-size:13px;padding:4px 10px;min-height:32px}
-.ai-btn.spin{opacity:.6;pointer-events:none}
-.ai-card .ai-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-.ai-lines{margin:4px 0 6px;padding-inline-start:20px;display:grid;gap:4px;line-height:1.7}
-.ai-note{display:block;font-size:11px;color:var(--muted)}
-.ai-out{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--surface-2);white-space:pre-wrap;line-height:1.8}
-.ai-out .br-acts{margin-top:8px}
-.ai-row{display:grid;gap:8px;margin:10px 0}
-.ai-row .ai-btn{justify-self:start}
-.ai-qa{display:flex;gap:8px}.ai-qa .f{flex:1}
+/* v98: مجموعات الصفحات بتبويبات */
+#nav button.vg-off{display:none!important}
+.vg-bar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:4px;background:var(--surface-2,#f4f1e8);border-radius:12px;width:fit-content;max-width:100%}
+.vg-bar button{border:0;background:none;padding:8px 14px;border-radius:9px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;min-height:36px}
+.vg-bar button.on{background:var(--card,#fff);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}

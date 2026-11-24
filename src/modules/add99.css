@@ -1,0 +1,5 @@
+/* v99: شريط «التالي» للإرسال المتتابع، وزر 💡 */
+.wa-next{position:fixed;inset:auto 16px 16px auto;z-index:60;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card,#fff);border:1px solid var(--line,#e7e1d2);border-radius:14px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.12);max-width:calc(100vw - 32px)}
+.idea-b{display:inline-flex;align-items:center;gap:6px}.idea-p .panel-b{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}.idea-p .panel-b>div{display:flex;flex-direction:column;flex:1;min-width:200px}
+.idea-i{font-size:28px}
+header.top .idea-b{white-space:nowrap}@media (max-width:1280px){header.top .idea-t{display:none}}
