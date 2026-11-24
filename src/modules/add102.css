@@ -136,3 +136,8 @@ header.top .btn{white-space:nowrap}
 
 /* ===== حذف «إرفاق ملف» (طلب يوسف «ما نحتاجه»): خيار التصوير في «إضافة نشاط» وزر «إرفاق» في الترويسة يؤديان الوظيفة نفسها (ocrPick)؛ تُخفى الواجهة فقط ===== */
 :root #ocr-top,.drawer .ocr-cta{display:none!important}
+
+/* ===== خط موحّد (اختيار يوسف: Noto Kufi Arabic) لكل الواجهة: العناوين والنص والأزرار والجداول والحقول =====
+   يبقى خط Amiri للنصوص الشرعية حيث هو، وتبقى ورقتا التصريح وكتاب وثيقة المطبوعتان بخطهما لأن أبعادهما ثابتة لورق A4. */
+:root:root:root{ --f-body:"Noto Kufi Arabic","IBM Plex Sans Arabic",system-ui,sans-serif; --f-display:"Noto Kufi Arabic","IBM Plex Sans Arabic",system-ui,sans-serif }
+body,button,input,select,textarea,.btn,.tabbar button,#nav button{font-family:var(--f-body)}
