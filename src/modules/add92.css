@@ -1,0 +1,4 @@
+/* v92 (JL-6): صفحة «نشاطاته» */
+.pa-h{display:flex;align-items:center;gap:8px;margin:14px 2px 6px;font-size:14px}
+.pa-l{display:flex;flex-direction:column;gap:6px}.pa-r{text-align:right}.pa-r .chip{margin-top:4px;margin-inline-end:4px}
+.pa-open{margin-bottom:10px}.pa-sg{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:12px}.pa-sg .btn{margin-inline-start:auto}
