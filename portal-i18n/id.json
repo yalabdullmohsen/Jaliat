@@ -639,5 +639,13 @@
 "تاريخ نهاية النشاط": "Tanggal selesai kegiatan",
 "اكتبوا تاريخ بداية النشاط {0}": "Tulis tanggal mulai kegiatan {0}",
 "تاريخ النهاية قبل البداية في النشاط {0}": "Tanggal selesai sebelum tanggal mulai pada kegiatan {0}",
-"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "Untuk kegiatan yang sudah berjalan di masjid tetapi belum terdaftar di sistem: tulis datanya apa adanya, nomor persetujuan jika ada, dan tanggal mulainya."
+"لنشاط قائم فعلًا في المسجد لكنه غير مسجل في النظام: اكتبوا بياناته كما هي، ورقم الموافقة إن وُجد، وتاريخ بدايته.": "Untuk kegiatan yang sudah berjalan di masjid tetapi belum terdaftar di sistem: tulis datanya apa adanya, nomor persetujuan jika ada, dan tanggal mulainya.",
+"رمز التفعيل": "Kode aktivasi",
+"يرسله القسم، 6 أرقام": "6 digit yang dikirim bagian",
+"اكتبوا رمز التفعيل الذي أرسله لكم القسم": "Masukkan kode aktivasi yang dikirim bagian kepada Anda",
+"أُوقف التفعيل 15 دقيقة بسبب محاولات خاطئة": "Aktivasi dihentikan 15 menit karena percobaan yang salah",
+"بيانات التفعيل أو رمز التفعيل غير صحيح. إن كنتم منسقاً جديداً فاختاروا «إنشاء حساب»": "Data atau kode aktivasi salah. Jika Anda koordinator baru, pilih “Buat akun”",
+"أدخل رقمك المدني ورقم هاتفك المسجّل لدى القسم، واختر رمزاً سرياً. يُفتح حسابك مباشرة.": "Masukkan nomor sipil dan nomor telepon yang terdaftar di bagian, lalu pilih PIN. Akun Anda langsung dibuka.",
+"رقمك غير مسجّل لدى القسم؟ تواصل مع قسم الجاليات ليضيفك.": "Nomor Anda tidak terdaftar di bagian? Hubungi Bagian Komunitas agar Anda ditambahkan.",
+"رقم الهاتف غير مسجّل لدى القسم لأي منسق، تواصلوا مع قسم الجاليات": "Nomor telepon ini tidak terdaftar di bagian untuk koordinator mana pun. Hubungi Bagian Komunitas"
 }
