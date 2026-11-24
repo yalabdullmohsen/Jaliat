@@ -99,12 +99,17 @@ Deno.serve(async (req) => {
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
   const task = TASKS[body?.kind];
   if (!task) return json({ ok: false, msg: "طلب غير صالح" }, 400);
   const me = await who(req, body);
   if (!me) return json({ ok: false, msg: "غير مصرّح" }, 401);
+<<<<<<< HEAD
+=======
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -122,6 +127,7 @@ Deno.serve(async (req) => {
   if (!me) return json({ ok: false, msg: "غير مصرّح" }, 401);
   const task = TASKS[body?.kind];
   if (!task) return json({ ok: false, msg: "طلب غير صالح" }, 400);
+>>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main

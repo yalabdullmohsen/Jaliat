@@ -8,3 +8,4 @@
 .ai-out .br-acts{margin-top:8px}
 .ai-row{display:grid;gap:8px;margin:10px 0}
 .ai-row .ai-btn{justify-self:start}
+.ai-qa{display:flex;gap:8px}.ai-qa .f{flex:1}
