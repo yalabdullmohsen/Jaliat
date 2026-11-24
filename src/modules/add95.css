@@ -1,0 +1,12 @@
+/* v95 (JL-4): تجميع الإشعارات وحالة مزامنة وثيقة */
+.nc-grp>summary{list-style:none;cursor:pointer;grid-template-columns:38px minmax(0,1fr) auto}
+.nc-grp>summary::-webkit-details-marker{display:none}
+.nc-grp>summary .nc-btn{align-self:center;white-space:nowrap}
+.nc-grp[open]>summary{background:var(--surface-2)}
+.nc-gl{display:flex;flex-direction:column;gap:2px;padding-inline-start:16px;border-inline-start:2px solid color-mix(in srgb,var(--c,var(--primary)) 35%,transparent);margin-inline-start:26px}
+.nc-info>summary .nc-ic{color:var(--muted)}
+.nc-note{padding:2px 18px 6px;color:var(--muted);font-size:12px}
+.wqsy{font-weight:700}.wqsy.ok{color:var(--ok)}.wqsy.late{color:var(--bad)}
+.wqsy-card .panel-b{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.wqsy-card .panel-b>div:first-child{display:flex;flex-direction:column;gap:2px}
+.wqsy-card.late{border-inline-start:4px solid var(--bad)}
