@@ -1,0 +1,10 @@
+/* v98 (JL-AI): زر ✨ وبطاقة المساعد */
+.ai-btn{font-size:13px;padding:4px 10px;min-height:32px}
+.ai-btn.spin{opacity:.6;pointer-events:none}
+.ai-card .ai-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.ai-lines{margin:4px 0 6px;padding-inline-start:20px;display:grid;gap:4px;line-height:1.7}
+.ai-note{display:block;font-size:11px;color:var(--muted)}
+.ai-out{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--surface-2);white-space:pre-wrap;line-height:1.8}
+.ai-out .br-acts{margin-top:8px}
+.ai-row{display:grid;gap:8px;margin:10px 0}
+.ai-row .ai-btn{justify-self:start}

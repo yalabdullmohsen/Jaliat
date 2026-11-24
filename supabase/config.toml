@@ -1,0 +1,3 @@
+# إعداد النشر: دالة ai تُنشر مع التحقق من JWT (الموظف بجلسته، والبوابة بمفتاح anon + portal_s في الجسم).
+[functions.ai]
+verify_jwt = true
