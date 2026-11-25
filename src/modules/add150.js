@@ -11,10 +11,12 @@ const ntRel = iso => { const s = (Date.now() - new Date(iso)) / 1000, d = Math.f
   const mo = Math.round(d / 30); return mo === 1 ? "قبل شهر" : mo === 2 ? "قبل شهرين" : `قبل ${mo} أشهر`; };
 /* المهمة الحية لإشعار مهمة: التأخر الآن، أو «أُنجزت»، أو «حُذفت» */
 const ntTask = n => { const m = String(n.link || "").match(/^#task:(.+)$/); return m ? (S.tasks || []).find(t => String(t.id) === m[1]) || null : undefined; };
-function ntBody(n){ let b = String(n.body || ""); if (n.kind !== "task_due") return b; const t = ntTask(n);
-  if (t === null) return b.replace(/،?\s*متأخرة\s+\d+\s+يوم/, "") + (b ? "، " : "") + "المهمة لم تعد موجودة";
-  if (t && /منجز/.test(t.status || "")) return b.replace(/،?\s*متأخرة\s+\d+\s+يوم/, "") + "، أُنجزت";
-  if (t?.due) { const late = diffDays(t.due, TODAY); return b.replace(/متأخرة\s+\d+\s+يوم/, late > 0 ? `متأخرة ${late} ${late === 1 ? "يوم" : late === 2 ? "يومين" : late <= 10 ? "أيام" : "يومًا"}` : "حان موعدها"); }
+const NT_LATE = /\s*[،—-]?\s*متأخرة\s+\d+\s+يوم/;
+const ntTitle = n => n.kind === "task_due" ? String(n.title || "").replace(/^(مهمة متأخرة)\s+\d+\s+يوم$/, "$1") : n.title;
+function ntBody(n){ let b = String(n.body || ""); if (n.kind !== "task_due") return b; const t = ntTask(n); b = b.replace(NT_LATE, "").trim(); const j = x => (b ? b + "، " : "") + x;
+  if (t === null) return j("المهمة لم تعد موجودة");
+  if (t && /منجز/.test(t.status || "")) return j("أُنجزت");
+  if (t?.due) { const late = diffDays(t.due, TODAY); if (late > 0) return j(`متأخرة ${late} ${late === 1 ? "يوم" : late === 2 ? "يومين" : late <= 10 ? "أيام" : "يومًا"}`); }
   return b; }
 /* دمج المتشابه: إشعارات المهمة الواحدة تبقى واحدة (الأحدث)، ثم عنوان واحد لما تكرر عنوانه */
 function ntMerge(L){ const seen = new Set(), U = [];
@@ -27,7 +29,7 @@ const ntPlural = (G) => { const n0 = G[0], c = G.length, m = String(n0.title || 
 function ntCard(n, col){ const b = ntBody(n);
   return `<button type="button" class="nt-i${n.read_at ? "" : " new"}" data-nlink="${esc(n.link || "")}" data-nid="${n.id}" style="--c:var(${col})">
     <span class="nt-ic"><svg><use href="#${nKind(n.kind)[1]}"/></svg></span>
-    <span class="nt-b"><span class="nt-t">${esc(n.title)}</span>${b ? `<span class="nt-d">${esc(b)}</span>` : ""}<time>${ntRel(n.created_at)}</time></span>${n.read_at ? "" : `<i class="nt-dot" aria-label="غير مقروء"></i>`}</button>`; }
+    <span class="nt-b"><span class="nt-t">${esc(ntTitle(n))}</span>${b ? `<span class="nt-d">${esc(b)}</span>` : ""}<time>${ntRel(n.created_at)}</time></span>${n.read_at ? "" : `<i class="nt-dot" aria-label="غير مقروء"></i>`}</button>`; }
 function ntGroup(G, col){ if (G.length === 1) return ntCard(G[0], col); const u = G.filter(x => !x.read_at).length;
   return `<details class="nt-grp"><summary class="nt-i${u ? " new" : ""}" style="--c:var(${col})"><span class="nt-ic"><svg><use href="#${nKind(G[0].kind)[1]}"/></svg></span>
     <span class="nt-b"><span class="nt-t">${esc(ntPlural(G))}</span><span class="nt-d">${G.slice(0, 2).map(x => esc(ntBody(x))).join("؛ ")}${G.length > 2 ? " وغيرها" : ""}</span><time>${ntRel(G[0].created_at)}</time></span>${u ? `<i class="nt-dot"></i>` : ""}</summary>
