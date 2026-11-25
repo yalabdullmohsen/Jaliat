@@ -19,10 +19,10 @@ function prCard(g){ const c = g.c, subj = g.w?.subj || g.ps[0]?.data?.topic || "
       <span class="prs-cb"><button type="button" class="btn btn-ghost" data-cpph="${esc(c.phone)}">نسخ الرقم</button><a class="btn" href="whatsapp://send?phone=${waNum(c.phone)}">${icon("i-wa")} محادثته</a></span>
       <span class="prs-v">${c.ok ? `✓ مؤكَّد من ${esc(c.src || "ملاحظة الكتاب في وثيقة")}` : "⚠ غير مؤكَّد: مأخوذ من جالية التصريح، تأكد قبل الإرسال"}</span></div>`
     : `<div class="prs-co warn"><b>لا يوجد منسق محدد لهذا الكتاب</b><span class="prs-v">⚠ لا ترسل قبل التأكد من المنسق</span></div>`;
-  const list = `<ol class="prs-l">${g.ps.map(p => `<li><button type="button" class="prs-i" data-permit="${esc(p.id)}"><span class="num">${esc(p.no)}</span><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.time || "")}</span></button></li>`).join("")}</ol>`;
+  const list = `<ol class="prs-l">${g.ps.map(p => `<li><button type="button" class="prs-i" data-permit="${esc(p.id)}"><bdi dir="ltr" class="num">${esc(p.no)}</bdi><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.time || "")}</span></button></li>`).join("")}</ol>`;
   const foot = g.sent ? `<div class="prs-f"><span class="prs-done">✓ أُبلغ ${esc(g.sent.coord || "")} · ${fmtTime(g.sent.sent_at)}</span><button class="btn btn-ghost" type="button" data-prsend="${esc(g.b)}">إعادة الإرسال</button></div>`
     : `<div class="prs-f"><button class="btn btn-ok" type="button" data-prsend="${esc(g.b)}">${icon("i-wa")} إرسال الكل PDF (${g.ps.length})</button>${g.w ? `<button class="btn" type="button" data-prdone="${esc(g.b)}">✓ تم الإبلاغ</button>` : ""}</div>`;
-  return `<div class="prs-c${g.sent ? " sent" : ""}"><div class="prs-top"><button type="button" class="chip t1 num" ${g.w ? `data-wq="${esc(g.w.id)}"` : ""}>${esc(g.b)}</button><b>${esc(subj)}</b><span class="chip">${g.ps.length} تصريح</span></div>${co}${list}${foot}</div>`; }
+  return `<div class="prs-c${g.sent ? " sent" : ""}"><div class="prs-top"><button type="button" class="chip t1 num" ${g.w ? `data-wq="${esc(g.w.id)}"` : ""}><bdi dir="ltr">${esc(g.b)}</bdi></button><b>${esc(subj)}</b><span class="chip">${g.ps.length} تصريح</span></div>${co}${list}${foot}</div>`; }
 
 function prsBox(){ if (!S.canWrite) return ""; const G = prGroups(), todo = G.filter(g => !g.sent), done = G.filter(g => g.sent);
   if (!G.length) return "";
