@@ -8,7 +8,7 @@ function prSentOf(w){ if (!w) return null; const ids = [w.id, wqParent(w)?.id, .
 function prCoord(ps){ const c = ps.map(p => p.data?.coord).find(x => x && x.phone); if (c) return { ...c, ok:true };
   const cm = ps.map(p => p.data?.comm).find(Boolean) || ""; const L = typeof coFor === "function" ? coFor(cm) : []; const g = L.sort((a, b) => (a.role === "منسق" ? 0 : 1) - (b.role === "منسق" ? 0 : 1))[0];
   return g ? { name:g.name, phone:g.phone, comm:g.comm, ok:false } : null; }
-function prGroups(){ const since = addDays(TODAY, -21), G = new Map();
+function prGroups(){ const since = addDays(TODAY, -10), G = new Map();
   for (const p of S.permits || []) { if (p.revoked || String(p.issued_at || "").slice(0, 10) < since) continue; const b = prBook(p); if (!b) continue; if (!G.has(b)) G.set(b, []); G.get(b).push(p); }
   const out = []; for (const [b, ps] of G) { const w = prDocOf(b); ps.sort((a, z) => String(a.no).localeCompare(String(z.no)));
     out.push({ b, w, ps, c:prCoord(ps), sent:prSentOf(w), last:ps.map(p => p.issued_at).sort().pop() || "" }); }
