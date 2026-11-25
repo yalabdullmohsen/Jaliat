@@ -1,4 +1,5 @@
 {
+"v126: permits ready to send, grouped by letter with verified coordinator": "«تصاريح جاهزة للإرسال»: كل كتاب في بطاقة مع تصاريحه ومنسقه المؤكَّد (الاسم والرقم)، وإرسال الكل PDF ثم «✓ تم الإبلاغ»",
 "IBAN issue notes in rewards sheet": "ملاحظة تحت كل آيبان فيه خطأ في كشف المكافآت",
 "v68: remove identity re-confirmation prompt": "إلغاء نافذة «تأكيد الهوية»",
 "v67: rewards sheet (name, civil id, IBAN, count, amount), 3 approval lines, formatted Excel": "كشف المكافآت الجديد: الاسم، الرقم المدني، الآيبان، عدد الخطب، المبلغ، مع ثلاث خانات اعتماد وتصدير إكسل منسّق",
