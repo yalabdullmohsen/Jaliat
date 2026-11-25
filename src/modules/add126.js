@@ -20,7 +20,7 @@ function prCard(g){ const c = g.c, subj = g.w?.subj || g.ps[0]?.data?.topic || "
       <span class="prs-v">${c.ok ? `✓ مؤكَّد من ${esc(c.src || "ملاحظة الكتاب في وثيقة")}` : "⚠ غير مؤكَّد: مأخوذ من جالية التصريح، تأكد قبل الإرسال"}</span></div>`
     : `<div class="prs-co warn"><b>لا يوجد منسق محدد لهذا الكتاب</b><span class="prs-v">⚠ لا ترسل قبل التأكد من المنسق</span></div>`;
   const list = `<ol class="prs-l">${g.ps.map(p => `<li><button type="button" class="prs-i" data-permit="${esc(p.id)}"><bdi dir="ltr" class="num">${esc(p.no)}</bdi><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.time || "")}</span></button></li>`).join("")}</ol>`;
-  const foot = g.sent ? `<div class="prs-f"><span class="prs-done">✓ أُبلغ ${esc(g.sent.coord || "")} · ${fmtTime(g.sent.sent_at)}</span><button class="btn btn-ghost" type="button" data-prsend="${esc(g.b)}">إعادة الإرسال</button></div>`
+  const foot = g.sent ? `<div class="prs-f"><span class="prs-done">✓ أُبلغ ${esc(g.sent.coord || "")} · ${fmtTime(g.sent.sent_at)}</span><button class="btn btn-ghost" type="button" data-prsend="${esc(g.b)}">إعادة الإرسال</button><button class="btn btn-ghost" type="button" data-prundo="${esc(g.sent.wq_id)}">↺ تراجع: لم أرسلها</button></div>`
     : `<div class="prs-f"><button class="btn btn-ok" type="button" data-prsend="${esc(g.b)}">${icon("i-wa")} إرسال الكل PDF (${g.ps.length})</button>${g.w ? `<button class="btn" type="button" data-prdone="${esc(g.b)}">✓ تم الإبلاغ</button>` : ""}</div>`;
   return `<div class="prs-c${g.sent ? " sent" : ""}"><div class="prs-top"><button type="button" class="chip t1 num" ${g.w ? `data-wq="${esc(g.w.id)}"` : ""}><bdi dir="ltr">${esc(g.b)}</bdi></button><b>${esc(subj)}</b><span class="chip">${g.ps.length} تصريح</span></div>${co}${list}${foot}</div>`; }
 
@@ -52,3 +52,8 @@ const _wqMarkSent126 = wqMarkSent; wqMarkSent = async function(id){ const w = wq
   if (!c?.ok) return _wqMarkSent126(id);
   const { data, error } = await sb.from("wq_notify").insert({ wq_id:w.id, outcome:"موافقة", coord:c.name, phone:waNum(c.phone), comm:c.comm || null }).select().single(); if (error) return writeFail(error);
   S.wqn.set(w.id, data); toast(`عُلِّم: أُبلغ ${c.name} ✓`); wqForm(w.id); };
+
+/* تراجع عن «تم الإبلاغ» من البطاقة نفسها (ضُغطت بالغلط) */
+document.addEventListener("click", async ev => { const u = ev.target.closest("[data-prundo]"); if (!u) return; ev.preventDefault(); ev.stopPropagation();
+  const { error } = await sb.from("wq_notify").delete().eq("wq_id", u.dataset.prundo); if (error) return writeFail(error);
+  S.wqn.delete(u.dataset.prundo); toast("رجعت البطاقة لقائمة «جاهزة للإرسال»"); render(); }, true);
