@@ -1,0 +1,22 @@
+
+/* v126 — تصاريح جاهزة للإرسال: بطاقة لكل كتاب مع منسقه */
+.prs{display:grid;gap:10px;margin:0 0 14px;padding:14px;border:1px solid var(--gold);border-radius:16px;background:color-mix(in srgb,var(--gold) 6%,var(--surface))}
+.prs-h{display:flex;align-items:center;gap:8px;font-size:1.02rem}
+.prs-c{display:grid;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.prs-c.sent{opacity:.8}
+.prs-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.prs-top>b{flex:1;min-width:180px;line-height:1.6}
+.prs-co{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid var(--ok);background:color-mix(in srgb,var(--ok) 8%,var(--surface))}
+.prs-co.warn{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--surface))}
+.prs-co>b{font-size:1.05rem}.prs-co>small{color:var(--muted)}
+.prs-lb{font-size:.8rem;color:var(--muted)}
+.prs-ph{font-weight:700;font-size:1.05rem;letter-spacing:.5px;color:var(--primary)}
+.prs-cb{display:flex;gap:6px;margin-inline-start:auto}
+.prs-v{flex-basis:100%;font-size:.8rem;color:var(--muted)}
+.prs-l{margin:0;padding:0 18px 0 0;display:grid;gap:4px}
+.prs-i{all:unset;cursor:pointer;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:6px 8px;border-radius:10px;width:calc(100% - 16px)}
+.prs-i:hover{background:var(--surface-2)}.prs-i .num{color:var(--muted);font-size:.8rem}
+.prs-f{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.prs-done{color:var(--ok);font-weight:700}
+.prs-old summary{cursor:pointer;color:var(--muted);padding:4px 0}
+.prs-old .prs-c{margin-top:8px}
+@media(max-width:520px){.prs-cb{margin:0;width:100%}.prs-cb .btn{flex:1}}
