@@ -36,7 +36,7 @@ function pBulkSummary(w, rows, failed){ S.form = { kind:"pbulk", ids:rows.map(r 
     `${rows.length ? `<button class="btn btn-primary" type="button" data-pball>${icon("i-wa")} إرسال الكل PDF</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`); }
 document.addEventListener("click", async ev => { const o = ev.target.closest("[data-pone]"); if (o) { ev.preventDefault(); ev.stopImmediatePropagation();
     const f = await (PPDF.get(o.dataset.pone) || Promise.resolve(null)).catch(() => null); if (!f) return toast("ملف هذا التصريح ما جهز، افتحه من القائمة وأرسله");
-    if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:"تصريح إلقاء درس" }); } catch (_) {} return; }
+    if (navigator.canShare && navigator.canShare({ files:[f] })) { try { await navigator.share({ files:[f], title:permitKind(S.permits.find(x => x.id === o.dataset.pone)).title }); } catch (_) {} return; }
     const l = document.createElement("a"); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); return toast("نزل الملف، أرفقه في واتساب"); }
   const a = ev.target.closest("[data-pwball]"); if (a) { ev.preventDefault(); if (!canPermit()) return; return pBulk(a.dataset.pwball); }
   const b = ev.target.closest("[data-pball]"); if (!b || S.form?.kind !== "pbulk") return; ev.preventDefault(); ev.stopImmediatePropagation();
@@ -44,7 +44,7 @@ document.addEventListener("click", async ev => { const o = ev.target.closest("[d
   if (!files.length) return toast("ملفات PDF ما جهزت، افتح كل تصريح وأرسله");
   const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
   /* الجوال: مشاركة كل الملفات مرة واحدة. الكمبيوتر: نافذة المشاركة تمرّر ملفاً واحداً فقط، فتنزَّل الملفات كلها لتحدّدها وترفقها دفعة واحدة */
-  if (mobile && navigator.canShare && navigator.canShare({ files })) { try { await navigator.share({ files, title:"تصاريح إلقاء دروس", text:`${files.length} تصريح إلقاء درس` }); } catch (_) {} return; }
+  if (mobile && navigator.canShare && navigator.canShare({ files })) { try { await navigator.share({ files, title:"تصاريح الأنشطة", text:ids.map(i => permitKind(S.permits.find(x => x.id === i)).title).filter((t, k, a) => a.indexOf(t) === k).map(t => `${ids.filter(i => permitKind(S.permits.find(x => x.id === i)).title === t).length} ${t}`).join("، ") }); } catch (_) {} return; }
   files.forEach((f, i) => setTimeout(() => { const l = document.createElement("a"); l.href = URL.createObjectURL(f); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 4000); }, i * 1200));
   toast(`ينزّل ${files.length} ملف… إذا سألك كروم «تنزيل عدة ملفات» اضغط «السماح»، ثم حدّدها كلها من مجلد Downloads (Ctrl+A) وأرفقها في واتساب`); }, true);
 
