@@ -5,7 +5,11 @@ const PERMIT_KINDS = {
   "دورة علمية":   { title:"تصريح دورة علمية",  verb:"إقامة دورة علمية", noun:"الدورة" },
   "محاضرة دينية": { title:"تصريح محاضرة",      verb:"إلقاء محاضرة",     noun:"المحاضرة" },
 };
+/* «إذا تصريح حلقة ضع تصريح حلقة» (يوسف): أي نوع أو عنوان نشاط يبدأ بـ«حلقة» (حلقة قرآن، حلقة تحفيظ…) = «تصريح حلقة» */
+const HALAQA = { title:"تصريح حلقة", verb:"إقامة حلقة", noun:"الحلقة" };
 function permitKind(p){
-  const type = p?.data?.kind || (p?.act_id && S.byId?.get(p.act_id)?.type) || "درس ديني";
+  const act = p?.act_id && S.byId?.get(p.act_id);
+  const type = p?.data?.kind || act?.type || "درس ديني";
+  if (/(^|\s)حلق/.test(type) || /^\s*حلق/.test(act?.title || "")) return { type:/(^|\s)حلق/.test(type) ? type : "حلقة", ...HALAQA };
   return { type, ...(PERMIT_KINDS[type] || { title:`تصريح ${type}`, verb:`إقامة ${type}`, noun:"النشاط" }) };
 }
