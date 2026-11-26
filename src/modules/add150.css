@@ -9,12 +9,18 @@
 .nt-ib svg{width:18px;height:18px}
 .nt-ib.sm{width:28px;height:28px;background:transparent}
 .nt-ib:hover{background:var(--primary-soft)}
-.nt-f{display:flex;gap:var(--s1);padding:0 var(--s3) var(--s3);overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line-2)}
-.nt-f::-webkit-scrollbar{display:none}
-.nt-f button{flex:1 1 auto;border:1px solid var(--line);background:var(--surface);color:var(--n1);border-radius:999px;padding:6px 6px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
-.nt-f button span{color:var(--n2);font-weight:700;margin-inline-start:2px}
+/* اللوحة عمود flex: الشريط حاوية تمرير (overflow-x) فحدّه الأدنى 0 وكان ينكمش إلى ~13px حين تطول القائمة فيخرج نص الشرائح تحتها.
+   الرأس والشريط والتنبيه ثابتة الارتفاع، والجسم وحده يتقلّص ويُمرَّر. */
+.nt-top,.nt-f,.nt-push{flex-shrink:0}
+.nt-body{flex:1 1 auto;min-height:0}
+.nt-f{display:flex;gap:var(--s2);padding:var(--s1) var(--s3) var(--s3);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:var(--s3);scrollbar-width:thin;scrollbar-color:var(--line) transparent;border-bottom:1px solid var(--line-2)}
+.nt-f::-webkit-scrollbar{height:4px}
+.nt-f::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.nt-f button{flex:0 0 auto;scroll-snap-align:start;display:inline-flex;align-items:center;gap:6px;min-height:34px;border:1px solid var(--line);background:var(--surface);color:var(--n1);border-radius:999px;padding:0 14px;font:inherit;font-size:13px;line-height:1.2;font-weight:600;cursor:pointer;white-space:nowrap}
+.nt-f button span{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--surface-2);color:var(--n1);font-size:11px;font-weight:700;line-height:1}
 .nt-f button.on{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
-.nt-f button.on span{color:inherit;opacity:.85}
+.nt-f button.on span{background:rgba(255,255,255,.22);color:inherit}
+.nt-f button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
 .nt-push{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s4);background:var(--primary-soft);color:var(--ink);font-size:13px}
 .nt-push>svg{width:16px;height:16px;color:var(--primary)}
 .nt-push span{flex:1}
