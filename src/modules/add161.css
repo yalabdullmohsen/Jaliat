@@ -1,0 +1,18 @@
+/* ===== v161: ملاءمة كل الأجهزة (جوال 390 · لوحي 768 · مكتب 1440) — قواعد مشتركة ===== */
+/* أزرار تذييل النوافذ على الجوال تلتف في صفوف بدل شريط أفقي يُخفي نصف الإجراءات (إسناد، نسخ، Copilot، حذف) خارج الشاشة */
+@media (max-width:700px){
+  .drawer-f{flex-wrap:wrap!important;overflow-x:visible;row-gap:8px}
+  .drawer-f>.btn,.drawer-f>span,.drawer-f>a{flex:1 1 auto;justify-content:center;text-align:center}
+}
+/* الجهاز اللوحي والشاشات المتوسطة (701–1100): الجدول يمرّر أفقيًا داخل إطاره بأعمدة مقروءة بدل أعمدة مضغوطة كلمةً في كل سطر */
+@media (min-width:701px) and (max-width:1100px){
+  .table-wrap th{white-space:nowrap}
+  .table-wrap td:not(.num){min-width:8em}
+}
+/* علامة «؟» على الشريط العلوي الممتد بعرض الشاشة تبقى داخلها ولا تُقصّ عند الحافة */
+.top>.g-pin{top:4px;inset-inline-start:4px}
+/* زر طي القائمة: مساحة لمس 44px دون تغيير شكله */
+.collapse{position:relative}.collapse::after{content:"";position:absolute;inset:-8px}
+/* عناصر شبكة اللوحة لا تتمدد أوسع من عمودها؛ وصفوف كتب وثيقة تلتف على الجوال بدل أن يُعصر العنوان ويخرج الصف عن الشاشة */
+.panel-b>*{min-width:0}
+.wo-i{flex-wrap:wrap}.wo-i>div{flex:1 1 160px;min-width:0}
