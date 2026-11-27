@@ -46,6 +46,8 @@ function from(t) {
     eq(c, v) { q.f.push(r => r[c] === v); return api; }, neq(c, v) { q.f.push(r => r[c] !== v); return api; }, in(c, a) { q.f.push(r => a.includes(r[c])); return api; },
     gte(c, v) { q.f.push(r => r[c] >= v); return api; }, is(c, v) { q.f.push(r => v === null ? r[c] == null : r[c] === v); return api; },
     not(c, op, v) { const L = op === "in" ? String(v).replace(/^\(|\)$/g, "").split(",") : [v]; q.f.push(r => op === "is" ? !(v === null ? r[c] == null : r[c] === v) : !L.includes(String(r[c]))); return api; }, lte(c, v) { q.f.push(r => r[c] <= v); return api; },
+    gt(c, v) { q.f.push(r => r[c] > v); return api; }, lt(c, v) { q.f.push(r => r[c] < v); return api; }, range(a, b) { q.lim = b - a + 1; return api; }, or() { return api; },
+    like(c, v) { const re = new RegExp('^' + String(v).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '.*') + '$'); q.f.push(r => re.test(String(r[c] ?? ''))); return api; }, ilike(c, v) { return api.like(c, v); },
     order(c, o) { q.ord = { c, asc: o?.ascending !== false }; return api; }, limit(n) { q.lim = n; return api; },
     single() { q.one = true; return api; }, maybeSingle() { q.one = true; q.maybe = true; return api; },
     then(ok, no) { try { return Promise.resolve(run()).then(ok, no); } catch (e) { D.errors.push(String(e)); return Promise.resolve({ data: null, error: err(String(e)) }).then(ok, no); } },
