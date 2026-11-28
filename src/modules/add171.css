@@ -1,11 +1,79 @@
-/* v171 (JL-CLOCK): ساعة الترويسة؛ ألوان الهوية عبر المتغيرات فتعمل فاتحًا وداكنًا */
-.hclock{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:none;line-height:1.15;padding:4px 12px;border-inline-start:1px solid var(--line);margin-inline-start:4px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;user-select:none}
-.hclock .hc-t{display:inline-flex;align-items:baseline;gap:4px;font-weight:700;font-size:20px;letter-spacing:.2px}
-.hclock .hc-n{direction:ltr;unicode-bidi:isolate;min-width:4.6ch;text-align:end}
-.hclock .hc-a{font-size:12px;font-weight:600;color:var(--muted)}
-.hclock .hc-d{font-size:11.5px;color:var(--muted);margin-top:2px}
-/* الرئيسية تعرض التاريخ تحت العنوان أصلًا: لا تكرار */
-header.top:has(#title .sub) .hclock .hc-d{display:none}
-@media (max-width:1100px){.hclock .hc-d{display:none}}
-@media (max-width:700px){.hclock{padding:2px 8px;margin-inline-start:0;border:0}.hclock .hc-t{font-size:15px}.hclock .hc-a{font-size:10.5px}.hclock .hc-n{min-width:4.2ch}}
-@media (max-width:360px){.hclock .hc-a{display:none}}
+/* v171 — تبسيط عام: أقل كلام، أقل ازدحام، نفس هوية «عاجي ملكي» */
+
+/* 1) الشريط العلوي: أيقونات بدل النصوص الطويلة */
+.top{gap:8px}
+.top #guide-btn span,.top .idea-b .idea-t,.top .finder .kbd{display:none}
+.top #guide-btn,.top .idea-b,.top #refresh-btn,.top #bell{min-width:38px;padding-inline:10px;justify-content:center}
+.top .finder{max-width:260px}
+
+/* 2) نصوص الشرح تحت العناوين تُخفى (الشرح في «دليل الصفحة» و«؟») */
+.panel-h .s,.prs>.s,.pt-info>.s{display:none}
+.panel-h{padding:12px 16px}
+.panel-h h3{font-size:15px}
+.panel-b{padding:14px 16px}
+
+/* 3) سطر الوصف داخل القوائم: سطر واحد هادئ بلا التفاف */
+.prs-i .s,.li-m .s,.wq-t .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;color:var(--muted);font-size:.82rem}
+
+/* 4) مسافات أهدأ بين البطاقات */
+#view>*+*{margin-top:12px}
+#view>.panel,#view>.prs{box-shadow:none}
+
+/* 5) بطاقة «تصاريح جاهزة للإرسال» مختصرة */
+.prs{gap:8px;padding:12px;border-color:var(--line);background:var(--surface)}
+.prs-h{font-size:1rem}
+.prs-c{gap:8px;padding:10px 12px;border-radius:12px}
+.prs-top>b{font-weight:600;font-size:.95rem;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prs-co,.prs-co.warn{padding:0;border:0;background:none;gap:6px 10px}
+.prs-co>b{font-size:.95rem}
+.prs-co.warn>b{color:var(--warn)}
+.prs-ph{font-size:.95rem}
+.prs-v,.prs-co.warn .prs-v{display:none}
+.prs-cb .btn{padding:4px 10px;font-size:.82rem}
+.prs-ld>summary{cursor:pointer;color:var(--primary);font-size:.85rem;font-weight:600;padding:2px 0;list-style:none}
+.prs-ld>summary::-webkit-details-marker{display:none}
+.prs-ld>summary::before{content:"▾ ";display:inline-block;transition:transform .15s}
+.prs-ld:not([open])>summary::before{transform:rotate(90deg)}
+.prs-ld[open]>summary{margin-bottom:6px}
+.prs-l{gap:2px}
+.prs-i{padding:4px 8px;flex-wrap:nowrap}
+.prs-i b{white-space:nowrap}
+.prs-f .btn{padding:6px 12px}
+
+/* «موافقات تحتاج تصريح»: مجموعات أخف */
+.pt-lang{margin:0;padding:12px 16px 2px;font-size:.88rem;color:var(--muted);font-weight:600}
+.pt-lang span{font-weight:400}
+.pt-gh{padding:8px 16px!important;background:none!important;border:0!important}
+.pt-gh h4{font-size:.95rem}
+.pt-gh .s{display:none}
+.pn-co{padding:0 16px}
+.cph{padding:4px 0;gap:8px}
+.cph-b{padding:3px 10px!important;font-size:.8rem!important}
+
+/* الرئيسية: لا بطاقة يتيمة، وقوائم طويلة بارتفاع محدود */
+.ht-stats{grid-template-columns:repeat(auto-fit,minmax(128px,1fr))!important}
+.ht-setup .check>span,.mw-top .s,.mw-c>small{display:none}
+.ht-setup .check{padding:10px 14px;align-items:center}
+.mw-i>span:not(.mw-go),.prio .s{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.mw-l,.home-grid .list{max-height:420px;overflow:auto;scrollbar-width:thin}
+
+/* وثيقة: أقل شرح، والردود المتعددة سطر واحد */
+.wo .panel-b>.s:not(.bad-t),.wqtodo>.s{display:none}
+.wq-t .wq-r~.wq-r{display:none}
+
+/* القوائم الطويلة: «عرض المزيد» */
+.c170-h{display:none!important}
+.c170-more{display:block;margin:10px auto;min-width:180px}
+
+/* 6) لوحات قابلة للطي (تُطوى ما لا يُستعمل يومياً) */
+.c170>.panel-h{cursor:pointer;border-bottom:0}
+.c170>.panel-h h3::before{content:"＋ ";color:var(--primary)}
+.c170.open>.panel-h h3::before{content:"－ "}
+.c170:not(.open)>:not(.panel-h){display:none!important}
+.c170.open>.panel-h{border-bottom:1px solid var(--line)}
+.c170>.g2{padding:12px 16px}
+
+@media(max-width:700px){
+  .top .finder{max-width:none}
+  .prs-top>b{white-space:normal}
+}
