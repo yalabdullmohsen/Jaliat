@@ -65,6 +65,24 @@
 .c170-h{display:none!important}
 .c170-more{display:block;margin:10px auto;min-width:180px}
 
+/* شروح مقدّمات الصفحات والبطاقات: تُخفى أو تُختصر لسطر */
+.pv-hd .pv-l>small,.ft-h .s,.rt-info p,.kpi .kdef{display:none}
+.check>span,.iz .s,td .s,.ccard .s[style*="pre-line"]{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+td .s,.iz .s{-webkit-line-clamp:1}
+.ccard .s[style*="pre-line"]{-webkit-line-clamp:3}
+
+/* بطاقات الأرقام في كل الصفحات: صف مرن بلا بطاقة يتيمة */
+.kpis{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))!important}
+
+/* المهام: عمود الموظف الفارغ يصير سطراً واحداً */
+.tk-col:has(.tk-list>.empty:only-child)>.tk-list{display:none}
+.tk-col:has(.tk-list>.empty:only-child)>.panel-h{border-bottom:0}
+.tk-col:has(.tk-list>.empty:only-child) h3{color:var(--muted)}
+
+/* شريط «ابدأ الجولة التعليمية» مختصر */
+.tr-start{padding:8px 12px}
+.tr-start>span{font-size:.85rem}
+
 /* 6) لوحات قابلة للطي (تُطوى ما لا يُستعمل يومياً) */
 .c170>.panel-h{cursor:pointer;border-bottom:0}
 .c170>.panel-h h3::before{content:"＋ ";color:var(--primary)}
