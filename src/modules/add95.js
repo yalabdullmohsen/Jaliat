@@ -84,8 +84,8 @@ const WQ_LATE_H = 24;
 function wqSyncInfo(){ const sy = S.wqSync || {}, last = sy.last || null, h = last ? (Date.now() - new Date(last)) / 36e5 : Infinity;
   const late = h > WQ_LATE_H, login = sy.state === "login";
   const since = !last ? "" : h < 1 ? `قبل ${Math.max(1, Math.round(h * 60))} دقيقة` : h < 48 ? `قبل ${Math.round(h)} ساعة` : `قبل ${Math.floor(h / 24)} يوم`;
-  const why = login ? "جلسة وثيقة منتهية على جهاز الدوام: سجّل دخولك في وثيقة لتعود المزامنة."
-    : !last ? "لم تصل أي بيانات من وثيقة بعد." : late ? "لم يرسل جهاز الدوام بيانات من وثيقة: افتح وثيقة على جهاز الدوام وسجّل الدخول، وتأكد أن مهمة المزامنة تعمل." : "";
+  const why = login ? "جلسة وثيقة منتهية: سجّل دخولك في وثيقة ثم اضغط «مزامنة الآن»."
+    : !last ? "لم تصل أي بيانات من وثيقة بعد." : late ? "لم تصل بيانات من وثيقة: افتح وثيقة على هذا الجهاز أو أي جهاز عليه جسر إنجاز، ثم اضغط «مزامنة الآن»." : "";
   return { last, late:late || login, since, why }; }
 function wqSyncLine(){ const I = wqSyncInfo();
   return `<span class="wqsy ${I.late ? "late" : "ok"}">${I.late ? "⚠ لم تتم المزامنة" : "✓ آخر مزامنة"}${I.last ? `: ${I.since} (${esc(fmtTime(I.last))})` : ""}</span>`; }
