@@ -65,7 +65,7 @@ const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.
 const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 function pushCard(){ try { if (+localStorage.getItem("push-later") > Date.now()) return ""; } catch (_) {}
   if (S.push.on) return "";
-  if (isIOS() && !isStandalone()) return `<div class="check pc"><b>لتصلك إشعارات «إنجاز» على الآيفون</b><span>اضغط زر المشاركة <b>⬆</b> في Safari ثم <b>«إضافة إلى الشاشة الرئيسية»</b>، وافتح «إنجاز» من أيقونته وفعّل الإشعارات، مرة واحدة.</span><div class="br-acts"><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`;
+  if (isIOS() && !isStandalone()) return `<div class="check pc"><b>لتصلك إشعارات «إنجاز» على الآيفون</b><span>اضغط زر المشاركة <b>${ei("share")}</b> في Safari ثم <b>«إضافة إلى الشاشة الرئيسية»</b>، وافتح «إنجاز» من أيقونته وفعّل الإشعارات، مرة واحدة.</span><div class="br-acts"><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`;
   if (!S.push.sup) return "";
   if ("Notification" in window && Notification.permission === "denied") return `<div class="check pc"><b>الإشعارات موقوفة على هذا الجهاز</b><span>فعّلها من إعدادات المتصفح أو الجهاز لموقع «إنجاز»، ثم حدّث الصفحة.</span></div>`;
   return `<div class="check pc"><b>فعّل الإشعارات على هذا الجهاز</b><span>تصلك المهام والقرارات وموافقات وثيقة فوراً، حتى و«إنجاز» مغلق.</span><div class="br-acts"><button type="button" class="btn btn-primary" data-pushon>تفعيل الإشعارات</button><button type="button" class="btn btn-ghost" data-pushlater>لاحقاً</button></div></div>`; }

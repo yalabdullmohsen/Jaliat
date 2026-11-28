@@ -17,8 +17,8 @@ function prGroups(){ const since = addDays(TODAY, -10), G = new Map();
 function prCard(g){ const c = g.c, subj = g.w?.subj || g.ps[0]?.data?.topic || "";
   const co = c ? `<div class="prs-co${c.ok ? "" : " warn"}"><span class="prs-lb">يُرسل إلى</span><b>${esc(c.name)}</b><small>${esc(c.comm || "")}</small><bdi dir="ltr" class="prs-ph">${esc(c.phone)}</bdi>
       <span class="prs-cb"><button type="button" class="btn btn-ghost" data-cpph="${esc(c.phone)}">نسخ الرقم</button><a class="btn" href="whatsapp://send?phone=${waNum(c.phone)}">${icon("i-wa")} محادثته</a></span>
-      <span class="prs-v">${c.ok ? `✓ مؤكَّد من ${esc(c.src || "ملاحظة الكتاب في وثيقة")}` : "⚠ غير مؤكَّد: مأخوذ من جالية التصريح، تأكد قبل الإرسال"}</span></div>`
-    : `<div class="prs-co warn"><b>لا يوجد منسق محدد لهذا الكتاب</b><span class="prs-v">⚠ لا ترسل قبل التأكد من المنسق</span></div>`;
+      <span class="prs-v">${c.ok ? `✓ مؤكَّد من ${esc(c.src || "ملاحظة الكتاب في وثيقة")}` : "" + ei("warn") + "غير مؤكَّد: مأخوذ من جالية التصريح، تأكد قبل الإرسال"}</span></div>`
+    : `<div class="prs-co warn"><b>لا يوجد منسق محدد لهذا الكتاب</b><span class="prs-v">${ei("warn")}لا ترسل قبل التأكد من المنسق</span></div>`;
   const list = `<ol class="prs-l">${g.ps.map(p => `<li><button type="button" class="prs-i" data-permit="${esc(p.id)}"><bdi dir="ltr" class="num">${esc(p.no)}</bdi><b>${esc(p.data?.sheikh || "—")}</b><span class="s">${esc(p.data?.mosque || "")} · ${esc(p.data?.time || "")}</span></button></li>`).join("")}</ol>`;
   const foot = g.sent ? `<div class="prs-f"><span class="prs-done">✓ أُبلغ ${esc(g.sent.coord || "")} · ${fmtTime(g.sent.sent_at)}</span><button class="btn btn-ghost" type="button" data-prsend="${esc(g.b)}">إعادة الإرسال</button><button class="btn btn-ghost" type="button" data-prundo="${esc(g.sent.wq_id)}">↺ تراجع: لم أرسلها</button></div>`
     : `<div class="prs-f"><button class="btn btn-ok" type="button" data-prsend="${esc(g.b)}">${icon("i-wa")} إرسال الكل PDF (${g.ps.length})</button>${g.w ? `<button class="btn" type="button" data-prdone="${esc(g.b)}">✓ تم الإبلاغ</button>` : ""}</div>`;

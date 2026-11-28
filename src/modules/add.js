@@ -53,7 +53,7 @@ function smartInsights(){
   const miss = E.filter(e => e.issues.some(i => i.t.startsWith("ناقص"))).length;
   if (miss) out.push({ lv:"bad", ic:"✎", t:`أنشطة بياناتها ناقصة (${miss})`, s:"أكملها لتظهر في التقويم والإحصاءات بدقة", go:"acts", f:F0({ st:"miss" }) });
   const ending = E.filter(e => e.live && in7(e.end) && e.status !== "مكتمل");
-  if (ending.length) out.push({ lv:"warn", ic:"⏳", t:`أنشطة تنتهي خلال 7 أيام (${ending.length})`, s:"جدّد الموافقة أو اجعل الحالة «مكتمل»", go:"acts", f:F0({ st:"ينتهي قريباً" }) });
+  if (ending.length) out.push({ lv:"warn", ic:"i-hourglass", t:`أنشطة تنتهي خلال 7 أيام (${ending.length})`, s:"جدّد الموافقة أو اجعل الحالة «مكتمل»", go:"acts", f:F0({ st:"ينتهي قريباً" }) });
   const docsSoon = S.docs.filter(d => d.end && d.end >= TODAY && diffDays(TODAY, d.end) <= 14);
   if (docsSoon.length) { const linked = E.filter(e => docsSoon.some(d => d.no === e.doc)).length; out.push({ lv:"warn", ic:"▤", t:`وثائق تنتهي خلال أسبوعين (${docsSoon.length})`, s:linked ? `الأنشطة المرتبطة بها: ${linked}` : "", go:"docs" }); }
   const starting = E.filter(e => e.live && e.start > TODAY && in7(e.start));
@@ -66,12 +66,12 @@ function smartInsights(){
     out.push({ lv:"ok", ic:"✦", t:`أنسب يوم لجدولة نشاط جديد: ${DAYS[min[0]]}`, s:`أنشطته الجارية ${min[1]} فقط، والأكثر ازدحاماً ${DAYS[max[0]]} (${max[1]})`, go:"cal" });
     const lc = {}; run.forEach(e => (e.lect || "").split(" / ").filter(Boolean).forEach(l => lc[l] = (lc[l] || 0) + 1));
     const busy = Object.entries(lc).filter(([, n]) => n >= 4).sort((a, b) => b[1] - a[1]);
-    if (busy.length) out.push({ lv:"info", ic:"♪", t:`أكثر المحاضرين أنشطة: ${busy[0][0]} (${busy[0][1]})`, s:busy.length > 1 ? `و${busy.length - 1} آخرون لديهم 4 أنشطة جارية أو أكثر` : "", go:"acts", f:F0({ q:busy[0][0] }) });
+    if (busy.length) out.push({ lv:"info", ic:"i-mic", t:`أكثر المحاضرين أنشطة: ${busy[0][0]} (${busy[0][1]})`, s:busy.length > 1 ? `و${busy.length - 1} آخرون لديهم 4 أنشطة جارية أو أكثر` : "", go:"acts", f:F0({ q:busy[0][0] }) });
   }
   const nob = [...S.khatibs.values()].filter(k => !k.bak).length;
   if (nob) out.push({ lv:"gold", ic:"◆", t:`مساجد جمعة بلا خطيب احتياط (${nob})`, s:"", go:"khatibs" });
   const hi = [...S.notes.values()].filter(n => n.prio === "عالية" && n.status !== "مغلقة").length;
-  if (hi) out.push({ lv:"warn", ic:"★", t:`ملاحظات عالية الأولوية مفتوحة (${hi})`, s:"", go:"notes" });
+  if (hi) out.push({ lv:"warn", ic:"i-star", t:`ملاحظات عالية الأولوية مفتوحة (${hi})`, s:"", go:"notes" });
   if (!out.length) out.push({ lv:"ok", ic:"✓", t:"كل شيء على ما يرام", s:"لا تعارضات ولا نواقص ولا موافقات قريبة الانتهاء" });
   return out;
 }
@@ -112,7 +112,7 @@ function vHome(){
     </div>
     <div class="home-col">
       <div class="panel"><div class="panel-h"><h3>رؤى ذكية</h3><span class="spark">تُحدَّث تلقائياً</span></div>
-        <div class="list ins">${ins.map(x => `<button class="li"${goAttrs(x)}><span class="ic ${x.lv}">${esc(x.ic)}</span><span><span class="t">${esc(x.t)}</span>${x.s ? `<br><span class="s">${esc(x.s)}</span>` : ""}</span><span class="go">‹</span></button>`).join("")}</div></div>
+        <div class="list ins">${ins.map(x => `<button class="li"${goAttrs(x)}><span class="ic ${x.lv}">${/^i-/.test(x.ic) ? icon(x.ic, 15) : esc(x.ic)}</span><span><span class="t">${esc(x.t)}</span>${x.s ? `<br><span class="s">${esc(x.s)}</span>` : ""}</span><span class="go">‹</span></button>`).join("")}</div></div>
       <div class="panel"><div class="panel-h"><h3>حسب النوع</h3></div><div class="panel-b bars">
         ${t.map(([x, n]) => `<div class="bar"><span>${typeChip(x)}</span><span class="track"><i style="width:${E.length ? n / E.length * 100 : 0}%;background:var(--${TK[x]})"></i></span><span class="v">${n}</span></div>`).join("")}
       </div></div>

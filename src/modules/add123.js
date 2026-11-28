@@ -10,7 +10,7 @@ function aiAlts(e){ const raw = S.acts.get(e.id); if (!raw) return [];
   return out; }
 const _actForm101 = actForm;
 actForm = function(id, preset){ _actForm101(id, preset); const e = id && S.byId.get(id); if (!e || !e.cf?.length || S.form?.kind !== "act" || !S.canWrite) return;
-  $("#drawer .drawer-b")?.insertAdjacentHTML("beforeend", `<div class="ai-row">${aiBtn(`data-aicf="${esc(id)}"`, "✨ اقترح حلًّا للتعارض", "بديل متاح من بيانات المنصة يختاره المساعد الذكي")}<div class="ai-host"></div></div>`); };
+  $("#drawer .drawer-b")?.insertAdjacentHTML("beforeend", `<div class="ai-row">${aiBtn(`data-aicf="${esc(id)}"`, "اقترح حلًّا للتعارض", "بديل متاح من بيانات المنصة يختاره المساعد الذكي")}<div class="ai-host"></div></div>`); };
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-aicf],[data-aicfwa]"); if (!t) return;
   if (t.dataset.aicfwa !== undefined) { const h = t.closest(".ai-host"); const co = coFor(h?._e?.comm || "")[0]; if (!co?.phone) return toast("لا يوجد رقم للمنسق"); return waGo(co.phone, h._msg || ""); }
   const e = S.byId.get(t.dataset.aicf), host = t.parentElement.querySelector(".ai-host"); if (!e || !host) return;

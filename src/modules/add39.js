@@ -8,7 +8,7 @@ const WQ_HALL = /حجز|قاعة|قاعه|مسرح|خيمة|خيمه/;
 function hallLetters(){ const reply = wqIndex(); return S.wq.filter(w => wqDir(w) === "out" && WQ_HALL.test(w.subj || "") && wqDate(w) >= addDays(TODAY, -150)).sort((a, b) => wqDate(b).localeCompare(wqDate(a))).map(w => ({ w, r:reply.get(w.id), st:wqStage(w, reply) })); }
 const _vHalls39 = vHalls;
 vHalls = function(){ const h = _vHalls39(); const L = hallLetters(); if (!L.length) return h; const wait = L.filter(x => x.st !== "done");
-  const box = `<div class="panel hl-w"><div class="panel-b"><div class="hl-h"><b>📨 كتب حجز القاعات</b><span class="chip ${wait.length ? "warn" : "ok"}">${wait.length ? `${wait.length} بانتظار الرد` : "كلها منجزة ✓"}</span></div>
+  const box = `<div class="panel hl-w"><div class="panel-b"><div class="hl-h"><b>${ei("mail")}كتب حجز القاعات</b><span class="chip ${wait.length ? "warn" : "ok"}">${wait.length ? `${wait.length} بانتظار الرد` : "كلها منجزة ✓"}</span></div>
     <div class="hl-l">${L.slice(0, 8).map(({ w, r, st }) => `<button type="button" class="hl-i" data-wq="${esc(w.id)}"><span class="hl-t"><b>${esc(w.subj)}</b><span class="s">إلى: ${esc(wqClean(w.to_whom).replace(/^مدير\s+/, ""))} · أُرسل ${fmt(wqDate(w))}</span></span><span class="chip ${r ? (wqRes(r) === "ok" ? "ok" : wqRes(r) === "no" ? "bad" : "t1") : st === "done" ? "ok" : "warn"}">${r ? (wqRes(r) === "ok" ? "تمت الموافقة" : wqRes(r) === "no" ? "لم تتم الموافقة" : "وصل الرد") : st === "done" ? "منجز" : `بانتظار الرد · ${Math.max(0, Math.round((dOf(TODAY) - dOf(wqDate(w))) / 864e5))} يوم`}</span></button>`).join("")}</div></div></div>`;
   return box + h; };
 const _prio39 = priorities;
@@ -44,7 +44,7 @@ waOpen = (phone, text) => waInside(phone, text);
 waGo = (phone, text, next, name) => waInside(phone, text, next, name);
 const _vWhatsApp41 = vWhatsApp;
 vWhatsApp = function(){ if (!S.waPop || !waEmbedOk() || S.waCfg.on) return _vWhatsApp41();
-  return `<div class="wa-qbar"><span class="wa-qi">📲</span><div><b>الرسالة جاهزة${S.waPop.name ? ` إلى ${esc(S.waPop.name)}` : ""}</b><span>تُفتح المحادثة خلال ثوانٍ، اضغط زر الإرسال ➤ داخل واتساب</span></div>${S.waPop.next ? `<button type="button" class="btn btn-primary" data-wapnext>التالي ›</button>` : ""}<button type="button" class="btn btn-ghost" data-wapback>↩ رجوع</button></div>`; };
+  return `<div class="wa-qbar"><span class="wa-qi">${ei("wa")}</span><div><b>الرسالة جاهزة${S.waPop.name ? ` إلى ${esc(S.waPop.name)}` : ""}</b><span>تُفتح المحادثة خلال ثوانٍ، اضغط زر الإرسال ➤ داخل واتساب</span></div>${S.waPop.next ? `<button type="button" class="btn btn-primary" data-wapnext>التالي ›</button>` : ""}<button type="button" class="btn btn-ghost" data-wapback>↩ رجوع</button></div>`; };
 const _go41 = go;
 go = function(v, ...a){ if (v !== "whatsapp" && S.waPop && !S.waPop._leaving) { S.waPop = null; document.body.classList.remove("wa-q"); } return _go41(v, ...a); };
 document.addEventListener("click", ev => { const t = ev.target.closest("[data-wapback],[data-wapnext]"); if (!t) return; if (t.dataset.wapnext !== undefined) { const nx = S.waPop?.next; if (nx) nx(); return; } waBack(); });
