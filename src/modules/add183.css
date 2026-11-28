@@ -1,0 +1,32 @@
+/* v183 — البحث الذكي (Ctrl K) بشكل أحدث وأرتب: نافذة أنظف، صفوف أهدأ، تمييز الكلمة المطابقة */
+.pal-scrim{background:rgba(20,28,24,.28);backdrop-filter:blur(6px) saturate(1.1);-webkit-backdrop-filter:blur(6px) saturate(1.1);padding-top:max(12vh,calc(16px + env(safe-area-inset-top,0px)))}
+.pal{width:min(720px,100%);border-radius:22px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 0 0 .5px rgba(40,30,10,.08),0 30px 80px -20px rgba(20,30,25,.45);animation:pal183 .16s ease-out}
+@keyframes pal183{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:none}}
+.pal-in{padding:18px 20px;gap:12px;border-bottom:1px solid var(--line)}
+.pal-in svg{width:22px;height:22px;color:var(--primary)}
+.pal-in input{font-size:19px;font-weight:500;color:var(--ink)}
+.pal-in input::placeholder{color:var(--n2,var(--muted));font-weight:400}
+.pal-in .kbd{font-size:11px;opacity:.7}
+.pal-l{padding:6px 8px 10px;scroll-padding:40px}
+.pal-g{position:sticky;top:0;z-index:1;background:var(--surface);font-size:11.5px;font-weight:700;color:var(--muted);padding:12px 12px 6px;letter-spacing:.02em}
+.pal-i{grid-template-columns:36px 1fr auto;gap:12px;padding:10px 12px;border-radius:12px;position:relative;transition:background .1s}
+.pal-i .ic{width:36px;height:36px;border-radius:11px;background:var(--surface-2);color:var(--primary)}
+.pal-i .ic svg{width:18px;height:18px}
+.pal-i .t{font-size:15px;font-weight:600;color:var(--ink)}
+.pal-i .s{font-size:12.5px;margin-top:1px}
+.pal-i .pid{font-size:11.5px;font-weight:500;color:var(--muted);margin-inline-end:6px;font-variant-numeric:tabular-nums}
+.pal-i mark{background:color-mix(in srgb,var(--gold) 22%,transparent);color:inherit;border-radius:4px;padding:0 1px}
+.pal-tier{display:none}
+.pal-i .kbd{opacity:0}
+.pal-i[aria-selected="true"]{background:var(--surface-2)}
+.pal-i[aria-selected="true"]::before{content:"";position:absolute;inset-inline-start:0;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--primary)}
+.pal-i[aria-selected="true"] .ic{background:var(--primary);color:#fff}
+.pal-i[aria-selected="true"] .kbd{opacity:.75}
+.pal-rec{padding:2px 12px 10px}
+.pal-rec .chip{background:var(--surface-2);border-radius:99px;padding:4px 12px}
+.pal-f{padding:10px 18px;font-size:11.5px;gap:16px;background:color-mix(in srgb,var(--surface-2) 50%,var(--surface))}
+.pal-l .empty{padding:28px;text-align:center;color:var(--muted)}
+/* زر البحث في الشريط العلوي */
+.top .finder{border-radius:12px;background:var(--surface-2);border:1px solid transparent;transition:border-color .15s,background .15s}
+.top .finder:hover{background:var(--surface);border-color:var(--line)}
+@media(max-width:600px){.pal{border-radius:18px}.pal-in input{font-size:17px}.pal-f{display:none}}

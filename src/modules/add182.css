@@ -1,0 +1,29 @@
+/* v182 — «هل المسجد متاح؟»: أداتان متجاورتان بنفس العرض، بطاقة واحدة لكل أداة، وبلا شرح طويل */
+#view:has(>.avx)>*+*{margin-top:0}
+#view:has(>.avx){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#view:has(>.avx)>.vg-bar{grid-column:1/-1}
+#view:has(>.avx)>.inq{grid-column:1;grid-row:2}
+#view:has(>.avx)>.inq-sub{grid-column:2;grid-row:2;margin:0;padding:0 4px}
+#view:has(>.avx)>.avx{grid-column:2;grid-row:2;max-width:none;margin:0}
+.inq-top>span{display:none}
+.inq-top{border-radius:18px;padding:16px;border-color:var(--line);background:var(--surface);gap:12px}
+.inq-top>b,.inq-sub{font-size:1rem;font-weight:700;color:var(--ink)}
+.inq-top textarea{min-height:90px}
+/* الفحص السريع: بطاقة واحدة بخطوات متتابعة بدل بطاقات متفرقة */
+.avx{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;gap:4px}
+.avx-step{border:0;border-radius:0;background:none;padding:12px 2px;border-top:1px solid var(--line)}
+.avx-ans{box-shadow:none;padding:14px;border-radius:14px}
+.avx-ans b{font-size:20px}
+.avx-ic{width:44px;height:44px;font-size:22px}
+.avx-search{height:44px;border-radius:12px}
+@media(max-width:900px){
+  #view:has(>.avx){grid-template-columns:1fr}
+  #view:has(>.avx)>.inq,#view:has(>.avx)>.inq-sub,#view:has(>.avx)>.avx{grid-column:1;grid-row:auto}
+}
+.inq,.inq-top,.inq-one{min-width:0}
+.inq-one{display:flex;gap:8px;align-items:stretch}
+.inq-one>textarea{flex:1;min-width:0;width:auto!important}
+.inq-row select{min-width:0!important;width:100%}
+.avx>.inq-sub{margin:0 0 6px;padding:2px 2px 0}
+.inq-one .btn{flex:none}
+.inq-top.drag{outline:2px dashed var(--primary);outline-offset:-6px;background:var(--primary-soft)}
