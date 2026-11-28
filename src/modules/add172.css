@@ -9,3 +9,10 @@ header.top:has(#title .sub) .hclock .hc-d{display:none}
 @media (max-width:1100px){.hclock .hc-d{display:none}}
 @media (max-width:700px){.hclock{padding:2px 8px;margin-inline-start:0;border:0}.hclock .hc-t{font-size:15px}.hclock .hc-a{font-size:10.5px}.hclock .hc-n{min-width:4.2ch}}
 @media (max-width:360px){.hclock .hc-a{display:none}}
+/* الصفحات الداخلية على الجوال فيها زر «رجوع»: كانت الساعة تزيد الترويسة 14 بكسل فتتجاوز الصفحة عرض الشاشة (375).
+   تصير أصغر بلا «ص/م» (الوقت وحده يكفي في الترويسة الضيقة)، وتُخفى تمامًا على الشاشات الأضيق من 360 مع زر الرجوع */
+@media (max-width:420px){header.top:has(#back-btn:not([hidden])) .hclock{padding:2px 4px}
+  header.top:has(#back-btn:not([hidden])) .hclock .hc-a{display:none}
+  header.top:has(#back-btn:not([hidden])) .hclock .hc-t{font-size:14px}
+  header.top:has(#back-btn:not([hidden])) .hclock .hc-n{min-width:3.6ch}}
+@media (max-width:360px){header.top:has(#back-btn:not([hidden])) .hclock{display:none}}

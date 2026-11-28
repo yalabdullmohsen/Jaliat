@@ -1,0 +1,5 @@
+/* v173 (JL-AI-NAV): صفحة المساعد الذكي */
+.aih{display:grid;gap:14px;max-width:920px}
+.aih-lead{margin:0}
+.aih .ai-card{margin:0}
+.aih-ctx .li .s{white-space:normal}
