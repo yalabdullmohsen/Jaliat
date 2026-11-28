@@ -58,7 +58,7 @@ grantSave = async function(){ const v = id => $("#" + id)?.value.trim() || "", d
 const pActLabel = e => `#${e.n} · ${e.lect || "—"} · ${e.mosName || ""}${e.area ? "، " + e.area : ""} · ${daysText(e) || ""} ${e.time || ""}${e.doc ? " · موافقة " + e.doc : ""}`;
 function pNextDate(days){ const t = dOf(TODAY); if (!days?.length) return TODAY; for (let i = 0; i < 8; i++) { const d = new Date(t); d.setDate(t.getDate() + i); if (days.includes(d.getDay())) return addDays(TODAY, i); } return TODAY; }
 function pActBox(){ const L = S.E.filter(e => !["ملغى", "مكتمل"].includes(e.status)).sort((a, b) => (b.n || 0) - (a.n || 0));
-  return `<div class="p-auto">${fld("p-act", "✨ اكتب رقم الكتاب أو اختر النشاط، وتتعبّأ البيانات تلقائياً", `<input class="f" id="p-act" list="p-acts" placeholder="اكتب رقم الكتاب (مثل 2610-6416) أو اسم الشيخ أو المسجد…"><datalist id="p-acts">${L.slice(0, 600).map(e => `<option value="${esc(pActLabel(e))}">`).join("")}</datalist>`)}<span class="hint">بعد التعبئة راجع البيانات وعدّل اللي تبيه، ثم ${S.form?.kind === "permit" ? "«إصدار التصريح»" : "«تفويض وإرسال المهمة»"}.</span></div>`; }
+  return `<div class="p-auto">${fld("p-act", "" + ei("spark") + "اكتب رقم الكتاب أو اختر النشاط، وتتعبّأ البيانات تلقائياً", `<input class="f" id="p-act" list="p-acts" placeholder="اكتب رقم الكتاب (مثل 2610-6416) أو اسم الشيخ أو المسجد…"><datalist id="p-acts">${L.slice(0, 600).map(e => `<option value="${esc(pActLabel(e))}">`).join("")}</datalist>`)}<span class="hint">بعد التعبئة راجع البيانات وعدّل اللي تبيه، ثم ${S.form?.kind === "permit" ? "«إصدار التصريح»" : "«تفويض وإرسال المهمة»"}.</span></div>`; }
 const pMos = (name, area, gov) => [name, area, gov ? (/^محافظة/.test(gov) ? gov : "محافظة " + gov) : ""].filter((x, i, a) => x && a.indexOf(x) === i).join("، ");
 function pFill(e){ if (!e) return; const set = (id, v) => { const x = $("#" + id); if (x && v != null && !x.readOnly) x.value = v; };
   const doc = docBy[e.doc], comm = S.comms.find(c => c.name === e.comm);
@@ -69,7 +69,7 @@ function pFill(e){ if (!e) return; const set = (id, v) => { const x = $("#" + id
   set("p-rep", e.rep || "weekly"); set("p-date", pNextDate(days));
   const start = doc?.start || null; if (start) { const t = dOf(start); let d0 = start; for (let i = 0; i < 8 && days.length; i++) { const x = new Date(t); x.setDate(t.getDate() + i); if (days.includes(x.getDay())) { d0 = addDays(start, i); break; } } set("p-date", d0); }
   pDurDoc(doc);
-  const note = [e.doc ? `موافقة ${e.doc}${doc?.end ? " سارية حتى " + fmt(doc.end) : ""}` : "", e.notes && !/⚠/.test(e.notes) ? e.notes : ""].filter(Boolean).join(" · ");
+  const note = [e.doc ? `موافقة ${e.doc}${doc?.end ? " سارية حتى " + fmt(doc.end) : ""}` : "", e.notes && !/⚠/.test(e.notes) ? e.notes : ""].filter(Boolean).join(" · "); // emoji-ok: بيانات/نص رسالة لا عرض
   set($("#g-note") ? "g-note" : "p-note", note);
   if (S.form) S.form.act = e.id; toast("تعبّأت البيانات من النشاط، راجعها"); }
 function pDurDoc(doc){ const sel = $("#p-dur"); if (!sel) return; const from = $("#p-date")?.value || TODAY;
@@ -201,8 +201,8 @@ function pDoneList(){ const L = [...(S.pdone || [])].sort((a, b) => (b[1].at || 
 function pDoneForm(id){ const e = S.E.find(x => x.id === id); if (!e) return;
   openDrawer("تأكيد التصريح", `<div class="card pad"><b>${esc(e.lect || "—")}</b><br><span class="s">${esc([e.mosName, daysText(e), e.time].filter(Boolean).join(" · "))}</span></div>
     <p class="hint" style="margin:12px 2px">اختر الحالة، وبعدها تختفي من القائمة. تقدر ترجعها من «المؤكدة».</p>
-    <button type="button" class="btn btn-done tk-open" data-pdset="issued" data-pid="${esc(id)}">📄 تم إصدار التصريح</button>
-    <button type="button" class="btn btn-primary tk-open" style="margin-top:10px" data-pdset="sent" data-pid="${esc(id)}">📤 تم إرسال التصريح</button>`,
+    <button type="button" class="btn btn-done tk-open" data-pdset="issued" data-pid="${esc(id)}"><svg class="ei" aria-hidden="true"><use href="#i-doc"/></svg>تم إصدار التصريح</button>
+    <button type="button" class="btn btn-primary tk-open" style="margin-top:10px" data-pdset="sent" data-pid="${esc(id)}"><svg class="ei" aria-hidden="true"><use href="#i-send"/></svg>تم إرسال التصريح</button>`,
     `<button class="btn btn-ghost" data-close>إغلاق</button>`); }
 async function pDoneSet(id, st){ const v = { st, at:new Date().toISOString(), by:S.me?.name || S.me?.username || "" };
   const { error } = await sb.from("settings").upsert({ key:"pdone:" + id, value:v }); if (error) return writeFail(error);

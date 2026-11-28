@@ -287,7 +287,7 @@ tbody td{border-bottom:1px solid var(--line-2)}
   .nf-tip .btn{position:sticky;bottom:0}
 }
 .nf-tip span{overflow-wrap:anywhere}
-@media (max-width:700px){#odx-bar{width:50px;height:50px;padding:0;border-radius:50%;font-size:0;display:grid;place-items:center}#odx-bar::before{content:"☁︎";font-size:22px;line-height:1}}
+@media (max-width:700px){#odx-bar{width:50px;height:50px;padding:0;border-radius:50%;font-size:0;display:grid;place-items:center}#odx-bar .ei{width:22px;height:22px;margin:0}}
 /* ===== v69: nothing may widen the page on a phone: tab bars scroll inside themselves ===== */
 .rn-seg,.seg,.stabs{max-width:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .rn-seg::-webkit-scrollbar,.seg::-webkit-scrollbar,.stabs::-webkit-scrollbar{display:none}
@@ -390,8 +390,8 @@ tbody td{border-bottom:1px solid var(--line-2)}
 .br-all .br-acts{margin:0!important}
 .br-all .btn{padding:6px 12px;font-size:12.5px}
 @media (min-width:701px){#odx-bar{width:46px;height:46px;padding:0;border-radius:50%;font-size:0;display:grid;place-items:center;opacity:.92}
-  #odx-bar::before{content:"☁︎";font-size:20px;line-height:1}
-  #odx-bar:hover{width:auto;padding:0 16px;border-radius:12px;font-size:13.5px}#odx-bar:hover::before{content:"";font-size:0}}
+  #odx-bar .ei{width:20px;height:20px;margin:0}
+  #odx-bar:hover{width:auto;padding:0 16px;border-radius:12px;font-size:13.5px}#odx-bar:hover .ei{width:1.1em;height:1.1em;margin-inline-end:.35em}}
 /* recording proof (exact date/time) on every sermon / lesson recording */
 .sr-pf{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px 12px;margin:10px 0 4px;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
 .sr-pf div{display:grid;gap:1px}.sr-pf span{font-size:11.5px;color:var(--muted)}.sr-pf b{font-size:13px}
