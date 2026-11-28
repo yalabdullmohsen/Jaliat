@@ -1,0 +1,7 @@
+/* v180 — صفحة «واتساب القسم» بلا جسر: فتح التطبيق مباشرة */
+.wa180 .panel-b{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.wa180 .panel-b>div{flex:1;min-width:180px;display:grid}
+.wa180-i{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--primary-soft);color:var(--primary);font-size:22px}
+.wa180-i .ei{margin:0}
+.wa180-f{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 16px}
+.wa180-f .f{flex:1;min-width:160px}
