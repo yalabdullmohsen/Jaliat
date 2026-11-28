@@ -78,3 +78,40 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
   if (msg?.type === "wq-fetch" && /^https:\/\/[a-z0-9-]+\.supabase\.co\//.test(msg.url || "")) {
     fetch(msg.url).then(async x => { const b = new Uint8Array(await x.arrayBuffer()); let s = ""; for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode.apply(null, b.subarray(i, i + 8192)); reply({ ok: x.ok, type: x.headers.get("content-type"), b64: btoa(s) }); }).catch(() => reply({ ok: false })); return true; }
 });
+
+// ===== v2.6 (JL-SYNC-2): «مزامنة الآن» على الجهاز الذي ضُغط منه =====
+// يفتح وثيقة في لسان خلفي بجلسة الموظف نفسه، يقرأ الكتب (wq.js)، ويرسلها إلى watheqa-ingest بجلسة المستخدم في «إنجاز» (لا مفتاح).
+const SYNCS = new Map(); // tabId -> { job, from, timer }
+const syncTell = (s, o) => { try { chrome.tabs.sendMessage(s.from, { type: "wq-sync-status", id: s.job.id, ...o }); } catch (_) {} };
+const syncEnd = (tabId, o) => { const s = SYNCS.get(tabId); if (!s) return; clearTimeout(s.timer); SYNCS.delete(tabId); syncTell(s, o); chrome.tabs.remove(tabId).catch(() => {}); };
+async function startSync(job, from) {
+  const tab = await chrome.tabs.create({ url: `${WQ}/Inbox`, active: false });
+  const s = { job, from, phase: "load", timer: setTimeout(() => syncEnd(tab.id, { state: "failed", error: "لم تكتمل قراءة وثيقة خلال 8 دقائق" }), 480000) };
+  SYNCS.set(tab.id, s); syncTell(s, { state: "working", step: "فتح وثيقة" });
+}
+async function syncLoaded(tabId, tab) {
+  const s = SYNCS.get(tabId); if (!s || s.phase !== "load") return;
+  if (/\/Account\/Login|\/Login/i.test(tab.url || "")) return syncEnd(tabId, { state: "failed", error: "login" });
+  s.phase = "read"; const p = await ping(tabId);
+  if (!p) return syncEnd(tabId, { state: "failed", error: "لم تستجب صفحة وثيقة للإضافة" });
+  const res = await chrome.tabs.sendMessage(tabId, { type: "wq-read", job: { since: s.job.since, max: s.job.max } }).catch(() => null);
+  if (!res?.ok) return syncEnd(tabId, { state: "failed", error: res?.error || "تعذّرت قراءة وثيقة" });
+  syncTell(s, { state: "working", step: `إرسال ${res.docs.length} كتابًا إلى إنجاز` });
+  try {
+    let n = 0;
+    for (let i = 0; i < res.docs.length || i === 0; i += 400) {
+      const r = await fetch(s.job.url, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${s.job.token}`, apikey: s.job.anon || "" }, body: JSON.stringify({ docs: res.docs.slice(i, i + 400) }) });
+      const j = await r.json().catch(() => null);
+      if (!r.ok || !j?.ok) return syncEnd(tabId, { state: "failed", error: j?.error || `رفض الخادم الكتب (${r.status})` });
+      n += j.n || 0;
+    }
+    syncEnd(tabId, { state: "done", n, read: res.docs.length });
+  } catch (e) { syncEnd(tabId, { state: "failed", error: "تعذّر الاتصال بإنجاز" }); }
+}
+chrome.tabs.onUpdated.addListener((tabId, info, tab) => { if (info.status === "complete") syncLoaded(tabId, tab).catch(() => {}); });
+chrome.tabs.onRemoved.addListener(tabId => { if (SYNCS.has(tabId)) syncEnd(tabId, { state: "failed", error: "أُغلقت نافذة وثيقة قبل الاكتمال" }); });
+chrome.runtime.onMessage.addListener((msg, sender, reply) => {
+  if (msg?.type === "wq-sync" && sender.tab?.id >= 0 && msg.job && /^https:\/\/[a-z0-9-]+\.supabase\.co\/functions\/v1\/watheqa-ingest$/.test(msg.job.url || "") && msg.job.token) {
+    startSync(msg.job, sender.tab.id).then(() => reply({ ok: true }), e => reply({ ok: false, e: String(e) })); return true; }
+  if (msg?.type === "wq-progress" && sender.tab?.id >= 0) { const s = SYNCS.get(sender.tab.id); if (s) syncTell(s, { state: "working", step: msg.step }); }
+});

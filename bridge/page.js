@@ -19,3 +19,14 @@ window.addEventListener("message", e => {
   }
 });
 chrome.runtime.onMessage.addListener(m => { if (m?.type === "wq-status") window.postMessage({ type: "jaliyat-wq-status", ...m }, location.origin); });
+// v2.6 (JL-SYNC-2): «مزامنة الآن» من هذا الجهاز (يقرأ وثيقة بجلسة الموظف ويرسل الكتب بجلسة «إنجاز»)
+document.documentElement.dataset.copilotBridgeV = "2.6";
+window.addEventListener("message", e => {
+  if (e.source !== window || e.origin !== location.origin) return;
+  if (e.data?.type === "jaliyat-wq-sync" && e.data.job && typeof e.data.job === "object") {
+    const j = e.data.job;
+    chrome.runtime.sendMessage({ type: "wq-sync", job: { id: String(j.id), url: String(j.url || ""), token: String(j.token || ""), anon: String(j.anon || ""), since: String(j.since || ""), max: +j.max || 300 } },
+      r => { if (!r?.ok) window.postMessage({ type: "jaliyat-wq-sync-status", id: String(j.id), state: "failed", error: "لم تستجب إضافة الجسر" }, location.origin); });
+  }
+});
+chrome.runtime.onMessage.addListener(m => { if (m?.type === "wq-sync-status") window.postMessage({ type: "jaliyat-wq-sync-status", ...m }, location.origin); });

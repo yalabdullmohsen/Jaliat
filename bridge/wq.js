@@ -124,9 +124,57 @@
     return { ok: true, ref: m ? "كتاب " + m[1] : (key && body.includes(key) ? "أُرسل" : "أُرسل (تحقق من صندوق الصادر)") };
   }
 
+  // ===== v2.6 (JL-SYNC-2): «مزامنة الآن» من هذا الجهاز: يقرأ الوارد (لي ولمن أعمل بالإنابة عنه) وتفاصيل الكتب المتغيّرة =====
+  const txt = e => (e ? (e.innerText || e.textContent || "") : "").replace(/[ \t ]+/g, " ").replace(/\n\s*\n+/g, "\n").trim();
+  const html = async u => { const r = await fetch(u, { credentials: "include", headers: { "X-Requested-With": "XMLHttpRequest" } });
+    if (/\/Account\/Login/i.test(r.url)) fail("login"); return { r, t: await r.text() }; };
+  const parseDoc = t => new DOMParser().parseFromString(t, "text/html");
+  // الصف بترتيب أعمدة الوارد نفسه (الحالة الثانية = عنوان أيقونة الإجراء) كما تتوقعه watheqa-ingest
+  // الأعمدة بأسمائها لا بمواضعها: وارد «العرض بالإنابة» بلا عمود تحديد، والمعرّف فيه على زر الإجراءات فقط
+  const COLS = [".inbox-select", ".inbox-status-ic", ".inbox-subject", ".inbox-docno", ".inbox-col-state", ".inbox-sender", ".inbox-col-created", ".inbox-col-lastaction", ".inbox-col-actions"];
+  const rowOf = tr => { const el = tr.querySelector("[data-document-id],[data-doc-id]"); const id = el?.dataset.documentId || el?.dataset.docId; if (!/^\d+$/.test(id || "")) return null;
+    const cells = COLS.map((c, i) => { const td = tr.querySelector(":scope > td" + c); return !td || i === 0 ? "" : txt(td) || td.querySelector("[title]")?.getAttribute("title") || ""; });
+    return { id, no: txt(tr.querySelector(".inbox-docno")), subj: txt(tr.querySelector(".subject-line")), row: cells }; };
+  const lastOf = d => { const m = /(\d{4})\/(\d{2})\/(\d{2})(?: (\d{2}):(\d{2}))?/.exec(d.row[7] || ""); return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4] || "23"}:${m[5] || "59"}` : ""; };
+  async function readInbox(viewAs, since, max) {
+    const q = viewAs ? `viewAs=${encodeURIComponent(viewAs)}` : "";
+    const { t } = await html(`/Inbox${q ? "?" + q : ""}`); const d = parseDoc(t);
+    const out = [...d.querySelectorAll("tbody tr")].map(rowOf).filter(Boolean);
+    let cursor = d.getElementById("inboxMore")?.dataset.cursor || "";
+    while (cursor && out.length < max && !(since && out.length && lastOf(out[out.length - 1]) && lastOf(out[out.length - 1]) < since)) {
+      const { r, t: more } = await html(`/Inbox?handler=More${q ? "&" + q : ""}&cursor=${encodeURIComponent(cursor)}`);
+      const rows = [...parseDoc(`<table><tbody>${more}</tbody></table>`).querySelectorAll("tbody tr")].map(rowOf).filter(Boolean);
+      if (!rows.length) break; out.push(...rows); cursor = r.headers.get("x-next-cursor") || "";
+    }
+    return out.map(x => ({ ...x, viewAs }));
+  }
+  async function readView(d) {
+    const { t } = await html(`/Documents/View?id=${encodeURIComponent(d.id)}${d.viewAs ? "&viewAs=" + encodeURIComponent(d.viewAs) : ""}`);
+    const v = parseDoc(t); if (!v.querySelector(".letter-sheet")) return d;
+    const date = (/(\d{2}\/\d{2}\/\d{4})/.exec(txt(v.querySelector(".letter-dates"))) || [])[1] || "";
+    const actions = [...v.querySelectorAll("#docTimeline tbody tr")].map(tr => [...tr.children].map(td => txt(td)).filter(x => x && x !== "—").join(" ")).filter(Boolean).join(" | ");
+    const links = [...v.querySelectorAll(".doc-switch-row[href]")].map(a => (/[?&]id=(\d+)/.exec(a.getAttribute("href")) || [])[1]).filter(Boolean);
+    return { ...d, date, to: txt(v.querySelector(".letter-intro")), body: txt(v.querySelector(".letter-body-static")), signer: [txt(v.querySelector(".letter-sender-name")), txt(v.querySelector(".letter-sender-role"))].filter(Boolean).join("\n ") || txt(v.querySelector(".letter-sender")), actions, links };
+  }
+  async function read(job) {
+    try {
+      const since = String(job.since || ""), max = Math.min(+job.max || 300, 1500);
+      say("قراءة الوارد");
+      const sec = parseDoc((await html("/Secretaries")).t);
+      const as = [...new Set([...sec.querySelectorAll('a[href*="/Inbox?viewAs="]')].map(a => (/viewAs=(\d+)/.exec(a.getAttribute("href")) || [])[1]).filter(Boolean))];
+      const seen = new Map();
+      for (const who of ["", ...as]) for (const d of await readInbox(who, since, max)) if (!seen.has(d.id)) seen.set(d.id, d);
+      const list = [...seen.values()], fresh = list.filter(d => !since || !lastOf(d) || lastOf(d) >= since).slice(0, +job.views || 150);
+      for (let i = 0; i < fresh.length; i += 4) { say(`قراءة الكتب ${Math.min(i + 4, fresh.length)} من ${fresh.length}`);
+        const got = await Promise.all(fresh.slice(i, i + 4).map(d => readView(d).catch(() => d))); got.forEach(g => seen.set(g.id, g)); }
+      return { ok: true, docs: [...seen.values()].map(({ viewAs, ...d }) => d), sources: 1 + as.length };
+    } catch (e) { return { ok: false, error: e instanceof Stop ? e.message : "خطأ غير متوقع: " + (e && e.message) }; }
+  }
+
   chrome.runtime.onMessage.addListener((msg, _s, reply) => {
     if (msg?.type === "wq-ping") { reply({ ok: true, path: location.pathname + location.search }); return; }
     if (msg?.type === "wq-fill") { run(msg.job).then(reply); return true; }
     if (msg?.type === "wq-verify") { verify(msg.job).then(reply); return true; }
+    if (msg?.type === "wq-read") { read(msg.job || {}).then(reply); return true; }
   });
 })();
