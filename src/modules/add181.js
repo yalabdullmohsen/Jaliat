@@ -10,6 +10,8 @@ vMosques = function(){ const t = S.f.mk181 === "les" ? "les" : "kh", keep = S.mo
   S.mosques = keep.filter(m => (t === "kh" ? kh : les).has(m.id)); S.f.mkind = ""; let h;
   try { h = _vMosques181(); } finally { S.mosques = keep; S.f.mkind = fk; }
   h = h.replace(/<select class="f" data-fk="mkind">[\s\S]*?<\/select>/, "");
+  /* خلية «مكافآت الخطب» تُضاف آخر الصف، فعنوانها يكون آخر الأعمدة أيضاً (كان بعد «الأنشطة» فتنزاح الأعمدة) */
+  if (h.includes("<th>مكافآت الخطب</th>")) { h = h.replace("<th>مكافآت الخطب</th>", ""); const i = h.indexOf("</tr>", h.indexOf("<thead")); if (i > 0) h = h.slice(0, i) + "<th>مكافآت الخطب</th>" + h.slice(i); }
   if (t === "les") h = h.replace(/<div class="check warn"><b>\d+ من \d+ مسجد خطباء[\s\S]*?<\/div>(?=<div class="toolbar">)/, "");
   const n = s => keep.filter(m => s.has(m.id)).length;
   const bar = `<div class="vg-bar mk181" role="tablist" aria-label="المساجد">${[["kh", "مساجد الجاليات (خطب الجمعة)", n(kh)], ["les", "مساجد الدروس والدورات", n(les)]].map(([k, l, c]) => `<button type="button" role="tab" aria-selected="${k === t}" class="${k === t ? "on" : ""}" data-mk181="${k}">${l} <span class="num">${c}</span></button>`).join("")}</div>`;
