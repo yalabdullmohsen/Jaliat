@@ -86,7 +86,7 @@ async function odxAuto(){ await odxLoad(); ODX.place = await odxGet("place");
   if (!ODX.last) { await odCfgLoad().catch(() => {}); if (OD.cfg?.last) ODX.last = OD.cfg.last; }
   odxBadge(); if (!odxDue()) return;
   await odxSave(false); if (!odxDue()) return;
-  if (!$("#odx-bar")) document.body.insertAdjacentHTML("beforeend", `<button type="button" id="odx-bar" data-odx="save">☁︎ احفظ نسخة اليوم في OneDrive</button>`); }
+  if (!$("#odx-bar")) document.body.insertAdjacentHTML("beforeend", `<button type="button" id="odx-bar" data-odx="save">${ei("cloud")}احفظ نسخة اليوم في OneDrive</button>`); }
 document.addEventListener("click", ev => { if (ev.target.closest("#odx-bar")) setTimeout(() => $("#odx-bar")?.remove(), 50); }, true);
 /* the old admin-only uploader now uses the same complete copy */
 odAuto = async function(){}; odRun = function(manual){ return odxSave(!!manual); };

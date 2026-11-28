@@ -55,12 +55,12 @@ function inqCheck(items){
     else if (sl && !sm) { out[i].bad.push({ t:`المحاضر نفسه في مسجدين بنفس الوقت (الصف ${j + 1})` }); out[j].bad.push({ t:`المحاضر نفسه في مسجدين بنفس الوقت (الصف ${i + 1})` }); } }
   return out;
 }
-function inqCard(R){ const c = R.c, x = c.x, k = R.bad.length ? "bad" : R.warn.length ? "warn" : "ok", ic = { bad:"✕", warn:"⚠", ok:"✓" }[k];
+function inqCard(R){ const c = R.c, x = c.x, k = R.bad.length ? "bad" : R.warn.length ? "warn" : "ok", ic = { bad:"✕", warn:"" + ei("warn") + "", ok:"✓" }[k];
   const row = (z, cls) => `<li class="${cls}">${z.open ? `<button type="button" class="inq-lk" data-prio-open="${esc(z.open)}">${esc(z.t)}</button>` : esc(z.t)}</li>`;
   return `<div class="inq-c ${k}"><div class="inq-h"><span class="inq-ic">${ic}</span><div><b>${esc(x.sheikh || "—")}</b><span>${esc([x.mosque ? "مسجد " + x.mosque.replace(/^مسجد\s*/, "") : "", x.area, inqWhen(c)].filter(Boolean).join(" · "))}</span></div></div>
     <ul>${R.bad.map(z => row(z, "b")).join("")}${R.warn.map(z => row(z, "w")).join("")}${R.ok.map(z => row(z, "o")).join("")}${!R.bad.length && !R.warn.length && !R.ok.length ? `<li class="o">لا تعارض مع أي نشاط أو كتاب</li>` : ""}</ul></div>`; }
 function inqPaint(){ const o = $("#inq-out"); if (!o) return; const b = INQ.res.reduce((n, R) => n + (R.bad.length ? 1 : 0), 0), w = INQ.res.reduce((n, R) => n + (!R.bad.length && R.warn.length ? 1 : 0), 0);
-  o.innerHTML = (INQ.name ? `<div class="inq-nm">📄 <b>${esc(INQ.name)}</b></div>` : "") + (INQ.st ? `<div class="inq-st">${INQ.st}</div>` : "");
+  o.innerHTML = (INQ.name ? `<div class="inq-nm">${ei("doc")}<b>${esc(INQ.name)}</b></div>` : "") + (INQ.st ? `<div class="inq-st">${INQ.st}</div>` : "");
   if (INQ.res.length) o.innerHTML += `<div class="inq-sum ${b ? "bad" : w ? "warn" : "ok"}"><b>${b ? `${b} من ${INQ.res.length} فيها تعارض` : w ? `لا تعارض حقيقي، و${w} فيها تنبيه` : `سليم: لا تعارض في الـ${INQ.res.length}`}</b><span>${esc(INQ.name)}</span></div>` + INQ.res.map(inqCard).join(""); }
 async function inqRun(bodies, name){ if (INQ.busy) return; INQ.busy = true; INQ.res = []; INQ.name = name || ""; const all = [];
   try { const t0 = Date.now(), msg = () => `<span class="spin"></span> يقرأ الذكاء الاصطناعي الكتاب${bodies.length > 1 ? ` (${bodies.length} ملفات معاً)` : ""}… ${Math.round((Date.now() - t0) / 1000)} ثانية`; INQ.st = msg(); inqPaint();
@@ -75,7 +75,7 @@ async function inqRun(bodies, name){ if (INQ.busy) return; INQ.busy = true; INQ.
 const _vAvail78 = vAvail;
 vAvail = function(){ const L = (S.wq || []).filter(w => w.dir === "out" && w.body).sort((a, b) => wqDate(b).localeCompare(wqDate(a))).slice(0, 40);
   return `<div class="inq"><div class="inq-top"><b>استعلام عن كتاب</b><span>ارفع الكتاب (PDF أو صورة، حتى عدة ملفات) أو اختر كتاباً من وثيقة أو ألصق نصه، فأفحص كل درس فيه مع الأنشطة والتصاريح وكتب وثيقة الجارية وأقول لك أين التعارض قبل الإرسال.</span>
-    <div class="inq-row"><label class="btn btn-primary">📎 ارفع الكتاب<input type="file" id="inq-file" accept="application/pdf,image/*" multiple hidden></label>
+    <div class="inq-row"><label class="btn btn-primary"><svg class="ei" aria-hidden="true"><use href="#i-paperclip"/></svg>ارفع الكتاب<input type="file" id="inq-file" accept="application/pdf,image/*" multiple hidden></label>
       ${L.length ? `<select class="f" id="inq-wq"><option value="">أو اختر كتاباً من وثيقة…</option>${L.map(w => `<option value="${esc(w.id)}">${esc(w.no || "مسودة")} · ${esc((w.subj || "").slice(0, 60))}</option>`).join("")}</select>` : ""}</div>
     <textarea class="f" id="inq-text" rows="3" placeholder="أو ألصق نص الكتاب هنا"></textarea><button type="button" class="btn" id="inq-go">استعلام عن النص</button></div>
     <div id="inq-out" class="inq-out"></div></div><h3 class="inq-sub">فحص سريع لموعد واحد</h3>${_vAvail78()}`; };
@@ -87,7 +87,7 @@ document.addEventListener("change", async ev => { const t = ev.target;
 document.addEventListener("click", ev => { if (ev.target.id !== "inq-go") return; const v = ($("#inq-text")?.value || "").trim(); if (v.length < 20) return toast("ألصق نص الكتاب أولاً"); inqRun([{ text:v }], "نص ملصوق"); });
 GUIDES.avail = { g:"الأنشطة والجدولة", d:"ارفع كتاباً وأعرف قبل الإرسال إن كان فيه تعارض مع أي نشاط أو تصريح أو كتاب في وثيقة.", s:[
   { sel:"#view label", txt:"ارفع الكتاب", t:"ارفع الكتاب", x:"PDF أو صورة، أو اختر كتاباً من وثيقة، أو ألصق نصه. يقرؤه الذكاء الاصطناعي ويفحص كل درس." },
-  { sel:"#inq-out", t:"النتيجة", x:"لكل درس: ✕ تعارض حقيقي، ⚠ تنبيه (مثل ممنوع بعد العشاء أو كتاب جارٍ بنفس الموعد)، ✓ سليم. اضغط على السبب لفتح النشاط أو الكتاب." },
+  { sel:"#inq-out", t:"النتيجة", x:"لكل درس: ✕ تعارض حقيقي، " + ei("warn") + "تنبيه (مثل ممنوع بعد العشاء أو كتاب جارٍ بنفس الموعد)، ✓ سليم. اضغط على السبب لفتح النشاط أو الكتاب." },
   { sel:"#view h3,#view b", txt:"فحص سريع لموعد واحد", up:".panel", t:"فحص سريع لموعد واحد", x:"اختر المسجد واليوم ووقت الصلاة، فيخبرك فوراً إن كان فيه نشاط آخر في الموعد نفسه." },
   { t:"حجز القاعات", x:"التبويب الثاني في هذه الصفحة: حجز قاعات المسجد الكبير مع التنبيه إن كانت القاعة محجوزة." }] };
 TOURS["g-avail"] = { title:"دليل: استعلام", steps:[{ t:"استعلام", x:GUIDES.avail.d + "<br><br>سنمرّ على أجزاء الصفحة واحداً واحداً. اضغط «التالي»." }, ...GUIDES.avail.s.map(z => ({ go:"avail", ...z }))] };

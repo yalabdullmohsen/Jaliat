@@ -4,8 +4,8 @@ const _permitForm63 = permitForm;
 permitForm = function(preset, grant){ _permitForm63(preset, grant); if (S.form?.kind !== "permit") return; PR.items = []; PR.meta = null;
   const L = (S.wq || []).filter(w => w.kind === "موافقة" || (w.dir === "in" && w.approval)).sort((a, b) => wqDate(b).localeCompare(wqDate(a))).slice(0, 40);
   $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<div class="pr-ai">
-    <div class="pr-h"><b>✨ تعبئة تلقائية من الكتاب</b><span>أرفق كتاب الموافقة، أو اختره من وثيقة، فيقرؤه الذكاء الاصطناعي ويعبّئ التصريح، ثم اضغط «إصدار التصريح».</span></div>
-    <div class="pr-row"><label class="btn btn-primary pr-up">📎 أرفق الكتاب (PDF أو صورة)<input type="file" id="pr-file" accept="application/pdf,image/*" hidden></label>
+    <div class="pr-h"><b><svg class="ei" aria-hidden="true"><use href="#i-spark"/></svg>تعبئة تلقائية من الكتاب</b><span>أرفق كتاب الموافقة، أو اختره من وثيقة، فيقرؤه الذكاء الاصطناعي ويعبّئ التصريح، ثم اضغط «إصدار التصريح».</span></div>
+    <div class="pr-row"><label class="btn btn-primary pr-up"><svg class="ei" aria-hidden="true"><use href="#i-paperclip"/></svg>أرفق الكتاب (PDF أو صورة)<input type="file" id="pr-file" accept="application/pdf,image/*" hidden></label>
       ${L.length ? `<select class="f" id="pr-wq"><option value="">أو اختر كتاب موافقة من وثيقة…</option>${L.map(w => `<option value="${esc(w.id)}">${esc(w.no || "")} · ${esc((w.subj || "").slice(0, 60))}</option>`).join("")}</select>` : ""}</div>
     <div id="pr-st" class="pr-st" hidden></div><div id="pr-items" class="pr-items" hidden></div></div>`); };
 const b64of = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = () => no(r.error); r.readAsDataURL(f); });
@@ -38,5 +38,5 @@ document.addEventListener("dragover", ev => { if (ev.target.closest?.(".pr-ai"))
 document.addEventListener("dragleave", ev => ev.target.closest?.(".pr-ai")?.classList.remove("drag"));
 document.addEventListener("drop", async ev => { const z = ev.target.closest?.(".pr-ai"); if (!z) return; ev.preventDefault(); z.classList.remove("drag"); const f = ev.dataTransfer?.files?.[0]; if (!f) return; const g = await prSmall(f); prRead({ b64:await b64of(g), mime:g.type || "application/pdf" }); });
 /* the guide mentions it */
-if (typeof GUIDES === "object" && GUIDES.permits) GUIDES.permits.s.splice(1, 0, { sel:"[data-pnew]", t:"التعبئة من الكتاب", x:"داخل «إصدار تصريح»: <b>«📎 أرفق الكتاب»</b> (PDF أو صورة، أو اسحبه للنافذة) أو اختر كتاب الموافقة من وثيقة، فيقرؤه الذكاء الاصطناعي ويعبّئ الشيخ والمسجد والتاريخ والوقت والمدة. إن كان فيه أكثر من درس تختار الدرس بضغطة. بعدها <b>«إصدار التصريح»</b>." });
+if (typeof GUIDES === "object" && GUIDES.permits) GUIDES.permits.s.splice(1, 0, { sel:"[data-pnew]", t:"التعبئة من الكتاب", x:"داخل «إصدار تصريح»: <b>«" + ei("paperclip") + "أرفق الكتاب»</b> (PDF أو صورة، أو اسحبه للنافذة) أو اختر كتاب الموافقة من وثيقة، فيقرؤه الذكاء الاصطناعي ويعبّئ الشيخ والمسجد والتاريخ والوقت والمدة. إن كان فيه أكثر من درس تختار الدرس بضغطة. بعدها <b>«إصدار التصريح»</b>." });
 if (typeof TOURS === "object" && TOURS["g-permits"] && GUIDES?.permits) TOURS["g-permits"].steps = [TOURS["g-permits"].steps[0], ...GUIDES.permits.s.map(s => ({ go:"permits", ...s }))];

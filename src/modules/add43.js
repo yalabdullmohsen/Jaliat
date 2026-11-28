@@ -75,7 +75,7 @@ function srProof(r){ const p = r.proof || {}, st = p.started || r.recorded_at, e
   const ok = p.rule ? p.in_rule !== false : null, hm = d => kwT(d).replace(/:\d\d (?=[صم])/, " ");
   const off = p.offline ? "سُجّل دون اتصال بالإنترنت وأُرسل لاحقاً؛ الوقت من ساعة الجوال" : "";
   const free = p.rule === "offline" && !p.offline;
-  const msg = off ? (ok === false ? `⚠ ${off}، وخارج وقت الخطبة/يوم الدرس` : `${off}`) : free ? (ok === false ? `⚠ سُجّل خارج وقت الخطبة/يوم الدرس (الساعة ${hm(st)})` : "✓ سُجّل في الوقت") : ok === null ? "" : ok === false ? `⚠ سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
+  const msg = off ? (ok === false ? `${ei("warn")}${off}، وخارج وقت الخطبة/يوم الدرس` : `${off}`) : free ? (ok === false ? `${ei("warn")}سُجّل خارج وقت الخطبة/يوم الدرس (الساعة ${hm(st)})` : "✓ سُجّل في الوقت") : ok === null ? "" : ok === false ? `${ei("warn")}سُجّل خارج وقت الخطبة (${hm(p.win_open)} إلى ${hm(p.win_close)})` : p.rule === "lesson_day" ? `✓ سُجّل في يوم الدرس${p.act_n ? ` (النشاط #${p.act_n})` : ""}` : p.rule === "request" ? "✓ سُجّل بطلب من القسم" : "✓ سُجّل في وقت الخطبة";
   return `<div class="sr-pf${ok === false ? " bad" : ok && !off ? " ok" : ""}">
     <div><span>التاريخ</span><b>${kwD(st)}</b></div><div><span>الوقت</span><b class="num">${kwT(st)} إلى ${kwT(en)}</b></div><div><span>المدة</span><b class="num">${mmss2(r.secs)}</b></div>${r.mosque ? `<div><span>المسجد</span><b>${esc(r.mosque)}</b></div>` : ""}
     ${msg ? `<p>${msg}</p>` : ""}

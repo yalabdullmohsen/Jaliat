@@ -42,9 +42,9 @@ intakeOpen = function(files){ _intakeOpen60(files); if (S.form?.kind !== "intake
   const inp = $("#iz-in"); if (inp) inp.accept = ATT_ACCEPT;
   const z = $("#iz"); if (z) { z.querySelector("svg")?.outerHTML && (z.querySelector("svg").outerHTML = `<svg width="30" height="30"><use href="#i-clip"/></svg>`); const b = z.querySelector("b"), s = z.querySelector(".s"); if (b) b.textContent = "اسحب أي ملف هنا، أو اضغط للاختيار"; if (s) s.textContent = "صورة، PDF، إكسل، وورد أو نص، يقرؤه Copilot ويضع كل معلومة في مكانها"; }
   const md = $(".iz-mode"); if (md && !(hasBridge() && brV() >= 1.1)) md.innerHTML = `<svg width="18" height="18"><use href="#i-clip"/></svg><span><b>Copilot غير متصل على هذا الجهاز</b><br><span class="s">سيقرأ النظام الملف بنفسه الآن. ولقراءة أدق بـ Copilot ركّب «جسر إنجاز» مرة واحدة.</span> <button type="button" class="btn btn-ghost" data-go="whatsapp" data-close>خطوات التركيب</button></span>`;
-  const tab = document.querySelector('#iz-tabs [data-izmode="file"]'); if (tab) tab.textContent = "📎 إرفاق ملف";
+  const tab = document.querySelector('#iz-tabs [data-izmode="file"]'); if (tab) tab.innerHTML = ei("paperclip") + "إرفاق ملف";
   $("#iz-go") && ($("#iz-go").lastChild.textContent = " اقرأ وضع كل شيء في مكانه");
-  const note = $("#iz-note")?.closest(".fld"); note?.insertAdjacentHTML("afterend", `<details class="lrn" id="lrn"><summary>📚 ما تعلّمه Copilot <span class="chip" id="lrn-n">…</span></summary>
+  const note = $("#iz-note")?.closest(".fld"); note?.insertAdjacentHTML("afterend", `<details class="lrn" id="lrn"><summary>${ei("book")}ما تعلّمه Copilot <span class="chip" id="lrn-n">…</span></summary>
     <span class="s">كل تصحيح تعمله في طلب قرأه Copilot يُحفظ هنا تلقائياً ويطبّقه في المرات القادمة. ويمكنك تعليمه قاعدة بنفسك:</span>
     <div class="lrn-add"><input class="f" id="lrn-in" placeholder="مثال: «مسجد الرحمن» في الجهراء اسمه في النظام «عبدالرحمن عوض»"><button type="button" class="btn" data-lrnadd>علّمه</button></div><div class="lrn-l" id="lrn-l"></div></details>`);
   lrnLoad().then(lrnPaint);
