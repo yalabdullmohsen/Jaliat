@@ -4,7 +4,7 @@
 @keyframes pal183{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:none}}
 .pal-in{padding:18px 20px;gap:12px;border-bottom:1px solid var(--line)}
 .pal-in svg{width:22px;height:22px;color:var(--primary)}
-.pal-in input{font-size:19px;font-weight:500;color:var(--ink)}
+.pal-in input{font-size:19px;font-weight:500;color:var(--ink);border:0!important;box-shadow:none!important;outline:0!important;background:none!important;padding:0}
 .pal-in input::placeholder{color:var(--n2,var(--muted));font-weight:400}
 .pal-in .kbd{font-size:11px;opacity:.7}
 .pal-l{padding:6px 8px 10px;scroll-padding:40px}
