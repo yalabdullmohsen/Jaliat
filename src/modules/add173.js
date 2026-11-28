@@ -7,14 +7,15 @@ const AIHUB_CTX = [
   { t:"تلخيص الطلب وترجمته", x:"افتح طلبًا من «طلبات المنسقين»: «لخّص الطلب» يعرضه في سطر مع المطلوب، و«ترجمة إلى العربية» للطلب المكتوب بلغة أخرى.", go:"inbox" },
   { t:"حل التعارض", x:"افتح نشاطًا فيه تعارض: «اقترح حلًّا للتعارض» يقترح وقتًا آخر أو مسجدًا متاحًا من بيانات المنصة، مع رسالة للمنسق.", go:"acts", f:{ st:"cf" } },
 ];
-const aihubAllowed = () => !!(S.canWrite || S.me);
+/* للموظف صاحب صلاحية الكتابة فقط (قرار المنسّق): المشاهد لا يرى العنصر ولا الصفحة، والرابط المباشر #aihub يعيده إلى الرئيسية */
+const aihubAllowed = () => !!S.canWrite;
 function vAiHub(){
-  if (!aihubAllowed()) return `<div class="panel"><div class="panel-b"><span class="s">المساعد الذكي متاح للموظفين بعد تسجيل الدخول.</span></div></div>`;
   const ctx = S.canWrite ? `<div class="panel aih-ctx"><div class="panel-h"><h3>في مكانها من المنصة</h3><span class="s">تحتاج كتابًا أو طلبًا أو نشاطًا مفتوحًا، فتظهر أزرارها هناك.</span></div><div class="panel-b"><div class="list">${AIHUB_CTX.map((c, i) => `<button type="button" class="li aih-go" data-aihgo="${i}"><span class="ic">${icon("i-spark", 15)}</span><span><span class="t">${esc(c.t)}</span><br><span class="s">${esc(c.x)}</span></span></button>`).join("")}</div></div></div>` : "";
   return `<div class="aih"><p class="aih-lead s">اقتراحات من المساعد الذكي تقرؤها وتعتمدها بنفسك، ولا يتغيّر شيء في المنصة تلقائيًا.</p>${aiBriefCard()}${qaBox()}${ctx}</div>`;
 }
 const _render173 = render;
 render = function(){ if (S.view !== "aihub") return _render173.apply(this, arguments);
+  if (!aihubAllowed()) { S.view = "home"; try { history.replaceState(null, "", "#home"); } catch(e) {} return render(); }
   $("#title").textContent = TITLES.aihub; $("#add-act").hidden = true; $("#view").innerHTML = vAiHub(); if (typeof afterRender === "function") afterRender("aihub"); };
 /* عنصر القائمة: بعد «الرئيسية» بأيقونة الشرارة، لمن له الصلاحية فقط */
 const _afterRender173 = afterRender;
