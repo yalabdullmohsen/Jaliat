@@ -180,7 +180,7 @@ html[dir=ltr] body{font-family:"IBM Plex Sans Arabic","Segoe UI",system-ui,-appl
 .tg-a{display:block;margin:0 auto 12px;background:none;border:0;font:inherit;color:var(--pri,#1f6b4f);font-weight:600;text-decoration:underline;cursor:pointer;min-height:44px;padding:8px}
 @media (prefers-reduced-motion:reduce){#tg *{transition:none!important;animation:none!important}}
 .sec-h{font-size:15px;font-weight:700;margin:16px 4px 8px}.sec-h .sub{font-weight:400}
-</style><link rel="stylesheet" href="brand/ui.css?v=1"></head><body>
+</style><link rel="stylesheet" href="brand/ui.css?v=1"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="brand/portal-clean.css?v=1"></head><body>
 <header class="bar"><div class="bar-in"><img class="mark" src="brand/bawaba-192.png" alt="" width="38" height="38" style="object-fit:cover"><div class="bar-t"><b>بوابة إنجاز</b><small id="cm">قسم الجاليات ورعاية المهتدين وطلبة البعوث</small></div><button type="button" class="lg" id="lgb" data-lgsheet aria-label="Language"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg></button><button type="button" class="av" id="av" hidden data-tab="me"></button></div></header>
 <main class="w" id="app"><div class="spin">جارٍ التحميل…</div></main>
 <nav class="tabs" id="tabs"></nav>
@@ -220,7 +220,7 @@ let LG="ar",DICT={};const LGI=()=>UI_LANGS.find(x=>x[0]===LG)||UI_LANGS[0];
 const LOC=()=>LGI()[4]+"-u-nu-latn";
 function _t(s,...a){s=String(s??"");let r=(LG!=="ar"&&DICT[s])||s;a.forEach((v,i)=>{r=r.split("{"+i+"}").join(v)});return r}
 const SEP=()=>LGI()[3]?"، ":", ";
-async function langLoad(c){if(c==="ar"){DICT={};return true}try{const r=await fetch("portal-i18n/"+c+".json?v=18");if(!r.ok)throw 0;DICT=await r.json();return true}catch(_){DICT={};return false}}
+async function langLoad(c){if(c==="ar"){DICT={};return true}try{const r=await fetch("portal-i18n/"+c+".json?v=19");if(!r.ok)throw 0;DICT=await r.json();return true}catch(_){DICT={};return false}}
 function langApply(){const L=LGI(),h=document.documentElement;h.lang=L[0];h.dir=L[3]?"rtl":"ltr";const bt=document.querySelector(".bar-t b");if(bt)bt.textContent=_t("بوابة إنجاز");document.title=_t("بوابة إنجاز")+" · "+_t("قسم الجاليات");const lb=$("lgb");if(lb){let n=lb.querySelector("span");if(!n){n=document.createElement("span");n.setAttribute("data-notr","");lb.appendChild(n)}n.textContent=L[1];lb.classList.add("named")}if(!S_){const cm=$("cm");if(cm)cm.textContent=_t("قسم الجاليات ورعاية المهتدين وطلبة البعوث")}}
 async function langInit(){const c=LS.g("lang");if(c&&c!=="ar"&&UI_LANGS.some(x=>x[0]===c)){if(await langLoad(c))LG=c}langApply();trObserve()}
 async function setLang(c){const sh0=$("lg-sh");if(sh0)sh0.remove();if(c===LG)return;document.body.style.cursor="progress";const ok=await langLoad(c);LG=ok?c:"ar";LS.s("lang",LG==="ar"?"":LG);document.body.style.cursor="";langApply();if(S_&&I){draw()}else if(S_){}else login()}
@@ -590,4 +590,8 @@ const hs=(location.hash.match(/^#s=([0-9a-f]+)/)||[])[1],oldR=/^#r=/.test(locati
 document.addEventListener("loadedmetadata",ev=>{const a=ev.target;if(a.tagName==="AUDIO"&&a.duration===Infinity&&!a.dataset.df){a.dataset.df="1";a.currentTime=1e7;a.addEventListener("timeupdate",function f(){a.removeEventListener("timeupdate",f);a.currentTime=0})}},true);
 const t0=hs||LS.g("s");langInit().then(()=>{if(oldR){mode="in";login(_t("أُوقف رابط تسجيل الخطباء القديم. الشيخ أو الخطيب يطلب حسابه من زر «أنا شيخ أو خطيب، طلب حساب»"))}else if(t0)enter(t0);else login()});
 document.addEventListener("change",ev=>{if(ev.target&&ev.target.id==="la"&&!(REC&&(REC.on||REC.url))){LS.s("la",ev.target.value);const y=scrollY;draw();scrollTo(0,y)}});
+
+/* تحديث 28/11/2026: القوائم الطويلة تعرض أول 6، والباقي بزر «عرض الكل» (نفس قاعدة إنجاز) */
+const CL_OPEN=new Set();function clLimit(){document.querySelectorAll("#app .card.list").forEach((L,i)=>{const k=tab+"|"+i;L.querySelectorAll(":scope>.cl-more").forEach(x=>x.remove());const it=[...L.children].filter(x=>!x.classList.contains("cl-more"));it.forEach(x=>x.classList.remove("cl-h"));if(CL_OPEN.has(k)||it.length<=8)return;it.forEach((x,j)=>x.classList.toggle("cl-h",j>=6));const b=document.createElement("button");b.type="button";b.className="cl-more";b.textContent=_t("عرض الكل")+" ("+it.length+")";b.onclick=()=>{CL_OPEN.add(k);clLimit()};L.appendChild(b)})}
+{const _draw=draw;draw=function(...a){const r=_draw.apply(this,a);try{clLimit()}catch(_){}return r}}
 </script></body></html>
