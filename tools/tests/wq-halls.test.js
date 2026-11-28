@@ -27,3 +27,11 @@ test("الترحيل: لا كتابة فوق حجز قائم، ولا تخمين
   assert.match(rb, /delete from public\.bookings where data->>'src' = 'watheqa';/);
   assert.doesNotMatch(rb, /delete from public\.bookings;/);
 });
+
+test("JL-HALLS-2: الحالة من الرد الوارد (موافقة، رفض، تحويل، غير واضح) بنصوص حقيقية، والرفض قبل الموافقة", () => {
+  const m = fs.readFileSync(require.resolve("../../docs/migrations/2026-11-28_wq_halls_replies.sql"), "utf8");
+  assert.match(m, /if t ~ no_re then return 'no'; end if;\s*if t ~ ok_re then return 'ok'; end if;/, "«غير متاح» تُفحص قبل «متاح»");
+  for (const no of ["2611-5137-03", "2610-2239", "2611-4785-02", "2601-6066", "2611-5137-02"]) assert.ok(m.includes(no), `مثال حقيقي ${no} في الاختبار الذاتي`);
+  assert.match(m, /st := 'مبدئي';/, "لا رد بعد = مبدئي");
+  assert.match(m, /update watheqa_hall_review set dismissed = true, reason = 'رُفض بالرد '/, "الرفض يحسم سؤال الطلب");
+});
