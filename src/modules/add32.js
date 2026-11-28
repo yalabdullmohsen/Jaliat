@@ -1,8 +1,8 @@
 /* ================= v32: «استقبال طلب»، خياران: إرفاق ملف/صورة، أو لصق نص → إدخال تلقائي مع تأكيد ================= */
 const _intakeOpen32 = intakeOpen;
 intakeOpen = function(files){ _intakeOpen32(files); if (S.form?.kind !== "intake") return; S.form.mode = "file";
-  $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<div class="seg iz-tabs" id="iz-tabs"><button type="button" class="on" data-izmode="file">📎 إرفاق ملف أو صورة</button><button type="button" data-izmode="paste">📋 لصق نص</button></div>
-    <div id="iz-paste" hidden><div class="iz-pbar"><button type="button" class="btn" data-izclip>📋 لصق من الحافظة</button><span class="s">انسخ نص الطلب (من الواتساب أو الإيميل أو أي مكان) والصقه هنا</span></div>
+  $(".drawer-b")?.insertAdjacentHTML("afterbegin", `<div class="seg iz-tabs" id="iz-tabs"><button type="button" class="on" data-izmode="file">${ei("paperclip")}إرفاق ملف أو صورة</button><button type="button" data-izmode="paste">${ei("clipb")}لصق نص</button></div>
+    <div id="iz-paste" hidden><div class="iz-pbar"><button type="button" class="btn" data-izclip><svg class="ei" aria-hidden="true"><use href="#i-clipb"/></svg>لصق من الحافظة</button><span class="s">انسخ نص الطلب (من الواتساب أو الإيميل أو أي مكان) والصقه هنا</span></div>
     <textarea class="f" id="iz-text" rows="9" placeholder="مثال:&#10;الجالية الفلبينية، مسجد العثمان، حولي&#10;درس ديني كل اثنين وأربعاء بعد صلاة المغرب&#10;المحاضر: الشيخ عبدالله&#10;المنسق: محمد، 99xxxxxx"></textarea></div>`); };
 function izMode(m){ S.form.mode = m; document.querySelectorAll("#iz-tabs button").forEach(b => b.classList.toggle("on", b.dataset.izmode === m));
   const P = $("#iz-paste"); if (P) P.hidden = m !== "paste"; for (const s of ["#iz", "#iz-files", ".iz-mode"]) { const e = $(s); if (e) e.hidden = m === "paste"; }
@@ -34,4 +34,4 @@ document.addEventListener("paste", ev => { if (S.form?.kind === "intake" && S.fo
 /* «الاقتراحات»، أسفل القائمة تحت «خروج»: اقتراح سريع يصل لرئيس القسم */
 (function(){ const lo = document.getElementById("logout"); if (!lo || document.getElementById("sugg-btn")) return;
   lo.parentElement.insertAdjacentHTML("afterend", `<button class="btn sugg-btn" id="sugg-btn" type="button"><span>الاقتراحات</span></button>`); })();
-document.addEventListener("click", ev => { if (ev.target.closest("#sugg-btn")) { $("#side")?.classList.remove("open"); const hd = S.profiles.find(p => p.username === "fayez") || S.profiles.find(p => p.role === "مدير"); qForm(null, { to:hd?.id, body:"💡 اقتراح: " }); } });
+document.addEventListener("click", ev => { if (ev.target.closest("#sugg-btn")) { $("#side")?.classList.remove("open"); const hd = S.profiles.find(p => p.username === "fayez") || S.profiles.find(p => p.role === "مدير"); qForm(null, { to:hd?.id, body:"اقتراح: " }); } });

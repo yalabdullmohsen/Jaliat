@@ -18,7 +18,7 @@ function vFix(){
     <div class="rn-seg fx-tabs">${tabs.map(([k, l, n]) => `<button type="button" class="${tab === k ? "on" : ""}" data-fixt="${k}">${l} <span class="num">${n}</span></button>`).join("")}</div>
     <div class="fx-l">${tab === "acts" ? (A.map(({ e, miss }) => `<button type="button" class="fx-i" data-prio-open="act:${e.id}"><span class="fx-n">#${e.n}</span><span class="fx-t"><b>${esc(e.type || "نشاط")} · ${esc(e.comm || "—")}</b><span>${esc(e.mosName || "—")} · ${esc(e.time || "—")}</span></span><span class="fx-m">${miss.map(m => `<i>${m}</i>`).join("")}</span></button>`).join("") || `<div class="fx-ok">✓ كل الأنشطة مكتملة</div>`)
       : tab === "comms" ? (C.map(c => `<button type="button" class="fx-i" data-go="coords"><span class="fx-n">!</span><span class="fx-t"><b>${esc(c)}</b><span>لا يوجد منسق برقم هاتف، أضفه من «المنسقون»</span></span><span class="fx-m"><i>المنسق</i></span></button>`).join("") || `<div class="fx-ok">✓ كل الجاليات لها منسق</div>`)
-      : (K.map(({ c, i }) => `<button type="button" class="fx-i" data-fixco="${i}"><span class="fx-n">☎</span><span class="fx-t"><b>${esc(c.name)}</b><span>${esc(c.comm || "")} · ${esc(c.role || "")}</span></span><span class="fx-m"><i>رقم الهاتف</i></span></button>`).join("") || `<div class="fx-ok">✓ كل المنسقين لهم أرقام</div>`)}</div></div>`;
+      : (K.map(({ c, i }) => `<button type="button" class="fx-i" data-fixco="${i}"><span class="fx-n">${ei("phone")}</span><span class="fx-t"><b>${esc(c.name)}</b><span>${esc(c.comm || "")} · ${esc(c.role || "")}</span></span><span class="fx-m"><i>رقم الهاتف</i></span></button>`).join("") || `<div class="fx-ok">✓ كل المنسقين لهم أرقام</div>`)}</div></div>`;
 }
 
 
@@ -79,7 +79,7 @@ document.addEventListener("click", async ev => { const t = ev.target.closest("bu
   if (D.ptcopy) { const ok = await cpCopy(portalURL(D.ptcopy)); return toast(ok ? "نُسخ رابط البوابة" : "تعذّر النسخ"); }
   if (D.ptwa) { const co = S.coords.find(k => k.comm === D.ptwa && k.phone && k.status !== "سابق"); return waOpen(co?.phone || "", portalMsg(D.ptwa, co)); }
 });
-document.addEventListener("change", ev => { if (ev.target.id === "vs-photo") { const l = $("#vs-photo-l"); if (l) l.textContent = ev.target.files?.[0] ? "📷 أُرفقت الصورة ✓" : "📷 التقط صورة"; } });
+document.addEventListener("change", ev => { if (ev.target.id === "vs-photo") { const l = $("#vs-photo-l"); if (l) l.innerHTML = ei("cam") + (ev.target.files?.[0] ? "أُرفقت الصورة ✓" : "التقط صورة"); } });
 /* sidebar: collapsible groups (remembered), the current page's group always open */
 function ngApply(){ let st = {}; try { st = JSON.parse(localStorage.getItem("ng") || "{}"); } catch (_) {}
   document.querySelectorAll("#nav .ng").forEach(g => { const cur = g.querySelector('[aria-current="page"]'); const cl = !cur && (st[g.dataset.g] === undefined ? true : !!st[g.dataset.g]); g.classList.toggle("cl", cl); g.querySelector(".sep")?.setAttribute("aria-expanded", String(!cl));

@@ -452,7 +452,7 @@ function issues(e){
   if (!e.sl && e.time !== undefined) out.push({lv:"warn", t:"الوقت غير محدد بدقة"});
   if (!e.lect) out.push({lv:"warn", t:"المحاضر غير مذكور"});
   if (e.doc && !e.doc_) out.push({lv:"warn", t:"الوثيقة غير مسجلة"});
-  if ((e.notes||"").includes("⚠")) out.push({lv:"warn", t:"تنبيه في الملاحظات"});
+  if ((e.notes||"").includes("⚠")) out.push({lv:"warn", t:"تنبيه في الملاحظات"}); // emoji-ok: بيانات/نص رسالة لا عرض
   return out;
 }
 const onDay = (e, d) => { const s = isoOf(d); return e.live && e.start <= s && e.end >= s && e.days.includes(d.getDay()); };

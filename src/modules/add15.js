@@ -24,7 +24,7 @@ function cfWhy(e, c){
 function cfPanel(e){
   if (!e?.cf?.length) return "";
   const fixes = [...altFixes(e), ...e.cf.flatMap(c => altFixes(c.o, 2))].slice(0, 7);
-  return `<div class="ai-an"><b>🧠 تحليل التعارض والحلول المقترحة</b>
+  return `<div class="ai-an"><b>${ei("spark")}تحليل التعارض والحلول المقترحة</b>
     ${e.cf.map(c => { const w = cfWhy(e, c); return `<div class="ai-why"><span>${esc(w.why)}</span><ul>${w.root.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>`; }).join("")}
     ${fixes.length ? `<span class="s">حلول خالية من أي تعارض (تم فحصها مع كل الأنشطة):</span><div class="ai-fix">${fixes.map(f => `<button type="button" class="btn" data-cffix="${esc(JSON.stringify(f))}">✓ ${esc(f.label)}</button>`).join("")}</div>` : `<span class="s">لا يوجد وقت أو يوم بديل خالٍ، الحل: تغيير المحاضر أو المسجد.</span>`}
     ${S.admin ? `<button type="button" class="btn btn-ghost" data-tkfrom="cf|${esc(e.id)}">أو أسند حل التعارض لموظف</button>` : ""}</div>`;
@@ -104,7 +104,7 @@ function qBadge(){ const b = document.querySelector('#nav [data-nav="questions"]
 function qCard(q){
   const mine = q.from_id === S.me?.id, toMe = q.to_id === S.me?.id;
   return `<button type="button" class="tk ${q.answer ? "done" : toMe ? "late" : ""}" data-q="${q.id}"><div class="rq-h"><b class="num rq-no">س-${q.no}</b>${q.answer ? `<span class="chip ok">أُجيب</span>` : q.seen_at ? `<span class="chip t1">قُرئ</span>` : `<span class="chip gold">لم يُقرأ</span>`}<span class="s">${ago(q.created_at)}</span></div>
-    <span class="s">${mine ? `إلى ${esc(pname(q.to_id))}` : `من ${esc(pname(q.from_id))}${toMe ? "" : ` إلى ${esc(pname(q.to_id))}`}`}</span><b>${esc(q.body.slice(0, 160))}</b>${q.answer ? `<span class="s">💬 ${esc(q.answer.slice(0, 140))}</span>` : ""}</button>`;
+    <span class="s">${mine ? `إلى ${esc(pname(q.to_id))}` : `من ${esc(pname(q.from_id))}${toMe ? "" : ` إلى ${esc(pname(q.to_id))}`}`}</span><b>${esc(q.body.slice(0, 160))}</b>${q.answer ? `<span class="s">${ei("chat")}${esc(q.answer.slice(0, 140))}</span>` : ""}</button>`;
 }
 function vQuestions(){
   const tab = S.f.qt || "in", me = S.me.id;
@@ -126,7 +126,7 @@ function qForm(id, preset){
   openDrawer(`السؤال س-${q.no}`, `<div class="q-meta"><span>من <b>${esc(pname(q.from_id))}</b> إلى <b>${esc(pname(q.to_id))}</b></span><span class="s">${fmtTime(q.created_at)}${q.seen_at ? ` · قُرئ ${fmtTime(q.seen_at)}` : " · لم يُقرأ بعد"}</span></div>
     <div class="q-body">${esc(q.body).replace(/\n/g, "<br>")}</div>
     ${q.link ? linkBtn(q.link) : ""}
-    ${toMe || S.admin ? fld("q-ans", q.answer ? `الإجابة${q.answered_at ? "، " + fmtTime(q.answered_at) : ""}` : "إجابتك", `<textarea class="f" id="q-ans" rows="5" placeholder="اكتب الإجابة…">${esc(q.answer || "")}</textarea>`) : q.answer ? `<div class="q-ans"><b>💬 الإجابة</b><span class="s">${fmtTime(q.answered_at)}</span><div>${esc(q.answer).replace(/\n/g, "<br>")}</div></div>` : `<div class="empty s">لم تصل إجابة بعد</div>`}`,
+    ${toMe || S.admin ? fld("q-ans", q.answer ? `الإجابة${q.answered_at ? "، " + fmtTime(q.answered_at) : ""}` : "إجابتك", `<textarea class="f" id="q-ans" rows="5" placeholder="اكتب الإجابة…">${esc(q.answer || "")}</textarea>`) : q.answer ? `<div class="q-ans"><b>${ei("chat")}الإجابة</b><span class="s">${fmtTime(q.answered_at)}</span><div>${esc(q.answer).replace(/\n/g, "<br>")}</div></div>` : `<div class="empty s">لم تصل إجابة بعد</div>`}`,
     `${toMe || S.admin ? `<button class="btn btn-primary" data-qans>${q.answer ? "تعديل الإجابة" : "إرسال الإجابة"}</button>` : ""}${q.from_id === S.me.id && !q.answer ? `<button class="btn btn-ghost" data-qnew="${q.to_id}">سؤال آخر لنفس الشخص</button>` : ""}<button class="btn btn-ghost" data-close>إغلاق</button>`);
   if (toMe && !q.seen_at) { q.seen_at = new Date().toISOString(); sb.from("questions").update({ seen_at:q.seen_at }).eq("id", q.id).then(() => {}); }
 }
@@ -145,7 +145,7 @@ const _openLink15 = openLink;
 openLink = function(h){ const s = String(h || "").replace(/^#/, ""); if (s.startsWith("q:")) { if (S.view !== "questions") go("questions"); return qForm(s.slice(2)); } return _openLink15(h); };
 /* ask from any task */
 const _taskForm15 = taskForm;
-taskForm = function(id, preset){ _taskForm15(id, preset); const t = id && S.tasks.find(x => x.id === id); if (!t) return; const other = t.assignee === S.me.id ? t.assigner : t.assignee; if (other && other !== S.me.id) $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-ghost" type="button" data-qnew="${other}" data-qlink="#task:${t.id}">❓ اسأل ${esc(pname(other))}</button>`); };
+taskForm = function(id, preset){ _taskForm15(id, preset); const t = id && S.tasks.find(x => x.id === id); if (!t) return; const other = t.assignee === S.me.id ? t.assigner : t.assignee; if (other && other !== S.me.id) $(".drawer-f [data-close]")?.insertAdjacentHTML("beforebegin", `<button class="btn btn-ghost" type="button" data-qnew="${other}" data-qlink="#task:${t.id}">${ei("help")}اسأل ${esc(pname(other))}</button>`); };
 const _palAll15q = palAll;
 palAll = function(){ const A = _palAll15q(); A.unshift({ g:"إجراءات", t:"توجيه سؤال لموظف", s:"", ic:"i-chat", run:() => qForm(null), txt:"سؤال اسئله اسال موظف" }); return A; };
 const _alerts15 = alerts;

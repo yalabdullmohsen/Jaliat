@@ -117,7 +117,7 @@ const hallByText = t => { const k = nkey(t || ""); return HALLS.find(h => k && (
 PRIME_MSG = PRIME_MSG.replace("مثال:", `- {"op":"add_booking","hall":"مسرح ثنيان الغانم | مسرح النساء | القاعة الكبرى | مسرح الإدارة","day":"YYYY-MM-DD","from":"18:00","to":"20:00","title":"","comm":"","coord":"","phone":"","count":0,"status":"مؤكد|مبدئي"}  ← حجز قاعة (ثنيان الغانم: مسرح واحد؛ المسجد الكبير: مسرح النساء والقاعة الكبرى ومسرح الإدارة). تحقق من جدول الحجوزات في الملف قبل الحجز.
 مثال:`);
 const _describe12 = describe;
-describe = function(a){ if (a.op === "add_booking") { const h = hallByText(a.hall); const c = h && bkClash(h.id, a.day, a.from, a.to).length; return ["حجز قاعة", `${h ? hallName(h.id) : a.hall + " (غير معروفة)"}، ${fmt(a.day)}، ${t12(a.from)} إلى ${t12(a.to)}، ${a.title || a.comm || ""}${c ? " ⚠ محجوزة" : ""}`, c ? "bad" : "ok"]; } return _describe12(a); };
+describe = function(a){ if (a.op === "add_booking") { const h = hallByText(a.hall); const c = h && bkClash(h.id, a.day, a.from, a.to).length; return ["حجز قاعة", `${h ? hallName(h.id) : a.hall + " (غير معروفة)"}، ${fmt(a.day)}، ${t12(a.from)} إلى ${t12(a.to)}، ${a.title || a.comm || ""}${c ? " محجوزة" : ""}`, c ? "bad" : "ok"]; } return _describe12(a); };
 const _runAction12 = runAction;
 runAction = async function(a){
   if (a.op !== "add_booking") return _runAction12(a);

@@ -92,7 +92,7 @@ describe = function(a){
   if (a.op === "add_request") { const d = a.data || {}; return ["تسجيل طلب وارد", `${d.org || ""}، ${d.comm || ""}، ${(d.acts || []).length} نشاط${d.issues ? "، نواقص: " + d.issues : ""}`, "gold"]; }
   if (a.op === "log_attendance") return [`حضور النشاط #${a.n}`, `${fmt(a.day)}، الحضور ${a.cnt || 0}، مهتدون ${a.converts || 0}`, "ok"];
   const r = _describe11(a);
-  if (a.op === "add_act") { try { const m = actMatch(tolAct(a.data)); if (m) r[1] += ` ⚠ مشابه للنشاط #${m.n}`; } catch (_) {} }
+  if (a.op === "add_act") { try { const m = actMatch(tolAct(a.data)); if (m) r[1] += `، مشابه للنشاط #${m.n}`; } catch (_) {} }
   return r;
 };
 const _runAction11 = runAction;
@@ -386,7 +386,7 @@ function vWeekly(){
 }
 function weekText(){
   const W = weekRows();
-  return `📅 جدول أنشطة ${S.f.wkc || "الجاليات"}، من ${fmt(W[0].iso)} إلى ${fmt(W[6].iso)}\n` + W.filter(x => x.L.length).map(x => `\n*${DAYS[x.d.getDay()]} ${fmt(x.iso)}*\n` + x.L.map(a => `• ${a.time || ""}، ${a.mosName} (${a.area})، ${a.lect || ""}${S.f.wkc ? "" : "، " + a.comm}`).join("\n")).join("\n") + SIGN;
+  return `📅 جدول أنشطة ${S.f.wkc || "الجاليات"}، من ${fmt(W[0].iso)} إلى ${fmt(W[6].iso)}\n` + W.filter(x => x.L.length).map(x => `\n*${DAYS[x.d.getDay()]} ${fmt(x.iso)}*\n` + x.L.map(a => `• ${a.time || ""}، ${a.mosName} (${a.area})، ${a.lect || ""}${S.f.wkc ? "" : "، " + a.comm}`).join("\n")).join("\n") + SIGN; // emoji-ok: بيانات/نص رسالة لا عرض
 }
 function printArea(sel2){ document.querySelectorAll(".print-area.on").forEach(x => x.classList.remove("on")); const el = $(sel2); if (!el) return; el.classList.add("on"); document.body.classList.add("print-any"); setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove("print-any"); el.classList.remove("on"); }, 500); }, 50); }
 

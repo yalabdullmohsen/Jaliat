@@ -4,7 +4,7 @@ const aiReqInput = r => { const d = { ...(r.data || {}) }; delete d.ack; delete 
   return { no:r.no, status:r.status, fields:keep }; };
 const _reqForm100 = reqForm;
 reqForm = async function(id){ await _reqForm100(id); const r = S.reqs.find(x => x.id === id); if (!r || S.form?.kind !== "req") return;
-  $("#drawer .rq-tools")?.insertAdjacentHTML("beforebegin", `<div class="ai-row">${aiBtn(`data-aireq="${esc(id)}"`, "✨ لخّص الطلب", "سطر واحد مع المطلوب من المساعد الذكي")}<div class="ai-host"></div></div>`); };
+  $("#drawer .rq-tools")?.insertAdjacentHTML("beforebegin", `<div class="ai-row">${aiBtn(`data-aireq="${esc(id)}"`, "لخّص الطلب", "سطر واحد مع المطلوب من المساعد الذكي")}<div class="ai-host"></div></div>`); };
 document.addEventListener("click", async ev => { const t = ev.target.closest("[data-aireq]"); if (!t) return;
   const r = S.reqs.find(x => String(x.id) === t.dataset.aireq), host = t.parentElement.querySelector(".ai-host"); if (!r || !host) return;
   aiBusy(t, true); const a = await aiCall("req_summary", aiReqInput(r)); aiBusy(t, false);
